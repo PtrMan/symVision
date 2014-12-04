@@ -6,6 +6,13 @@ package Datastructures;
  */
 public class Map2d<Type>
 {
+    public Map2d(int width, int length)
+    {
+        this.width = width;
+        this.length = length;
+        this.array = (Type[])new Object[width*length];
+    }
+    
     public Type getAt(int x, int y)
     {
         if( x < 0 || x > width || y < 0 || y > length )

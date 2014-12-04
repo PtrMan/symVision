@@ -22,6 +22,12 @@ public class ProcessA
         public int altitude = 0;
     }
     
+    public void setWorkingImage(Map2d<Boolean> image)
+    {
+        // TODO< copy >
+        workingImage = image;
+    }
+    
     // TODO< sample as long as the hit/miss ratio is large enought >
     /**
      * 
@@ -62,6 +68,6 @@ public class ProcessA
         samples.add(new Sample(new Vector2d<Integer>(x, y)));
     }
     
-    private Random random;
+    private Random random = new Random();
     private Map2d<Boolean> workingImage;
 }

@@ -18,6 +18,12 @@ import math.DistinctUtility;
  */
 public class ProcessD
 {
+    /**
+     * 
+     * Invariants:
+     *    * a.x < b.x
+     * 
+     */
     public static class LineDetector
     {
         public static LineDetector createFromIntegerPositions(Vector2d<Integer> a, Vector2d<Integer> b, ArrayList<Integer> integratedSampleIndices)
@@ -27,13 +33,48 @@ public class ProcessD
             createdDetector = new LineDetector();
             createdDetector.aFloat = new Vector2d<Float>((float)a.x, (float)a.y);
             createdDetector.bFloat = new Vector2d<Float>((float)b.x, (float)b.y);
+            createdDetector.fullfillABInvariant();
             createdDetector.integratedSampleIndices = integratedSampleIndices;
             
             // calculate m, n
-            createdDetector.m = (b.x-a.x)/(b.y-a.y);
+            createdDetector.m = (b.y-a.y)/(b.x-a.x);
             createdDetector.n = a.y - a.y * createdDetector.m;
             
             return createdDetector;
+        }
+        
+        public static LineDetector createFromFloatPositions(Vector2d<Float> a, Vector2d<Float> b, ArrayList<Integer> integratedSampleIndices)
+        {
+            LineDetector createdDetector;
+            
+            createdDetector = new LineDetector();
+            createdDetector.aFloat = a;
+            createdDetector.bFloat = b;
+            createdDetector.fullfillABInvariant();
+            createdDetector.integratedSampleIndices = integratedSampleIndices;
+            
+            // calculate m, n
+            createdDetector.m = (b.y-a.y)/(b.x-a.x);
+            createdDetector.n = a.y - a.y * createdDetector.m;
+            
+            return createdDetector;
+        }
+        
+        /**
+         * 
+         * swaps a and b if necessary to fullfil the invariant
+         * 
+         */
+        private void fullfillABInvariant()
+        {
+            if( aFloat.x > bFloat.x )
+            {
+                Vector2d<Float> temp;
+                
+                temp = aFloat;
+                aFloat = bFloat;
+                bFloat = temp;
+            }
         }
         
         public boolean doesContainSampleIndex(int index)
@@ -66,6 +107,26 @@ public class ProcessD
             dotProduct = diffAB.x * diffAPosition.x + diffAB.y * diffAPosition.y;
             
             return dotProduct > 0.0f && dotProduct < length;
+        }
+        
+        public Vector2d<Float> getAProjected()
+        {
+            // TODO< project aFloat onto line defined by m and n >
+            return aFloat;
+        }
+        
+        public Vector2d<Float> getBProjected()
+        {
+            // TODO< project bFloat onto line defined by m and n >
+            return bFloat;
+        }
+        
+        public Vector2d<Float> getProjectedNormalizedDirector()
+        {
+            Vector2d<Float> diff;
+            
+            diff = Vector2d.FloatHelper.sub(getAProjected(), getBProjected());
+            return Vector2d.FloatHelper.normalize(diff);
         }
     }
     
@@ -131,7 +192,7 @@ public class ProcessD
                     int sampleIndex;
                     
                     
-                    sampleIndex = iteratorDetector.integratedSampleIndices.get(sampleI);
+                    sampleIndex = iteratorDetector.integratedSampleIndices.get(sampleIndexI);
                     currentSample = samples.get(sampleIndex);
                     
                     regression.addData((float)currentSample.position.y, (float)currentSample.position.x);
@@ -162,7 +223,7 @@ public class ProcessD
         return new Vector2d<Float>((float)vector.x, (float)vector.y);
     }
     
-    public Random random;
+    public Random random = new Random();
     
     private final static float MAXMSE = 4.0f; // max mean square error for inclusion of a point
 }
