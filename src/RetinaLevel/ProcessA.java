@@ -5,6 +5,7 @@ import Datastructures.Vector2d;
 import bpsolver.Parameters;
 import java.util.ArrayList;
 import java.util.Random;
+import math.RandomUtil;
 
 /**
  *
@@ -37,6 +38,7 @@ public class ProcessA
         
     }
     
+    
     public void setWorkingImage(Map2d<Boolean> image)
     {
         workingImage = image.clone();
@@ -56,29 +58,38 @@ public class ProcessA
         int hitCount;
         int sampleCount;
         int checkCounter;
+        int samplePositionsI;
         
-        final float CHECKAFTERITERATIONS = 1000;
+        final float CHECKAFTERITERATIONS = 3000;
         
         resultSamples = new ArrayList<>();
         
         hitCount = 0;
         sampleCount = 0;
         checkCounter = 0;
+        samplePositionsI = 0;
+        
+        resizeSamplePositionsForSize(workingImage.getWidth(), workingImage.getLength());
         
         for(;;)
         {
             int x, y;
             boolean readBoolean;
+            Vector2d<Integer> samplePosition;
             
-            x = random.nextInt(workingImage.getWidth());
-            y = random.nextInt(workingImage.getLength());
-            
-            readBoolean = workingImage.readAt(x, y);
+            // if the array with the precomputed sample positions is depleated we exit
+            if( samplePositions.length <= samplePositionsI )
+            {
+                break;
+            }
+            samplePosition = samplePositions[samplePositionsI];
+
+            readBoolean = workingImage.readAt(samplePosition.x, samplePosition.y);
             
             if( readBoolean )
             {
-                addSampleToList(resultSamples, x, y);
-                workingImage.setAt(x, y, false);
+                addSampleToList(resultSamples, samplePosition.x, samplePosition.y);
+                workingImage.setAt(samplePosition.x, samplePosition.y, false);
                 
                 hitCount++;
             }
@@ -93,9 +104,9 @@ public class ProcessA
                 }
             }
             
-            
             sampleCount++;
             checkCounter++;
+            samplePositionsI++;
         }
         
         return resultSamples;
@@ -106,6 +117,33 @@ public class ProcessA
         samples.add(new Sample(new Vector2d<Integer>(x, y)));
     }
     
+    private void resizeSamplePositionsForSize(int width, int height)
+    {
+        int samplePositionsArraySize;
+        int i;
+        
+        samplePositionsArraySize = (int)Math.round((float)(width*height)*(3.0f/4.0));
+
+        if( samplePositions.length >= samplePositionsArraySize )
+        {
+            return;
+        }
+        
+        samplePositions = new Vector2d[samplePositionsArraySize];
+        
+        for( i = 0; i < samplePositionsArraySize; i++ )
+        {
+            int vectorX, vectorY;
+            
+            vectorX = Math.round(RandomUtil.radicalInverse(i, 2)*(float)(width-1));
+            vectorY = Math.round(RandomUtil.radicalInverse(i, 3)*(float)(height-1));
+
+            samplePositions[i] = new Vector2d<Integer>(vectorX, vectorY);
+        }
+    }
+    
     private Random random = new Random();
     private Map2d<Boolean> workingImage;
+    
+    private Vector2d<Integer>[] samplePositions = new Vector2d[0];
 }

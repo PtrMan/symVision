@@ -17,7 +17,7 @@ public class Map2d<Type>
     
     public Type readAt(int x, int y)
     {
-        if( x < 0 || x > width || y < 0 || y > length )
+        if( x < 0 || x >= width || y < 0 || y >= length )
         {
             throw new RuntimeException("access error");
         }
