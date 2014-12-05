@@ -82,5 +82,10 @@ public class Vector2d<Type>
         {
             return (float)Math.sqrt(vector.x*vector.x + vector.y*vector.y);
         }
+        
+        public static Vector2d<Float> getScaled(Vector2d<Float> a, float value)
+        {
+            return new Vector2d<Float>(a.x*value, a.y*value);
+        }
     }
 }

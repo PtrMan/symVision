@@ -121,7 +121,7 @@ public class ProcessD
             return bFloat;
         }
         
-        public Vector2d<Float> getProjectedNormalizedDirector()
+        public Vector2d<Float> getProjectedNormalizedDirection()
         {
             Vector2d<Float> diff;
             

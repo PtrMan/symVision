@@ -1,6 +1,11 @@
 package RetinaLevel;
 
 import Datastructures.Vector2d;
+import static Datastructures.Vector2d.FloatHelper.dot;
+import static Datastructures.Vector2d.FloatHelper.getScaled;
+import static Datastructures.Vector2d.FloatHelper.sub;
+import static Datastructures.Vector2d.FloatHelper.add;
+import static Datastructures.Vector2d.FloatHelper.getLength;
 import java.util.ArrayList;
 
 /**
@@ -51,24 +56,8 @@ public class ProcessH
     
     private static boolean canDetectorsBeFused(ProcessD.LineDetector detectorA, ProcessD.LineDetector detectorB)
     {
-        Vector2d<Float> normalizedDirectionA, normalizedDirectionB;
-        float dotResult;
         Vector2d<Float> projectedABegin, projectedAEnd;
         Vector2d<Float> projectedBBegin, projectedBEnd;
-        
-        final float MINDOTRESULTFORCONSIDERATION = 0.9f;
-        
-        normalizedDirectionA = detectorA.getProjectedNormalizedDirector();
-        normalizedDirectionB = detectorB.getProjectedNormalizedDirector();
-        
-        // TODO< projecting the points on the other line and measuring the distance is much better than this angle stuff >
-        dotResult = Vector2d.FloatHelper.dot(normalizedDirectionA, normalizedDirectionB);
-        
-        if( dotResult < MINDOTRESULTFORCONSIDERATION )
-        {
-            return false;
-        }
-        // here else
         
         projectedABegin = detectorA.getAProjected();
         projectedAEnd = detectorA.getBProjected();
@@ -89,10 +78,30 @@ public class ProcessH
             projectedBEnd = tempEnd;
         }
         
-        return vectorXBetween(projectedABegin, projectedAEnd, projectedBBegin) && vectorXBetween(projectedBBegin, projectedBEnd, projectedAEnd);
+        if( vectorXBetween(projectedABegin, projectedAEnd, projectedBBegin) && vectorXBetween(projectedBBegin, projectedBEnd, projectedAEnd) )
+        {
+        }
+        else
+        {
+            return false;
+        }
+        
+        // projecting the points on the other line and measue the distance
+        
+        if( !isProjectedPointOntoLineBelowDistanceLimit(projectedBBegin, detectorA) )
+        {
+            return false;
+        }
+        
+        if( !isProjectedPointOntoLineBelowDistanceLimit(projectedAEnd, detectorB) )
+        {
+            return false;
+        }
+        
+        return true;
     }
     
-    private ProcessD.LineDetector fuseLineDetectors(ProcessD.LineDetector detectorA, ProcessD.LineDetector detectorB)
+    private static ProcessD.LineDetector fuseLineDetectors(ProcessD.LineDetector detectorA, ProcessD.LineDetector detectorB)
     {
         Vector2d<Float> projectedABegin, projectedAEnd;
         Vector2d<Float> projectedBBegin, projectedBEnd;
@@ -129,4 +138,30 @@ public class ProcessH
     {
         return value.x > min.x && value.x < max.x;
     }
+    
+    private static boolean isProjectedPointOntoLineBelowDistanceLimit(Vector2d<Float> point, ProcessD.LineDetector line)
+    {
+        Vector2d<Float> projectedPoint;
+        float distanceBetweenProjectedAndPoint;
+        
+        projectedPoint = projectPointOntoLine(point, line);
+        distanceBetweenProjectedAndPoint = getLength(sub(projectedPoint, point));
+        
+        return distanceBetweenProjectedAndPoint < MAXDISTANCEFORCANDIDATEPOINT;
+    }
+    
+    private static Vector2d<Float> projectPointOntoLine(Vector2d<Float> point, ProcessD.LineDetector line)
+    {
+        Vector2d<Float> lineDirection;
+        Vector2d<Float> diffFromAToPoint;
+        float dotResult;
+        
+        lineDirection = line.getProjectedNormalizedDirection();
+        diffFromAToPoint = sub(point, line.getAProjected());
+        dotResult = dot(lineDirection, diffFromAToPoint);
+        
+        return add(line.getAProjected(), getScaled(lineDirection, dotResult));
+    }
+    
+    private static final float MAXDISTANCEFORCANDIDATEPOINT = 3.0f;
 }
