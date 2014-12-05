@@ -1,5 +1,7 @@
 package Datastructures;
 
+import static java.lang.System.arraycopy;
+
 /**
  *
  * 
@@ -13,7 +15,7 @@ public class Map2d<Type>
         this.array = (Type[])new Object[width*length];
     }
     
-    public Type getAt(int x, int y)
+    public Type readAt(int x, int y)
     {
         if( x < 0 || x > width || y < 0 || y > length )
         {
@@ -41,6 +43,16 @@ public class Map2d<Type>
     public int getLength()
     {
         return length;
+    }
+    
+    public Map2d<Type> clone()
+    {
+        Map2d<Type> cloned;
+        
+        cloned = new Map2d<>(width, length);
+        arraycopy(array, 0, cloned.array, 0, array.length);
+        
+        return cloned;
     }
     
     private int width;

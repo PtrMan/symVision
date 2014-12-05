@@ -13,19 +13,32 @@ public class ProcessA
 {
     public static class Sample
     {
+        public enum EnumType
+        {
+            ENDOSCELETON,
+            EXOSCELETON
+        }
+        
         public Sample(Vector2d<Integer> position)
         {
             this.position = position;
         }
         
+        public boolean isAltidudeValid()
+        {
+            return altitude != -1;
+        }
+        
         public Vector2d<Integer> position;
-        public int altitude = 0;
+        public int altitude = -1;
+        public EnumType type;
+        
+        
     }
     
     public void setWorkingImage(Map2d<Boolean> image)
     {
-        // TODO< copy >
-        workingImage = image;
+        workingImage = image.clone();
     }
     
     // TODO< sample as long as the hit/miss ratio is large enought >
@@ -51,7 +64,7 @@ public class ProcessA
             x = random.nextInt(workingImage.getWidth());
             y = random.nextInt(workingImage.getLength());
             
-            readBoolean = workingImage.getAt(x, y);
+            readBoolean = workingImage.readAt(x, y);
             
             if( readBoolean )
             {

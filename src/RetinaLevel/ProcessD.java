@@ -132,21 +132,24 @@ public class ProcessD
     
     /**
      * 
-     * 
+     * \param samples doesn't need to be filtered for endo/exosceleton points, it does it itself
      * 
      * \return only the surviving line segments
      */
     public ArrayList<LineDetector> detectLines(ArrayList<ProcessA.Sample> samples)
     {
+        ArrayList<ProcessA.Sample> workingSamples;
         ArrayList<LineDetector> resultLineDetectors;
         int sampleI;
         
         resultLineDetectors = new ArrayList<>();
         
-        for( sampleI = 0; sampleI < samples.size(); sampleI++ )
+        workingSamples = filterEndosceletonPoints(samples);
+        
+        for( sampleI = 0; sampleI < workingSamples.size(); sampleI++ )
         {
             // to form a new line detector form a new linedetector by choosing two points at random
-            ArrayList<Integer> sampleIndicesForInitialLine = DistinctUtility.getTwoDisjunctNumbers(random, samples.size());
+            ArrayList<Integer> sampleIndicesForInitialLine = DistinctUtility.getTwoDisjunctNumbers(random, workingSamples.size());
 
             // create new line detector
             LineDetector createdLineDetector;
@@ -157,7 +160,7 @@ public class ProcessD
             sampleIndexA = sampleIndicesForInitialLine.get(0);
             sampleIndexB = sampleIndicesForInitialLine.get(1);
 
-            createdLineDetector = LineDetector.createFromIntegerPositions(samples.get(sampleIndexA).position, samples.get(sampleIndexB).position, sampleIndicesForInitialLine);
+            createdLineDetector = LineDetector.createFromIntegerPositions(workingSamples.get(sampleIndexA).position, workingSamples.get(sampleIndexB).position, sampleIndicesForInitialLine);
 
             resultLineDetectors.add(createdLineDetector);
             
@@ -168,7 +171,7 @@ public class ProcessD
             {
                 ProcessA.Sample currentSample;
                 
-                currentSample = samples.get(sampleI);
+                currentSample = workingSamples.get(sampleI);
                 
                 if( iteratorDetector.doesContainSampleIndex(sampleI) )
                 {
@@ -193,7 +196,7 @@ public class ProcessD
                     
                     
                     sampleIndex = iteratorDetector.integratedSampleIndices.get(sampleIndexI);
-                    currentSample = samples.get(sampleIndex);
+                    currentSample = workingSamples.get(sampleIndex);
                     
                     regression.addData((float)currentSample.position.y, (float)currentSample.position.x);
                 }
@@ -221,6 +224,23 @@ public class ProcessD
     private static Vector2d<Float> convertVectorToFloat(Vector2d<Integer> vector)
     {
         return new Vector2d<Float>((float)vector.x, (float)vector.y);
+    }
+    
+    private static ArrayList<ProcessA.Sample> filterEndosceletonPoints(ArrayList<ProcessA.Sample> samples)
+    {
+        ArrayList<ProcessA.Sample> filtered;
+        
+        filtered = new ArrayList<>();
+        
+        for( ProcessA.Sample iterationSample : samples )
+        {
+            if( iterationSample.type == ProcessA.Sample.EnumType.ENDOSCELETON )
+            {
+                filtered.add(iterationSample);
+            }
+        }
+        
+        return filtered;
     }
     
     public Random random = new Random();
