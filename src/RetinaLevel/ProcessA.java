@@ -2,6 +2,7 @@ package RetinaLevel;
 
 import Datastructures.Map2d;
 import Datastructures.Vector2d;
+import bpsolver.Parameters;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -52,11 +53,19 @@ public class ProcessA
     public ArrayList<Sample> sampleImage()
     {
         ArrayList<Sample> resultSamples;
-        int sampleI;
+        int hitCount;
+        int sampleCount;
+        int checkCounter;
+        
+        final float CHECKAFTERITERATIONS = 1000;
         
         resultSamples = new ArrayList<>();
         
-        for( sampleI = 0; sampleI < 1000; sampleI++ )
+        hitCount = 0;
+        sampleCount = 0;
+        checkCounter = 0;
+        
+        for(;;)
         {
             int x, y;
             boolean readBoolean;
@@ -70,7 +79,23 @@ public class ProcessA
             {
                 addSampleToList(resultSamples, x, y);
                 workingImage.setAt(x, y, false);
+                
+                hitCount++;
             }
+            
+            if( checkCounter >= CHECKAFTERITERATIONS )
+            {
+                checkCounter = 0;
+                
+                if( (float)hitCount / (float)sampleCount < Parameters.ProcessA.MINIMALHITRATIOUNTILTERMINATION )
+                {
+                    break;
+                }
+            }
+            
+            
+            sampleCount++;
+            checkCounter++;
         }
         
         return resultSamples;
