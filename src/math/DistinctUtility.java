@@ -29,7 +29,7 @@ public class DistinctUtility
                 int randomNumber;
             
                 randomNumber = random.nextInt(max);
-                if( numbers.contains(randomNumber) )
+                if( !numbers.contains(randomNumber) )
                 {
                     numbers.add(randomNumber);
                     break;
