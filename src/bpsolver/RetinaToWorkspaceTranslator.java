@@ -5,7 +5,7 @@ import RetinaLevel.ProcessD;
 import FargGeneral.network.Link;
 import FargGeneral.network.Network;
 import FargGeneral.network.Node;
-import bpsolver.nodes.PlatonicPrimitveInstanceNode;
+import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.util.ArrayList;
 
 public class RetinaToWorkspaceTranslator
@@ -20,26 +20,24 @@ public class RetinaToWorkspaceTranslator
     {
         Node objectNode;
         
-        objectNode = new PlatonicPrimitveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
+        objectNode = new PlatonicPrimitiveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
         network.nodes.add(objectNode);
         
         for( ProcessD.LineDetector iterationLine : lines )
         {
-            PlatonicPrimitveInstanceNode createdLineNode;
+            PlatonicPrimitiveInstanceNode createdLineNode;
             Link createdForwardLink, createdBackwardLink;
             
-            createdLineNode = new PlatonicPrimitveInstanceNode(networkHandles.lineSegmentPlatonicPrimitiveNode);
+            createdLineNode = new PlatonicPrimitiveInstanceNode(networkHandles.lineSegmentPlatonicPrimitiveNode);
             createdLineNode.p1 = iterationLine.getAProjected();
             createdLineNode.p2 = iterationLine.getBProjected();
             network.nodes.add(createdLineNode);
             
             // linkage
-            createdForwardLink = network.linkCreator.createLink(Link.EnumType.CONTAINS);
-            createdForwardLink.target = createdLineNode;
+            createdForwardLink = network.linkCreator.createLink(Link.EnumType.CONTAINS, createdLineNode);
             objectNode.outgoingLinks.add(createdForwardLink);
             
-            createdBackwardLink = network.linkCreator.createLink(Link.EnumType.ISPARTOF);
-            createdBackwardLink.target = objectNode;
+            createdBackwardLink = network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
             createdLineNode.outgoingLinks.add(createdBackwardLink);
             
             // add all codelet's of it

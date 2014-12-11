@@ -14,7 +14,7 @@ import bpsolver.ltm.Link;
 import bpsolver.ltm.LinkCreator;
 import FargGeneral.network.Network;
 import FargGeneral.network.Node;
-import bpsolver.nodes.PlatonicPrimitveNode;
+import bpsolver.nodes.PlatonicPrimitiveNode;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -66,20 +66,19 @@ public class BpSolver {
      */
     public void setupLtmFactoryDefault()
     {
-        PlatonicPrimitveNode lineSegmentPrimitiveNode = new PlatonicPrimitveNode("LineSegment", null);
+        PlatonicPrimitiveNode lineSegmentPrimitiveNode = new PlatonicPrimitiveNode("LineSegment", null);
         networkHandles.lineSegmentPlatonicPrimitiveNode = lineSegmentPrimitiveNode;
         network.nodes.add(lineSegmentPrimitiveNode);
         
-        PlatonicPrimitveNode lineSegmentAttributeNode = new PlatonicPrimitveNode("LineSegmentLength", "LineSegmentLength");
+        PlatonicPrimitiveNode lineSegmentAttributeNode = new PlatonicPrimitiveNode("LineSegmentLength", "LineSegmentLength");
         networkHandles.lineSegmentFeatureLineLengthPrimitiveNode = lineSegmentAttributeNode;
         network.nodes.add(lineSegmentAttributeNode);
         
-        FargGeneral.network.Link link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS);
-        link.target = lineSegmentAttributeNode;
+        FargGeneral.network.Link link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, lineSegmentAttributeNode);
         lineSegmentPrimitiveNode.outgoingLinks.add(link);
         
         
-        PlatonicPrimitveNode objectPrimitiveNode = new PlatonicPrimitveNode("Object", null);
+        PlatonicPrimitiveNode objectPrimitiveNode = new PlatonicPrimitiveNode("Object", null);
         networkHandles.objectPlatonicPrimitiveNode = objectPrimitiveNode;
         network.nodes.add(objectPrimitiveNode);
     }

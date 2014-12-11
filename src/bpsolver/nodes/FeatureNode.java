@@ -7,14 +7,14 @@ import FargGeneral.network.Node;
  * foundalis dissertation page 143
  */
 public class FeatureNode extends Node {
-    public static FeatureNode createFloatNode(Node featureTypeNode, float value)
+    public static FeatureNode createFloatNode(Node featureTypeNode, float value, int weight)
     {
-        return new FeatureNode(featureTypeNode, EnumValueType.FLOAT, value, 0);
+        return new FeatureNode(featureTypeNode, EnumValueType.FLOAT, value, 0, weight);
     }
     
-    public static FeatureNode createIntegerNode(Node featureTypeNode, int value)
+    public static FeatureNode createIntegerNode(Node featureTypeNode, int value, int weight)
     {
-        return new FeatureNode(featureTypeNode, EnumValueType.INT, 0.0f, value);
+        return new FeatureNode(featureTypeNode, EnumValueType.INT, 0.0f, value, weight);
     }
     
     /**
@@ -24,7 +24,7 @@ public class FeatureNode extends Node {
      * \param valueFloat
      * \param valueInt 
      */
-    private FeatureNode(Node featureTypeNode, EnumValueType valueType, float valueFloat, int valueInt)
+    private FeatureNode(Node featureTypeNode, EnumValueType valueType, float valueFloat, int valueInt, int weight)
     {
         super(NodeTypes.EnumType.FEATURENODE.ordinal());
         
@@ -33,6 +33,8 @@ public class FeatureNode extends Node {
         this.valueInt = valueInt;
         
         this.featureTypeNode = featureTypeNode;
+        
+        this.weight = weight;
     }
     
     public float getValueAsFloat()
@@ -55,12 +57,19 @@ public class FeatureNode extends Node {
         return valueInt;
     }
     
+    public int getWeight()
+    {
+        return weight;
+    }
+    
     public Node featureTypeNode; // node in ltm, which is either a platonic primitive node (with the type of a feature) or a node which is a learned type (triangle, etc)
     // is compared by reference (isEqual), because the node can be of any valid type
     
     private float valueFloat;
     private int valueInt;
     private EnumValueType valueType;
+    
+    private int weight; // used for fair fusing of nodes
     
     public enum EnumValueType
     {

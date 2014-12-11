@@ -8,9 +8,9 @@ import FargGeneral.network.Node;
  * see Foundalis dissertation chapter 7.1
  * see Foundalis dissertation page 141 for an explaination of the types
  */
-public class PlatonicPrimitveNode extends Node
+public class PlatonicPrimitiveNode extends Node
 {
-    public PlatonicPrimitveNode(String platonicType, String codeletKey)
+    public PlatonicPrimitiveNode(String platonicType, String codeletKey)
     {
         super(NodeTypes.EnumType.PLATONICPRIMITIVENODE.ordinal());
         

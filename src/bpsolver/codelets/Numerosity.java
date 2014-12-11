@@ -1,17 +1,22 @@
 package bpsolver.codelets;
 
-import bpsolver.Codelet;
-import bpsolver.Database;
+import bpsolver.SolverCodelet;
+import FargGeneral.network.Network;
+import FargGeneral.network.Node;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 
-public class Numerosity extends Codelet {
-    // startnode must be a object node
-    public Numerosity(Database database, Database.Node startNode)
+public class Numerosity extends SolverCodelet {
+    public Numerosity(Network network)
     {
-        this.database = database;
-        this.startNode = startNode;
+        super(network);
+    }
+    
+    @Override
+    public void initialize()
+    {
+        random = new Random();
     }
     
     @Override
@@ -97,7 +102,5 @@ public class Numerosity extends Codelet {
         return node.type == Database.Node.EnumType.LINE;
     }
     
-    private Database.Node startNode;
-    private Database database;
-    private Random random = new Random();
+    private Random random;
 }

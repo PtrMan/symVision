@@ -7,7 +7,7 @@ import FargGeneral.network.Link;
 import FargGeneral.network.Network;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
-import bpsolver.nodes.PlatonicPrimitveInstanceNode;
+import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import misc.Assert;
 
 
@@ -25,22 +25,21 @@ public class LineSegmentLength extends SolverCodelet
     @Override
     public RunResult run()
     {
-        PlatonicPrimitveInstanceNode thisLine;
+        PlatonicPrimitiveInstanceNode thisLine;
         FeatureNode createdLineSegmentLength;
         float lineSegmentLength;
         Link createdLink;
         
         Assert.Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "startNode node type is wrong!");
-        Assert.Assert(((PlatonicPrimitveInstanceNode)startNode).primitiveNode.equals(networkHandles.lineSegmentPlatonicPrimitiveNode), "startNode is not a line!");
+        Assert.Assert(((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(networkHandles.lineSegmentPlatonicPrimitiveNode), "startNode is not a line!");
         
-        thisLine = (PlatonicPrimitveInstanceNode)startNode;
+        thisLine = (PlatonicPrimitiveInstanceNode)startNode;
         
         lineSegmentLength = Vector2d.FloatHelper.getLength(Vector2d.FloatHelper.sub(thisLine.p1, thisLine.p2));
         
-        createdLineSegmentLength = FeatureNode.createFloatNode(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode, lineSegmentLength);
+        createdLineSegmentLength = FeatureNode.createFloatNode(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode, lineSegmentLength, 1);
         
-        createdLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE);
-        createdLink.target = createdLineSegmentLength;
+        createdLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdLineSegmentLength);
         thisLine.outgoingLinks.add(createdLink);
         
         return new RunResult(false);

@@ -1,53 +1,60 @@
 package bpsolver.codelets;
 
 import Datastructures.Tuple4;
-import bpsolver.Codelet;
-import bpsolver.Database;
+import FargGeneral.Codelet;
+import FargGeneral.network.Link;
+import FargGeneral.network.Network;
+import FargGeneral.network.Node;
+import bpsolver.NetworkHandles;
 import bpsolver.Parameters;
+import bpsolver.SolverCodelet;
+import bpsolver.nodes.FeatureNode;
+import bpsolver.nodes.NodeTypes;
+import bpsolver.nodes.PlatonicPrimitiveNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import math.DistinctUtility;
 import static math.Math.weightFloats;
+import misc.Assert;
 
 /**
  *
  * chooses two items and looks if they have a matching anotation, if so, modify the graph so they point at the same (averaged) attribute
  * 
- * see page 147 in the disertation
+ * see page 147 in the foundalis disertation
  * 
- * * line segments - relinks already existing LINELENGTH nodes if the length is roughtly equal
+ * * line segments - relinks already existing LineSegmentLength nodes if the length is roughtly equal
  * TODO
  * * angle - relink if they are roughtly equal
  */
-public class SearchAndFuseRoughtlyEqualElements extends Codelet {
+public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
     // startnode must be a object node
-    public SearchAndFuseRoughtlyEqualElements(Database database, Database.Node startNode)
+    public SearchAndFuseRoughtlyEqualElements(Network network, NetworkHandles networkHandles)
     {
-        this.database = database;
-        this.startNode = startNode;
+        super(network, networkHandles);
     }
     
     @Override
     public Codelet.RunResult run() {
         ArrayList<Integer> distinctEdgeIndices;
-        Database.Node nodeA, nodeB;
-        HashMap<Database.Node.EnumType, Tuple4<Database.Node, Integer, Database.Node, Integer>> commonChildnodesOfNodes;
+        Node nodeA, nodeB;
+        HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> commonChildnodesOfNodes;
         
         // choose two random nodes
         
-        if( startNode.outgoingEdges.size() < 2 )
+        if( startNode.outgoingLinks.size() < 2 )
         {
             return new RunResult(true);
         }
         // else here
         
-        distinctEdgeIndices = DistinctUtility.getTwoDisjunctNumbers(random, startNode.outgoingEdges.size());
+        distinctEdgeIndices = DistinctUtility.getTwoDisjunctNumbers(random, startNode.outgoingLinks.size());
         
-        nodeA = startNode.outgoingEdges.get(distinctEdgeIndices.get(0)).destination;
-        nodeB = startNode.outgoingEdges.get(distinctEdgeIndices.get(1)).destination;
+        nodeA = startNode.outgoingLinks.get(distinctEdgeIndices.get(0)).target;
+        nodeB = startNode.outgoingLinks.get(distinctEdgeIndices.get(1)).target;
         
-        commonChildnodesOfNodes = getCommonChildnodesOfNodes(nodeA, nodeB);
+        commonChildnodesOfNodes = getCommonFeatureNodesOfNodes(nodeA, nodeB);
         
         // if the two nodes don't have at least one common type which is Measurable we are done here
         if( commonChildnodesOfNodes.keySet().size() == 0 )
@@ -61,11 +68,11 @@ public class SearchAndFuseRoughtlyEqualElements extends Codelet {
         // * retrive Tuple
         // * look if the measurements are roughtly equal
         // * relink graph if they are
-        Database.Node.EnumType[] typeKeysAsArray = (Database.Node.EnumType[])commonChildnodesOfNodes.keySet().toArray();
+        PlatonicPrimitiveNode[] typeKeysAsArray = (PlatonicPrimitiveNode[])commonChildnodesOfNodes.keySet().toArray();
         int keyIndex = random.nextInt(typeKeysAsArray.length);
-        Database.Node.EnumType chosenKeyForCommonChildnodes = typeKeysAsArray[keyIndex];
+        PlatonicPrimitiveNode chosenKeyForCommonChildnodes = typeKeysAsArray[keyIndex];
         
-        Tuple4<Database.Node, Integer, Database.Node, Integer> chosenTuple = commonChildnodesOfNodes.get(chosenKeyForCommonChildnodes);
+        Tuple4<FeatureNode, Integer, FeatureNode, Integer> chosenTuple = commonChildnodesOfNodes.get(chosenKeyForCommonChildnodes);
         
         boolean measurementsAreRoughtlyEqual = areMeasurementsRoughtlyEqual(chosenTuple.e0, chosenTuple.e2);
         if( !measurementsAreRoughtlyEqual )
@@ -79,76 +86,104 @@ public class SearchAndFuseRoughtlyEqualElements extends Codelet {
         return new RunResult(true);
     }
     
+    
+    @Override
+    public void initialize() {
+        random = new Random();
+    }
+
+    @Override
+    public SolverCodelet clone() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+    
     /**
      * 
      * \return map with the values, where the indices 1 and 3 are the edge indices which lead to the nodes of that type.
-     *         the indices 0 and 2 are the subnodes which are the attributes
+     *         the indices 0 and 2 are the subnodes which are the features
+     *         the key is the (common) type of the feature, by default points at the featureTypeNode of both nodes
      */
-    private static HashMap<Database.Node.EnumType, Tuple4<Database.Node, Integer, Database.Node, Integer>> getCommonChildnodesOfNodes(Database.Node nodeA, Database.Node nodeB)
+    private HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> getCommonFeatureNodesOfNodes(Node nodeA, Node nodeB)
     {
-        HashMap<Database.Node.EnumType, Tuple4<Database.Node, Integer, Database.Node, Integer>> resultMap;
-        int edgeIndexA, edgeIndexB;
+        HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> resultMap;
+        int linkIndexA, linkIndexB;
         
         resultMap = new HashMap<>();
         
-        if( nodeA.type != nodeB.type )
+        if( nodeA.type != nodeB.type)
+        {
+            return resultMap;
+        }
+        if( nodeA.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() )
         {
             return resultMap;
         }
         // else here
         
-        for( edgeIndexA = 0; edgeIndexA < nodeA.outgoingEdges.size(); edgeIndexA++ )
+        for( linkIndexA = 0; linkIndexA < nodeA.outgoingLinks.size(); linkIndexA++ )
         {
-            for( edgeIndexB = 0; edgeIndexB < nodeB.outgoingEdges.size(); edgeIndexB++ )
+            for( linkIndexB = 0; linkIndexB < nodeB.outgoingLinks.size(); linkIndexB++ )
             {
-                Database.Node iterationChildNodeOfNodeA, iterationChildNodeOfNodeB;
+                Node iterationChildNodeOfNodeA, iterationChildNodeOfNodeB;
+                FeatureNode iterationChildNodeOfNodeAAsFeatureNode, iterationChildNodeOfNodeBAsFeatureNode;
                 
-                iterationChildNodeOfNodeA = nodeA.outgoingEdges.get(edgeIndexA).destination;
-                iterationChildNodeOfNodeB = nodeB.outgoingEdges.get(edgeIndexB).destination;
+                iterationChildNodeOfNodeA = nodeA.outgoingLinks.get(linkIndexA).target;
+                iterationChildNodeOfNodeB = nodeB.outgoingLinks.get(linkIndexB).target;
                 
                 if( iterationChildNodeOfNodeA.type != iterationChildNodeOfNodeB.type )
                 {
                     continue;
                 }
+                if( !isFeatureNode(iterationChildNodeOfNodeA) )
+                {
+                    continue;
+                }
                 // else here
                 
-                if( !hasNodetypeMeasurableAttribute(iterationChildNodeOfNodeA.type) )
+                iterationChildNodeOfNodeAAsFeatureNode = (FeatureNode)iterationChildNodeOfNodeA;
+                iterationChildNodeOfNodeBAsFeatureNode = (FeatureNode)iterationChildNodeOfNodeB;
+                
+                if( iterationChildNodeOfNodeAAsFeatureNode.featureTypeNode.equals(iterationChildNodeOfNodeBAsFeatureNode.featureTypeNode) )
                 {
                     continue;
                 }
                 // else here
                 
                 // the nodes can't be equal because this is nonsensical
-                // CONTEXT< eual noes can't be connected indirectly >
+                // CONTEXT< equal nodes can't be connected indirectly >
                 if( iterationChildNodeOfNodeA.equals(iterationChildNodeOfNodeB) )
                 {
                     continue;
                 }
                 // else here
                 
-                resultMap.put(iterationChildNodeOfNodeA.type, new Tuple4<>(iterationChildNodeOfNodeA, edgeIndexA, iterationChildNodeOfNodeB, edgeIndexB));
+                resultMap.put(iterationChildNodeOfNodeAAsFeatureNode.featureTypeNode, new Tuple4<>(iterationChildNodeOfNodeAAsFeatureNode, linkIndexA, iterationChildNodeOfNodeBAsFeatureNode, linkIndexB));
             }
         }
         
         return resultMap;
     }
     
-    private static boolean hasNodetypeMeasurableAttribute(Database.Node.EnumType type)
+    private boolean isFeatureNode(Node node)
     {
-        return type == Database.Node.EnumType.LENGTH;
+        return node.type == NodeTypes.EnumType.FEATURENODE.ordinal();
     }
     
-    private static boolean areMeasurementsRoughtlyEqual(Database.Node nodeA, Database.Node nodeB)
+    private boolean areMeasurementsRoughtlyEqual(Node nodeA, Node nodeB)
     {
-        // assert
-        if( nodeA.type != nodeB.type )
-        {
-            throw new RuntimeException("assert failed");
-        }
+        FeatureNode nodeAAsFeatureNode, nodeBAsFeatureNode;
         
-        if( nodeA.type == Database.Node.EnumType.LENGTH )
+        Assert.Assert(nodeA.type == NodeTypes.EnumType.FEATURENODE.ordinal(), "");
+        Assert.Assert(nodeB.type == NodeTypes.EnumType.FEATURENODE.ordinal(), "");
+        
+        nodeAAsFeatureNode = (FeatureNode)nodeA;
+        nodeBAsFeatureNode = (FeatureNode)nodeB;
+        
+        Assert.Assert(nodeAAsFeatureNode.featureTypeNode.equals(nodeBAsFeatureNode), "types are not the same");
+        
+        if( nodeAAsFeatureNode.featureTypeNode.equals(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode) )
         {
-            return areLengthsRoughtlyEqual(nodeA, nodeB);
+            return areLengthsRoughtlyEqual(nodeAAsFeatureNode, nodeBAsFeatureNode);
         }
         else
         {
@@ -156,78 +191,56 @@ public class SearchAndFuseRoughtlyEqualElements extends Codelet {
         }
     }
     
-    private static boolean areLengthsRoughtlyEqual(Database.Node nodeA, Database.Node nodeB)
+    private boolean areLengthsRoughtlyEqual(FeatureNode nodeA, FeatureNode nodeB)
     {
-        Database.LengthNode lengthNodeA, lengthNodeB;
         float lengthMin, lengthMax;
         float ratio;
         
-        // assert
-        if( nodeA.type != nodeB.type )
-        {
-            throw new RuntimeException("assert failed");
-        }
+        Assert.Assert(nodeA.featureTypeNode.equals(nodeA), "types are not the same");
+        Assert.Assert(nodeA.featureTypeNode.equals(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode), "not a LINESEGMENTLENGTH feature node!");
         
-        // assert
-        if( nodeA.type != Database.Node.EnumType.LENGTH )
-        {
-            throw new RuntimeException("assert failed");
-        }
-        
-        lengthNodeA = (Database.LengthNode)nodeA;
-        lengthNodeB = (Database.LengthNode)nodeB;
-        
-        lengthMin = Math.min(lengthNodeA.length, lengthNodeB.length);
-        lengthMax = Math.max(lengthNodeA.length, lengthNodeB.length);
+        lengthMin = Math.min(nodeA.getValueAsFloat(), nodeB.getValueAsFloat());
+        lengthMax = Math.max(nodeA.getValueAsFloat(), nodeB.getValueAsFloat());
         
         ratio = lengthMin/lengthMax;
         
         return ratio > Parameters.RELATIVELINELENGTHTOBECONSIDEREDEQUAL;
     }
     
-    private static void relinkGraph(Database.Node parentNode, Database.Node nodeA, Database.Node nodeB, Tuple4<Database.Node, Integer, Database.Node, Integer> relinkInfoTuple)
+    private void relinkGraph(Node parentNode, Node nodeA, Node nodeB, Tuple4<FeatureNode, Integer, FeatureNode, Integer> relinkInfoTuple)
     {
-        int edgeIndexOfNodeA, edgeIndexOfNodeB;
-        Database.Node combinedNode;
+        int linkIndexOfNodeA, linkIndexOfNodeB;
+        Node combinedNode;
 
-        edgeIndexOfNodeA = relinkInfoTuple.e1;
-        edgeIndexOfNodeB = relinkInfoTuple.e3;
+        linkIndexOfNodeA = relinkInfoTuple.e1;
+        linkIndexOfNodeB = relinkInfoTuple.e3;
         
-        combinedNode = combineMeasurementNodes(relinkInfoTuple.e0, relinkInfoTuple.e2);
+        combinedNode = combineFeatureNodes(relinkInfoTuple.e0, relinkInfoTuple.e2);
         
-        nodeA.outgoingEdges.set(edgeIndexOfNodeA, new Database.Edge(combinedNode));
-        nodeB.outgoingEdges.set(edgeIndexOfNodeB, new Database.Edge(combinedNode));
+        nodeA.outgoingLinks.set(linkIndexOfNodeA, network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));
+        nodeB.outgoingLinks.set(linkIndexOfNodeB, network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));
     }
     
-    private static Database.Node combineMeasurementNodes(Database.Node nodeA, Database.Node nodeB)
+    private FeatureNode combineFeatureNodes(FeatureNode nodeA, FeatureNode nodeB)
     {
         float valueA, valueB;
         int weightAsIntA, weightAsIntB;
         float weightedValue;
         int weightSum;
         
-        // assert
-        if( nodeA.type != nodeB.type )
-        {
-            throw new RuntimeException("assert failed");
-        }
+        Assert.Assert(nodeA.featureTypeNode.equals(nodeB.featureTypeNode), "assert failed");
         
-        if( nodeA.type == Database.Node.EnumType.LENGTH )
+        if( nodeA.featureTypeNode.equals(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode) )
         {
-            Database.LengthNode lengthNodeA, lengthNodeB;
-            
-            lengthNodeA = (Database.LengthNode)nodeA;
-            lengthNodeB = (Database.LengthNode)nodeB;
-            
-            valueA = lengthNodeA.length;
-            weightAsIntA = lengthNodeA.getWeight();
-            valueB = lengthNodeB.length;
-            weightAsIntB = lengthNodeB.getWeight();
+            valueA = nodeA.getValueAsFloat();
+            weightAsIntA = nodeA.getWeight();
+            valueB = nodeA.getValueAsFloat();
+            weightAsIntB = nodeA.getWeight();
             
             weightedValue = weightFloat(valueA, weightAsIntA, valueB, weightAsIntB);
             weightSum = weightAsIntA + weightAsIntB;
             
-            return new Database.LengthNode(weightedValue, weightSum);
+            return FeatureNode.createFloatNode(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode, weightedValue, weightSum);
         }
         else
         {
@@ -240,7 +253,5 @@ public class SearchAndFuseRoughtlyEqualElements extends Codelet {
         return weightFloats(valueA, (float)weightAAsInt, valueB, (float)weightBAsInt);
     }
     
-    private Database.Node startNode;
-    private Database database;
-    private Random random = new Random();
+    private Random random;
 }

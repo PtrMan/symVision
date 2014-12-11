@@ -1,6 +1,6 @@
 package bpsolver;
 
-import bpsolver.nodes.PlatonicPrimitveNode;
+import bpsolver.nodes.PlatonicPrimitiveNode;
 
 /**
  *
@@ -8,8 +8,8 @@ import bpsolver.nodes.PlatonicPrimitveNode;
  */
 public class NetworkHandles
 {
-    public PlatonicPrimitveNode lineSegmentPlatonicPrimitiveNode;
-    public PlatonicPrimitveNode lineSegmentFeatureLineLengthPrimitiveNode;
+    public PlatonicPrimitiveNode lineSegmentPlatonicPrimitiveNode;
+    public PlatonicPrimitiveNode lineSegmentFeatureLineLengthPrimitiveNode;
     
-    public PlatonicPrimitveNode objectPlatonicPrimitiveNode;
+    public PlatonicPrimitiveNode objectPlatonicPrimitiveNode;
 }

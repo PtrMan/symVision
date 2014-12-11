@@ -17,7 +17,7 @@ public class Network
     // used to create links with the right type
     public interface ILinkCreator
     {
-        public Link createLink(Link.EnumType type);
+        public Link createLink(Link.EnumType type, Node target);
     }
     
     public ArrayList<Node> nodes = new ArrayList<>();

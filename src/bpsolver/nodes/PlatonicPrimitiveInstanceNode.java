@@ -7,16 +7,16 @@ import FargGeneral.network.Node;
  * is a instance of a platonic primitive, for example a line or a curve
  * 
  */
-public class PlatonicPrimitveInstanceNode extends Node
+public class PlatonicPrimitiveInstanceNode extends Node
 {
-    public PlatonicPrimitveInstanceNode(PlatonicPrimitveNode primitiveNode)
+    public PlatonicPrimitiveInstanceNode(PlatonicPrimitiveNode primitiveNode)
     {
         super(NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal());
         
         this.primitiveNode = primitiveNode;
     }
     
-    public PlatonicPrimitveNode primitiveNode;
+    public PlatonicPrimitiveNode primitiveNode;
     
     // used to store data
     // linesegment : uses p1 and p2

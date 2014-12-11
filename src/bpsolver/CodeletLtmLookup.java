@@ -5,8 +5,8 @@ import FargGeneral.network.Link;
 import FargGeneral.network.Network;
 import FargGeneral.network.Node;
 import bpsolver.nodes.NodeTypes;
-import bpsolver.nodes.PlatonicPrimitveInstanceNode;
-import bpsolver.nodes.PlatonicPrimitveNode;
+import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
+import bpsolver.nodes.PlatonicPrimitiveNode;
 import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,17 +39,17 @@ public class CodeletLtmLookup
     public void lookupAndPutCodeletsAtCoderackForPrimitiveNode(Node node, Coderack coderack, Network ltm)
     {
         Node ltmNodeForPrimitiveNode;
-        PlatonicPrimitveInstanceNode platonicPrimitiveInstanceNode; 
+        PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode; 
         
         // lookup ltmNodeForNode
         Assert.Assert(node.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "Must be a PLATONICPRIMITIVEINSTANCENODE node");
         
-        platonicPrimitiveInstanceNode = (PlatonicPrimitveInstanceNode)node;
+        platonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode)node;
         ltmNodeForPrimitiveNode = platonicPrimitiveInstanceNode.primitiveNode;
         
         for( Link iterationLink : ltmNodeForPrimitiveNode.outgoingLinks )
         {
-            PlatonicPrimitveNode currentAttributePrimitiveNode;
+            PlatonicPrimitiveNode currentAttributePrimitiveNode;
             RegisterEntry registerEntry;
             
             if( iterationLink.type != FargGeneral.network.Link.EnumType.HAS )
@@ -63,7 +63,7 @@ public class CodeletLtmLookup
             }
             // we are here if the link is HAS and the type of the linked node is PLATONICPRIMITIVENODE
             
-            currentAttributePrimitiveNode = (PlatonicPrimitveNode)iterationLink.target;
+            currentAttributePrimitiveNode = (PlatonicPrimitiveNode)iterationLink.target;
             
             // try to lookup the codelet
             if( currentAttributePrimitiveNode.codeletKey == null )
