@@ -6,6 +6,7 @@ import static Datastructures.Vector2d.FloatHelper.getScaled;
 import static Datastructures.Vector2d.FloatHelper.sub;
 import static Datastructures.Vector2d.FloatHelper.add;
 import static Datastructures.Vector2d.FloatHelper.getLength;
+import bpsolver.Parameters;
 import java.util.ArrayList;
 
 /**
@@ -147,7 +148,7 @@ public class ProcessH
         projectedPoint = projectPointOntoLine(point, line);
         distanceBetweenProjectedAndPoint = getLength(sub(projectedPoint, point));
         
-        return distanceBetweenProjectedAndPoint < MAXDISTANCEFORCANDIDATEPOINT;
+        return distanceBetweenProjectedAndPoint < Parameters.ProcessH.MAXDISTANCEFORCANDIDATEPOINT;
     }
     
     private static Vector2d<Float> projectPointOntoLine(Vector2d<Float> point, ProcessD.LineDetector line)
@@ -162,6 +163,4 @@ public class ProcessH
         
         return add(line.getAProjected(), getScaled(lineDirection, dotResult));
     }
-    
-    private static final float MAXDISTANCEFORCANDIDATEPOINT = 3.0f;
 }
