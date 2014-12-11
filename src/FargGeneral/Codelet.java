@@ -1,4 +1,4 @@
-package bpsolver;
+package FargGeneral;
 
 public abstract class Codelet {
     public class RunResult {
@@ -10,5 +10,4 @@ public abstract class Codelet {
     }
     
     public abstract RunResult run();
-    
 }

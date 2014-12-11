@@ -6,4 +6,9 @@ public class Math
     {
         return (valueA*weightA + valueB*weightB)/(weightA + weightB);
     }
+    
+    public static float power2(float x)
+    {
+        return x*x;
+    }
 }

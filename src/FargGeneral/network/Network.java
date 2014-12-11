@@ -1,5 +1,6 @@
-package bpsolver.network;
+package FargGeneral.network;
 
+import FargGeneral.network.Link;
 import java.util.ArrayList;
 
 /**
@@ -11,6 +12,12 @@ public class Network
     public interface IDepthToDecay
     {
         public float translateDepthToDecayrate(int depth);
+    }
+    
+    // used to create links with the right type
+    public interface ILinkCreator
+    {
+        public Link createLink(Link.EnumType type);
     }
     
     public ArrayList<Node> nodes = new ArrayList<>();
@@ -73,4 +80,6 @@ public class Network
             iterationNode.activiation = Math.min(iterationNode.activiation, 1.0f);
         }
     }
+    
+    public ILinkCreator linkCreator;
 }

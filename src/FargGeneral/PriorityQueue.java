@@ -1,4 +1,4 @@
-package bpsolver;
+package FargGeneral;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -11,9 +11,8 @@ public class PriorityQueue<Type>
         public float priority = 0.0f;
     }
     
-    public PriorityQueue(int size, Random random)
+    public PriorityQueue(Random random)
     {
-        this.size = size;
         this.random = random;
     }
     
@@ -59,16 +58,6 @@ public class PriorityQueue<Type>
         element = new QueueElement();
         element.priority = priority;
         element.value = value;
-        
-        //System.Diagnostics.Debug.Assert(queue.Count <= size);
-
-        if( queue.size() == size )
-        {
-            // replace the last element with the new element
-            queue.set(queue.size()-1, element);
-            return;
-        }
-        // else
 
         queue.add(element);
     }
@@ -76,7 +65,7 @@ public class PriorityQueue<Type>
     // the queue is sorted by priority
     private ArrayList<QueueElement> queue = new ArrayList<>();
 
-    private int size;
+    
     private Random random;
     private float prioritySum = 0.0f;
 
