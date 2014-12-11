@@ -17,6 +17,7 @@ import java.util.Random;
 import math.DistinctUtility;
 import static math.Math.weightFloats;
 import misc.Assert;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  *
@@ -93,8 +94,8 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
     }
 
     @Override
-    public SolverCodelet clone() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public SolverCodelet cloneObject() {
+        throw new NotImplementedException();
     }
     
     /**

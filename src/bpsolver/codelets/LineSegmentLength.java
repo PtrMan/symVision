@@ -52,7 +52,7 @@ public class LineSegmentLength extends SolverCodelet
     }
     
     @Override
-    public SolverCodelet clone()
+    public SolverCodelet cloneObject()
     {
         LineSegmentLength cloned;
         

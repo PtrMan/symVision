@@ -3,24 +3,24 @@ package bpsolver.codelets;
 import bpsolver.SolverCodelet;
 import FargGeneral.network.Network;
 import FargGeneral.network.Node;
+import bpsolver.NetworkHandles;
+import bpsolver.nodes.NodeTypes;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class Numerosity extends SolverCodelet {
-    public Numerosity(Network network)
+    public Numerosity(Network network, NetworkHandles networkHandles)
     {
-        super(network);
-    }
-    
-    @Override
-    public void initialize()
-    {
-        random = new Random();
+        super(network, networkHandles);
     }
     
     @Override
     public RunResult run() {
+        // TODO< recode >
+        /*
+        
         HashMap<Database.Node.EnumType, Database.NumerosityNode> existingNumerosityNodes;
         ArrayList<Database.Node> numberableNodes;
         
@@ -92,15 +92,31 @@ public class Numerosity extends SolverCodelet {
             
             database.nodes.add(createNumerosityNode);
         }
+        */
         
         return new RunResult(true);
     }
     
-    private static boolean isNodeNumberable(Database.Node node)
+    
+    @Override
+    public void initialize()
     {
-        // TODO< do this dynamically >
-        return node.type == Database.Node.EnumType.LINE;
+        random = new Random();
+    }
+    
+    
+    @Override
+    public SolverCodelet cloneObject() {
+        throw new NotImplementedException();
+    }
+    
+    
+    private static boolean isNodeNumberable(Node node)
+    {
+        return node.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal();
     }
     
     private Random random;
+    
+
 }

@@ -29,7 +29,7 @@ public abstract class SolverCodelet extends Codelet
     // must be called before it runs
     public abstract void initialize();
     
-    public abstract SolverCodelet clone();
+    public abstract SolverCodelet cloneObject();
     
     protected Network network;
     protected NetworkHandles networkHandles;

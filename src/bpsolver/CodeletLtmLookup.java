@@ -83,7 +83,7 @@ public class CodeletLtmLookup
         {
             SolverCodelet clonedCodelet;
             
-            clonedCodelet = iterationCodeletInformation.templateCodelet.clone();
+            clonedCodelet = iterationCodeletInformation.templateCodelet.cloneObject();
             clonedCodelet.setStartNode(workspaceNode);
             
             coderack.enqueue(clonedCodelet, iterationCodeletInformation.priority);
