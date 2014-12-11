@@ -37,7 +37,7 @@ public class LineSegmentLength extends SolverCodelet
         
         lineSegmentLength = Vector2d.FloatHelper.getLength(Vector2d.FloatHelper.sub(thisLine.p1, thisLine.p2));
         
-        createdLineSegmentLength = new FeatureNode(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode, FeatureNode.EnumValueType.FLOAT, lineSegmentLength, 0);
+        createdLineSegmentLength = FeatureNode.createFloatNode(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode, lineSegmentLength);
         
         createdLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE);
         createdLink.target = createdLineSegmentLength;

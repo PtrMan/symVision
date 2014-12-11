@@ -7,6 +7,16 @@ import FargGeneral.network.Node;
  * foundalis dissertation page 143
  */
 public class FeatureNode extends Node {
+    public static FeatureNode createFloatNode(Node featureTypeNode, float value)
+    {
+        return new FeatureNode(featureTypeNode, EnumValueType.FLOAT, value, 0);
+    }
+    
+    public static FeatureNode createIntegerNode(Node featureTypeNode, int value)
+    {
+        return new FeatureNode(featureTypeNode, EnumValueType.INT, 0.0f, value);
+    }
+    
     /**
      * 
      * \param featureTypeNode is the node in ltm which holds the type of the feature
@@ -14,7 +24,7 @@ public class FeatureNode extends Node {
      * \param valueFloat
      * \param valueInt 
      */
-    public FeatureNode(Node featureTypeNode, EnumValueType valueType, float valueFloat, int valueInt)
+    private FeatureNode(Node featureTypeNode, EnumValueType valueType, float valueFloat, int valueInt)
     {
         super(NodeTypes.EnumType.FEATURENODE.ordinal());
         
