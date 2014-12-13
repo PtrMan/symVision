@@ -9,7 +9,6 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import math.DistinctUtility;
 
-// TODO< lock detectors if they reached a high enought activation >
 // TODO< remove detectors which are removable which have a activation less than <constant> * sumofAllActivations >
 /**
  * detects lines
@@ -40,8 +39,9 @@ public class ProcessD
             createdDetector.integratedSampleIndices = integratedSampleIndices;
             
             // calculate m, n
-            createdDetector.m = (b.y-a.y)/(b.x-a.x);
-            createdDetector.n = a.y - a.y * createdDetector.m;
+            // bug outruling
+            createdDetector.m = 0.0f; //(b.y-a.y)/(b.x-a.x);
+            createdDetector.n = 0.0f; //a.y - a.y * createdDetector.m;
             
             return createdDetector;
         }
@@ -57,8 +57,9 @@ public class ProcessD
             createdDetector.integratedSampleIndices = integratedSampleIndices;
             
             // calculate m, n
-            createdDetector.m = (b.y-a.y)/(b.x-a.x);
-            createdDetector.n = a.y - a.y * createdDetector.m;
+            // bug outruling
+            createdDetector.m = 0.0f; //(b.y-a.y)/(b.x-a.x);
+            createdDetector.n = 0.0f; //a.y - a.y * createdDetector.m;
             
             return createdDetector;
         }
@@ -138,7 +139,7 @@ public class ProcessD
         
         public float getActivation()
         {
-            return (float)integratedSampleIndices.size() + (Parameters.ProcessD.MAXMSE - mse)*Parameters.ProcessD.LOCKINGACTIVATIONMSESCALE;
+            return (float)integratedSampleIndices.size() + (Parameters.getProcessdMaxMse() - mse)*Parameters.getProcessdLockingActivationScale();
         }
     }
     
@@ -152,11 +153,11 @@ public class ProcessD
     {
         ArrayList<ProcessA.Sample> workingSamples;
         ArrayList<LineDetector> resultLineDetectors;
-        int sampleI;
+        
         float sumOfAllActivations;
         float maxActivation;
         
-        final float SAMPLECOUNTLINEDETECTORMULTIPLIER = 15.0f;
+        final float SAMPLECOUNTLINEDETECTORMULTIPLIER = 3.5f;
         
         resultLineDetectors = new ArrayList<>();
         sumOfAllActivations = 0.0f;
@@ -164,41 +165,10 @@ public class ProcessD
         
         workingSamples = filterEndosceletonPoints(samples);
         
-        int lineDetectorCounter;
+        int counter;
         
-        for( lineDetectorCounter = 0; lineDetectorCounter < Math.round((float)samples.size()*SAMPLECOUNTLINEDETECTORMULTIPLIER); lineDetectorCounter++ )
+        for( counter = 0; counter < Math.round((float)samples.size()*SAMPLECOUNTLINEDETECTORMULTIPLIER); counter++ )
         {
-            // to form a new line detector form a new linedetector by choosing two points at random
-            ArrayList<Integer> sampleIndicesForInitialLine = DistinctUtility.getTwoDisjunctNumbers(random, workingSamples.size());
-
-            // create new line detector
-            LineDetector createdLineDetector;
-
-            int sampleIndexA;
-            int sampleIndexB;
-
-            sampleIndexA = sampleIndicesForInitialLine.get(0);
-            sampleIndexB = sampleIndicesForInitialLine.get(1);
-
-            if( workingSamples.get(sampleIndexA).position.x != workingSamples.get(sampleIndexB).position.x )
-            {
-                createdLineDetector = LineDetector.createFromIntegerPositions(workingSamples.get(sampleIndexA).position, workingSamples.get(sampleIndexB).position, sampleIndicesForInitialLine);
-
-                resultLineDetectors.add(createdLineDetector);
-                sumOfAllActivations += createdLineDetector.getActivation();
-
-                maxActivation = calculationMaxActivation(resultLineDetectors);
-            }
-        }
-        
-        
-        for( sampleI = 0; sampleI < workingSamples.size(); sampleI++ )
-        {
-            // TODO< refactor into 3 functions >
-            
-            
-            /*
-            for( lineDetectorCounter = 0; lineDetectorCounter < 5; lineDetectorCounter++ )
             {
                 // to form a new line detector form a new linedetector by choosing two points at random
                 ArrayList<Integer> sampleIndicesForInitialLine = DistinctUtility.getTwoDisjunctNumbers(random, workingSamples.size());
@@ -211,19 +181,26 @@ public class ProcessD
 
                 sampleIndexA = sampleIndicesForInitialLine.get(0);
                 sampleIndexB = sampleIndicesForInitialLine.get(1);
-                
+
                 if( workingSamples.get(sampleIndexA).position.x != workingSamples.get(sampleIndexB).position.x )
                 {
-                    createdLineDetector = LineDetector.createFromIntegerPositions(workingSamples.get(sampleIndexA).position, workingSamples.get(sampleIndexB).position, sampleIndicesForInitialLine);
+                    // TODO< integrate as many as possible points into the detector ? >
                     
+                    createdLineDetector = LineDetector.createFromIntegerPositions(workingSamples.get(sampleIndexA).position, workingSamples.get(sampleIndexB).position, sampleIndicesForInitialLine);
+
                     resultLineDetectors.add(createdLineDetector);
                     sumOfAllActivations += createdLineDetector.getActivation();
-                    
+
                     maxActivation = calculationMaxActivation(resultLineDetectors);
                 }
             }
-            */
             
+            // try to include a random sample into the detectors
+            
+            int sampleI;
+            
+            sampleI = random.nextInt(workingSamples.size());
+        
             
             // try to integrate the current sample into line(s)
             for( LineDetector iteratorDetector : resultLineDetectors )
@@ -240,13 +217,6 @@ public class ProcessD
                 }
                 // else we are here
                 
-                if( !iteratorDetector.isBetweenOrginalStartAndEnd(convertVectorToFloat(currentSample.position)) )
-                {
-                    continue;
-                }
-                // else we are here
-                
-                
                 SimpleRegression regression = new SimpleRegression();
                 for (sampleIndexI = 0; sampleIndexI < iteratorDetector.integratedSampleIndices.size(); sampleIndexI++)
                 {
@@ -256,15 +226,15 @@ public class ProcessD
                     sampleIndex = iteratorDetector.integratedSampleIndices.get(sampleIndexI);
                     currentSample = workingSamples.get(sampleIndex);
                     
-                    regression.addData((float)currentSample.position.y, (float)currentSample.position.x);
+                    regression.addData(currentSample.position.x, currentSample.position.y);
                 }
                 
                 
-                regression.addData(currentSample.position.y, currentSample.position.x);
+                regression.addData(currentSample.position.x, currentSample.position.y);
                 
                 mse = (float)regression.getMeanSquareError();
                 
-                if( mse < Parameters.ProcessD.MAXMSE )
+                if( mse < Parameters.getProcessdMaxMse() )
                 {
                     // we do this to save the time for summing up all activations of all detectors after this modification
                     sumOfAllActivations -= iteratorDetector.getActivation();
@@ -284,33 +254,10 @@ public class ProcessD
                     maxActivation = calculationMaxActivation(resultLineDetectors);
                 }
             }
-            
-            
-            // try to delete (random) detectors if its activation is below the threashold and it didn't got locked
-            /*
-            int counter;
-            
-            for( counter = 0; counter < 2; counter++ )
-            {
-                int discardCandidateDetectorIndex;
-                LineDetector discardCandidate;
-
-                discardCandidateDetectorIndex = random.nextInt(resultLineDetectors.size());
-                discardCandidate = resultLineDetectors.get(discardCandidateDetectorIndex);
-
-                if( !discardCandidate.isLocked && discardCandidate.getActivation() < maxActivation*Parameters.ProcessD.MINIMALACTIVATIONTOSUMRATIO )
-                {
-                    maxActivation = calculationMaxActivation(resultLineDetectors);
-                    sumOfAllActivations -= discardCandidate.getActivation();
-                    
-                    resultLineDetectors.remove(discardCandidateDetectorIndex);
-                }
-            }*/
-            
         }
         
-        
         // delete all detectors for which the activation was not enought
+        
         int detectorI;
         
         for( detectorI = resultLineDetectors.size()-1; detectorI >= 0; detectorI-- )
@@ -324,6 +271,7 @@ public class ProcessD
                 resultLineDetectors.remove(detectorI);
             }
         }
+        
         
         return resultLineDetectors;
     }
@@ -344,12 +292,7 @@ public class ProcessD
     
     private static void lockDetectorIfItHasEnoughtActivation(LineDetector detector)
     {
-        detector.isLocked |= detector.getActivation() > Parameters.ProcessD.LOCKINGACTIVATION;
-        
-        if( detector.isLocked )
-        {
-            int x = 0;
-        }
+        detector.isLocked |= detector.getActivation() > Parameters.getProcessdLockingActivation();
     }
     
     private static Vector2d<Float> convertVectorToFloat(Vector2d<Integer> vector)

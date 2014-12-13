@@ -8,6 +8,8 @@ import bpsolver.nodes.PlatonicPrimitiveNode;
 
 public class BpSolver {
     public static void main(String[] args) {
+        Parameters.init();
+        
         BpSolver solver = new BpSolver();
         solver.initializeNetwork();
         solver.setupLtmFactoryDefault();

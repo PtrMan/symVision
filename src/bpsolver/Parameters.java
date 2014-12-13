@@ -1,32 +1,65 @@
 package bpsolver;
 
+/**
+ * class to allow parameter tuning while the program is running, but also let parameters be set to constants (which the compiler or JIT hopefuly optimizes out)
+ * 
+ */
 public class Parameters
 {
-    // is the (less than 1.0) factor between two lines to be considered to have the equal length
-    // ASK< must this be a nonlinear relationship? >
-    public final static float RELATIVELINELENGTHTOBECONSIDEREDEQUAL = 0.9f;
-    
-    public static class ProcessA
+    public static float getProcessdLockingActivation()
     {
-        public final static float MINIMALHITRATIOUNTILTERMINATION = 0.005f;
+        return getProcessdMaxMse()*getProcessdLockingActivationScale()+getProcessdLockingActivationOffset();
     }
     
-    public static class ProcessD
+    public static float getProcessdMaxMse()
     {
-        public final static float MAXMSE = 4.0f; // max mean square error for inclusion of a point
-        
-        public final static float LOCKINGACTIVATIONMSESCALE = 0.5f;
-        public final static float MINIMALACTIVATIONTOSUMRATIO = 0.0f; // minimal ratio of the activation of an detector to the sum of all detectors to not get discarded
-        public final static float LOCKINGACTIVATION = LOCKINGACTIVATIONMSESCALE*MAXMSE+1.0f+5.5f; // the minimal activation of a detector to get locked
+        if( ALLOWTUNINGPROCESSDMAXMSE )
+        {
+            return currentProcessdMaxMse;
+        }
+        else
+        {
+            return HardParameters.ProcessD.MAXMSE;
+        }
     }
     
-    public static class ProcessE
+    public static float getProcessdLockingActivationOffset()
     {
-        public final static int NEIGHTBORHOODSEARCHRADIUS = 10;
+        if( ALLOWTUNINGPROCESSDLOCKINGACTIVATIONOFFSET )
+        {
+            return currentProcessdLockingActivationOffset;
+        }
+        else
+        {
+            return HardParameters.ProcessD.LOCKINGACTIVATIONOFFSET;
+        }
     }
     
-    public static class ProcessH
+    public static float getProcessdLockingActivationScale()
     {
-        public final static float MAXDISTANCEFORCANDIDATEPOINT = 3.0f;
+        if( ALLOWTUNINGPROCESSDLOCKINGACTIVATIONSCALE )
+        {
+            return currentProcessdLockingActivationScale;
+        }
+        else
+        {
+            return HardParameters.ProcessD.LOCKINGACTIVATIONMSESCALE;
+        }
     }
+    
+    public static void init()
+    {
+        currentProcessdMaxMse = HardParameters.ProcessD.MAXMSE;
+        currentProcessdLockingActivationOffset = HardParameters.ProcessD.LOCKINGACTIVATIONOFFSET;
+        currentProcessdLockingActivationScale = HardParameters.ProcessD.LOCKINGACTIVATIONMSESCALE;
+    }
+    
+    public static float currentProcessdMaxMse;
+    public static float currentProcessdLockingActivationOffset;
+    public static float currentProcessdLockingActivationScale;
+    
+    
+    private final static boolean ALLOWTUNINGPROCESSDMAXMSE = true;
+    private final static boolean ALLOWTUNINGPROCESSDLOCKINGACTIVATIONOFFSET = true;
+    private final static boolean ALLOWTUNINGPROCESSDLOCKINGACTIVATIONSCALE = true;
 }

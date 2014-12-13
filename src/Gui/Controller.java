@@ -10,6 +10,7 @@ import RetinaLevel.ProcessB;
 import RetinaLevel.ProcessC;
 import RetinaLevel.ProcessD;
 import RetinaLevel.ProcessH;
+import bpsolver.Parameters;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -73,13 +74,13 @@ public class Controller
             Graphics2D g2 = off_Image.createGraphics();
             g2.setColor(Color.BLACK);
 
-            g2.drawLine(10, 10, 30, 20);
+            //g2.drawLine(10, 10, 30, 20);
 
-            g2.drawLine(20, 30, 30, 20);
+            //g2.drawLine(20, 30, 30, 20);
             
             drawTestTriangle(g2, new Vector2d<>(20.0f, 60.0f), 10.0f, time, (3.0f / (float)Math.sqrt(3)));
             
-            drawTestTriangle(g2, new Vector2d<>(60.0f, 60.0f), 10.0f, time * 0.114f, 0.5f*(3.0f / (float)Math.sqrt(3)));
+            //drawTestTriangle(g2, new Vector2d<>(60.0f, 60.0f), 10.0f, time * 0.114f, 0.5f*(3.0f / (float)Math.sqrt(3)));
 
             return off_Image;
         }
@@ -88,7 +89,7 @@ public class Controller
         {
             drawTrianglePart(graphics, position, radius, angle                                      , radius * relativeSegmentWidth);
             drawTrianglePart(graphics, position, radius, angle + (2.0f*(float)Math.PI * (1.0f/3.0f)), radius * relativeSegmentWidth);
-            drawTrianglePart(graphics, position, radius, angle + (2.0f*(float)Math.PI * (2.0f/3.0f)), radius * relativeSegmentWidth);
+            //test drawTrianglePart(graphics, position, radius, angle + (2.0f*(float)Math.PI * (2.0f/3.0f)), radius * relativeSegmentWidth);
         }
         
         private static void drawTrianglePart(Graphics2D graphics, Vector2d<Float> center, float radius, float angle, float segmentWidth)
@@ -138,7 +139,7 @@ public class Controller
             BufferedImage resultImage;
             Graphics2D graphics;
 
-            resultImage = new BufferedImage(100, 50, BufferedImage.TYPE_INT_ARGB);
+            resultImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
 
             graphics = resultImage.createGraphics();
             graphics.setColor(Color.RED);
@@ -148,9 +149,14 @@ public class Controller
                 Vector2d<Float> aProjectedFloat;
                 Vector2d<Float> bProjectedFloat;
 
-                aProjectedFloat = iterationDetector.getAProjected();
-                bProjectedFloat = iterationDetector.getBProjected();
-
+                
+                //aProjectedFloat = iterationDetector.getAProjected();
+                //bProjectedFloat = iterationDetector.getBProjected();
+                
+                // we draw after m and n of the line
+                aProjectedFloat = new Vector2d<>(0.0f, iterationDetector.n);
+                bProjectedFloat = new Vector2d<>(100.0f, iterationDetector.n + iterationDetector.m*100.0f);
+                
                 graphics.drawLine(Math.round(aProjectedFloat.x), Math.round(aProjectedFloat.y), Math.round(bProjectedFloat.x), Math.round(bProjectedFloat.y));
             }
 
@@ -171,8 +177,12 @@ public class Controller
     }
     
     public static void main(String[] args) {
+        Parameters.init();
+        
         RecalculateActionListener recalculate = new RecalculateActionListener();
         recalculate.interactive = new Interactive();
+        
+        TuningWindow tuningWindow = new TuningWindow();
         
         Timer timer = new Timer(50, recalculate);
         timer.setInitialDelay(0);

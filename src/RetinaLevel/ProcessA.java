@@ -2,7 +2,7 @@ package RetinaLevel;
 
 import Datastructures.Map2d;
 import Datastructures.Vector2d;
-import bpsolver.Parameters;
+import bpsolver.HardParameters;
 import java.util.ArrayList;
 import java.util.Random;
 import math.RandomUtil;
@@ -43,8 +43,7 @@ public class ProcessA
     {
         workingImage = image.clone();
     }
-    
-    // TODO< sample as long as the hit/miss ratio is large enought >
+
     /**
      * 
      * avoids samping the same pixel by setting the sampled positions to false
@@ -98,7 +97,7 @@ public class ProcessA
             {
                 checkCounter = 0;
                 
-                if( (float)hitCount / (float)sampleCount < Parameters.ProcessA.MINIMALHITRATIOUNTILTERMINATION )
+                if( (float)hitCount / (float)sampleCount < HardParameters.ProcessA.MINIMALHITRATIOUNTILTERMINATION )
                 {
                     break;
                 }

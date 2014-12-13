@@ -6,7 +6,7 @@ import FargGeneral.network.Link;
 import FargGeneral.network.Network;
 import FargGeneral.network.Node;
 import bpsolver.NetworkHandles;
-import bpsolver.Parameters;
+import bpsolver.HardParameters;
 import bpsolver.SolverCodelet;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
@@ -205,7 +205,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         
         ratio = lengthMin/lengthMax;
         
-        return ratio > Parameters.RELATIVELINELENGTHTOBECONSIDEREDEQUAL;
+        return ratio > HardParameters.RELATIVELINELENGTHTOBECONSIDEREDEQUAL;
     }
     
     private void relinkGraph(Node parentNode, Node nodeA, Node nodeB, Tuple4<FeatureNode, Integer, FeatureNode, Integer> relinkInfoTuple)
