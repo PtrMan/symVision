@@ -29,4 +29,22 @@ public abstract class Node
     {
         activiation += activationDelta;
     }
+    
+    // TODO< good place to access a Map of the links >
+    public ArrayList<Link> getLinksByType(Link.EnumType type)
+    {
+        ArrayList<Link> result;
+        
+        result = new ArrayList<Link>();
+        
+        for( Link iterationLink : outgoingLinks )
+        {
+            if( iterationLink.type == type )
+            {
+                result.add(iterationLink);
+            }
+        }
+        
+        return result;
+    }
 }
