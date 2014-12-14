@@ -1,6 +1,7 @@
 package bpsolver.nodes;
 
 import FargGeneral.network.Node;
+import bpsolver.FeatureStatistics;
 
 /**
  * a feature is something like lineslope or linelength
@@ -70,6 +71,9 @@ public class FeatureNode extends Node {
     private EnumValueType valueType;
     
     private int weight; // used for fair fusing of nodes
+    
+    // TODO< set with constructor >
+    public FeatureStatistics statistics;
     
     public enum EnumValueType
     {
