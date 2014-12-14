@@ -48,9 +48,10 @@ public class Controller
             processB.process(samples, image);
             processC.process(samples);
 
-            ArrayList<ProcessD.LineDetector> lineDetectors = processD.detectLines(samples);
+            ArrayList<ProcessD.SingleLineDetector> lineDetectors = processD.detectLines(samples);
 
-            processH.process(lineDetectors);
+            // for now disabled to get raw lines
+            //processH.process(lineDetectors);
 
             BufferedImage detectorImage = drawDetectors(lineDetectors, samples);
 
@@ -134,7 +135,7 @@ public class Controller
             return convertedToMap;
         }
 
-        private static BufferedImage drawDetectors(ArrayList<ProcessD.LineDetector> lineDetectors, ArrayList<ProcessA.Sample> samples)
+        private static BufferedImage drawDetectors(ArrayList<ProcessD.SingleLineDetector> lineDetectors, ArrayList<ProcessA.Sample> samples)
         {
             BufferedImage resultImage;
             Graphics2D graphics;
@@ -144,18 +145,13 @@ public class Controller
             graphics = resultImage.createGraphics();
             graphics.setColor(Color.RED);
 
-            for( ProcessD.LineDetector iterationDetector : lineDetectors )
+            for( ProcessD.SingleLineDetector iterationDetector : lineDetectors )
             {
                 Vector2d<Float> aProjectedFloat;
                 Vector2d<Float> bProjectedFloat;
 
-                
-                //aProjectedFloat = iterationDetector.getAProjected();
-                //bProjectedFloat = iterationDetector.getBProjected();
-                
-                // we draw after m and n of the line
-                aProjectedFloat = new Vector2d<>(0.0f, iterationDetector.n);
-                bProjectedFloat = new Vector2d<>(100.0f, iterationDetector.n + iterationDetector.m*100.0f);
+                aProjectedFloat = iterationDetector.aFloat;
+                bProjectedFloat = iterationDetector.bFloat;
                 
                 graphics.drawLine(Math.round(aProjectedFloat.x), Math.round(aProjectedFloat.y), Math.round(bProjectedFloat.x), Math.round(bProjectedFloat.y));
             }

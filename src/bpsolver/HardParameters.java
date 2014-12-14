@@ -18,6 +18,8 @@ public class HardParameters
         public final static float LOCKINGACTIVATIONMSESCALE = 1.0f;
         public final static float MINIMALACTIVATIONTOSUMRATIO = 0.0f; // minimal ratio of the activation of an detector to the sum of all detectors to not get discarded
         public final static float LOCKINGACTIVATIONOFFSET = 4.6f; // LOCKINGACTIVATION = LOCKINGACTIVATIONMSESCALE*MAXMSE+this; // the minimal activation of a detector to get locked
+        
+        public final static float LINECLUSTERINGMAXDISTANCE = 7.0f; // how many units (pixels) can be the distance of points of a line to be considered to lay on the same line
     }
     
     public static class ProcessE
@@ -28,5 +30,10 @@ public class HardParameters
     public static class ProcessH
     {
         public final static float MAXDISTANCEFORCANDIDATEPOINT = 3.0f;
+    }
+    
+    public static class FeatureWeights
+    {
+        public final static float LINESEGMENTFEATURELINELENGTH = 0.7f;
     }
 }
