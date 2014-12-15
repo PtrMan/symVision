@@ -22,49 +22,63 @@ public class ProcessH
         // TODO< a possible solution is to flag "deleted" elements in the input array and store the fused Detectors in a second array
         //       then after one iteration these two arrays get merged (without deleted elements), this repeats as long as elements are fused
         //     >
-        repeatSearch:
-        for( iteratorLow = 0; iteratorLow < workingDetectors.size(); iteratorLow++ )
+        for(;;)
         {
-            for( iteratorHigh = iteratorLow+1; iteratorHigh < workingDetectors.size(); iteratorHigh++ )
+            boolean terminate;
+            
+            terminate = true;
+            
+            repeatSearch:
+            for( iteratorLow = 0; iteratorLow < workingDetectors.size(); iteratorLow++ )
             {
-                ProcessD.SingleLineDetector detectorLow;
-                ProcessD.SingleLineDetector detectorHigh;
-                
-                detectorLow = workingDetectors.get(iteratorLow);
-                detectorHigh = workingDetectors.get(iteratorHigh);
-                
-                if( canDetectorsBeFusedOverlap(detectorLow, detectorHigh) )
+                for( iteratorHigh = iteratorLow+1; iteratorHigh < workingDetectors.size(); iteratorHigh++ )
                 {
-                    ProcessD.SingleLineDetector fusedLineDetector;
-                    
-                    // fuse
-                    fusedLineDetector = fuseLineDetectorsOverlap(detectorLow, detectorHigh);
-                    
-                    // NOTE< order is important >
-                    workingDetectors.remove(iteratorHigh);
-                    workingDetectors.remove(iteratorLow);
-                    
-                    workingDetectors.add(fusedLineDetector);
-                    
-                    // we need to repeat the search because we changed the array
-                    break repeatSearch;
+                    ProcessD.SingleLineDetector detectorLow;
+                    ProcessD.SingleLineDetector detectorHigh;
+
+                    detectorLow = workingDetectors.get(iteratorLow);
+                    detectorHigh = workingDetectors.get(iteratorHigh);
+
+                    if( canDetectorsBeFusedOverlap(detectorLow, detectorHigh) )
+                    {
+                        ProcessD.SingleLineDetector fusedLineDetector;
+
+                        // fuse
+                        fusedLineDetector = fuseLineDetectorsOverlap(detectorLow, detectorHigh);
+
+                        // NOTE< order is important >
+                        workingDetectors.remove(iteratorHigh);
+                        workingDetectors.remove(iteratorLow);
+
+                        workingDetectors.add(fusedLineDetector);
+
+                        // we need to repeat the search because we changed the array
+                        terminate = false;
+                        break repeatSearch;
+                    }
+                    else if( canDetectorsBeFusedInside(detectorLow, detectorHigh) )
+                    {
+                        ProcessD.SingleLineDetector fusedLineDetector;
+
+                        // fuse
+                        fusedLineDetector = fuseLineDetectorsInside(detectorLow, detectorHigh);
+
+                        // NOTE< order is important >
+                        workingDetectors.remove(iteratorHigh);
+                        workingDetectors.remove(iteratorLow);
+
+                        workingDetectors.add(fusedLineDetector);
+
+                        // we need to repeat the search because we changed the array
+                        terminate = false;
+                        break repeatSearch;
+                    }
                 }
-                else if( canDetectorsBeFusedInside(detectorLow, detectorHigh) )
-                {
-                    ProcessD.SingleLineDetector fusedLineDetector;
-                    
-                    // fuse
-                    fusedLineDetector = fuseLineDetectorsInside(detectorLow, detectorHigh);
-                    
-                    // NOTE< order is important >
-                    workingDetectors.remove(iteratorHigh);
-                    workingDetectors.remove(iteratorLow);
-                    
-                    workingDetectors.add(fusedLineDetector);
-                    
-                    // we need to repeat the search because we changed the array
-                    break repeatSearch;
-                }
+            }
+            
+            if( terminate )
+            {
+                break;
             }
         }
     }
@@ -96,7 +110,7 @@ public class ProcessH
             projectedBEnd = tempEnd;
         }
         
-        if( vectorXBetween(projectedABegin, projectedAEnd, projectedBBegin) && vectorXBetween(projectedBBegin, projectedBEnd, projectedAEnd) )
+        if( vectorXBetweenInclusive(projectedABegin, projectedAEnd, projectedBBegin) && vectorXBetweenInclusive(projectedBBegin, projectedBEnd, projectedAEnd) )
         {
         }
         else
@@ -160,7 +174,7 @@ public class ProcessH
         // TODO< vertical special case >
         
         // which case?
-        if( vectorXBetween(detectorA.aFloat, detectorA.bFloat, detectorB.aFloat) && vectorXBetween(detectorA.aFloat, detectorA.bFloat, detectorB.bFloat)  )
+        if( vectorXBetweenInclusive(detectorA.aFloat, detectorA.bFloat, detectorB.aFloat) && vectorXBetweenInclusive(detectorA.aFloat, detectorA.bFloat, detectorB.bFloat)  )
         {
             // detectorB inside detectorA ?
             if( isProjectedPointOntoLineBelowDistanceLimit(detectorB.aFloat, detectorA) && isProjectedPointOntoLineBelowDistanceLimit(detectorB.bFloat, detectorA)  )
@@ -172,7 +186,7 @@ public class ProcessH
                 return false;
             }
         }
-        else if( vectorXBetween(detectorB.aFloat, detectorB.bFloat, detectorA.aFloat) && vectorXBetween(detectorB.aFloat, detectorB.bFloat, detectorA.bFloat) )
+        else if( vectorXBetweenInclusive(detectorB.aFloat, detectorB.bFloat, detectorA.aFloat) && vectorXBetweenInclusive(detectorB.aFloat, detectorB.bFloat, detectorA.bFloat) )
         {
             // detectorA inside detectorB ?
             if( isProjectedPointOntoLineBelowDistanceLimit(detectorA.aFloat, detectorB) && isProjectedPointOntoLineBelowDistanceLimit(detectorA.bFloat, detectorB)  )
@@ -198,7 +212,7 @@ public class ProcessH
         // TODO< vertical special case >
         
         // which case?
-        if( vectorXBetween(detectorA.aFloat, detectorA.bFloat, detectorB.aFloat) && vectorXBetween(detectorA.aFloat, detectorA.bFloat, detectorB.bFloat)  )
+        if( vectorXBetweenInclusive(detectorA.aFloat, detectorA.bFloat, detectorB.aFloat) && vectorXBetweenInclusive(detectorA.aFloat, detectorA.bFloat, detectorB.bFloat)  )
         {
             // detectorB inside detectorA
             
@@ -208,7 +222,7 @@ public class ProcessH
         }
         else
         {
-            Assert.Assert(vectorXBetween(detectorB.aFloat, detectorB.bFloat, detectorA.aFloat) && vectorXBetween(detectorB.aFloat, detectorB.bFloat, detectorA.bFloat), "");
+            Assert.Assert(vectorXBetweenInclusive(detectorB.aFloat, detectorB.bFloat, detectorA.aFloat) && vectorXBetweenInclusive(detectorB.aFloat, detectorB.bFloat, detectorA.bFloat), "");
             
             // detectorA inside detectorB
             
@@ -225,6 +239,11 @@ public class ProcessH
     private static boolean vectorXBetween(Vector2d<Float> min, Vector2d<Float> max, Vector2d<Float> value)
     {
         return value.x > min.x && value.x < max.x;
+    }
+    
+    private static boolean vectorXBetweenInclusive(Vector2d<Float> min, Vector2d<Float> max, Vector2d<Float> value)
+    {
+        return value.x >= min.x && value.x <= max.x;
     }
     
     private static boolean isProjectedPointOntoLineBelowDistanceLimit(Vector2d<Float> point, ProcessD.SingleLineDetector line)

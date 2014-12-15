@@ -80,6 +80,10 @@ public class ProcessD
      */
     public static class SingleLineDetector
     {
+        private SingleLineDetector()
+        {
+        }
+        
         public static SingleLineDetector createFromIntegerPositions(Vector2d<Integer> a, Vector2d<Integer> b)
         {
             SingleLineDetector createdDetector;
