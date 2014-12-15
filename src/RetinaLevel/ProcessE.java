@@ -25,21 +25,25 @@ public class ProcessE
         // this is only possible if we have the whole image at an instance
         // we assume here that this is the case
         
-        int lowI, highI;
+        int outerI, innerI;
         
         flushIntersections();
         
-        for( lowI = 0; lowI < lineDetectors.size()-1; lowI++ )
+        for( outerI = 0; outerI < lineDetectors.size(); outerI++ )
         {
-            for( highI = lowI+1; highI < lineDetectors.size(); highI++ )
+            for( innerI = 0; innerI < lineDetectors.size(); innerI++ )
             {
+                if( innerI == outerI )
+                {
+                    continue;
+                }
                 
                 Vector2d<Integer> intersectionPosition;
                 ProcessD.SingleLineDetector lowLine;
                 ProcessD.SingleLineDetector highLine;
                 
-                lowLine = lineDetectors.get(lowI);
-                highLine = lineDetectors.get(highI);
+                lowLine = lineDetectors.get(outerI);
+                highLine = lineDetectors.get(innerI);
                 
                 intersectionPosition = intersectLineDetectors(lowLine, highLine);
                 
@@ -72,8 +76,7 @@ public class ProcessE
     
     private static Vector2d<Integer> intersectLineDetectors(ProcessD.SingleLineDetector lineA, ProcessD.SingleLineDetector lineB)
     {
-        float x;
-        float y;
+        float x, y;
         
         // parallel check
         if( lineA.getM() == lineB.getM() )
@@ -81,7 +84,7 @@ public class ProcessE
             return null;
         }
         
-        x = (lineA.getN() - lineB.getN())/(lineA.getM() - lineB.getM());
+        x = (lineA.getN() - lineB.getN())/(lineB.getM() - lineA.getM());
         y = lineA.getN() + lineA.getM() * x;
         
         return new Vector2d<Integer>(Math.round(x), Math.round(y));

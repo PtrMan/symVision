@@ -200,12 +200,7 @@ public class ProcessD
         public float getN()
         {
             // TODO< m = inf special handling >
-            float m, n;
-            
-            m = getM();
-            
-            n = aFloat.y - aFloat.x*m;
-            return n;
+            return aFloat.y - aFloat.x*getM();
         }
         
         public float getM()

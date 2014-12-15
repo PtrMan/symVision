@@ -201,7 +201,7 @@ public class Controller
         
         TuningWindow tuningWindow = new TuningWindow();
         
-        Timer timer = new Timer(50, recalculate);
+        Timer timer = new Timer(20, recalculate);
         timer.setInitialDelay(0);
         timer.start(); 
     }
