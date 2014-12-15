@@ -193,7 +193,7 @@ public class ProcessD
             return add(new Vector2d<>(0.0f, getN()), getScaled(lineDirection, dotResult));
         }
         
-        private float getN()
+        public float getN()
         {
             // TODO< m = inf special handling >
             float m, n;
@@ -204,7 +204,7 @@ public class ProcessD
             return n;
         }
         
-        private float getM()
+        public float getM()
         {
             Vector2d<Float> diff;
             

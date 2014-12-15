@@ -9,6 +9,7 @@ import RetinaLevel.ProcessA;
 import RetinaLevel.ProcessB;
 import RetinaLevel.ProcessC;
 import RetinaLevel.ProcessD;
+import RetinaLevel.ProcessE;
 import RetinaLevel.ProcessH;
 import bpsolver.Parameters;
 import java.awt.Color;
@@ -40,6 +41,7 @@ public class Controller
             ProcessC processC = new ProcessC();
             ProcessD processD = new ProcessD();
             ProcessH processH = new ProcessH();
+            ProcessE processE = new ProcessE();
 
             processA.setWorkingImage(image);
             ArrayList<ProcessA.Sample> samples = processA.sampleImage();
@@ -52,8 +54,11 @@ public class Controller
             
             // can be commented/disabled if we want to debug the raw lines
             processH.process(lineDetectors);
-
-            BufferedImage detectorImage = drawDetectors(lineDetectors, samples);
+            
+            processE.process(lineDetectors, image);
+            ArrayList<ProcessE.Intersection> lineIntersections = processE.intersections;
+            
+            BufferedImage detectorImage = drawDetectors(lineDetectors, lineIntersections, samples);
 
 
             interactive.leftCanvas.setImage(javaImage);
@@ -135,7 +140,7 @@ public class Controller
             return convertedToMap;
         }
 
-        private static BufferedImage drawDetectors(ArrayList<ProcessD.SingleLineDetector> lineDetectors, ArrayList<ProcessA.Sample> samples)
+        private static BufferedImage drawDetectors(ArrayList<ProcessD.SingleLineDetector> lineDetectors, ArrayList<ProcessE.Intersection> intersections, ArrayList<ProcessA.Sample> samples)
         {
             BufferedImage resultImage;
             Graphics2D graphics;
@@ -163,6 +168,13 @@ public class Controller
                 }
                 
                 graphics.drawLine(Math.round(aProjectedFloat.x), Math.round(aProjectedFloat.y), Math.round(bProjectedFloat.x), Math.round(bProjectedFloat.y));
+            }
+            
+            for( ProcessE.Intersection iterationIntersection : intersections )
+            {
+                graphics.setColor(Color.BLUE);
+                
+                graphics.drawRect(iterationIntersection.intersectionPosition.x-1, iterationIntersection.intersectionPosition.y-1, 3, 3);
             }
 
             /*
