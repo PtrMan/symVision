@@ -49,9 +49,9 @@ public class Controller
             processC.process(samples);
 
             ArrayList<ProcessD.SingleLineDetector> lineDetectors = processD.detectLines(samples);
-
-            // for now disabled to get raw lines
-            //processH.process(lineDetectors);
+            
+            // can be commented/disabled if we want to debug the raw lines
+            processH.process(lineDetectors);
 
             BufferedImage detectorImage = drawDetectors(lineDetectors, samples);
 
@@ -143,7 +143,7 @@ public class Controller
             resultImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
 
             graphics = resultImage.createGraphics();
-            graphics.setColor(Color.RED);
+            
 
             for( ProcessD.SingleLineDetector iterationDetector : lineDetectors )
             {
@@ -152,6 +152,15 @@ public class Controller
 
                 aProjectedFloat = iterationDetector.aFloat;
                 bProjectedFloat = iterationDetector.bFloat;
+                
+                if( iterationDetector.resultOfCombination )
+                {
+                    graphics.setColor(Color.ORANGE);
+                }
+                else
+                {
+                    graphics.setColor(Color.RED);
+                }
                 
                 graphics.drawLine(Math.round(aProjectedFloat.x), Math.round(aProjectedFloat.y), Math.round(bProjectedFloat.x), Math.round(bProjectedFloat.y));
             }

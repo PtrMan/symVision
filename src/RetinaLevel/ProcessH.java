@@ -1,10 +1,7 @@
 package RetinaLevel;
 
 import Datastructures.Vector2d;
-import static Datastructures.Vector2d.FloatHelper.dot;
-import static Datastructures.Vector2d.FloatHelper.getScaled;
 import static Datastructures.Vector2d.FloatHelper.sub;
-import static Datastructures.Vector2d.FloatHelper.add;
 import static Datastructures.Vector2d.FloatHelper.getLength;
 import bpsolver.HardParameters;
 import java.util.ArrayList;
@@ -15,7 +12,7 @@ import java.util.ArrayList;
  */
 public class ProcessH
 {
-    public void process(ArrayList<ProcessD.LineDetector> workingDetectors)
+    public void process(ArrayList<ProcessD.SingleLineDetector> workingDetectors)
     {
         // called low and high because the index low is always lower than high
         int iteratorLow, iteratorHigh;
@@ -29,15 +26,15 @@ public class ProcessH
         {
             for( iteratorHigh = iteratorLow+1; iteratorHigh < workingDetectors.size(); iteratorHigh++ )
             {
-                ProcessD.LineDetector detectorLow;
-                ProcessD.LineDetector detectorHigh;
+                ProcessD.SingleLineDetector detectorLow;
+                ProcessD.SingleLineDetector detectorHigh;
                 
                 detectorLow = workingDetectors.get(iteratorLow);
                 detectorHigh = workingDetectors.get(iteratorHigh);
                 
                 if( canDetectorsBeFused(detectorLow, detectorHigh) )
                 {
-                    ProcessD.LineDetector fusedLineDetector;
+                    ProcessD.SingleLineDetector fusedLineDetector;
                     
                     // fuse
                     fusedLineDetector = fuseLineDetectors(detectorLow, detectorHigh);
@@ -55,7 +52,7 @@ public class ProcessH
         }
     }
     
-    private static boolean canDetectorsBeFused(ProcessD.LineDetector detectorA, ProcessD.LineDetector detectorB)
+    private static boolean canDetectorsBeFused(ProcessD.SingleLineDetector detectorA, ProcessD.SingleLineDetector detectorB)
     {
         Vector2d<Float> projectedABegin, projectedAEnd;
         Vector2d<Float> projectedBBegin, projectedBEnd;
@@ -102,10 +99,11 @@ public class ProcessH
         return true;
     }
     
-    private static ProcessD.LineDetector fuseLineDetectors(ProcessD.LineDetector detectorA, ProcessD.LineDetector detectorB)
+    private static ProcessD.SingleLineDetector fuseLineDetectors(ProcessD.SingleLineDetector detectorA, ProcessD.SingleLineDetector detectorB)
     {
         Vector2d<Float> projectedABegin, projectedAEnd;
         Vector2d<Float> projectedBBegin, projectedBEnd;
+        ProcessD.SingleLineDetector fusedLineDetector;
         
         // we fuse them with taking the lowest begin-x as the begin and the other as the end
         
@@ -128,7 +126,9 @@ public class ProcessH
             projectedBEnd = tempEnd;
         }
         
-        return ProcessD.LineDetector.createFromFloatPositions(projectedABegin, projectedBEnd, null);
+        fusedLineDetector = ProcessD.SingleLineDetector.createFromFloatPositions(projectedABegin, projectedBEnd);
+        fusedLineDetector.resultOfCombination = true;
+        return fusedLineDetector;
     }
     
     /**
@@ -140,27 +140,14 @@ public class ProcessH
         return value.x > min.x && value.x < max.x;
     }
     
-    private static boolean isProjectedPointOntoLineBelowDistanceLimit(Vector2d<Float> point, ProcessD.LineDetector line)
+    private static boolean isProjectedPointOntoLineBelowDistanceLimit(Vector2d<Float> point, ProcessD.SingleLineDetector line)
     {
         Vector2d<Float> projectedPoint;
         float distanceBetweenProjectedAndPoint;
         
-        projectedPoint = projectPointOntoLine(point, line);
+        projectedPoint = line.projectPointOntoLine(point);
         distanceBetweenProjectedAndPoint = getLength(sub(projectedPoint, point));
         
         return distanceBetweenProjectedAndPoint < HardParameters.ProcessH.MAXDISTANCEFORCANDIDATEPOINT;
-    }
-    
-    private static Vector2d<Float> projectPointOntoLine(Vector2d<Float> point, ProcessD.LineDetector line)
-    {
-        Vector2d<Float> lineDirection;
-        Vector2d<Float> diffFromAToPoint;
-        float dotResult;
-        
-        lineDirection = line.getProjectedNormalizedDirection();
-        diffFromAToPoint = sub(point, line.getAProjected());
-        dotResult = dot(lineDirection, diffFromAToPoint);
-        
-        return add(line.getAProjected(), getScaled(lineDirection, dotResult));
     }
 }

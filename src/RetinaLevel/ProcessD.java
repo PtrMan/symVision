@@ -53,7 +53,6 @@ public class ProcessD
             return (float)integratedSampleIndices.size() + (Parameters.getProcessdMaxMse() - mse)*Parameters.getProcessdLockingActivationScale();
         }
         
-        // does this work?
         public Vector2d<Float> projectPointOntoLine(Vector2d<Float> point)
         {
             Vector2d<Float> lineDirection;
@@ -140,6 +139,8 @@ public class ProcessD
         public Vector2d<Float> aFloat;
         public Vector2d<Float> bFloat;
         
+        public boolean resultOfCombination = false; // for visual debugging, was the detector combined from other detectors?
+        
         public boolean isBetweenOrginalStartAndEnd(Vector2d<Float> position) {
             Vector2d<Float> diffAB, diffABnormalizd, diffAPosition;
             float length;
@@ -171,7 +172,7 @@ public class ProcessD
             return bFloat;
         }
         
-        public Vector2d<Float> getProjectedNormalizedDirection()
+        public Vector2d<Float> getNormalizedDirection()
         {
             Vector2d<Float> diff;
             
@@ -179,6 +180,37 @@ public class ProcessD
             return Vector2d.FloatHelper.normalize(diff);
         }
         
+        public Vector2d<Float> projectPointOntoLine(Vector2d<Float> point)
+        {
+            Vector2d<Float> lineDirection;
+            Vector2d<Float> diffFromAToPoint;
+            float dotResult;
+
+            lineDirection = getNormalizedDirection();
+            diffFromAToPoint = sub(point, new Vector2d<>(0.0f, getN()));
+            dotResult = dot(lineDirection, diffFromAToPoint);
+
+            return add(new Vector2d<>(0.0f, getN()), getScaled(lineDirection, dotResult));
+        }
+        
+        private float getN()
+        {
+            // TODO< m = inf special handling >
+            float m, n;
+            
+            m = getM();
+            
+            n = aFloat.y - aFloat.x*m;
+            return n;
+        }
+        
+        private float getM()
+        {
+            Vector2d<Float> diff;
+            
+            diff = sub(bFloat, aFloat);
+            return diff.y/diff.x;
+        }
     }
     
     /**
