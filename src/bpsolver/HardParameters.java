@@ -29,7 +29,7 @@ public class HardParameters
     
     public static class ProcessH
     {
-        public final static float MAXDISTANCEFORCANDIDATEPOINT = 3.0f;
+        public final static float MAXDISTANCEFORCANDIDATEPOINT = 5.0f;
     }
     
     public static class FeatureWeights
