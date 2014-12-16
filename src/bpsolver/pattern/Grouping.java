@@ -2,9 +2,8 @@ package bpsolver.pattern;
 
 import bpsolver.NetworkHandles;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.TreeSet;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  * Grouping/CLustering algorithm as described in
@@ -18,12 +17,12 @@ public class Grouping
         Set<Pattern> patterns;
         Set<Pattern> knownExemplars;
         
-        patterns = new TreeSet<>();
-        knownExemplars = new TreeSet<>();
+        patterns = new LinkedHashSet<>();
+        knownExemplars = new LinkedHashSet<>();
         
         for( Pattern iterationExemplarI : exemplarsSet )
         {
-            if( exemplarIsSimilarToAPattern(iterationExemplarI, patterns, clusteringThreshold, networkHandles, matchingUpdateImplementation, featurePatternMatching) )
+            if( !exemplarIsSimilarToAPattern(iterationExemplarI, patterns, clusteringThreshold, networkHandles, matchingUpdateImplementation, featurePatternMatching) )
             {
                 float maxSimilarity;
                 Pattern closest;
