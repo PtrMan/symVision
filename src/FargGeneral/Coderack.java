@@ -13,5 +13,10 @@ public class Coderack
         queue.add(codelet, priority);
     }
     
+    public void flush()
+    {
+        queue.flush();
+    }
+    
     private PriorityQueue queue = new PriorityQueue(new Random());
 }

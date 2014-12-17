@@ -61,6 +61,12 @@ public class PriorityQueue<Type>
 
         queue.add(element);
     }
+    
+    public void flush()
+    {
+        queue.clear();
+        prioritySum = 0.0f;
+    }
 
     // the queue is sorted by priority
     private ArrayList<QueueElement> queue = new ArrayList<>();
