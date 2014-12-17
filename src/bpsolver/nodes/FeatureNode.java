@@ -58,6 +58,18 @@ public class FeatureNode extends Node {
         return valueInt;
     }
     
+    public void setValueAsFloat(float value)
+    {
+        valueType = EnumValueType.FLOAT;
+        valueFloat = value;
+    }
+    
+    public void setValueAsInt(int value)
+    {
+        valueType = EnumValueType.INT;
+        valueInt = value;
+    }
+    
     public int getWeight()
     {
         return weight;
