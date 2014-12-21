@@ -221,14 +221,14 @@ public class ProcessD
     public ArrayList<SingleLineDetector> detectLines(ArrayList<ProcessA.Sample> samples)
     {
         ArrayList<ProcessA.Sample> workingSamples;
-        ArrayList<LineDetectorWithMultiplePoints> resultLineDetectors;
+        ArrayList<LineDetectorWithMultiplePoints> multiplePointsLineDetector;
         
         float sumOfAllActivations;
         float maxActivation;
         
         final float SAMPLECOUNTLINEDETECTORMULTIPLIER = 3.5f;
         
-        resultLineDetectors = new ArrayList<>();
+        multiplePointsLineDetector = new ArrayList<>();
         sumOfAllActivations = 0.0f;
         maxActivation = 0.0f;
         
@@ -257,10 +257,10 @@ public class ProcessD
                     
                     createdLineDetector = new LineDetectorWithMultiplePoints(sampleIndicesForInitialLine);
 
-                    resultLineDetectors.add(createdLineDetector);
+                    multiplePointsLineDetector.add(createdLineDetector);
                     sumOfAllActivations += createdLineDetector.getActivation();
 
-                    maxActivation = calculationMaxActivation(resultLineDetectors);
+                    maxActivation = calculationMaxActivation(multiplePointsLineDetector);
                 }
             }
             
@@ -272,7 +272,7 @@ public class ProcessD
         
             
             // try to integrate the current sample into line(s)
-            for( LineDetectorWithMultiplePoints iteratorDetector : resultLineDetectors )
+            for( LineDetectorWithMultiplePoints iteratorDetector : multiplePointsLineDetector )
             {
                 ProcessA.Sample currentSample;
                 float mse;
@@ -320,16 +320,16 @@ public class ProcessD
                     // see above
                     sumOfAllActivations += iteratorDetector.getActivation();
                     
-                    maxActivation = calculationMaxActivation(resultLineDetectors);
+                    maxActivation = calculationMaxActivation(multiplePointsLineDetector);
                 }
             }
         }
         
         // delete all detectors for which the activation was not enought
-        deleteMultiPointDetectorsWhereActiviationIsInsuficient(resultLineDetectors);
+        deleteMultiPointDetectorsWhereActiviationIsInsuficient(multiplePointsLineDetector);
         
         // split the detectors into one or many lines
-        ArrayList<SingleLineDetector> resultSingleDetectors = splitDetectorsIntoLines(resultLineDetectors, samples);
+        ArrayList<SingleLineDetector> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector, samples);
         
         return resultSingleDetectors;
     }
