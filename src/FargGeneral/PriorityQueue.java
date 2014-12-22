@@ -2,10 +2,11 @@ package FargGeneral;
 
 import java.util.ArrayList;
 import java.util.Random;
+import misc.Assert;
 
 public class PriorityQueue<Type>
 {
-    private class QueueElement
+    public class QueueElement
     {
         public Type value;
         public float priority = 0.0f;
@@ -17,6 +18,55 @@ public class PriorityQueue<Type>
     }
     
     public QueueElement getReference()
+    {
+        int chosenIndex;
+        
+        chosenIndex = getNextQueueIndex();
+
+        return queue.get(chosenIndex);
+    }
+    
+    /**
+    * 
+    * only used for (re)filling
+    */
+    public void add(Type value, float priority)
+    {
+        QueueElement element;
+        
+        element = new QueueElement();
+        element.priority = priority;
+        element.value = value;
+        
+        prioritySum += priority;
+        
+        queue.add(element);
+    }
+    
+    public void flush()
+    {
+        queue.clear();
+        prioritySum = 0.0f;
+    }
+    
+    public int getSize()
+    {
+        return queue.size();
+    }
+    
+    public Type dequeue()
+    {
+        int chosenIndex;
+        Type value;
+        
+        chosenIndex = getNextQueueIndex();
+        value = queue.get(chosenIndex).value;
+        queue.remove(chosenIndex);
+        
+        return value;
+    }
+    
+    private int getNextQueueIndex()
     {
         int chosenIndex;
         int priorityDiscreteRange;
@@ -35,6 +85,16 @@ public class PriorityQueue<Type>
         chosenIndex = 0;
         for (; ; )
         {
+            Assert.Assert(chosenIndex <= queue.size(), "");
+            
+            if( chosenIndex == queue.size() )
+            {
+                Assert.Assert(queue.size() != 0, "");
+                chosenIndex = queue.size() - 1;
+                
+                break;
+            }
+            
             if( remainingPriority < queue.get(chosenIndex).priority )
             {
                 break;
@@ -42,30 +102,11 @@ public class PriorityQueue<Type>
             // else
 
             remainingPriority -= queue.get(chosenIndex).priority;
+            
+            chosenIndex++;
         }
-
-        return queue.get(chosenIndex);
-    }
-    
-    /**
-    * 
-    * only used for (re)filling
-    */
-    public void add(Type value, float priority)
-    {
-        QueueElement element;
         
-        element = new QueueElement();
-        element.priority = priority;
-        element.value = value;
-
-        queue.add(element);
-    }
-    
-    public void flush()
-    {
-        queue.clear();
-        prioritySum = 0.0f;
+        return chosenIndex;
     }
 
     // the queue is sorted by priority
