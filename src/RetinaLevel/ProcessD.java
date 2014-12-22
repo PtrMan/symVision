@@ -349,7 +349,7 @@ public class ProcessD
         
         regressionResultForLine = new RegressionForLineResult();
         
-        if( overlappingPixelsOnX <= overlappingPixelsOnY )
+        if( overlappingPixelsOnX <= overlappingPixelsOnY && false )
         {
             // regression on x axis
             
@@ -364,7 +364,9 @@ public class ProcessD
         }
         else
         {
-            float m, n, regressionN;
+            float regressionM, n, m, regressionN;
+            Vector2d<Float> pointA, pointB;
+            Vector2d<Float> pointAOnRegressionLineInFlippedSpace, pointBOnRegressionLineInFlippedSpace;
             Vector2d<Float> pointOnRegressionLine;
             
             // regression on y axis
@@ -376,14 +378,31 @@ public class ProcessD
             }
             
             // calculate m and n
-            m = 1.0f/(float)regression.getSlope();
+            regressionM = (float)regression.getSlope();
             regressionN = (float)regression.getIntercept();
-            pointOnRegressionLine = new Vector2d<>(regressionN, 0.0f);
-            n = pointOnRegressionLine.y + m * pointOnRegressionLine.x;
             
+            m = 1.0f/regressionM;
+            pointOnRegressionLine = new Vector2d<>(regressionN, 0.0f);
+            n = pointOnRegressionLine.y - m * pointOnRegressionLine.x;
+            
+            /*
+            // calculate m and n
+            regressionM = (float)regression.getSlope();
+            regressionN = (float)regression.getIntercept();
+            
+            pointAOnRegressionLineInFlippedSpace = new Vector2d<>(0.0f, regressionN);
+            pointA = new Vector2d<>(pointAOnRegressionLineInFlippedSpace.y, pointAOnRegressionLineInFlippedSpace.x);
+            
+            pointBOnRegressionLineInFlippedSpace = new Vector2d<>(1.0f, regressionN + 1.0f*regressionM);
+            pointB = new Vector2d<>(pointBOnRegressionLineInFlippedSpace.y, pointBOnRegressionLineInFlippedSpace.x);
+            
+            m = (pointB.y - pointA.y)/(pointB.x - pointA.x);
+            n = pointA.y - pointA.x * m;
+            */
             regressionResultForLine.mse = (float)regression.getMeanSquareError();
             regressionResultForLine.n = n;
             regressionResultForLine.m = m;
+            
         }
         
         return regressionResultForLine;
