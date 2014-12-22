@@ -9,6 +9,7 @@ import FargGeneral.Coderack;
 import FargGeneral.network.Link;
 import FargGeneral.network.Network;
 import FargGeneral.network.Node;
+import RetinaLevel.LineIntersection;
 import RetinaLevel.ProcessA;
 import RetinaLevel.ProcessB;
 import RetinaLevel.ProcessC;
@@ -74,7 +75,7 @@ public class Controller
             processH.process(lineDetectors);
             
             processE.process(lineDetectors, image);
-            ArrayList<ProcessE.Intersection> lineIntersections = processE.intersections;
+            ArrayList<LineIntersection> lineIntersections = processE.intersections;
             
             
             
@@ -235,7 +236,7 @@ public class Controller
         }
         
 
-        private static void drawDetectors(Graphics2D graphics, ArrayList<ProcessD.SingleLineDetector> lineDetectors, ArrayList<ProcessE.Intersection> intersections, ArrayList<ProcessA.Sample> samples)
+        private static void drawDetectors(Graphics2D graphics, ArrayList<ProcessD.SingleLineDetector> lineDetectors, ArrayList<LineIntersection> intersections, ArrayList<ProcessA.Sample> samples)
         {
             for( ProcessD.SingleLineDetector iterationDetector : lineDetectors )
             {
@@ -257,7 +258,7 @@ public class Controller
                 graphics.drawLine(Math.round(aProjectedFloat.x), Math.round(aProjectedFloat.y), Math.round(bProjectedFloat.x), Math.round(bProjectedFloat.y));
             }
             
-            for( ProcessE.Intersection iterationIntersection : intersections )
+            for( LineIntersection iterationIntersection : intersections )
             {
                 graphics.setColor(Color.BLUE);
                 

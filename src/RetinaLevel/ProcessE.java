@@ -11,14 +11,6 @@ import java.util.ArrayList;
  */
 public class ProcessE
 {
-    public class Intersection
-    {
-        public ProcessD.SingleLineDetector lineA;
-        public ProcessD.SingleLineDetector lineB;
-        
-        public Vector2d<Integer> intersectionPosition;
-    }
-    
     public void process(ArrayList<ProcessD.SingleLineDetector> lineDetectors, Map2d<Boolean> image)
     {
         // we examine ALL possible intersections of all lines
@@ -65,7 +57,7 @@ public class ProcessE
                 
                 // create entry and register stuff ...
                 // TODO< register it on the line itself? >
-                Intersection createdIntersection = new Intersection();
+                LineIntersection createdIntersection = new LineIntersection();
                 createdIntersection.intersectionPosition = intersectionPosition;
                 createdIntersection.lineA = lowLine;
                 createdIntersection.lineB = highLine;
@@ -124,5 +116,5 @@ public class ProcessE
         intersections.clear();
     }
     
-    public ArrayList<Intersection> intersections = new ArrayList<>();
+    public ArrayList<LineIntersection> intersections = new ArrayList<>();
 }
