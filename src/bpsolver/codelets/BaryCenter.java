@@ -163,7 +163,7 @@ public class BaryCenter extends SolverCodelet
         
         baryCenter = new Vector2d<Float>(0.0f, 0.0f);
         
-        linksOfObject = startNode.getLinksByType(Link.EnumType.HASATTRIBUTE);
+        linksOfObject = startNode.getLinksByType(Link.EnumType.CONTAINS);
         
         for( Link iterationLink : linksOfObject )
         {
