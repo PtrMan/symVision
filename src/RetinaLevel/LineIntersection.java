@@ -4,8 +4,8 @@ import Datastructures.Vector2d;
 
 public class LineIntersection
 {
-    public ProcessD.SingleLineDetector lineA;
-    public ProcessD.SingleLineDetector lineB;
+    public SingleLineDetector lineA;
+    public SingleLineDetector lineB;
 
     public Vector2d<Integer> intersectionPosition;
 }
