@@ -13,7 +13,7 @@ import misc.Assert;
  */
 public class ProcessH
 {
-    public void process(ArrayList<ProcessD.SingleLineDetector> workingDetectors)
+    public void process(ArrayList<SingleLineDetector> workingDetectors)
     {
         // called low and high because the index low is always lower than high
         int iteratorLow, iteratorHigh;
@@ -33,15 +33,15 @@ public class ProcessH
             {
                 for( iteratorHigh = iteratorLow+1; iteratorHigh < workingDetectors.size(); iteratorHigh++ )
                 {
-                    ProcessD.SingleLineDetector detectorLow;
-                    ProcessD.SingleLineDetector detectorHigh;
+                    SingleLineDetector detectorLow;
+                    SingleLineDetector detectorHigh;
 
                     detectorLow = workingDetectors.get(iteratorLow);
                     detectorHigh = workingDetectors.get(iteratorHigh);
 
                     if( canDetectorsBeFusedOverlap(detectorLow, detectorHigh) )
                     {
-                        ProcessD.SingleLineDetector fusedLineDetector;
+                        SingleLineDetector fusedLineDetector;
 
                         // fuse
                         fusedLineDetector = fuseLineDetectorsOverlap(detectorLow, detectorHigh);
@@ -58,7 +58,7 @@ public class ProcessH
                     }
                     else if( canDetectorsBeFusedInside(detectorLow, detectorHigh) )
                     {
-                        ProcessD.SingleLineDetector fusedLineDetector;
+                        SingleLineDetector fusedLineDetector;
 
                         // fuse
                         fusedLineDetector = fuseLineDetectorsInside(detectorLow, detectorHigh);
@@ -84,7 +84,7 @@ public class ProcessH
     }
     
     // overlap case
-    private static boolean canDetectorsBeFusedOverlap(ProcessD.SingleLineDetector detectorA, ProcessD.SingleLineDetector detectorB)
+    private static boolean canDetectorsBeFusedOverlap(SingleLineDetector detectorA, SingleLineDetector detectorB)
     {
         // TODO< vertical special case >
         
@@ -134,13 +134,13 @@ public class ProcessH
     }
     
     // fusing for overlap case
-    private static ProcessD.SingleLineDetector fuseLineDetectorsOverlap(ProcessD.SingleLineDetector detectorA, ProcessD.SingleLineDetector detectorB)
+    private static SingleLineDetector fuseLineDetectorsOverlap(SingleLineDetector detectorA, SingleLineDetector detectorB)
     {
         // TODO< vertical special case >
         
         Vector2d<Float> projectedABegin, projectedAEnd;
         Vector2d<Float> projectedBBegin, projectedBEnd;
-        ProcessD.SingleLineDetector fusedLineDetector;
+        SingleLineDetector fusedLineDetector;
         
         // we fuse them with taking the lowest begin-x as the begin and the other as the end
         
@@ -163,13 +163,13 @@ public class ProcessH
             projectedBEnd = tempEnd;
         }
         
-        fusedLineDetector = ProcessD.SingleLineDetector.createFromFloatPositions(projectedABegin, projectedBEnd);
+        fusedLineDetector = SingleLineDetector.createFromFloatPositions(projectedABegin, projectedBEnd);
         fusedLineDetector.resultOfCombination = true;
         return fusedLineDetector;
     }
     
     // inside case
-    private static boolean canDetectorsBeFusedInside(ProcessD.SingleLineDetector detectorA, ProcessD.SingleLineDetector detectorB)
+    private static boolean canDetectorsBeFusedInside(SingleLineDetector detectorA, SingleLineDetector detectorB)
     {
         // TODO< vertical special case >
         
@@ -205,9 +205,9 @@ public class ProcessH
     }
     
     // TODO fuseLineDetectorsInside
-    private static ProcessD.SingleLineDetector fuseLineDetectorsInside(ProcessD.SingleLineDetector detectorA, ProcessD.SingleLineDetector detectorB)
+    private static SingleLineDetector fuseLineDetectorsInside(SingleLineDetector detectorA, SingleLineDetector detectorB)
     {
-        ProcessD.SingleLineDetector fusedLineDetector;
+        SingleLineDetector fusedLineDetector;
         
         // TODO< vertical special case >
         
@@ -216,7 +216,7 @@ public class ProcessH
         {
             // detectorB inside detectorA
             
-            fusedLineDetector = ProcessD.SingleLineDetector.createFromFloatPositions(detectorA.aFloat, detectorA.bFloat);
+            fusedLineDetector = SingleLineDetector.createFromFloatPositions(detectorA.aFloat, detectorA.bFloat);
             fusedLineDetector.resultOfCombination = true;
             return fusedLineDetector;
         }
@@ -226,7 +226,7 @@ public class ProcessH
             
             // detectorA inside detectorB
             
-            fusedLineDetector = ProcessD.SingleLineDetector.createFromFloatPositions(detectorB.aFloat, detectorB.bFloat);
+            fusedLineDetector = SingleLineDetector.createFromFloatPositions(detectorB.aFloat, detectorB.bFloat);
             fusedLineDetector.resultOfCombination = true;
             return fusedLineDetector;
         }
@@ -246,7 +246,7 @@ public class ProcessH
         return value.x >= min.x && value.x <= max.x;
     }
     
-    private static boolean isProjectedPointOntoLineBelowDistanceLimit(Vector2d<Float> point, ProcessD.SingleLineDetector line)
+    private static boolean isProjectedPointOntoLineBelowDistanceLimit(Vector2d<Float> point, SingleLineDetector line)
     {
         Vector2d<Float> projectedPoint;
         float distanceBetweenProjectedAndPoint;

@@ -1,10 +1,10 @@
 package bpsolver;
 
 import FargGeneral.Coderack;
-import RetinaLevel.ProcessD;
 import FargGeneral.network.Link;
 import FargGeneral.network.Network;
 import FargGeneral.network.Node;
+import RetinaLevel.SingleLineDetector;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.util.ArrayList;
 
@@ -16,7 +16,7 @@ public class RetinaToWorkspaceTranslator
      * \param network
      * \return the node which is the object node 
      */
-    public static ArrayList<Node> createObjectFromLines(ArrayList<ProcessD.SingleLineDetector> lines, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup)
+    public static ArrayList<Node> createObjectFromLines(ArrayList<SingleLineDetector> lines, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup)
     {
         ArrayList<Node> resultNodes;
         
@@ -25,7 +25,7 @@ public class RetinaToWorkspaceTranslator
         
         resultNodes = new ArrayList<>();
         
-        for( ProcessD.SingleLineDetector iterationLine : lines )
+        for( SingleLineDetector iterationLine : lines )
         {
             PlatonicPrimitiveInstanceNode createdLineNode;
             Link createdForwardLink, createdBackwardLink;

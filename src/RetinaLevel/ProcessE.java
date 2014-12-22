@@ -11,7 +11,7 @@ import java.util.ArrayList;
  */
 public class ProcessE
 {
-    public void process(ArrayList<ProcessD.SingleLineDetector> lineDetectors, Map2d<Boolean> image)
+    public void process(ArrayList<SingleLineDetector> lineDetectors, Map2d<Boolean> image)
     {
         // we examine ALL possible intersections of all lines
         // this is only possible if we have the whole image at an instance
@@ -31,8 +31,8 @@ public class ProcessE
                 }
                 
                 Vector2d<Integer> intersectionPosition;
-                ProcessD.SingleLineDetector lowLine;
-                ProcessD.SingleLineDetector highLine;
+                SingleLineDetector lowLine;
+                SingleLineDetector highLine;
                 
                 lowLine = lineDetectors.get(outerI);
                 highLine = lineDetectors.get(innerI);
@@ -66,7 +66,7 @@ public class ProcessE
         }
     }
     
-    private static Vector2d<Integer> intersectLineDetectors(ProcessD.SingleLineDetector lineA, ProcessD.SingleLineDetector lineB)
+    private static Vector2d<Integer> intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB)
     {
         float x, y;
         
