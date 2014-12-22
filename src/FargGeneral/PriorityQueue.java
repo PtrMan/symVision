@@ -56,14 +56,19 @@ public class PriorityQueue<Type>
     
     public Type dequeue()
     {
+        return dequeueQueueElement().value;
+    }
+    
+    public QueueElement dequeueQueueElement()
+    {
         int chosenIndex;
-        Type value;
+        QueueElement result;
         
         chosenIndex = getNextQueueIndex();
-        value = queue.get(chosenIndex).value;
+        result = queue.get(chosenIndex);
         queue.remove(chosenIndex);
         
-        return value;
+        return result;
     }
     
     private int getNextQueueIndex()
