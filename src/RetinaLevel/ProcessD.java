@@ -15,6 +15,7 @@ import java.util.Random;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import math.DistinctUtility;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 // TODO< remove detectors which are removable which have a activation less than <constant> * sumofAllActivations >
 /**
@@ -223,14 +224,9 @@ public class ProcessD
         ArrayList<ProcessA.Sample> workingSamples;
         ArrayList<LineDetectorWithMultiplePoints> multiplePointsLineDetector;
         
-        float sumOfAllActivations;
-        float maxActivation;
-        
         final float SAMPLECOUNTLINEDETECTORMULTIPLIER = 3.5f;
         
         multiplePointsLineDetector = new ArrayList<>();
-        sumOfAllActivations = 0.0f;
-        maxActivation = 0.0f;
         
         workingSamples = filterEndosceletonPoints(samples);
         
@@ -258,71 +254,18 @@ public class ProcessD
                     createdLineDetector = new LineDetectorWithMultiplePoints(sampleIndicesForInitialLine);
 
                     multiplePointsLineDetector.add(createdLineDetector);
-                    sumOfAllActivations += createdLineDetector.getActivation();
-
-                    maxActivation = calculationMaxActivation(multiplePointsLineDetector);
                 }
             }
             
             // try to include a random sample into the detectors
             
-            int sampleI;
+            int sampleIndex;
             
-            sampleI = random.nextInt(workingSamples.size());
+            sampleIndex = random.nextInt(workingSamples.size());
         
             
             // try to integrate the current sample into line(s)
-            for( LineDetectorWithMultiplePoints iteratorDetector : multiplePointsLineDetector )
-            {
-                ProcessA.Sample currentSample;
-                float mse;
-                int sampleIndexI;
-                
-                currentSample = workingSamples.get(sampleI);
-                
-                if( iteratorDetector.doesContainSampleIndex(sampleI) )
-                {
-                    continue;
-                }
-                // else we are here
-                
-                SimpleRegression regression = new SimpleRegression();
-                for (sampleIndexI = 0; sampleIndexI < iteratorDetector.integratedSampleIndices.size(); sampleIndexI++)
-                {
-                    int sampleIndex;
-                    
-                    
-                    sampleIndex = iteratorDetector.integratedSampleIndices.get(sampleIndexI);
-                    currentSample = workingSamples.get(sampleIndex);
-                    
-                    regression.addData(currentSample.position.x, currentSample.position.y);
-                }
-                
-                
-                regression.addData(currentSample.position.x, currentSample.position.y);
-                
-                mse = (float)regression.getMeanSquareError();
-                
-                if( mse < Parameters.getProcessdMaxMse() )
-                {
-                    // we do this to save the time for summing up all activations of all detectors after this modification
-                    sumOfAllActivations -= iteratorDetector.getActivation();
-                    
-                    iteratorDetector.mse = mse;
-                    
-                    iteratorDetector.integratedSampleIndices.add(sampleI);
-                    
-                    iteratorDetector.n = (float)regression.getIntercept();
-                    iteratorDetector.m = (float)regression.getSlope();
-                    
-                    lockDetectorIfItHasEnoughtActivation(iteratorDetector);
-                    
-                    // see above
-                    sumOfAllActivations += iteratorDetector.getActivation();
-                    
-                    maxActivation = calculationMaxActivation(multiplePointsLineDetector);
-                }
-            }
+            tryToIntegratePointIntoAllLineDetectors(sampleIndex, multiplePointsLineDetector, workingSamples);
         }
         
         // delete all detectors for which the activation was not enought
@@ -332,6 +275,181 @@ public class ProcessD
         ArrayList<SingleLineDetector> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector, samples);
         
         return resultSingleDetectors;
+    }
+    
+    private static void tryToIntegratePointIntoAllLineDetectors(int sampleIndex, ArrayList<LineDetectorWithMultiplePoints> multiplePointsLineDetector, ArrayList<ProcessA.Sample> workingSamples) {
+        for( LineDetectorWithMultiplePoints iteratorDetector : multiplePointsLineDetector )
+        {
+            ArrayList<Vector2d<Float>> positionsOfSamples;
+            RegressionForLineResult regressionResult;
+            ProcessA.Sample currentSample;
+
+            currentSample = workingSamples.get(sampleIndex);
+
+            if( iteratorDetector.doesContainSampleIndex(sampleIndex) )
+            {
+                continue;
+            }
+            // else we are here
+            
+            positionsOfSamples = getPositionsOfSamplesOfDetector(iteratorDetector, workingSamples);
+            positionsOfSamples.add(convertVectorFromIntToFloat(currentSample.position));
+            
+            regressionResult = calcRegressionForPoints(positionsOfSamples);
+            
+            if( regressionResult.mse < Parameters.getProcessdMaxMse() )
+            {
+                iteratorDetector.mse = regressionResult.mse;
+
+                iteratorDetector.integratedSampleIndices.add(sampleIndex);
+
+                iteratorDetector.n = regressionResult.n;
+                iteratorDetector.m = regressionResult.m;
+
+                lockDetectorIfItHasEnoughtActivation(iteratorDetector);
+            }
+        }
+    }
+    
+    private static ArrayList<Vector2d<Float>> getPositionsOfSamplesOfDetector(LineDetectorWithMultiplePoints detector, ArrayList<ProcessA.Sample> workingSamples)
+    {
+        ArrayList<Vector2d<Float>> resultPositions;
+        
+        resultPositions = new ArrayList<>();
+        
+        for( int iterationSampleIndex : detector.integratedSampleIndices )
+        {
+            ProcessA.Sample currentSample;
+            Vector2d<Float> convertedPosition;
+            
+            currentSample = workingSamples.get(iterationSampleIndex);
+            convertedPosition = convertVectorFromIntToFloat(currentSample.position);
+            resultPositions.add(convertedPosition);
+        }
+        
+        return resultPositions;
+    }
+    
+    /**
+     * works by counting the "overlapping" pixel coordinates, chooses the axis with the less overlappings
+     *  
+     */
+    private static RegressionForLineResult calcRegressionForPoints(ArrayList<Vector2d<Float>> positions)
+    {
+        SimpleRegression regression;
+        
+        int overlappingPixelsOnX, overlappingPixelsOnY;
+        
+        RegressionForLineResult regressionResultForLine;
+        
+        overlappingPixelsOnX = calcCountOfOverlappingPixelsForAxis(positions, EnumAxis.X);
+        overlappingPixelsOnY = calcCountOfOverlappingPixelsForAxis(positions, EnumAxis.Y);
+        
+        regression = new SimpleRegression();
+        
+        regressionResultForLine = new RegressionForLineResult();
+        
+        if( overlappingPixelsOnX <= overlappingPixelsOnY )
+        {
+            // regression on x axis
+            
+            for( Vector2d<Float> iterationPosition : positions )
+            {
+                regression.addData(iterationPosition.x, iterationPosition.y);
+            }
+            
+            regressionResultForLine.mse = (float)regression.getMeanSquareError();
+            regressionResultForLine.n = (float)regression.getIntercept();
+            regressionResultForLine.m = (float)regression.getSlope();
+        }
+        else
+        {
+            float m, n, regressionN;
+            Vector2d<Float> pointOnRegressionLine;
+            
+            // regression on y axis
+            // we switch x and y and calculate m and n from the regression result
+            
+            for( Vector2d<Float> iterationPosition : positions )
+            {
+                regression.addData(iterationPosition.y, iterationPosition.x);
+            }
+            
+            // calculate m and n
+            m = 1.0f/(float)regression.getSlope();
+            regressionN = (float)regression.getIntercept();
+            pointOnRegressionLine = new Vector2d<>(regressionN, 0.0f);
+            n = pointOnRegressionLine.y + m * pointOnRegressionLine.x;
+            
+            regressionResultForLine.mse = (float)regression.getMeanSquareError();
+            regressionResultForLine.n = n;
+            regressionResultForLine.m = m;
+        }
+        
+        return regressionResultForLine;
+    }
+    
+    private static int calcCountOfOverlappingPixelsForAxis(ArrayList<Vector2d<Float>> positions, EnumAxis axis) {
+        float maxCoordinatOnAxis;
+        int arraysizeOfDimension;
+        int[] dimensionCounter;
+        int overlappingCounter;
+        int arrayI;
+        
+        overlappingCounter = 0;
+        
+        maxCoordinatOnAxis = getMaximalCoordinateForPoints(positions, axis);
+        arraysizeOfDimension = Math.round(maxCoordinatOnAxis)+1;
+        dimensionCounter = new int[arraysizeOfDimension];
+        
+        for( Vector2d<Float> iterationPosition : positions )
+        {
+            int dimensionCounterIndex;
+            
+            if( axis == EnumAxis.X )
+            {
+                dimensionCounterIndex = Math.round(iterationPosition.x);
+            }
+            else
+            {
+                dimensionCounterIndex = Math.round(iterationPosition.y);
+            }
+            
+            dimensionCounter[dimensionCounterIndex]++;
+        }
+        
+        // count the "rows" where the count is greater than 1
+        for( arrayI = 0; arrayI < dimensionCounter.length; arrayI++ )
+        {
+            if( dimensionCounter[arrayI] > 1 )
+            {
+                overlappingCounter++;
+            }
+        }
+        
+        return overlappingCounter;
+    }
+    
+    // used to calculate the arraysize
+    private static float getMaximalCoordinateForPoints(ArrayList<Vector2d<Float>> positions, EnumAxis axis)
+    {
+        float max;
+        
+        max = 0;
+        
+        for( Vector2d<Float> iterationPosition : positions )
+        {
+            if( axis == EnumAxis.X )
+            {
+                max = Math.max(max, iterationPosition.x);
+            }
+            else
+            {
+                max = Math.max(max, iterationPosition.y);
+            }
+        }
+        
+        return max;
     }
     
     private static ArrayList<SingleLineDetector> splitDetectorsIntoLines(ArrayList<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints, ArrayList<ProcessA.Sample> samples)
@@ -434,26 +552,12 @@ public class ProcessD
         }
     }
     
-    private static float calculationMaxActivation(ArrayList<LineDetectorWithMultiplePoints> lineDetectors)
-    {
-        float maxActivation;
-        
-        maxActivation = 0.0f;
-        
-        for( LineDetectorWithMultiplePoints iterator : lineDetectors )
-        {
-            maxActivation = Math.max(iterator.getActivation(), maxActivation);
-        }
-        
-        return maxActivation;
-    }
-    
     private static void lockDetectorIfItHasEnoughtActivation(LineDetectorWithMultiplePoints detector)
     {
         detector.isLocked |= detector.getActivation() > Parameters.getProcessdLockingActivation();
     }
     
-    private static Vector2d<Float> convertVectorToFloat(Vector2d<Integer> vector)
+    private static Vector2d<Float> convertVectorFromIntToFloat(Vector2d<Integer> vector)
     {
         return new Vector2d<Float>((float)vector.x, (float)vector.y);
     }
@@ -490,5 +594,18 @@ public class ProcessD
             return -1;
         }
         
+    }
+    
+    private static class RegressionForLineResult
+    {
+        public float mse;
+        
+        public float m, n;
+    }
+    
+    private enum EnumAxis
+    {
+        X,
+        Y
     }
 }
