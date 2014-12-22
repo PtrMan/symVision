@@ -5,6 +5,7 @@ import static Datastructures.Vector2d.FloatHelper.add;
 import static Datastructures.Vector2d.FloatHelper.dot;
 import static Datastructures.Vector2d.FloatHelper.getScaled;
 import static Datastructures.Vector2d.FloatHelper.sub;
+import java.util.ArrayList;
 
 /**
  * 
@@ -80,7 +81,9 @@ public class SingleLineDetector
     public boolean resultOfCombination = false; // for visual debugging, was the detector combined from other detectors?
 
     public boolean marked = false; // used for marking in other (multithreading syncronous) processes
-
+    
+    public ArrayList<LineIntersection> intersections = new ArrayList<>();
+    
     public boolean isBetweenOrginalStartAndEnd(Vector2d<Float> position) {
         Vector2d<Float> diffAB, diffABnormalizd, diffAPosition;
         float length;
