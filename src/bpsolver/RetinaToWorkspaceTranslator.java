@@ -16,17 +16,28 @@ public class RetinaToWorkspaceTranslator
      * \param network
      * \return the node which is the object node 
      */
-    public static Node createObjectFromLines(ArrayList<ProcessD.LineDetector> lines, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup)
+    public static ArrayList<Node> createObjectFromLines(ArrayList<ProcessD.SingleLineDetector> lines, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup)
     {
-        Node objectNode;
+        ArrayList<Node> resultNodes;
         
-        objectNode = new PlatonicPrimitiveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
-        network.nodes.add(objectNode);
+        // for now we store each linesegment as a slingle object
+        // todo< integrate other processes which use angle connections to build objects >
         
-        for( ProcessD.LineDetector iterationLine : lines )
+        resultNodes = new ArrayList<>();
+        
+        for( ProcessD.SingleLineDetector iterationLine : lines )
         {
             PlatonicPrimitiveInstanceNode createdLineNode;
             Link createdForwardLink, createdBackwardLink;
+            Node objectNode;
+            
+            
+            objectNode = new PlatonicPrimitiveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
+            network.nodes.add(objectNode);
+            
+            // add all codelet's of the object
+            codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(objectNode, coderack, network);
+        
             
             createdLineNode = new PlatonicPrimitiveInstanceNode(networkHandles.lineSegmentPlatonicPrimitiveNode);
             createdLineNode.p1 = iterationLine.getAProjected();
@@ -42,8 +53,10 @@ public class RetinaToWorkspaceTranslator
             
             // add all codelet's of it
             codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdLineNode, coderack, network);
+            
+            resultNodes.add(objectNode);
         }
         
-        return objectNode;
+        return resultNodes;
     }
 }

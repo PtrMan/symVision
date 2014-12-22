@@ -5,13 +5,20 @@ import Datastructures.Vector2d;
 import static Datastructures.Vector2d.FloatHelper.add;
 import static Datastructures.Vector2d.FloatHelper.getScaled;
 import static Datastructures.Vector2d.FloatHelper.sub;
+import FargGeneral.Coderack;
+import FargGeneral.network.Network;
+import FargGeneral.network.Node;
 import RetinaLevel.ProcessA;
 import RetinaLevel.ProcessB;
 import RetinaLevel.ProcessC;
 import RetinaLevel.ProcessD;
 import RetinaLevel.ProcessE;
 import RetinaLevel.ProcessH;
+import bpsolver.BpSolver;
+import bpsolver.CodeletLtmLookup;
+import bpsolver.NetworkHandles;
 import bpsolver.Parameters;
+import bpsolver.RetinaToWorkspaceTranslator;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -25,7 +32,11 @@ public class Controller
 {
     private static class RecalculateActionListener implements ActionListener
     {
-
+        public RecalculateActionListener(BpSolver bpSolver)
+        {
+            this.bpSolver = bpSolver;
+        }
+        
         @Override
         public void actionPerformed(ActionEvent ae) {
             recalculate();
@@ -33,6 +44,9 @@ public class Controller
         
         private void recalculate()
         {
+            // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
+            bpSolver.coderack.flush();
+            
             BufferedImage javaImage = drawToJavaImage((float)time * 0.1f);
             Map2d<Boolean> image = drawToImage(javaImage);
 
@@ -58,8 +72,14 @@ public class Controller
             processE.process(lineDetectors, image);
             ArrayList<ProcessE.Intersection> lineIntersections = processE.intersections;
             
+            
+            ArrayList<Node> objectNodes = RetinaToWorkspaceTranslator.createObjectFromLines(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup);
+            
+            
             BufferedImage detectorImage = drawDetectors(lineDetectors, lineIntersections, samples);
-
+            
+            
+            bpSolver.cycle(500);
 
             interactive.leftCanvas.setImage(javaImage);
             interactive.rightCanvas.setImage(detectorImage);
@@ -191,12 +211,16 @@ public class Controller
         
         private Interactive interactive;
         private int time;
+        
+        private BpSolver bpSolver;
     }
     
     public static void main(String[] args) {
+        BpSolver bpSolver = new BpSolver();
+        
         Parameters.init();
         
-        RecalculateActionListener recalculate = new RecalculateActionListener();
+        RecalculateActionListener recalculate = new RecalculateActionListener(bpSolver);
         recalculate.interactive = new Interactive();
         
         TuningWindow tuningWindow = new TuningWindow();

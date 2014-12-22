@@ -4,49 +4,27 @@ import FargGeneral.Coderack;
 import bpsolver.codelets.LineSegmentLength;
 import bpsolver.ltm.LinkCreator;
 import FargGeneral.network.Network;
+import bpsolver.codelets.BaryCenter;
 import bpsolver.nodes.PlatonicPrimitiveNode;
 
 public class BpSolver {
-    public static void main(String[] args) {
+    public static void main(String[] args)
+    {
         Parameters.init();
         
         BpSolver solver = new BpSolver();
-        solver.initializeNetwork();
-        solver.setupLtmFactoryDefault();
-        solver.initializeCodeletLtmLookup();
-        
-        /*
-         BufferedImage javaImage = drawToJavaImage();
-        Map2d<Boolean> image = drawToImage(javaImage);
-        
-        ProcessA processA = new ProcessA();
-        ProcessB processB = new ProcessB();
-        ProcessC processC = new ProcessC();
-        ProcessD processD = new ProcessD();
-        ProcessH processH = new ProcessH();
-        
-        processA.setWorkingImage(image);
-        ArrayList<ProcessA.Sample> samples = processA.sampleImage();
-        
-        
-        processB.process(samples, image);
-        processC.process(samples);
-        
-        ArrayList<ProcessD.LineDetector> lineDetectors = processD.detectLines(samples);
-        
-        processH.process(lineDetectors);
-        
-        BufferedImage detectorImage = drawDetectors(lineDetectors, samples);
-        
-        
-        Interactive interactive = new Interactive();
-        interactive.leftCanvas.setImage(javaImage);
-        interactive.rightCanvas.setImage(detectorImage);
-        */
-        
-        //Node objectNode = RetinaToWorkspaceTranslator.createObjectFromLines(lineDetectors, solver.network, solver.networkHandles, solver.coderack, solver.codeletLtmLookup);
-        
-        // TODO< process >
+    }
+    
+    public BpSolver()
+    {
+        initializeNetwork();
+        setupLtmFactoryDefault();
+        initializeCodeletLtmLookup();
+    }
+    
+    public void cycle(int cycleCount)
+    {
+        coderack.cycle(cycleCount);
     }
     
     /**
@@ -67,7 +45,7 @@ public class BpSolver {
         networkHandles.lineSegmentFeatureLineLengthPrimitiveNode.outgoingLinks.add(link);
         
         
-        networkHandles.barycenterPlatonicPrimitiveNode = new PlatonicPrimitiveNode("barycenter", null);
+        networkHandles.barycenterPlatonicPrimitiveNode = new PlatonicPrimitiveNode("barycenter", "BaryCenter");
         network.nodes.add(networkHandles.barycenterPlatonicPrimitiveNode);
         
         networkHandles.xCoordinatePlatonicPrimitiveNode = new PlatonicPrimitiveNode("xCoordinate", null);
@@ -86,6 +64,10 @@ public class BpSolver {
         PlatonicPrimitiveNode objectPrimitiveNode = new PlatonicPrimitiveNode("Object", null);
         networkHandles.objectPlatonicPrimitiveNode = objectPrimitiveNode;
         network.nodes.add(objectPrimitiveNode);
+        
+        // a object has a barycenter
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.barycenterPlatonicPrimitiveNode);
+        networkHandles.objectPlatonicPrimitiveNode.outgoingLinks.add(link);
     }
     
     private void initializeNetwork()
@@ -105,14 +87,21 @@ public class BpSolver {
         createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.5f));
         
         codeletLtmLookup.registry.put("LineSegmentLength", createdRegistryEntry);
+        
+        
+        createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
+        createdCodelet = new BaryCenter(network, networkHandles, BaryCenter.EnumRecalculate.NO);
+        createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.1f));
+        
+        codeletLtmLookup.registry.put("BaryCenter", createdRegistryEntry);
     }
     
     // both ltm and workspace
     // the difference is that the nodes of the workspace may all be deleted
-    private Network network = new Network();
-    private NetworkHandles networkHandles = new NetworkHandles();
-    private Coderack coderack = new Coderack();
-    private CodeletLtmLookup codeletLtmLookup;
+    public Network network = new Network();
+    public NetworkHandles networkHandles = new NetworkHandles();
+    public Coderack coderack = new Coderack();
+    public CodeletLtmLookup codeletLtmLookup;
     
     
     
