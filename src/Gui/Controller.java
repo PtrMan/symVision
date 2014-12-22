@@ -6,6 +6,7 @@ import static Datastructures.Vector2d.FloatHelper.add;
 import static Datastructures.Vector2d.FloatHelper.getScaled;
 import static Datastructures.Vector2d.FloatHelper.sub;
 import FargGeneral.Coderack;
+import FargGeneral.network.Link;
 import FargGeneral.network.Network;
 import FargGeneral.network.Node;
 import RetinaLevel.ProcessA;
@@ -19,6 +20,9 @@ import bpsolver.CodeletLtmLookup;
 import bpsolver.NetworkHandles;
 import bpsolver.Parameters;
 import bpsolver.RetinaToWorkspaceTranslator;
+import bpsolver.nodes.FeatureNode;
+import bpsolver.nodes.NodeTypes;
+import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
@@ -73,13 +77,21 @@ public class Controller
             ArrayList<ProcessE.Intersection> lineIntersections = processE.intersections;
             
             
+            
             ArrayList<Node> objectNodes = RetinaToWorkspaceTranslator.createObjectFromLines(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup);
             
-            
-            BufferedImage detectorImage = drawDetectors(lineDetectors, lineIntersections, samples);
-            
-            
             bpSolver.cycle(500);
+            
+            BufferedImage detectorImage;
+            Graphics2D graphics;
+
+            detectorImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+            graphics = detectorImage.createGraphics();
+            
+            drawDetectors(graphics, lineDetectors, lineIntersections, samples);
+            drawObjectBaryCenters(graphics, objectNodes, bpSolver.networkHandles);
+            
+            
 
             interactive.leftCanvas.setImage(javaImage);
             interactive.rightCanvas.setImage(detectorImage);
@@ -159,17 +171,72 @@ public class Controller
 
             return convertedToMap;
         }
-
-        private static BufferedImage drawDetectors(ArrayList<ProcessD.SingleLineDetector> lineDetectors, ArrayList<ProcessE.Intersection> intersections, ArrayList<ProcessA.Sample> samples)
+        
+        // draws the barycenters if possible
+        private static void drawObjectBaryCenters(Graphics2D graphics, ArrayList<Node> objectNodes, NetworkHandles networkHandles)
         {
-            BufferedImage resultImage;
-            Graphics2D graphics;
-
-            resultImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
-
-            graphics = resultImage.createGraphics();
+            graphics.setColor(Color.GREEN);
             
+            for( Node iterationNode : objectNodes )
+            {
+                for( Link iterationLink : iterationNode.getLinksByType(Link.EnumType.HASATTRIBUTE) )
+                {
+                    PlatonicPrimitiveInstanceNode platonicPrimitiveInstance;
+                    
+                    if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() )
+                    {
+                        continue;
+                    }
+                    
+                    platonicPrimitiveInstance = (PlatonicPrimitiveInstanceNode)iterationLink.target;
+                    
+                    if( !platonicPrimitiveInstance.primitiveNode.equals(networkHandles.barycenterPlatonicPrimitiveNode) )
+                    {
+                        continue;
+                    }
+                    // here if barycenter
+                    float barycenterX, barycenterY;
+                    int barycenterXAsInt, barycenterYAsInt;
+                    
+                    barycenterX = 0.0f;
+                    barycenterY = 0.0f;
+                    
+                    for( Link iterationLink2 : platonicPrimitiveInstance.getLinksByType(Link.EnumType.HASATTRIBUTE) )
+                    {
+                        FeatureNode featureNode;
+                        
+                        if( iterationLink2.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() )
+                        {
+                            continue;
+                        }
+                        
+                        featureNode = (FeatureNode)iterationLink2.target;
+                        
+                        if( featureNode.featureTypeNode.equals(networkHandles.xCoordinatePlatonicPrimitiveNode) )
+                        {
+                            barycenterX = featureNode.getValueAsFloat();
+                        }
+                        else if( featureNode.featureTypeNode.equals(networkHandles.yCoordinatePlatonicPrimitiveNode) )
+                        {
+                            barycenterY = featureNode.getValueAsFloat();
+                        }
+                    }
+                    
+                    barycenterXAsInt = Math.round(barycenterX);
+                    barycenterYAsInt = Math.round(barycenterY);
+                    
+                    // draw
+                    
+                    graphics.drawLine(barycenterXAsInt-1, barycenterYAsInt, barycenterXAsInt+1, barycenterYAsInt);
+                    graphics.drawLine(barycenterXAsInt, barycenterYAsInt-1, barycenterXAsInt, barycenterYAsInt+1);
 
+                }
+            }
+        }
+        
+
+        private static void drawDetectors(Graphics2D graphics, ArrayList<ProcessD.SingleLineDetector> lineDetectors, ArrayList<ProcessE.Intersection> intersections, ArrayList<ProcessA.Sample> samples)
+        {
             for( ProcessD.SingleLineDetector iterationDetector : lineDetectors )
             {
                 Vector2d<Float> aProjectedFloat;
@@ -206,7 +273,7 @@ public class Controller
             }
             */
 
-            return resultImage;
+            
         }
         
         private Interactive interactive;
