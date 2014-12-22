@@ -349,7 +349,7 @@ public class ProcessD
         
         regressionResultForLine = new RegressionForLineResult();
         
-        if( overlappingPixelsOnX <= overlappingPixelsOnY && false )
+        if( overlappingPixelsOnX <= overlappingPixelsOnY )
         {
             // regression on x axis
             
@@ -365,8 +365,6 @@ public class ProcessD
         else
         {
             float regressionM, n, m, regressionN;
-            Vector2d<Float> pointA, pointB;
-            Vector2d<Float> pointAOnRegressionLineInFlippedSpace, pointBOnRegressionLineInFlippedSpace;
             Vector2d<Float> pointOnRegressionLine;
             
             // regression on y axis
@@ -385,24 +383,9 @@ public class ProcessD
             pointOnRegressionLine = new Vector2d<>(regressionN, 0.0f);
             n = pointOnRegressionLine.y - m * pointOnRegressionLine.x;
             
-            /*
-            // calculate m and n
-            regressionM = (float)regression.getSlope();
-            regressionN = (float)regression.getIntercept();
-            
-            pointAOnRegressionLineInFlippedSpace = new Vector2d<>(0.0f, regressionN);
-            pointA = new Vector2d<>(pointAOnRegressionLineInFlippedSpace.y, pointAOnRegressionLineInFlippedSpace.x);
-            
-            pointBOnRegressionLineInFlippedSpace = new Vector2d<>(1.0f, regressionN + 1.0f*regressionM);
-            pointB = new Vector2d<>(pointBOnRegressionLineInFlippedSpace.y, pointBOnRegressionLineInFlippedSpace.x);
-            
-            m = (pointB.y - pointA.y)/(pointB.x - pointA.x);
-            n = pointA.y - pointA.x * m;
-            */
             regressionResultForLine.mse = (float)regression.getMeanSquareError();
             regressionResultForLine.n = n;
             regressionResultForLine.m = m;
-            
         }
         
         return regressionResultForLine;
