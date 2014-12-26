@@ -3,6 +3,7 @@ package RetinaLevel;
 import Datastructures.Vector2d;
 import static Datastructures.Vector2d.FloatHelper.add;
 import static Datastructures.Vector2d.FloatHelper.dot;
+import static Datastructures.Vector2d.FloatHelper.getLength;
 import static Datastructures.Vector2d.FloatHelper.getScaled;
 import static Datastructures.Vector2d.FloatHelper.sub;
 import bpsolver.HardParameters;
@@ -15,6 +16,7 @@ import java.util.Random;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 
 import math.DistinctUtility;
+import misc.Assert;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 // TODO< remove detectors which are removable which have a activation less than <constant> * sumofAllActivations >
@@ -95,37 +97,37 @@ public class ProcessD
         for( counter = 0; counter < Math.round((float)samples.size()*SAMPLECOUNTLINEDETECTORMULTIPLIER); counter++ )
         {
             {
-                // to form a new line detector form a new linedetector by choosing two points at random
-                ArrayList<Integer> sampleIndicesForInitialLine = DistinctUtility.getTwoDisjunctNumbers(random, workingSamples.size());
+                int centerPointIndex;
+                
+                // to form a new line detector choose one point at random and chose n points in the neighborhood
+                // this increases the chances that it lies on a (small) line
+                centerPointIndex = random.nextInt(workingSamples.size());
+                
+                ArrayList<Integer> chosenPointIndices = new ArrayList<Integer>();
+                chosenPointIndices.add(centerPointIndex);
+                
+                // modifies chosenPointIndices
+                choosePointIndicesInsideRadius(chosenPointIndices.get(0), chosenPointIndices, workingSamples, HardParameters.ProcessD.EARLYCANDIDATECOUNT);
+                
 
                 // create new line detector
                 LineDetectorWithMultiplePoints createdLineDetector;
 
-                int sampleIndexA;
-                int sampleIndexB;
-
-                sampleIndexA = sampleIndicesForInitialLine.get(0);
-                sampleIndexB = sampleIndicesForInitialLine.get(1);
-
-                if( workingSamples.get(sampleIndexA).position.x != workingSamples.get(sampleIndexB).position.x )
-                {
-                    // TODO< integrate as many as possible points into the detector ? >
-                    
-                    createdLineDetector = new LineDetectorWithMultiplePoints(sampleIndicesForInitialLine);
-
-                    multiplePointsLineDetector.add(createdLineDetector);
-                }
+                
+                createdLineDetector = new LineDetectorWithMultiplePoints(chosenPointIndices);
+                multiplePointsLineDetector.add(createdLineDetector);
             }
             
             // try to include a random sample into the detectors
-            
-            int sampleIndex;
-            
-            sampleIndex = random.nextInt(workingSamples.size());
-        
-            
-            // try to integrate the current sample into line(s)
-            tryToIntegratePointIntoAllLineDetectors(sampleIndex, multiplePointsLineDetector, workingSamples);
+            {
+                int sampleIndex;
+
+                sampleIndex = random.nextInt(workingSamples.size());
+
+
+                // try to integrate the current sample into line(s)
+                tryToIntegratePointIntoAllLineDetectors(sampleIndex, multiplePointsLineDetector, workingSamples);
+            }
         }
         
         // delete all detectors for which the activation was not enought
@@ -136,6 +138,60 @@ public class ProcessD
         
         return resultSingleDetectors;
     }
+    
+    // TODO< use acceleration datastruction for the points >
+    /**
+     * modifies alreadyIntegratedPointIndices and returns result in it
+     *
+     * \param centerPointIndex
+     * \param alreadyIntegratedPointIndices
+     * \param workingSamples
+     * \param count 
+     */
+    private void choosePointIndicesInsideRadius(int centerPointIndex, ArrayList<Integer> alreadyIntegratedPointIndices, ArrayList<ProcessA.Sample> workingSamples, int count)
+    {
+        Vector2d<Integer> centerPositionAsInt;
+        Vector2d<Float> centerPosition;
+        int counter;
+        
+        centerPositionAsInt = workingSamples.get(centerPointIndex).position;
+        centerPosition = convertVectorFromIntToFloat(centerPositionAsInt);
+        
+        for( counter = 0; counter < count; )
+        {
+            int chosenPointIndex;
+            ArrayList<Integer> chosenPointIndexAsList;
+            Vector2d<Integer> chosenPointPositionAsInt;
+            Vector2d<Float> chosenPointPosition;
+            
+            chosenPointIndexAsList = DistinctUtility.getDisjuctNumbersTo(random, alreadyIntegratedPointIndices, 1, workingSamples.size());
+            Assert.Assert(chosenPointIndexAsList.size() == 1, "");
+            chosenPointIndex = chosenPointIndexAsList.get(0);
+            
+            // check if it is inside radius
+            chosenPointPositionAsInt = workingSamples.get(chosenPointIndex).position;
+            chosenPointPosition = convertVectorFromIntToFloat(chosenPointPositionAsInt);
+            
+            if( !Helper.isDistanceBetweenPositionsBelow(centerPosition, chosenPointPosition, HardParameters.ProcessD.EARLYCANDIDATEMAXDISTANCE) )
+            {
+                alreadyIntegratedPointIndices.add(chosenPointIndex);
+                
+                // we have one more point, so increment counter
+                counter++;
+                continue;
+            }
+        }
+    }
+    
+    // TODO< belongs into dedicated helper >
+    static private class Helper
+    {
+        private static boolean isDistanceBetweenPositionsBelow(Vector2d<Float> a, Vector2d<Float> b, float maxDistance)
+        {
+            return getLength(sub(a, b)) < maxDistance;
+        }
+    }
+    
     
     private static void tryToIntegratePointIntoAllLineDetectors(int sampleIndex, ArrayList<LineDetectorWithMultiplePoints> multiplePointsLineDetector, ArrayList<ProcessA.Sample> workingSamples) {
         for( LineDetectorWithMultiplePoints iteratorDetector : multiplePointsLineDetector )
