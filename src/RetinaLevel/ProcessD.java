@@ -30,6 +30,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class ProcessD
 {
+    // just for debugging as a flag, is actually true
+    public final static boolean ENABLELOCKING = false;
+    
     private static class LineDetectorWithMultiplePoints
     {
         public LineDetectorWithMultiplePoints(ArrayList<Integer> integratedSampleIndices)
@@ -73,6 +76,12 @@ public class ProcessD
         {
             return Vector2d.FloatHelper.normalize(new Vector2d<>(1.0f, m));
         }
+        
+        // TODO< just simply test flag >
+        public boolean isYAxisSingularity()
+        {
+            return Float.isInfinite(m);
+        }
     }
     
     /**
@@ -107,7 +116,7 @@ public class ProcessD
                 chosenPointIndices.add(centerPointIndex);
                 
                 // modifies chosenPointIndices
-                choosePointIndicesInsideRadius(chosenPointIndices.get(0), chosenPointIndices, workingSamples, HardParameters.ProcessD.EARLYCANDIDATECOUNT);
+                choosePointIndicesInsideRadius(chosenPointIndices.get(0), chosenPointIndices, workingSamples, HardParameters.ProcessD.EARLYCANDIDATECOUNT-1);
                 
 
                 // create new line detector
@@ -115,10 +124,47 @@ public class ProcessD
 
                 
                 createdLineDetector = new LineDetectorWithMultiplePoints(chosenPointIndices);
-                multiplePointsLineDetector.add(createdLineDetector);
+                
+                ArrayList<Vector2d<Float>> positionsOfSamples;
+                RegressionForLineResult regressionResult;
+                
+                positionsOfSamples = getPositionsOfSamplesOfDetector(createdLineDetector, workingSamples);
+            
+                regressionResult = calcRegressionForPoints(positionsOfSamples);
+                
+                Assert.Assert(createdLineDetector.integratedSampleIndices.size() >= 2, "");
+                // the regression mse is not defined if it are only two points
+                if( createdLineDetector.integratedSampleIndices.size() == 2 )
+                {
+                    // TODO< calculate m and n for the two point case >
+                    
+                    createdLineDetector.mse = 0.0f;
+                    
+                    createdLineDetector.n = regressionResult.n;
+                    createdLineDetector.m = regressionResult.m;
+
+                    lockDetectorIfItHasEnoughtActivation(createdLineDetector);
+
+                    multiplePointsLineDetector.add(createdLineDetector);
+                }
+                else
+                {
+                    if( regressionResult.mse < Parameters.getProcessdMaxMse() )
+                    {
+                        createdLineDetector.mse = regressionResult.mse;
+
+                        createdLineDetector.n = regressionResult.n;
+                        createdLineDetector.m = regressionResult.m;
+
+                        lockDetectorIfItHasEnoughtActivation(createdLineDetector);
+
+                        multiplePointsLineDetector.add(createdLineDetector);
+                    }
+                }
             }
             
             // try to include a random sample into the detectors
+            if( false )
             {
                 int sampleIndex;
 
@@ -172,7 +218,7 @@ public class ProcessD
             chosenPointPositionAsInt = workingSamples.get(chosenPointIndex).position;
             chosenPointPosition = convertVectorFromIntToFloat(chosenPointPositionAsInt);
             
-            if( !Helper.isDistanceBetweenPositionsBelow(centerPosition, chosenPointPosition, HardParameters.ProcessD.EARLYCANDIDATEMAXDISTANCE) )
+            if( Helper.isDistanceBetweenPositionsBelow(centerPosition, chosenPointPosition, HardParameters.ProcessD.EARLYCANDIDATEMAXDISTANCE) )
             {
                 alreadyIntegratedPointIndices.add(chosenPointIndex);
                 
@@ -389,64 +435,92 @@ public class ProcessD
         ArrayList<SingleLineDetector> resultSingleLineDetectors;
         ArrayList<Vector2d<Float>> projectedPointPositions;
         
-        // first sort all points after the x position
-        // TODO< handle the special case where its all on one x coordinate >
-        // and then "cluster" the lines after the distance between succeeding points
-        
         resultSingleLineDetectors = new ArrayList<>();
         projectedPointPositions = new ArrayList<>();
         
-        // project
-        for( int iterationSampleIndex : lineDetectorWithMultiplePoints.integratedSampleIndices )
+        if( lineDetectorWithMultiplePoints.isYAxisSingularity() )
         {
-            Vector2d<Integer> samplePositionAsInt;
-            Vector2d<Float> samplePosition;
-            Vector2d<Float> projectedSamplePosition;
-            
-            samplePositionAsInt = samples.get(iterationSampleIndex).position;
-            samplePosition = new Vector2d<Float>((float)samplePositionAsInt.x, (float)samplePositionAsInt.y);
-            projectedSamplePosition = lineDetectorWithMultiplePoints.projectPointOntoLine(samplePosition);
-            
-            projectedPointPositions.add(projectedSamplePosition);
-        }
+            // TODO< handle the special case where its all on one x coordinate >
         
-        sort(projectedPointPositions, new VectorComperatorByX());
-        
-        // "cluster"
 
-        boolean nextIsNewLineStart;
-        float lastXPosition;
-        Vector2d<Float> lineStartPosition;
-        
-        nextIsNewLineStart = true;
-        
-        lineStartPosition = projectedPointPositions.get(0);
-        lastXPosition = projectedPointPositions.get(0).x;
-        
-        
-        for( Vector2d<Float> iterationPoint : projectedPointPositions )
+            // TODO TODO TODO
+        }
+        else
         {
-            if( nextIsNewLineStart )
-            {
-                lineStartPosition = iterationPoint;
-                lastXPosition = iterationPoint.x;
-                
-                nextIsNewLineStart = false;
-                
-                continue;
-            }
-            // else we are here
+            // first sort all points after the x position
+            // and then "cluster" the lines after the distance between succeeding points
             
-            if( iterationPoint.x - lastXPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE )
+            // project
+            for( int iterationSampleIndex : lineDetectorWithMultiplePoints.integratedSampleIndices )
             {
-                lastXPosition = iterationPoint.x;
+                Vector2d<Integer> samplePositionAsInt;
+                Vector2d<Float> samplePosition;
+                Vector2d<Float> projectedSamplePosition;
+
+                samplePositionAsInt = samples.get(iterationSampleIndex).position;
+                samplePosition = new Vector2d<Float>((float)samplePositionAsInt.x, (float)samplePositionAsInt.y);
+                projectedSamplePosition = lineDetectorWithMultiplePoints.projectPointOntoLine(samplePosition);
+
+                projectedPointPositions.add(projectedSamplePosition);
             }
-            else
+
+            if( Float.isNaN(projectedPointPositions.get(0).x) )
             {
-                // form a new line
-                resultSingleLineDetectors.add(SingleLineDetector.createFromFloatPositions(lineStartPosition, iterationPoint));
-                
-                nextIsNewLineStart = true;
+                int z = 1;
+            }
+
+            sort(projectedPointPositions, new VectorComperatorByX());
+
+            if( Float.isNaN(projectedPointPositions.get(0).x) )
+            {
+                int z = 1;
+            }
+
+            // "cluster"
+
+            boolean nextIsNewLineStart;
+            float lastXPosition;
+            Vector2d<Float> lineStartPosition;
+            Vector2d<Float> lastPoint;
+            
+            nextIsNewLineStart = true;
+
+            lineStartPosition = projectedPointPositions.get(0);
+            lastXPosition = projectedPointPositions.get(0).x;
+
+
+            for( Vector2d<Float> iterationPoint : projectedPointPositions )
+            {
+                if( nextIsNewLineStart )
+                {
+                    lineStartPosition = iterationPoint;
+                    lastXPosition = iterationPoint.x;
+
+                    nextIsNewLineStart = false;
+
+                    continue;
+                }
+                // else we are here
+
+                if( iterationPoint.x - lastXPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE )
+                {
+                    lastXPosition = iterationPoint.x;
+                }
+                else
+                {
+                    // form a new line
+                    resultSingleLineDetectors.add(SingleLineDetector.createFromFloatPositions(lineStartPosition, iterationPoint));
+
+                    nextIsNewLineStart = true;
+                }
+            }
+            
+            // form a new line for the last point
+            lastPoint = projectedPointPositions.get(projectedPointPositions.size()-1);
+            
+            if( !nextIsNewLineStart && lastPoint.x - lastXPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE )
+            {
+                resultSingleLineDetectors.add(SingleLineDetector.createFromFloatPositions(lineStartPosition, lastPoint));
             }
         }
         
@@ -456,6 +530,11 @@ public class ProcessD
     private static void deleteMultiPointDetectorsWhereActiviationIsInsuficient(ArrayList<LineDetectorWithMultiplePoints> lineDetectors)
     {
         int detectorI;
+        
+        if( !ENABLELOCKING )
+        {
+            return;
+        }
         
         for( detectorI = lineDetectors.size()-1; detectorI >= 0; detectorI-- )
         {

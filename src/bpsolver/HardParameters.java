@@ -21,8 +21,8 @@ public class HardParameters
         
         public final static float LINECLUSTERINGMAXDISTANCE = 7.0f; // how many units (pixels) can be the distance of points of a line to be considered to lay on the same line
         
-        public final static float EARLYCANDIDATEMAXDISTANCE = 7.0f; // maximal distance for the early candidates of a line inside a radius of a "center point"
-        public final static int EARLYCANDIDATECOUNT = 4;
+        public final static float EARLYCANDIDATEMAXDISTANCE = 4.0f; // maximal distance for the early candidates of a line inside a radius of a "center point"
+        public final static int EARLYCANDIDATECOUNT = 2;
     }
     
     public static class ProcessE
