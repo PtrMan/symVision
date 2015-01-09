@@ -16,6 +16,7 @@ import RetinaLevel.ProcessC;
 import RetinaLevel.ProcessD;
 import RetinaLevel.ProcessE;
 import RetinaLevel.ProcessH;
+import RetinaLevel.SingleLineDetector;
 import bpsolver.BpSolver;
 import bpsolver.CodeletLtmLookup;
 import bpsolver.NetworkHandles;
@@ -32,11 +33,14 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import javax.swing.Timer;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class Controller
 {
     private static class RecalculateActionListener implements ActionListener
     {
+
+       
         public RecalculateActionListener(BpSolver bpSolver)
         {
             this.bpSolver = bpSolver;
@@ -49,6 +53,9 @@ public class Controller
         
         private void recalculate()
         {
+            final boolean enableProcessH = false;
+            final boolean enableProcessE = false;
+            
             // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
             bpSolver.coderack.flush();
             
@@ -69,15 +76,22 @@ public class Controller
             processB.process(samples, image);
             processC.process(samples);
 
-            ArrayList<ProcessD.SingleLineDetector> lineDetectors = processD.detectLines(samples);
-            
-            // can be commented/disabled if we want to debug the raw lines
-            processH.process(lineDetectors);
-            
-            processE.process(lineDetectors, image);
-            ArrayList<LineIntersection> lineIntersections = processE.intersections;
+            ArrayList<SingleLineDetector> lineDetectors = processD.detectLines(samples);
             
             
+            if( enableProcessH )
+            {
+                processH.process(lineDetectors);
+            }
+            
+            ArrayList<LineIntersection> lineIntersections = new ArrayList<>();
+            
+            if( enableProcessE )
+            {
+                processE.process(lineDetectors, image);
+                
+                lineIntersections = getAllLineIntersections(lineDetectors);
+            }
             
             ArrayList<Node> objectNodes = RetinaToWorkspaceTranslator.createObjectFromLines(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup);
             
@@ -117,10 +131,12 @@ public class Controller
 
             //g2.drawLine(20, 30, 30, 20);
             
-            drawTestTriangle(g2, new Vector2d<>(20.0f, 60.0f), 10.0f, time, (3.0f / (float)Math.sqrt(3)));
+            ///drawTestTriangle(g2, new Vector2d<>(20.0f, 60.0f), 10.0f, time, (3.0f / (float)Math.sqrt(3)));
             
             //drawTestTriangle(g2, new Vector2d<>(60.0f, 60.0f), 10.0f, time * 0.114f, 0.5f*(3.0f / (float)Math.sqrt(3)));
-
+            
+            g2.drawOval(5, 5, 80, 80);
+            
             return off_Image;
         }
         
@@ -236,9 +252,9 @@ public class Controller
         }
         
 
-        private static void drawDetectors(Graphics2D graphics, ArrayList<ProcessD.SingleLineDetector> lineDetectors, ArrayList<LineIntersection> intersections, ArrayList<ProcessA.Sample> samples)
+        private static void drawDetectors(Graphics2D graphics, ArrayList<SingleLineDetector> lineDetectors, ArrayList<LineIntersection> intersections, ArrayList<ProcessA.Sample> samples)
         {
-            for( ProcessD.SingleLineDetector iterationDetector : lineDetectors )
+            for( SingleLineDetector iterationDetector : lineDetectors )
             {
                 Vector2d<Float> aProjectedFloat;
                 Vector2d<Float> bProjectedFloat;
@@ -274,6 +290,48 @@ public class Controller
             }
             */
 
+            
+        }
+        
+        // TODO< refactor out >
+        private static ArrayList<LineIntersection> getAllLineIntersections(ArrayList<SingleLineDetector> lineDetectors)
+        {
+            ArrayList<LineIntersection> uniqueIntersections;
+            
+            uniqueIntersections = new ArrayList<>();
+            
+            for( SingleLineDetector currentDetector : lineDetectors )
+            {
+                findAndAddUniqueIntersections(uniqueIntersections, currentDetector.intersections);
+            }
+            
+            return uniqueIntersections;
+        }
+        
+        // modifies uniqueIntersections
+        private static void findAndAddUniqueIntersections(ArrayList<LineIntersection> uniqueIntersections, ArrayList<LineIntersection> intersections)
+        {
+            for( LineIntersection currentOuterIntersection : intersections )
+            {
+                boolean found;
+                
+                found = false;
+                
+                for( LineIntersection currentUnqiueIntersection : uniqueIntersections )
+                {
+                    if( currentUnqiueIntersection.equals(currentOuterIntersection) )
+                    {
+                        found = true;
+                        break;
+                    }
+                }
+                
+                if( !found )
+                {
+                    uniqueIntersections.add(currentOuterIntersection);
+                }
+            }
+            
             
         }
         
