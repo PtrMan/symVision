@@ -2,6 +2,7 @@ package RetinaLevel.tests;
 
 import Datastructures.Vector2d;
 import RetinaLevel.ProcessD;
+import RetinaLevel.SingleLineDetector;
 import java.util.ArrayList;
 import misc.Assert;
 
@@ -24,12 +25,12 @@ public class ProcessH
     
     private static void testOverlapA()
     {
-        ArrayList<ProcessD.SingleLineDetector> detectors;
+        ArrayList<SingleLineDetector> detectors;
         RetinaLevel.ProcessH processH = new RetinaLevel.ProcessH();
         
         detectors = new ArrayList<>();
-        detectors.add(ProcessD.SingleLineDetector.createFromFloatPositions(new Vector2d<>(7.0f, 5.0f+2.0f*7.0f), new Vector2d<>(15.0f, 5.0f+2.0f*15.0f)));
-        detectors.add(ProcessD.SingleLineDetector.createFromFloatPositions(new Vector2d<>(5.0f, 5.0f+2.0f*5.0f+2.0f), new Vector2d<>(10.0f, 5.0f+2.0f*10.0f+2.0f)));
+        detectors.add(SingleLineDetector.createFromFloatPositions(new Vector2d<>(7.0f, 5.0f+2.0f*7.0f), new Vector2d<>(15.0f, 5.0f+2.0f*15.0f)));
+        detectors.add(SingleLineDetector.createFromFloatPositions(new Vector2d<>(5.0f, 5.0f+2.0f*5.0f+2.0f), new Vector2d<>(10.0f, 5.0f+2.0f*10.0f+2.0f)));
         
         
         processH.process(detectors);
@@ -43,12 +44,12 @@ public class ProcessH
     
     private static void testOverlapAEqual()
     {
-        ArrayList<ProcessD.SingleLineDetector> detectors;
+        ArrayList<SingleLineDetector> detectors;
         RetinaLevel.ProcessH processH = new RetinaLevel.ProcessH();
         
         detectors = new ArrayList<>();
-        detectors.add(ProcessD.SingleLineDetector.createFromFloatPositions(new Vector2d<>(5.0f, 5.0f+2.0f*5.0f), new Vector2d<>(15.0f, 5.0f+2.0f*15.0f)));
-        detectors.add(ProcessD.SingleLineDetector.createFromFloatPositions(new Vector2d<>(5.0f, 5.0f+2.0f*5.0f+2.0f), new Vector2d<>(10.0f, 5.0f+2.0f*10.0f+2.0f)));
+        detectors.add(SingleLineDetector.createFromFloatPositions(new Vector2d<>(5.0f, 5.0f+2.0f*5.0f), new Vector2d<>(15.0f, 5.0f+2.0f*15.0f)));
+        detectors.add(SingleLineDetector.createFromFloatPositions(new Vector2d<>(5.0f, 5.0f+2.0f*5.0f+2.0f), new Vector2d<>(10.0f, 5.0f+2.0f*10.0f+2.0f)));
         
         
         processH.process(detectors);
