@@ -19,8 +19,6 @@ public class ProcessE
         
         int outerI, innerI;
         
-        flushIntersections();
-        
         for( outerI = 0; outerI < lineDetectors.size(); outerI++ )
         {
             for( innerI = 0; innerI < lineDetectors.size(); innerI++ )
@@ -61,7 +59,9 @@ public class ProcessE
                 createdIntersection.intersectionPosition = intersectionPosition;
                 createdIntersection.lineA = lowLine;
                 createdIntersection.lineB = highLine;
-                intersections.add(createdIntersection);
+                
+                lowLine.intersections.add(createdIntersection);
+                highLine.intersections.add(createdIntersection);
             }
         }
     }
@@ -110,11 +110,4 @@ public class ProcessE
         
         return false;
     }
-    
-    private void flushIntersections()
-    {
-        intersections.clear();
-    }
-    
-    public ArrayList<LineIntersection> intersections = new ArrayList<>();
 }
