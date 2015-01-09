@@ -118,7 +118,13 @@ public class ProcessD
                 // modifies chosenPointIndices
                 choosePointIndicesInsideRadius(chosenPointIndices.get(0), chosenPointIndices, workingSamples, HardParameters.ProcessD.EARLYCANDIDATECOUNT-1);
                 
-
+                if( chosenPointIndices.size() < 2 )
+                {
+                    // ignore potential detectors with less than two points
+                    continue;
+                }
+                
+                
                 // create new line detector
                 LineDetectorWithMultiplePoints createdLineDetector;
 
@@ -196,19 +202,24 @@ public class ProcessD
      */
     private void choosePointIndicesInsideRadius(int centerPointIndex, ArrayList<Integer> alreadyIntegratedPointIndices, ArrayList<ProcessA.Sample> workingSamples, int count)
     {
+        final int MAXTRIES = 20;
+        
         Vector2d<Integer> centerPositionAsInt;
         Vector2d<Float> centerPosition;
-        int counter;
+        int counter, tryCounter;
         
         centerPositionAsInt = workingSamples.get(centerPointIndex).position;
         centerPosition = convertVectorFromIntToFloat(centerPositionAsInt);
         
+        tryCounter = 0;
         for( counter = 0; counter < count; )
         {
             int chosenPointIndex;
             ArrayList<Integer> chosenPointIndexAsList;
             Vector2d<Integer> chosenPointPositionAsInt;
             Vector2d<Float> chosenPointPosition;
+            
+            tryCounter++;
             
             chosenPointIndexAsList = DistinctUtility.getDisjuctNumbersTo(random, alreadyIntegratedPointIndices, 1, workingSamples.size());
             Assert.Assert(chosenPointIndexAsList.size() == 1, "");
@@ -224,7 +235,13 @@ public class ProcessD
                 
                 // we have one more point, so increment counter
                 counter++;
+                tryCounter = 0;
                 continue;
+            }
+            
+            if( tryCounter >= MAXTRIES )
+            {
+                return;
             }
         }
     }
