@@ -16,6 +16,7 @@ import RetinaLevel.ProcessC;
 import RetinaLevel.ProcessD;
 import RetinaLevel.ProcessE;
 import RetinaLevel.ProcessH;
+import RetinaLevel.ProcessM;
 import RetinaLevel.SingleLineDetector;
 import bpsolver.BpSolver;
 import bpsolver.CodeletLtmLookup;
@@ -39,8 +40,6 @@ public class Controller
 {
     private static class RecalculateActionListener implements ActionListener
     {
-
-       
         public RecalculateActionListener(BpSolver bpSolver)
         {
             this.bpSolver = bpSolver;
@@ -54,7 +53,8 @@ public class Controller
         private void recalculate()
         {
             final boolean enableProcessH = false;
-            final boolean enableProcessE = false;
+            final boolean enableProcessE = true;
+            final boolean enableProcessM = true;
             
             // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
             bpSolver.coderack.flush();
@@ -68,6 +68,7 @@ public class Controller
             ProcessD processD = new ProcessD();
             ProcessH processH = new ProcessH();
             ProcessE processE = new ProcessE();
+            ProcessM processM = new ProcessM();
 
             processA.setWorkingImage(image);
             ArrayList<ProcessA.Sample> samples = processA.sampleImage();
@@ -93,6 +94,15 @@ public class Controller
                 lineIntersections = getAllLineIntersections(lineDetectors);
             }
             
+            ArrayList<ProcessM.LineParsing> lineParsings = new ArrayList<>();
+            
+            if( enableProcessM )
+            {
+                processM.process(lineDetectors);
+                
+                lineParsings = processM.getLineParsings();
+            }
+            
             ArrayList<Node> objectNodes = RetinaToWorkspaceTranslator.createObjectFromLines(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup);
             
             bpSolver.cycle(500);
@@ -105,7 +115,7 @@ public class Controller
             
             drawDetectors(graphics, lineDetectors, lineIntersections, samples);
             drawObjectBaryCenters(graphics, objectNodes, bpSolver.networkHandles);
-            
+            drawLineParsings(graphics, lineParsings);
             
 
             interactive.leftCanvas.setImage(javaImage);
@@ -168,7 +178,31 @@ public class Controller
             
             graphics.drawLine(pointAInt.x, pointAInt.y, pointBInt.x, pointBInt.y);
         }
+        
+        private static void drawLineParsings(Graphics2D graphics, ArrayList<ProcessM.LineParsing> lineParsings)
+        {
+            for( ProcessM.LineParsing iterationLineParsing : lineParsings )
+            {
+                drawLineParsing(graphics, iterationLineParsing);
+            }
+        }
+        
+        private static void drawLineParsing(Graphics2D graphics, ProcessM.LineParsing lineParsing)
+        {
+            graphics.setColor(Color.LIGHT_GRAY);
+            
+            for( SingleLineDetector iterationDetector : lineParsing.lineParsing )
+            {
+                Vector2d<Float> aProjectedFloat;
+                Vector2d<Float> bProjectedFloat;
 
+                aProjectedFloat = iterationDetector.aFloat;
+                bProjectedFloat = iterationDetector.bFloat;
+                
+                graphics.drawLine(Math.round(aProjectedFloat.x), Math.round(aProjectedFloat.y), Math.round(bProjectedFloat.x), Math.round(bProjectedFloat.y));
+            }
+        }
+        
         private static Map2d<Boolean> drawToImage(BufferedImage javaImage)
         {
             DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
