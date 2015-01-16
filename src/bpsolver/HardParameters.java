@@ -27,7 +27,7 @@ public class HardParameters
     
     public static class ProcessE
     {
-        public final static int NEIGHTBORHOODSEARCHRADIUS = 10;
+        public final static int NEIGHTBORHOODSEARCHRADIUS = 2;
     }
     
     public static class ProcessH
