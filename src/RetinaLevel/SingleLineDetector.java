@@ -135,6 +135,11 @@ public class SingleLineDetector
 
         return add(new Vector2d<>(0.0f, getN()), getScaled(lineDirection, dotResult));
     }
+    
+    public boolean isXOfPointInLine(Vector2d<Float> point)
+    {
+        return point.x >= getAProjected().x && point.x <= getBProjected().x;
+    }
 
     public float getN()
     {
