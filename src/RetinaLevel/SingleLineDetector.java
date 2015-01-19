@@ -102,16 +102,16 @@ public class SingleLineDetector
 
         return dotProduct > 0.0f && dotProduct < length;
     }
-
+    
+    // TODO< rename to getA >
     public Vector2d<Float> getAProjected()
     {
-        // TODO< project aFloat onto line defined by m and n >
         return aFloat;
     }
-
+    
+    // TODO< rename to getB >
     public Vector2d<Float> getBProjected()
     {
-        // TODO< project bFloat onto line defined by m and n >
         return bFloat;
     }
 
@@ -148,5 +148,66 @@ public class SingleLineDetector
 
         diff = sub(bFloat, aFloat);
         return diff.y/diff.x;
+    }
+
+    public float getLength() {
+        Vector2d<Float> diff;
+        
+        diff = sub(aFloat, bFloat);
+        
+        return Datastructures.Vector2d.FloatHelper.getLength(diff);
+    }
+    
+    public static float getAngleBetween(SingleLineDetector a, SingleLineDetector b)
+    {
+        Vector2d<Float> aNormalizedDirection, bNormalizedDirection;
+        float dotResult;
+        float angleInRad;
+        float angleInDegree;
+        
+        aNormalizedDirection = a.getNormalizedDirection();
+        bNormalizedDirection = b.getNormalizedDirection();
+        
+        dotResult = dot(aNormalizedDirection, bNormalizedDirection);
+        angleInRad = (float)Math.acos(dotResult);
+        angleInDegree = angleInRad * (360.0f/(2.0f*(float)Math.PI));
+        
+        if( angleInDegree > 90.0f )
+        {
+            angleInDegree = 180.0f - angleInDegree;
+        }
+        
+        return angleInDegree;
+    }
+
+    float getTangentM()
+    {
+        float m;
+        
+        m = getM();
+        
+        return -1.0f/m;
+    }
+    
+    public static Vector2d<Float> intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB)
+    {
+        return SingleLineDetector.intersectLinesMN(lineA.getM(), lineA.getN(), lineB.getM(), lineB.getN());
+    }
+    
+    // returns null if they are parallel
+    public static Vector2d<Float> intersectLinesMN(float am, float an, float bm, float bn)
+    {
+        float x, y;
+        
+        // parallel check
+        if( am == bm )
+        {
+            return null;
+        }
+        
+        x = (an - bn)/(bm - am);
+        y = an + am * x;
+        
+        return new Vector2d<Float>(x, y);
     }
 }

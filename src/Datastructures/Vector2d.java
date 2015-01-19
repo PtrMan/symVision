@@ -88,4 +88,12 @@ public class Vector2d<Type>
             return new Vector2d<Float>(a.x*value, a.y*value);
         }
     }
+    
+    public static class ConverterHelper
+    {
+        public static Vector2d<Float> convertIntVectorToFloat(Vector2d<Integer> vector)
+        {
+            return new Vector2d<Float>((float)vector.x, (float)vector.y);
+        }
+    }
 }

@@ -68,18 +68,15 @@ public class ProcessE
     
     private static Vector2d<Integer> intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB)
     {
-        float x, y;
+        Vector2d<Float> intersectionFloat;
         
-        // parallel check
-        if( lineA.getM() == lineB.getM() )
+        intersectionFloat = SingleLineDetector.intersectLineDetectors(lineA, lineB);
+        if( intersectionFloat == null )
         {
             return null;
         }
         
-        x = (lineA.getN() - lineB.getN())/(lineB.getM() - lineA.getM());
-        y = lineA.getN() + lineA.getM() * x;
-        
-        return new Vector2d<Integer>(Math.round(x), Math.round(y));
+        return new Vector2d<Integer>(Math.round(intersectionFloat.x), Math.round(intersectionFloat.y));
     }
     
     private static boolean isPointInsideImage(Vector2d<Integer> position, Map2d<Boolean> image)
