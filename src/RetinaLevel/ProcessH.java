@@ -56,8 +56,6 @@ public class ProcessH
                         terminate = false;
                         break repeatSearch;
                     }
-                    
-                    /*
                     else if( canDetectorsBeFusedInside(detectorLow, detectorHigh) )
                     {
                         SingleLineDetector fusedLineDetector;
@@ -74,7 +72,7 @@ public class ProcessH
                         // we need to repeat the search because we changed the array
                         terminate = false;
                         break repeatSearch;
-                    }*/
+                    }
                 }
             }
             
@@ -162,9 +160,6 @@ public class ProcessH
         projectedAEnd = detectorA.getBProjected();
         projectedBBegin = detectorB.getAProjected();
         projectedBEnd = detectorB.getBProjected();
-        
-        Assert.Assert(Math.abs(projectedABegin.y -projectedBBegin.y) < 20, "");
-        Assert.Assert(Math.abs(projectedAEnd.y -projectedBEnd.y) < 20, "");
         
         // we need to sort them after the x of the begin, so ABegin.x is always the lowest
         if( projectedBBegin.x < projectedABegin.x )
