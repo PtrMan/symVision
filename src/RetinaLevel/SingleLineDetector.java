@@ -216,4 +216,50 @@ public class SingleLineDetector
         
         return new Vector2d<Float>(x, y);
     }
+    
+    
+    // tests
+    public static void unittestProjectPoint()
+    {
+        SingleLineDetector testLine;
+        Vector2d<Float> point;
+        Vector2d<Float> projectedPoint;
+        
+        testLine = SingleLineDetector.createFromFloatPositions(new Vector2d<Float>(1.0f, 2.0f), new Vector2d<Float>(2.0f, 3.0f));
+        point = new Vector2d<Float>(2.0f, 1.0f);
+        
+        projectedPoint = testLine.projectPointOntoLine(point);
+        
+        if( projectedPoint.x < 1.0f + 0.01f && projectedPoint.x > 1.0f - 0.01f && projectedPoint.y < 2.0f + 0.01f && projectedPoint.y > 2.0f - 0.01f ) 
+        {
+            // all fine
+        }
+        else
+        {
+            throw new RuntimeException("Unittest failed (1)");
+        }
+        
+        
+        testLine = SingleLineDetector.createFromFloatPositions(new Vector2d<Float>(1.0f, 2.0f), new Vector2d<Float>(2.0f, 2.0f));
+        point = new Vector2d<Float>(2.0f, 1.0f);
+        
+        projectedPoint = testLine.projectPointOntoLine(point);
+        
+        if( projectedPoint.x < 2.0f + 0.01f && projectedPoint.x > 2.0f - 0.01f && projectedPoint.y < 2.0f + 0.01f && projectedPoint.y > 2.0f - 0.01f ) 
+        {
+            // all fine
+        }
+        else
+        {
+            throw new RuntimeException("Unittest failed (1)");
+        }
+        
+        testLine = SingleLineDetector.createFromFloatPositions(new Vector2d<Float>(0.0f, 1.0f), new Vector2d<Float>(1.0f, 0.0f));
+        point = new Vector2d<Float>(2.0f, 1.0f);
+        
+        projectedPoint = testLine.projectPointOntoLine(point);
+        
+        
+        int x = 0;
+    }
 }

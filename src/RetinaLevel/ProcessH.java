@@ -38,7 +38,7 @@ public class ProcessH
 
                     detectorLow = workingDetectors.get(iteratorLow);
                     detectorHigh = workingDetectors.get(iteratorHigh);
-
+                    
                     if( canDetectorsBeFusedOverlap(detectorLow, detectorHigh) )
                     {
                         SingleLineDetector fusedLineDetector;
@@ -56,6 +56,8 @@ public class ProcessH
                         terminate = false;
                         break repeatSearch;
                     }
+                    
+                    /*
                     else if( canDetectorsBeFusedInside(detectorLow, detectorHigh) )
                     {
                         SingleLineDetector fusedLineDetector;
@@ -72,7 +74,7 @@ public class ProcessH
                         // we need to repeat the search because we changed the array
                         terminate = false;
                         break repeatSearch;
-                    }
+                    }*/
                 }
             }
             
@@ -91,15 +93,22 @@ public class ProcessH
         Vector2d<Float> projectedABegin, projectedAEnd;
         Vector2d<Float> projectedBBegin, projectedBEnd;
         
+        SingleLineDetector inplaceDetectorA, inplaceDetectorB;
+        
         projectedABegin = detectorA.getAProjected();
         projectedAEnd = detectorA.getBProjected();
         projectedBBegin = detectorB.getAProjected();
         projectedBEnd = detectorB.getBProjected();
         
+        inplaceDetectorA = detectorA;
+        inplaceDetectorB = detectorB;
+        
         // we need to sort them after the x of the begin, so ABegin.x is always the lowest
         if( projectedBBegin.x < projectedABegin.x )
         {
             Vector2d<Float> tempBegin, tempEnd;
+            SingleLineDetector tempDetector;
+            
             
             tempBegin = projectedABegin;
             projectedABegin = projectedBBegin;
@@ -108,6 +117,11 @@ public class ProcessH
             tempEnd = projectedAEnd;
             projectedAEnd = projectedBEnd;
             projectedBEnd = tempEnd;
+            
+            
+            tempDetector = inplaceDetectorA;
+            inplaceDetectorA = inplaceDetectorB;
+            inplaceDetectorB = tempDetector;
         }
         
         if( vectorXBetweenInclusive(projectedABegin, projectedAEnd, projectedBBegin) && vectorXBetweenInclusive(projectedBBegin, projectedBEnd, projectedAEnd) )
@@ -120,12 +134,12 @@ public class ProcessH
         
         // projecting the points on the other line and measue the distance
         
-        if( !isProjectedPointOntoLineBelowDistanceLimit(projectedBBegin, detectorA) )
+        if( !isProjectedPointOntoLineBelowDistanceLimit(projectedBBegin, inplaceDetectorA) )
         {
             return false;
         }
         
-        if( !isProjectedPointOntoLineBelowDistanceLimit(projectedAEnd, detectorB) )
+        if( !isProjectedPointOntoLineBelowDistanceLimit(projectedAEnd, inplaceDetectorB) )
         {
             return false;
         }
@@ -148,6 +162,9 @@ public class ProcessH
         projectedAEnd = detectorA.getBProjected();
         projectedBBegin = detectorB.getAProjected();
         projectedBEnd = detectorB.getBProjected();
+        
+        Assert.Assert(Math.abs(projectedABegin.y -projectedBBegin.y) < 20, "");
+        Assert.Assert(Math.abs(projectedAEnd.y -projectedBEnd.y) < 20, "");
         
         // we need to sort them after the x of the begin, so ABegin.x is always the lowest
         if( projectedBBegin.x < projectedABegin.x )
@@ -253,6 +270,10 @@ public class ProcessH
         
         projectedPoint = line.projectPointOntoLine(point);
         distanceBetweenProjectedAndPoint = getLength(sub(projectedPoint, point));
+        
+        //System.out.println("line A (" + line.aFloat.x.toString() + "," + line.aFloat.y.toString() + ") B (" + line.bFloat.x.toString() + "," + line.bFloat.y.toString() + ")");
+        //System.out.println("point (" + point.x.toString() + "," + point.y.toString() + ")");
+        //System.out.println("projectedpoint (" + projectedPoint.x.toString() + "," + projectedPoint.y.toString() + ")");
         
         return distanceBetweenProjectedAndPoint < HardParameters.ProcessH.MAXDISTANCEFORCANDIDATEPOINT;
     }
