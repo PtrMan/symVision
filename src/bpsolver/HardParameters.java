@@ -35,6 +35,15 @@ public class HardParameters
         public final static float MAXDISTANCEFORCANDIDATEPOINT = 5.0f;
     }
     
+    public static class ProcessG
+    {
+        public final static float RATINGANGLEMULTIPLIER = 0.2f;
+        public final static float RATINGENDTOENDMAXDISTANCE = 5.0f;
+        public final static float RATINGENDTOENDMULTIPLIER = 0.7f;
+        public final static float VICINITYRADIUS = 10.0f;
+        public final static float MAXIMALDISTANCEOFENDOSCELETONTOLINE = 3.0f;
+    }
+    
     public static class FeatureWeights
     {
         public final static float LINESEGMENTFEATURELINELENGTH = 0.7f;
