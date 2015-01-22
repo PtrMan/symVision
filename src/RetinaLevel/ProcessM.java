@@ -14,6 +14,9 @@ public class ProcessM
         }
         
         public ArrayList<SingleLineDetector> lineParsing;
+        
+        public float processGInterestRating = 0.0f; // rating or interest of the parsing for processG to be a candidate of a curve
+        public boolean processGRated = false; // used to check for invalidated curves and rerate them if necessary
     }
     
     public void process(ArrayList<SingleLineDetector> lineDetectors)

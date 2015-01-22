@@ -1,7 +1,13 @@
 package RetinaLevel;
 
+import Datastructures.Map2d;
 import Datastructures.Vector2d;
+import static Datastructures.Vector2d.ConverterHelper.convertIntVectorToFloat;
+import static Datastructures.Vector2d.FloatHelper.getLength;
+import static Datastructures.Vector2d.FloatHelper.sub;
+import bpsolver.HardParameters;
 import java.util.ArrayList;
+import java.util.Arrays;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.DecompositionSolver;
@@ -14,6 +20,18 @@ import org.apache.commons.math3.linear.RealVector;
  */
 public class ProcessG
 {
+    
+    public static class Curve
+    {
+        public Curve(ArrayList<CurveElement> curveElements)
+        {
+            this.curveElements = curveElements;
+        }
+        
+        public ArrayList<CurveElement> curveElements;
+    }
+    
+    
     // test, works
     public static void testPoints()
     {
@@ -24,17 +42,16 @@ public class ProcessG
         testPoints.add(new Vector2d<>(1.8f, 4.0f));
         testPoints.add(new Vector2d<>(2.0f, 7.0f));
         
-        ArrayList<Curve> resultCurves;
+        Curve resultCurve;
         
         // works fine
-        resultCurves = calculatePolynominalsAndReturnCurves(testPoints);
-        
-        int t = 0;
+        resultCurve = calculatePolynominalsAndReturnCurve(testPoints);
     }
     
-    public static class Curve
+    
+    public static class CurveElement
     {
-        public Curve(float a0, float a1, float a2, float a3, float b0, float b1, float b2, float b3)
+        public CurveElement(float a0, float a1, float a2, float a3, float b0, float b1, float b2, float b3)
         {
             a = new float[]{a0, a1, a2, a3};
             b = new float[]{b0, b1, b2, b3};
@@ -45,7 +62,359 @@ public class ProcessG
         private float[] b;
     }
     
-    private static ArrayList<Curve> calculatePolynominalsAndReturnCurves(ArrayList<Vector2d<Float>> points)
+    public void process(ArrayList<SingleLineDetector> lineDetectors, ArrayList<ProcessM.LineParsing> lineParsings, ArrayList<ProcessA.Sample> samples)
+    {
+        resultCurves.clear();
+        
+        rerateLineParsings(lineParsings);
+        
+        // for each timeslice we get we select n times randomly "the best"(after the rating of the lineparsing) a lineparsing
+        // then we try to convert a part or all of it to a curve
+        
+        // not that we add and remove lineparsings, because it has no advantage to have a lineparsing and a curve which do overlap
+        // it adds also new lineparsings because lineparsings can be divided into curves
+        
+        // for now we do this for *all* curves
+        // TODO< select by random >
+        
+        int currentLineParsingIndex;
+        
+        for( currentLineParsingIndex = 0; currentLineParsingIndex < lineParsings.size(); currentLineParsingIndex++ )
+        {
+            ProcessM.LineParsing currentLineParsing;
+            
+            currentLineParsing = lineParsings.get(currentLineParsingIndex);
+            
+            
+            // try to covert (at least) a part of the lineParsing to a curve
+            
+            ArrayList<ArrayList<Vector2d<Float>>> protocurves;
+            ArrayList<Vector2d<Float>> currentProtocurve;
+            
+            protocurves = new ArrayList<ArrayList<Vector2d<Float>>>();
+            currentProtocurve = null;
+            
+            for( int pointIndex = 1; pointIndex < currentLineParsing.lineParsing.size()-1; pointIndex++ )
+            {
+                boolean atLeastOneSampleNotNearAdjacentLines = examineVincityOfSegmentPoint(pointIndex, currentLineParsing, samples);
+                
+                boolean IsParsingACurve = currentProtocurve != null;
+                
+                if( IsParsingACurve )
+                {
+                    if( atLeastOneSampleNotNearAdjacentLines )
+                    {
+                        // add segment to curve and mark last segment as in a curve
+                        currentProtocurve.add(currentLineParsing.lineParsing.get(pointIndex-1).getBProjected());
+                        
+                        currentLineParsing.lineParsing.get(pointIndex-1).markedPartOfCurve = true;
+                    }
+                    else
+                    {
+                        // finish lineparsing
+                        protocurves.add(currentProtocurve);
+                        currentProtocurve = null;
+                    }
+                }
+                else
+                {
+                    if( atLeastOneSampleNotNearAdjacentLines )
+                    {
+                        // begin a new lineparsing
+                        currentProtocurve = new ArrayList<>();
+                        
+                        currentProtocurve.add(currentLineParsing.lineParsing.get(pointIndex-1).getBProjected());
+                        
+                        currentLineParsing.lineParsing.get(pointIndex-1).markedPartOfCurve = true;
+                    }
+                    else
+                    {
+                        // do nothing
+                    }
+                }
+            }
+            
+            boolean IsParsingACurve = currentProtocurve != null;
+            
+            if( IsParsingACurve )
+            {
+                protocurves.add(currentProtocurve);
+                currentProtocurve = null;
+                IsParsingACurve = false;
+            }
+            
+            // convert protocurves to real curves
+            
+            for( ArrayList<Vector2d<Float>> iterationProtoCurve : protocurves )
+            {
+                Curve createdCurve;
+                
+                createdCurve = calculatePolynominalsAndReturnCurve(iterationProtoCurve);
+                resultCurves.add(createdCurve);
+            }
+        }
+        
+        // remove segments which are part of curves
+        // we don't touch the lineparsings here, because they are not visible from the cognitive layer
+        removeLinedetectorsWhichWereUsedInCurves(lineDetectors);
+    }
+    
+    public ArrayList<Curve> getResultCurves()
+    {
+        return resultCurves;
+    }
+    
+    private static void removeLinedetectorsWhichWereUsedInCurves(ArrayList<SingleLineDetector> lineDetectors)
+    {
+        int lineDetectorI;
+        
+        for( lineDetectorI = 0; lineDetectorI < lineDetectors.size(); lineDetectorI++ )
+        {
+            SingleLineDetector currentLineDetector;
+            
+            currentLineDetector = lineDetectors.get(lineDetectorI);
+            
+            if( currentLineDetector.markedPartOfCurve )
+            {
+                // before we remove it we have to make sure it doesn't get referenced in intersections
+                removeLineDetectorFromNeightborIntersections(currentLineDetector);
+                
+                lineDetectors.remove(lineDetectorI);
+                lineDetectorI--;
+                continue;
+            }
+        }
+    }
+    
+    private static void removeLineDetectorFromNeightborIntersections(SingleLineDetector lineDetector)
+    {
+        for( LineIntersection iterationIntersection : lineDetector.intersections )
+        {
+            if( iterationIntersection.lineA.equals(lineDetector) )
+            {
+                removeIntersectionBetweenLines(iterationIntersection.lineB, lineDetector);
+            }
+            else if( iterationIntersection.lineB.equals(lineDetector) )
+            {
+                removeIntersectionBetweenLines(iterationIntersection.lineA, lineDetector);
+            }
+        }
+    }
+
+    private static void removeIntersectionBetweenLines(SingleLineDetector lineA, SingleLineDetector lineB)
+    {
+        int intersectionI;
+        
+        for( intersectionI = 0; intersectionI < lineA.intersections.size(); intersectionI++ )
+        {
+            LineIntersection iterationIntersection;
+            
+            iterationIntersection = lineA.intersections.get(intersectionI);
+            
+            if( iterationIntersection.lineA.equals(lineB) )
+            {
+                lineA.intersections.remove(intersectionI);
+                break;
+            }
+            else if( iterationIntersection.lineB.equals(lineB) )
+            {
+                lineA.intersections.remove(intersectionI);
+                break;
+            }
+        }
+        
+        
+        for( intersectionI = 0; intersectionI < lineB.intersections.size(); intersectionI++ )
+        {
+            LineIntersection iterationIntersection;
+            
+            iterationIntersection = lineB.intersections.get(intersectionI);
+            
+            if( iterationIntersection.lineA.equals(lineA) )
+            {
+                lineB.intersections.remove(intersectionI);
+                break;
+            }
+            else if( iterationIntersection.lineB.equals(lineA) )
+            {
+                lineB.intersections.remove(intersectionI);
+                break;
+            }
+        }
+    }
+    
+    private static void rerateLineParsings(ArrayList<ProcessM.LineParsing> lineParsings)
+    {
+        for( ProcessM.LineParsing iterationLineParsing : lineParsings )
+        {
+            rerateLineParsing(iterationLineParsing);
+        }
+    }
+    
+    private static void rerateLineParsing(ProcessM.LineParsing lineParsing)
+    {
+        int lineDetectorI;
+        
+        if( lineParsing.processGRated )
+        {
+            return;
+        }
+        
+        lineParsing.processGInterestRating = 0.0f;
+        
+        for( lineDetectorI = 0; lineDetectorI < lineParsing.lineParsing.size()-1; lineDetectorI++ )
+        {
+            SingleLineDetector iterationLineDetector;
+            SingleLineDetector nextLineDetector;
+            float length;
+            float angleBetweenSegments;
+            Vector2d<Float> endToEndDiff;
+            float endToEndDistance;
+            float endToEndRating;
+            
+            iterationLineDetector = lineParsing.lineParsing.get(lineDetectorI);
+            nextLineDetector = lineParsing.lineParsing.get(lineDetectorI+1);
+            
+            // length criteria
+            
+            length = iterationLineDetector.getLength();
+            
+            // TODO< configurable constant >
+            lineParsing.processGInterestRating += (1.0f/length);
+            
+            // angle criteria
+            
+            angleBetweenSegments = SingleLineDetector.getAngleBetween(iterationLineDetector, nextLineDetector);
+            lineParsing.processGInterestRating += (90.0f-angleBetweenSegments)*HardParameters.ProcessG.RATINGANGLEMULTIPLIER;
+            
+            // meeting end to end criteria
+            
+            // we assume that the point a is the first and point b is the last
+            
+            endToEndDiff = sub(iterationLineDetector.getBProjected(), nextLineDetector.getAProjected());
+            endToEndDistance = getLength(endToEndDiff);
+            
+            endToEndRating = (float)Math.max(0.0f, (HardParameters.ProcessG.RATINGENDTOENDMAXDISTANCE - endToEndDistance)/HardParameters.ProcessG.RATINGENDTOENDMAXDISTANCE);
+            endToEndRating *= HardParameters.ProcessG.RATINGENDTOENDMULTIPLIER;
+            lineParsing.processGInterestRating += endToEndRating;
+        }
+        
+        lineParsing.processGRated = true;
+    }
+    
+    
+    
+    
+    private static boolean examineVincityOfSegmentPoint(int pointIndex, ProcessM.LineParsing lineParsing, ArrayList<ProcessA.Sample> samples)
+    {
+        Vector2d<Float> centerPoint;
+        ArrayList<ProcessA.Sample> endosceletonSamplesInVicinity;
+        ArrayList<SingleLineDetector> neightborLinesOfPoint;
+        boolean atLeastOneSampleNotNearLine;
+        
+        centerPoint = lineParsing.lineParsing.get(pointIndex).getBProjected();
+        endosceletonSamplesInVicinity = queryEndosceletonPointsInVicinityOf(samples, centerPoint);
+        neightborLinesOfPoint = getNeightborLinesOfPoint(pointIndex, lineParsing);
+        atLeastOneSampleNotNearLine = !areAllSamplesNearLines(endosceletonSamplesInVicinity, neightborLinesOfPoint, HardParameters.ProcessG.MAXIMALDISTANCEOFENDOSCELETONTOLINE);
+        
+        return atLeastOneSampleNotNearLine;
+    }
+    
+    private static ArrayList<ProcessA.Sample> queryEndosceletonPointsInVicinityOf(ArrayList<ProcessA.Sample> samples, Vector2d<Float> centerPoint)
+    {
+        return queryPointsInRadius(samples, centerPoint, HardParameters.ProcessG.VICINITYRADIUS, new ProcessA.Sample.EnumType[]{ProcessA.Sample.EnumType.ENDOSCELETON});
+    }
+    
+    private static ArrayList<ProcessA.Sample> queryPointsInRadius(ArrayList<ProcessA.Sample> samples, Vector2d<Float> centerPoint, float radius, ProcessA.Sample.EnumType[] typeFilterCriteria)
+    {
+        ArrayList<ProcessA.Sample> samplesInRadius;
+        
+        samplesInRadius = new ArrayList<>();
+        
+        // TODO< query the points in the radius with a optimized spartial scheme >
+        for( ProcessA.Sample iterationSample : samples )
+        {
+            Vector2d<Float> diff;
+            float distance;
+            
+            diff = sub(convertIntVectorToFloat(iterationSample.position), centerPoint);
+            distance = getLength(diff);
+            
+            if( distance < radius && Arrays.asList(typeFilterCriteria).contains(iterationSample.type) )
+            {
+                samplesInRadius.add(iterationSample);
+            }
+        }
+        
+        return samplesInRadius;
+    }
+    
+    private static ArrayList<SingleLineDetector> getNeightborLinesOfPoint(int pointIndex, ProcessM.LineParsing lineParsing) {
+        ArrayList<SingleLineDetector> resultLines;
+        
+        resultLines = new ArrayList<>();
+        
+        resultLines.add(lineParsing.lineParsing.get(pointIndex-1));
+        resultLines.add(lineParsing.lineParsing.get(pointIndex));
+        
+        return resultLines;
+    }
+    
+    /**
+     * checks if all samples are near at least one of the lines
+     * if this is not the case for one sample, it returns false
+     *  
+     */
+    private static boolean areAllSamplesNearLines(ArrayList<ProcessA.Sample> samples, ArrayList<SingleLineDetector> lines, final float maximalDistance)
+    {
+        for( ProcessA.Sample iterationSample : samples )
+        {
+            boolean sampleNearAnyLine;
+            Vector2d<Float> iterationSamplePosition;
+            
+            iterationSamplePosition = convertIntVectorToFloat(iterationSample.position);
+            
+            sampleNearAnyLine = false;
+            
+            for( SingleLineDetector iterationLine : lines )
+            {
+                Vector2d<Float> projectedPointPosition;
+                boolean projectedPointInsideLine;
+                Vector2d<Float> diff;
+                float distanceOfPointToLine;
+                
+                projectedPointPosition = iterationLine.projectPointOntoLine(iterationSamplePosition);
+                projectedPointInsideLine = iterationLine.isXOfPointInLine(projectedPointPosition);
+                
+                // ignore if it is not on the line
+                if( !projectedPointInsideLine )
+                {
+                    continue;
+                }
+                
+                diff = sub(projectedPointPosition, iterationSamplePosition);
+                distanceOfPointToLine = getLength(diff);
+                
+                if( distanceOfPointToLine < maximalDistance )
+                {
+                    sampleNearAnyLine = true;
+                    continue;
+                }
+            }
+            
+            if( !sampleNearAnyLine )
+            {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    
+    
+    
+    private static Curve calculatePolynominalsAndReturnCurve(ArrayList<Vector2d<Float>> points)
     {
         RealVector solvedA_2_i;
         RealVector solvedA_1_i;
@@ -67,7 +436,7 @@ public class ProcessG
         solvedB_3_i = ProcessG.calculate_2_i(points, solvedB_2_i);
         solvedB_0_i = ProcessG.calculate_0_i(points, EnumAxis.Y);
         
-        return createCurves(solvedA_0_i, solvedA_1_i, solvedA_2_i, solvedA_3_i, solvedB_0_i, solvedB_1_i, solvedB_2_i, solvedB_3_i);
+        return new Curve(createCurves(solvedA_0_i, solvedA_1_i, solvedA_2_i, solvedA_3_i, solvedB_0_i, solvedB_1_i, solvedB_2_i, solvedB_3_i));
     }
     
     // builds a linear equation for the a|b_2,i values and returns the coefficients
@@ -169,8 +538,8 @@ public class ProcessG
     }
     
     
-    private static ArrayList<Curve> createCurves(RealVector solvedA_0_i, RealVector solvedA_1_i, RealVector solvedA_2_i, RealVector solvedA_3_i, RealVector solvedB_0_i, RealVector solvedB_1_i, RealVector solvedB_2_i, RealVector solvedB_3_i) {
-        ArrayList<Curve> resultCurves;
+    private static ArrayList<CurveElement> createCurves(RealVector solvedA_0_i, RealVector solvedA_1_i, RealVector solvedA_2_i, RealVector solvedA_3_i, RealVector solvedB_0_i, RealVector solvedB_1_i, RealVector solvedB_2_i, RealVector solvedB_3_i) {
+        ArrayList<CurveElement> resultCurves;
         int numberOfPoints;
         int curveI;
         
@@ -180,8 +549,7 @@ public class ProcessG
         
         for( curveI = 0; curveI < numberOfPoints-1; curveI++ )
         {
-            resultCurves.add(
-                new Curve(
+            resultCurves.add(new CurveElement(
                     (float)solvedA_0_i.getEntry(curveI),
                     (float)solvedA_1_i.getEntry(curveI),
                     (float)solvedA_2_i.getEntry(curveI),
@@ -225,4 +593,6 @@ public class ProcessG
         X,
         Y
     }
+    
+    private ArrayList<Curve> resultCurves = new ArrayList<Curve>();
 }

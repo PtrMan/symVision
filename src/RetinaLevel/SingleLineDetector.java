@@ -81,6 +81,7 @@ public class SingleLineDetector
     public boolean resultOfCombination = false; // for visual debugging, was the detector combined from other detectors?
 
     public boolean marked = false; // used for marking in other (multithreading syncronous) processes
+    public boolean markedPartOfCurve = false; // used for processG
     
     public ArrayList<LineIntersection> intersections = new ArrayList<>();
     
