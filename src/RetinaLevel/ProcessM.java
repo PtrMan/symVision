@@ -119,30 +119,33 @@ public class ProcessM
                 currentIntersection = remainingIntersections.get(indexOfChosenRemainingIntersections);
                 remainingIntersections.remove(indexOfChosenRemainingIntersections);
                 
+                Assert.Assert(currentIntersection.partners[0].type == Intersection.EnumType.LINE, "is not line");
+                Assert.Assert(currentIntersection.partners[1].type == Intersection.EnumType.LINE, "is not line");
+                
                 // check out if the other side was already marked, if so, continue search for a unmarked edge/line
-                if( currentIntersection.lineA.equals(currentLineDetector) )
+                if( currentIntersection.partners[0].line.equals(currentLineDetector) )
                 {
-                    if( currentIntersection.lineB.marked )
+                    if( currentIntersection.partners[1].line.marked )
                     {
                         continue;
                     }
                     // else we are here
                     
-                    currentIntersection.lineB.marked = true;
-                    resultLineParsing.add(currentIntersection.lineB);
-                    currentLineDetector = currentIntersection.lineB;
+                    currentIntersection.partners[1].line.marked = true;
+                    resultLineParsing.add(currentIntersection.partners[1].line);
+                    currentLineDetector = currentIntersection.partners[1].line;
                 }
                 else
                 {
-                    if( currentIntersection.lineA.marked )
+                    if( currentIntersection.partners[0].line.marked )
                     {
                         continue;
                     }
                     // else we are here
                     
-                    currentIntersection.lineA.marked = true;
-                    resultLineParsing.add(currentIntersection.lineA);
-                    currentLineDetector = currentIntersection.lineA;
+                    currentIntersection.partners[0].line.marked = true;
+                    resultLineParsing.add(currentIntersection.partners[0].line);
+                    currentLineDetector = currentIntersection.partners[0].line;
                 }
             }
         }

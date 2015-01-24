@@ -8,6 +8,7 @@ import static Datastructures.Vector2d.FloatHelper.sub;
 import bpsolver.HardParameters;
 import java.util.ArrayList;
 import java.util.Arrays;
+import misc.Assert;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.DecompositionSolver;
@@ -190,13 +191,16 @@ public class ProcessG
     {
         for( Intersection iterationIntersection : lineDetector.intersections )
         {
-            if( iterationIntersection.lineA.equals(lineDetector) )
+            Assert.Assert(iterationIntersection.partners[0].type == Intersection.EnumType.LINE, "must be line");
+            Assert.Assert(iterationIntersection.partners[1].type == Intersection.EnumType.LINE, "must be line");
+            
+            if( iterationIntersection.partners[0].line.equals(lineDetector) )
             {
-                removeIntersectionBetweenLines(iterationIntersection.lineB, lineDetector);
+                removeIntersectionBetweenLines(iterationIntersection.partners[1].line, lineDetector);
             }
-            else if( iterationIntersection.lineB.equals(lineDetector) )
+            else if( iterationIntersection.partners[1].line.equals(lineDetector) )
             {
-                removeIntersectionBetweenLines(iterationIntersection.lineA, lineDetector);
+                removeIntersectionBetweenLines(iterationIntersection.partners[0].line, lineDetector);
             }
         }
     }
@@ -211,12 +215,15 @@ public class ProcessG
             
             iterationIntersection = lineA.intersections.get(intersectionI);
             
-            if( iterationIntersection.lineA.equals(lineB) )
+            Assert.Assert(iterationIntersection.partners[0].type == Intersection.EnumType.LINE, "must be line");
+            Assert.Assert(iterationIntersection.partners[1].type == Intersection.EnumType.LINE, "must be line");
+
+            if( iterationIntersection.partners[0].line.equals(lineB) )
             {
                 lineA.intersections.remove(intersectionI);
                 break;
             }
-            else if( iterationIntersection.lineB.equals(lineB) )
+            else if( iterationIntersection.partners[1].line.equals(lineB) )
             {
                 lineA.intersections.remove(intersectionI);
                 break;
@@ -230,12 +237,15 @@ public class ProcessG
             
             iterationIntersection = lineB.intersections.get(intersectionI);
             
-            if( iterationIntersection.lineA.equals(lineA) )
+            Assert.Assert(iterationIntersection.partners[0].type == Intersection.EnumType.LINE, "must be line");
+            Assert.Assert(iterationIntersection.partners[1].type == Intersection.EnumType.LINE, "must be line");
+            
+            if( iterationIntersection.partners[0].line.equals(lineA) )
             {
                 lineB.intersections.remove(intersectionI);
                 break;
             }
-            else if( iterationIntersection.lineB.equals(lineA) )
+            else if( iterationIntersection.partners[1].line.equals(lineA) )
             {
                 lineB.intersections.remove(intersectionI);
                 break;

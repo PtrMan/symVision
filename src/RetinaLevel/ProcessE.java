@@ -57,8 +57,8 @@ public class ProcessE
                 // TODO< register it on the line itself? >
                 Intersection createdIntersection = new Intersection();
                 createdIntersection.intersectionPosition = intersectionPosition;
-                createdIntersection.lineA = lowLine;
-                createdIntersection.lineB = highLine;
+                createdIntersection.partners[0] = Intersection.IntersectionPartner.makeLine(lowLine);
+                createdIntersection.partners[1] = Intersection.IntersectionPartner.makeLine(highLine);
                 
                 lowLine.intersections.add(createdIntersection);
                 highLine.intersections.add(createdIntersection);
