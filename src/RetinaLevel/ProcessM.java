@@ -97,7 +97,7 @@ public class ProcessM
         
         for(;;)
         {
-            ArrayList<LineIntersection> remainingIntersections;
+            ArrayList<Intersection> remainingIntersections;
             
             remainingIntersections = deepCopyIntersections(currentLineDetector.intersections);
             
@@ -105,7 +105,7 @@ public class ProcessM
             for(;;)
             {
                 int indexOfChosenRemainingIntersections;
-                LineIntersection currentIntersection;
+                Intersection currentIntersection;
                 
                 if( remainingIntersections.isEmpty() )
                 {
@@ -148,12 +148,12 @@ public class ProcessM
         }
     }
     
-    private static ArrayList<LineIntersection> deepCopyIntersections(ArrayList<LineIntersection> intersections) {
-        ArrayList<LineIntersection> copyed;
+    private static ArrayList<Intersection> deepCopyIntersections(ArrayList<Intersection> intersections) {
+        ArrayList<Intersection> copyed;
         
         copyed = new ArrayList<>();
         
-        for( LineIntersection iterationIntersection : intersections )
+        for( Intersection iterationIntersection : intersections )
         {
             copyed.add(iterationIntersection);
         }

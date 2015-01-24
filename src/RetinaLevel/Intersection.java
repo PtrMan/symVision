@@ -2,7 +2,7 @@ package RetinaLevel;
 
 import Datastructures.Vector2d;
 
-public class LineIntersection
+public class Intersection
 {
     public SingleLineDetector lineA;
     public SingleLineDetector lineB;

@@ -9,7 +9,7 @@ import FargGeneral.Coderack;
 import FargGeneral.network.Link;
 import FargGeneral.network.Network;
 import FargGeneral.network.Node;
-import RetinaLevel.LineIntersection;
+import RetinaLevel.Intersection;
 import RetinaLevel.ProcessA;
 import RetinaLevel.ProcessB;
 import RetinaLevel.ProcessC;
@@ -52,7 +52,7 @@ public class Controller
         
         private void recalculate()
         {
-            final boolean enableProcessH = false;
+            final boolean enableProcessH = true;
             final boolean enableProcessE = true;
             final boolean enableProcessM = true;
             
@@ -79,13 +79,16 @@ public class Controller
 
             ArrayList<SingleLineDetector> lineDetectors = processD.detectLines(samples);
             
+            ArrayList<Intersection> lineIntersections = new ArrayList<>();
+            
+            
             
             if( enableProcessH )
             {
                 processH.process(lineDetectors);
             }
             
-            ArrayList<LineIntersection> lineIntersections = new ArrayList<>();
+            
             
             if( enableProcessE )
             {
@@ -103,6 +106,10 @@ public class Controller
                 lineParsings = processM.getLineParsings();
             }
             
+            
+            
+            
+            
             ArrayList<Node> objectNodes = RetinaToWorkspaceTranslator.createObjectFromLines(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup);
             
             bpSolver.cycle(500);
@@ -113,8 +120,10 @@ public class Controller
             detectorImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
             graphics = detectorImage.createGraphics();
             
-            drawDetectors(graphics, lineDetectors, lineIntersections, samples);
-            drawObjectBaryCenters(graphics, objectNodes, bpSolver.networkHandles);
+            // TODO< remove the list of line intersections >
+            
+            //drawDetectors(graphics, lineDetectors, lineIntersections, samples);
+            //drawObjectBaryCenters(graphics, objectNodes, bpSolver.networkHandles);
             drawLineParsings(graphics, lineParsings);
             
 
@@ -286,7 +295,7 @@ public class Controller
         }
         
 
-        private static void drawDetectors(Graphics2D graphics, ArrayList<SingleLineDetector> lineDetectors, ArrayList<LineIntersection> intersections, ArrayList<ProcessA.Sample> samples)
+        private static void drawDetectors(Graphics2D graphics, ArrayList<SingleLineDetector> lineDetectors, ArrayList<Intersection> intersections, ArrayList<ProcessA.Sample> samples)
         {
             for( SingleLineDetector iterationDetector : lineDetectors )
             {
@@ -308,7 +317,7 @@ public class Controller
                 graphics.drawLine(Math.round(aProjectedFloat.x), Math.round(aProjectedFloat.y), Math.round(bProjectedFloat.x), Math.round(bProjectedFloat.y));
             }
             
-            for( LineIntersection iterationIntersection : intersections )
+            for( Intersection iterationIntersection : intersections )
             {
                 graphics.setColor(Color.BLUE);
                 
@@ -328,9 +337,9 @@ public class Controller
         }
         
         // TODO< refactor out >
-        private static ArrayList<LineIntersection> getAllLineIntersections(ArrayList<SingleLineDetector> lineDetectors)
+        private static ArrayList<Intersection> getAllLineIntersections(ArrayList<SingleLineDetector> lineDetectors)
         {
-            ArrayList<LineIntersection> uniqueIntersections;
+            ArrayList<Intersection> uniqueIntersections;
             
             uniqueIntersections = new ArrayList<>();
             
@@ -343,15 +352,15 @@ public class Controller
         }
         
         // modifies uniqueIntersections
-        private static void findAndAddUniqueIntersections(ArrayList<LineIntersection> uniqueIntersections, ArrayList<LineIntersection> intersections)
+        private static void findAndAddUniqueIntersections(ArrayList<Intersection> uniqueIntersections, ArrayList<Intersection> intersections)
         {
-            for( LineIntersection currentOuterIntersection : intersections )
+            for( Intersection currentOuterIntersection : intersections )
             {
                 boolean found;
                 
                 found = false;
                 
-                for( LineIntersection currentUnqiueIntersection : uniqueIntersections )
+                for( Intersection currentUnqiueIntersection : uniqueIntersections )
                 {
                     if( currentUnqiueIntersection.equals(currentOuterIntersection) )
                     {

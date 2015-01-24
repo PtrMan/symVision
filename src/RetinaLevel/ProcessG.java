@@ -188,7 +188,7 @@ public class ProcessG
     
     private static void removeLineDetectorFromNeightborIntersections(SingleLineDetector lineDetector)
     {
-        for( LineIntersection iterationIntersection : lineDetector.intersections )
+        for( Intersection iterationIntersection : lineDetector.intersections )
         {
             if( iterationIntersection.lineA.equals(lineDetector) )
             {
@@ -207,7 +207,7 @@ public class ProcessG
         
         for( intersectionI = 0; intersectionI < lineA.intersections.size(); intersectionI++ )
         {
-            LineIntersection iterationIntersection;
+            Intersection iterationIntersection;
             
             iterationIntersection = lineA.intersections.get(intersectionI);
             
@@ -226,7 +226,7 @@ public class ProcessG
         
         for( intersectionI = 0; intersectionI < lineB.intersections.size(); intersectionI++ )
         {
-            LineIntersection iterationIntersection;
+            Intersection iterationIntersection;
             
             iterationIntersection = lineB.intersections.get(intersectionI);
             

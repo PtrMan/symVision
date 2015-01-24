@@ -55,7 +55,7 @@ public class ProcessE
                 
                 // create entry and register stuff ...
                 // TODO< register it on the line itself? >
-                LineIntersection createdIntersection = new LineIntersection();
+                Intersection createdIntersection = new Intersection();
                 createdIntersection.intersectionPosition = intersectionPosition;
                 createdIntersection.lineA = lowLine;
                 createdIntersection.lineB = highLine;

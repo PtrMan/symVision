@@ -83,7 +83,7 @@ public class SingleLineDetector
     public boolean marked = false; // used for marking in other (multithreading syncronous) processes
     public boolean markedPartOfCurve = false; // used for processG
     
-    public ArrayList<LineIntersection> intersections = new ArrayList<>();
+    public ArrayList<Intersection> intersections = new ArrayList<>();
     
     public boolean isBetweenOrginalStartAndEnd(Vector2d<Float> position) {
         Vector2d<Float> diffAB, diffABnormalizd, diffAPosition;
