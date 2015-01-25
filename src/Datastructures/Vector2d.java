@@ -95,5 +95,10 @@ public class Vector2d<Type>
         {
             return new Vector2d<Float>((float)vector.x, (float)vector.y);
         }
+        
+        public static Vector2d<Integer> convertFloatVectorToInt(Vector2d<Float> vector)
+        {
+            return new Vector2d<Integer>(Math.round(vector.x), Math.round(vector.y));
+        }
     }
 }
