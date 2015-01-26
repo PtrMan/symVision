@@ -3,7 +3,9 @@ package RetinaLevel;
 import Datastructures.Map2d;
 import Datastructures.Vector2d;
 import static Datastructures.Vector2d.ConverterHelper.convertIntVectorToFloat;
+import static Datastructures.Vector2d.FloatHelper.add;
 import static Datastructures.Vector2d.FloatHelper.getLength;
+import static Datastructures.Vector2d.FloatHelper.normalize;
 import static Datastructures.Vector2d.FloatHelper.sub;
 import bpsolver.HardParameters;
 import java.util.ArrayList;
@@ -61,9 +63,55 @@ public class ProcessG
         // parametric curve parameters
         private float[] a;
         private float[] b;
+        
+        /**
+         * 
+         * result is normalized
+         * 
+         * \param t
+         * \return 
+         */
+        public Vector2d<Float> calcTangent(float t)
+        {
+            final Vector2d<Float> p1;
+            final Vector2d<Float> p2;
+            final Vector2d<Float> diff;
+            
+            final float t2;
+            
+            final float TEPSILON = 0.0001f;
+            
+            Assert.Assert(t >= 0.0f && t <= 1.0f, "t not in range");
+            
+            if( t > 0.5f )
+            {
+                t2 = t - TEPSILON;
+            }
+            else
+            {
+                t2 = t + TEPSILON;
+            }
+            
+            p1 = calcPosition(t);
+            p2 = calcPosition(t2);
+            diff = sub(p1, p2);
+            return normalize(diff);
+        }
+        
+        public Vector2d<Float> calcPosition(float t)
+        {
+            float x, y;
+            
+            Assert.Assert(t >= 0.0f && t <= 1.0f, "t not in range");
+            
+            x = a[0] + t*a[1] + t*t*a[2] + t*t*t*a[3];
+            y = b[0] + t*b[1] + t*t*b[2] + t*t*t*b[3];
+            
+            return new Vector2d<>(x, y);
+        }
     }
     
-    public void process(ArrayList<SingleLineDetector> lineDetectors, ArrayList<ProcessM.LineParsing> lineParsings, ArrayList<ProcessA.Sample> samples)
+    public void process(ArrayList<SingleLineDetector> lineDetectors, ArrayList<ProcessM.LineParsing> lineParsings, ArrayList<ProcessA.Sample> samples, Map2d<Boolean> image)
     {
         resultCurves.clear();
         
@@ -158,7 +206,88 @@ public class ProcessG
         // remove segments which are part of curves
         // we don't touch the lineparsings here, because they are not visible from the cognitive layer
         removeLinedetectorsWhichWereUsedInCurves(lineDetectors);
+        
+        // calculate intersections of curves with lines and curves
+        // ASK< does this belong into process E or another process? >
+        recalculateIntersections(lineDetectors, resultCurves, image);
     }
+    
+    // calculates only intersections of tangents
+    // TODO< other intersections >
+    private static void recalculateIntersections(ArrayList<SingleLineDetector> lineDetectors, ArrayList<Curve> curves, Map2d<Boolean> image)
+    {
+        // intersections between curves and lines
+        
+        for( Curve iterationCurve : curves )
+        {
+            final float curveBeginM, curveBeginN;
+            final float curveEndM, curveEndN;
+            CurveElement beginCurveElement, endCurveElement;
+            SingleLineDetector tempBeginCurveTangentLine, tempEndCurveTangentLine;
+            
+            beginCurveElement = iterationCurve.curveElements.get(0);
+            endCurveElement = iterationCurve.curveElements.get(iterationCurve.curveElements.size()-1);
+            
+            // TODO ASK< maybe we have to search the ending with the minimal x position? >
+            tempBeginCurveTangentLine = SingleLineDetector.createFromFloatPositions(beginCurveElement.calcPosition(0.0f), add(beginCurveElement.calcPosition(0.0f), beginCurveElement.calcTangent(0.0f)));
+            tempEndCurveTangentLine = SingleLineDetector.createFromFloatPositions(endCurveElement.calcPosition(1.0f), add(endCurveElement.calcPosition(1.0f), endCurveElement.calcTangent(1.0f)));
+            
+            curveBeginM = tempBeginCurveTangentLine.getM();
+            curveBeginN = tempBeginCurveTangentLine.getN();
+            
+            curveEndM = tempEndCurveTangentLine.getM();
+            curveEndN = tempEndCurveTangentLine.getN();
+            
+            for( SingleLineDetector iterationLineDetector : lineDetectors )
+            {
+                final Vector2d<Float> intersectionPositionBegin, intersectionPositionEnd;
+                
+                intersectionPositionBegin = SingleLineDetector.intersectLinesMN(iterationLineDetector.getM(), iterationLineDetector.getN(), curveBeginM, curveBeginN);
+                intersectionPositionEnd = SingleLineDetector.intersectLinesMN(iterationLineDetector.getM(), iterationLineDetector.getN(), curveEndM, curveEndN);
+                
+                // examine the intersection positions for inside the image and the neightborhood
+                
+                if(
+                    ProcessE.isPointInsideImage(Vector2d.ConverterHelper.convertFloatVectorToInt(intersectionPositionBegin), image) && 
+                    ProcessE.isNeightborhoodPixelSet(Vector2d.ConverterHelper.convertFloatVectorToInt(intersectionPositionBegin), image)
+                )
+                {
+                    Intersection createdIntersection;
+
+                    createdIntersection = new Intersection();
+                    createdIntersection.partners[0] = Intersection.IntersectionPartner.makeCurve(iterationCurve);
+                    createdIntersection.partners[1] = Intersection.IntersectionPartner.makeLine(iterationLineDetector);
+                    createdIntersection.intersectionPosition = Vector2d.ConverterHelper.convertFloatVectorToInt(intersectionPositionBegin);
+                    
+                    iterationLineDetector.intersections.add(createdIntersection);
+                }
+                
+                if(
+                    ProcessE.isPointInsideImage(Vector2d.ConverterHelper.convertFloatVectorToInt(intersectionPositionEnd), image) && 
+                    ProcessE.isNeightborhoodPixelSet(Vector2d.ConverterHelper.convertFloatVectorToInt(intersectionPositionEnd), image)
+                )
+                {
+                    Intersection createdIntersection;
+
+                    createdIntersection = new Intersection();
+                    createdIntersection.partners[0] = Intersection.IntersectionPartner.makeCurve(iterationCurve);
+                    createdIntersection.partners[1] = Intersection.IntersectionPartner.makeLine(iterationLineDetector);
+                    createdIntersection.intersectionPosition = Vector2d.ConverterHelper.convertFloatVectorToInt(intersectionPositionEnd);
+                    
+                    iterationLineDetector.intersections.add(createdIntersection);
+                }
+            }
+        }
+        
+        // intersections between curves and curves
+        
+        // begin/end
+        // TODO HIGH
+        
+        // middle section(s)
+        // TODO MEDIUM
+    }
+
     
     public ArrayList<Curve> getResultCurves()
     {

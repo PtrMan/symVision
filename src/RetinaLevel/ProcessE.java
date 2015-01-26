@@ -79,12 +79,14 @@ public class ProcessE
         return new Vector2d<Integer>(Math.round(intersectionFloat.x), Math.round(intersectionFloat.y));
     }
     
-    private static boolean isPointInsideImage(Vector2d<Integer> position, Map2d<Boolean> image)
+    // public because its used in processG
+    public static boolean isPointInsideImage(Vector2d<Integer> position, Map2d<Boolean> image)
     {
         return position.x >= 0 && position.x < image.getWidth() && position.y >= 0 && position.y < image.getLength();
     }
     
-    private static boolean isNeightborhoodPixelSet(Vector2d<Integer> position, Map2d<Boolean> image)
+    // public because its used in processG    
+    public static boolean isNeightborhoodPixelSet(Vector2d<Integer> position, Map2d<Boolean> image)
     {
         Vector2d<Integer> min, max;
         int ix, iy;
