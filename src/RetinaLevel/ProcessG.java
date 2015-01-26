@@ -276,6 +276,9 @@ public class ProcessG
                     
                     iterationLineDetector.intersections.add(createdIntersection);
                 }
+                
+                // TODO LOW line curve middle intersection
+                // (we need to segmentate the curve as many small lines and do a intersection test 
             }
         }
         
