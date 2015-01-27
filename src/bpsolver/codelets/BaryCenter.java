@@ -10,6 +10,7 @@ import bpsolver.SolverCodelet;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
+import bpsolver.nodes.PlatonicPrimitiveNode;
 import java.util.ArrayList;
 import misc.Assert;
 
@@ -103,23 +104,15 @@ public class BaryCenter extends SolverCodelet
             // create barycenter node and link it to the object
             // add the coordinate nodes
             
-            createdBaryCenterInstanceNode = new PlatonicPrimitiveInstanceNode(networkHandles.barycenterPlatonicPrimitiveNode);
+            createdBaryCenterInstanceNode = HelperFunctions.createVectorAttributeNode(calculatedBaryCenter, networkHandles.barycenterPlatonicPrimitiveNode, network, networkHandles);
             linkToBaryCenter = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdBaryCenterInstanceNode);
             startNode.outgoingLinks.add(linkToBaryCenter);
             
-            createdCoordinateXNode = FeatureNode.createFloatNode(networkHandles.xCoordinatePlatonicPrimitiveNode, calculatedBaryCenter.x, 1);
-            createdCoordinateYNode = FeatureNode.createFloatNode(networkHandles.yCoordinatePlatonicPrimitiveNode, calculatedBaryCenter.y, 1);
-            
-            linkToXNode = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdCoordinateXNode);
-            createdBaryCenterInstanceNode.outgoingLinks.add(linkToXNode);
-            
-            linkToYNode = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdCoordinateYNode);
-            createdBaryCenterInstanceNode.outgoingLinks.add(linkToYNode);
         }
         
         return new RunResult(recalculate == EnumRecalculate.YES);
     }
-    
+
     private boolean hasObjectAlreadyABaryCenter()
     {
         return getBaryCenterNodeOfObject() != null;

@@ -26,6 +26,7 @@ public class Link
         ISPARTOF,
         CONTAINS,
         HAS, // used for (platonic) features of platonic primitives in ltm
-        HASATTRIBUTE
+        HASATTRIBUTE,
+        ISA // "is a"
     }
 }

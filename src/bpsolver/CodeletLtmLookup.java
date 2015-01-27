@@ -38,42 +38,71 @@ public class CodeletLtmLookup
     
     public void lookupAndPutCodeletsAtCoderackForPrimitiveNode(Node node, Coderack coderack, Network ltm)
     {
-        Node ltmNodeForPrimitiveNode;
-        PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode; 
+        PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode;
+        PlatonicPrimitiveNode currentLtmNodeForPrimitiveNode;
         
         // lookup ltmNodeForNode
         Assert.Assert(node.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "Must be a PLATONICPRIMITIVEINSTANCENODE node");
         
         platonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode)node;
-        ltmNodeForPrimitiveNode = platonicPrimitiveInstanceNode.primitiveNode;
+        currentLtmNodeForPrimitiveNode = platonicPrimitiveInstanceNode.primitiveNode;
         
-        for( Link iterationLink : ltmNodeForPrimitiveNode.outgoingLinks )
-        {
-            PlatonicPrimitiveNode currentAttributePrimitiveNode;
-            RegisterEntry registerEntry;
-            
-            if( iterationLink.type != FargGeneral.network.Link.EnumType.HAS )
-            {
-                continue;
-            }
 
-            if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVENODE.ordinal() )
+        
+        for(;;)
+        {
+            boolean continueIsaRelationshipWalk;
+            
+            // we search for all "HAS" nodes and instantiate the codelets
+            
+            for( Link iterationLink : currentLtmNodeForPrimitiveNode.outgoingLinks )
             {
-                continue;
+                PlatonicPrimitiveNode currentAttributePrimitiveNode;
+                RegisterEntry registerEntry;
+
+                if( iterationLink.type != FargGeneral.network.Link.EnumType.HAS )
+                {
+                    continue;
+                }
+
+                if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVENODE.ordinal() )
+                {
+                    continue;
+                }
+                // we are here if the link is HAS and the type of the linked node is PLATONICPRIMITIVENODE
+
+                currentAttributePrimitiveNode = (PlatonicPrimitiveNode)iterationLink.target;
+
+                // try to lookup the codelet
+                if( currentAttributePrimitiveNode.codeletKey == null )
+                {
+                    continue;
+                }
+
+                registerEntry = registry.get(currentAttributePrimitiveNode.codeletKey);
+
+                instantiateAllCodeletsForWorkspaceNode(node, coderack, registerEntry.codeletInformations);
             }
-            // we are here if the link is HAS and the type of the linked node is PLATONICPRIMITIVENODE
             
-            currentAttributePrimitiveNode = (PlatonicPrimitiveNode)iterationLink.target;
+            continueIsaRelationshipWalk = false;
             
-            // try to lookup the codelet
-            if( currentAttributePrimitiveNode.codeletKey == null )
+            // search for a ISA node
+            for( Link iterationLink : currentLtmNodeForPrimitiveNode.outgoingLinks )
             {
-                continue;
+                if( iterationLink.type == Link.EnumType.ISA )
+                {
+                    Assert.Assert(iterationLink.target.type == NodeTypes.EnumType.PLATONICPRIMITIVENODE.ordinal(), "must be a PlatonicPrimitiveNode");
+                    currentLtmNodeForPrimitiveNode = (PlatonicPrimitiveNode)iterationLink.target;
+
+                    continueIsaRelationshipWalk = true;
+                    break;
+                }
             }
             
-            registerEntry = registry.get(currentAttributePrimitiveNode.codeletKey);
-            
-            instantiateAllCodeletsForWorkspaceNode(node, coderack, registerEntry.codeletInformations);
+            if( !continueIsaRelationshipWalk )
+            {
+                return;
+            }
         }
     }
     

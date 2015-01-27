@@ -35,35 +35,69 @@ public class BpSolver {
     {
         FargGeneral.network.Link link;
         
+        
+        networkHandles.objectPlatonicPrimitiveNode = new PlatonicPrimitiveNode("Object", null);
+        networkHandles.lineStructureAbstractPrimitiveNode = new PlatonicPrimitiveNode("lineStructure", null);
         networkHandles.lineSegmentPlatonicPrimitiveNode = new PlatonicPrimitiveNode("LineSegment", null);
+        
+        networkHandles.bayPlatonicPrimitiveNode = new PlatonicPrimitiveNode("bay", null /* TODO "Bay" */);
+        networkHandles.endpointPlatonicPrimitiveNode = new PlatonicPrimitiveNode("endpoint", "EndPoint");
+        networkHandles.barycenterPlatonicPrimitiveNode = new PlatonicPrimitiveNode("barycenter", "BaryCenter");
+        networkHandles.lineSegmentFeatureLineLengthPrimitiveNode = new PlatonicPrimitiveNode("LineSegmentLength", "LineSegmentLength");
+        
+        networkHandles.xCoordinatePlatonicPrimitiveNode = new PlatonicPrimitiveNode("xCoordinate", null);
+        networkHandles.yCoordinatePlatonicPrimitiveNode = new PlatonicPrimitiveNode("yCoordinate", null);
+        
+        networkHandles.lineStructureAbstractPrimitiveNode.isAbstract = true;
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.endpointPlatonicPrimitiveNode);
+        networkHandles.lineStructureAbstractPrimitiveNode.outgoingLinks.add(link);
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.bayPlatonicPrimitiveNode);
+        networkHandles.lineStructureAbstractPrimitiveNode.outgoingLinks.add(link);
+        
+        
         network.nodes.add(networkHandles.lineSegmentPlatonicPrimitiveNode);
         
-        networkHandles.lineSegmentFeatureLineLengthPrimitiveNode = new PlatonicPrimitiveNode("LineSegmentLength", "LineSegmentLength");
-        network.nodes.add(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode);
+        
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.ISA, networkHandles.lineStructureAbstractPrimitiveNode);
+        networkHandles.lineSegmentPlatonicPrimitiveNode.outgoingLinks.add(link);
+        
+        
         
         link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.lineSegmentFeatureLineLengthPrimitiveNode);
         networkHandles.lineSegmentFeatureLineLengthPrimitiveNode.outgoingLinks.add(link);
         
         
-        networkHandles.barycenterPlatonicPrimitiveNode = new PlatonicPrimitiveNode("barycenter", "BaryCenter");
-        network.nodes.add(networkHandles.barycenterPlatonicPrimitiveNode);
         
-        networkHandles.xCoordinatePlatonicPrimitiveNode = new PlatonicPrimitiveNode("xCoordinate", null);
-        network.nodes.add(networkHandles.xCoordinatePlatonicPrimitiveNode);
+        
+        
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.ISA, networkHandles.objectPlatonicPrimitiveNode);
+        networkHandles.lineStructureAbstractPrimitiveNode.outgoingLinks.add(link);
+        
+        // TODO< imagination of circle, center, tangent lines, etc >
+        
+        
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.xCoordinatePlatonicPrimitiveNode);
+        networkHandles.endpointPlatonicPrimitiveNode.outgoingLinks.add(link);
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.yCoordinatePlatonicPrimitiveNode);
+        networkHandles.endpointPlatonicPrimitiveNode.outgoingLinks.add(link);
+        
+        
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.xCoordinatePlatonicPrimitiveNode);
+        networkHandles.bayPlatonicPrimitiveNode.outgoingLinks.add(link);
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.yCoordinatePlatonicPrimitiveNode);
+        networkHandles.bayPlatonicPrimitiveNode.outgoingLinks.add(link);
+        
+        
         
         link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.xCoordinatePlatonicPrimitiveNode);
         networkHandles.barycenterPlatonicPrimitiveNode.outgoingLinks.add(link);
         
-        networkHandles.yCoordinatePlatonicPrimitiveNode = new PlatonicPrimitiveNode("yCoordinate", null);
-        network.nodes.add(networkHandles.yCoordinatePlatonicPrimitiveNode);
+        
         
         link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.yCoordinatePlatonicPrimitiveNode);
         networkHandles.barycenterPlatonicPrimitiveNode.outgoingLinks.add(link);
         
         
-        PlatonicPrimitiveNode objectPrimitiveNode = new PlatonicPrimitiveNode("Object", null);
-        networkHandles.objectPlatonicPrimitiveNode = objectPrimitiveNode;
-        network.nodes.add(objectPrimitiveNode);
         
         // a object has a barycenter
         link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.barycenterPlatonicPrimitiveNode);
@@ -94,6 +128,14 @@ public class BpSolver {
         createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.1f));
         
         codeletLtmLookup.registry.put("BaryCenter", createdRegistryEntry);
+        
+        
+        createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
+        createdCodelet = new bpsolver.codelets.EndPoint(network, networkHandles);
+        createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.2f));
+        
+        codeletLtmLookup.registry.put("EndPoint", createdRegistryEntry);
+        
     }
     
     // both ltm and workspace

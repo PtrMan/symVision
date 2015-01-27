@@ -12,8 +12,13 @@ public class NetworkHandles
     public PlatonicPrimitiveNode lineSegmentFeatureLineLengthPrimitiveNode;
     
     public PlatonicPrimitiveNode barycenterPlatonicPrimitiveNode;
+    public PlatonicPrimitiveNode endpointPlatonicPrimitiveNode;
+    public PlatonicPrimitiveNode bayPlatonicPrimitiveNode;
+    
     public PlatonicPrimitiveNode xCoordinatePlatonicPrimitiveNode;
     public PlatonicPrimitiveNode yCoordinatePlatonicPrimitiveNode;
     
     public PlatonicPrimitiveNode objectPlatonicPrimitiveNode;
+    
+    public PlatonicPrimitiveNode lineStructureAbstractPrimitiveNode;
 }

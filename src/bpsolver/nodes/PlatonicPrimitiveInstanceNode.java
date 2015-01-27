@@ -2,6 +2,7 @@ package bpsolver.nodes;
 
 import Datastructures.Vector2d;
 import FargGeneral.network.Node;
+import RetinaLevel.ProcessG;
 
 /**
  * is a instance of a platonic primitive, for example a line or a curve
@@ -23,4 +24,6 @@ public class PlatonicPrimitiveInstanceNode extends Node
     // point       : uses p1
     public Vector2d<Float> p1;
     public Vector2d<Float> p2;
+    
+    public ProcessG.Curve curve; // in case of a curve its the curve, can be null if it is not a curve
 }
