@@ -40,9 +40,12 @@ public class Controller
 {
     private static class RecalculateActionListener implements ActionListener
     {
-        public RecalculateActionListener(BpSolver bpSolver)
+        
+        
+        public RecalculateActionListener(BpSolver bpSolver, NodeGraph nodeGraph)
         {
             this.bpSolver = bpSolver;
+            this.nodeGraph = nodeGraph;
         }
         
         @Override
@@ -132,6 +135,8 @@ public class Controller
             
             // TODO< convert retina level information to workspace nodes >
             // TODO< process workspace nodes >
+            
+            nodeGraph.repopulateAfterNodes(objectNodes);
             
             time++;
         }
@@ -382,6 +387,7 @@ public class Controller
         private int time;
         
         private BpSolver bpSolver;
+        private final NodeGraph nodeGraph;
     }
     
     public static void main(String[] args) {
@@ -389,13 +395,17 @@ public class Controller
         
         Parameters.init();
         
-        RecalculateActionListener recalculate = new RecalculateActionListener(bpSolver);
+        
+        GraphWindow graphWindow = new GraphWindow();
+        
+        RecalculateActionListener recalculate = new RecalculateActionListener(bpSolver, graphWindow.getNodeGraph());
         recalculate.interactive = new Interactive();
         
         TuningWindow tuningWindow = new TuningWindow();
         
-        Timer timer = new Timer(20, recalculate);
+        Timer timer = new Timer(2000, recalculate);
         timer.setInitialDelay(0);
         timer.start(); 
+        
     }
 }

@@ -23,10 +23,19 @@ public class Link
     
     public enum EnumType
     {
-        ISPARTOF,
-        CONTAINS,
-        HAS, // used for (platonic) features of platonic primitives in ltm
-        HASATTRIBUTE,
-        ISA // "is a"
+        ISPARTOF("ISPARTOF"),
+        CONTAINS("CONTAINS"),
+        HAS("HAS"), // used for (platonic) features of platonic primitives in ltm
+        HASATTRIBUTE("HASATTRIBUTE"),
+        ISA("ISA") // "is a"
+        ;
+        
+        private String string;
+        
+        private EnumType(String name){string = name;}
+
+        public String toString() {
+            return string;
+        }
     }
 }
