@@ -136,7 +136,7 @@ public class Controller
             // TODO< convert retina level information to workspace nodes >
             // TODO< process workspace nodes >
             
-            nodeGraph.repopulateAfterNodes(objectNodes);
+            nodeGraph.repopulateAfterNodes(objectNodes, bpSolver.networkHandles);
             
             time++;
         }

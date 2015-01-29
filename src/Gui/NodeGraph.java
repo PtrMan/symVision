@@ -2,7 +2,11 @@ package Gui;
 
 import FargGeneral.network.Link;
 import FargGeneral.network.Node;
+import bpsolver.NetworkHandles;
+import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
+import bpsolver.nodes.NumeriosityNode;
+import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import com.mxgraph.layout.mxFastOrganicLayout;
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.swing.mxGraphComponent;
@@ -21,6 +25,8 @@ public class NodeGraph
     public NodeGraph()
     {
         graphComponent = new mxGraphComponent(graph);
+        
+        graph.setHtmlLabels(true);
     }
     
     public mxGraphComponent getGraph()
@@ -28,10 +34,10 @@ public class NodeGraph
         return graphComponent;
     }
     
-    public void repopulateAfterNodes(ArrayList<Node> nodes)
+    public void repopulateAfterNodes(ArrayList<Node> nodes, NetworkHandles networkHandles)
     {
         clear();
-        populateAfterNodes(nodes);
+        populateAfterNodes(nodes, networkHandles);
     }
     
     public void clear()
@@ -54,13 +60,13 @@ public class NodeGraph
         graphComponent = new mxGraphComponent(graph);
     }
     */
-    private void populateAfterNodes(ArrayList<Node> nodes)
+    private void populateAfterNodes(ArrayList<Node> nodes, NetworkHandles networkHandles)
     {
         VertexList verticesWithNode;
         
         graph.getModel().beginUpdate();
         
-        verticesWithNode = convertNodesToVertexWithNodeRecursivly(nodes);
+        verticesWithNode = convertNodesToVertexWithNodeRecursivly(nodes, networkHandles);
         populateEdgesBetweenNodes(verticesWithNode);
         insertLinksBetweenVertexNodes(verticesWithNode);
         
@@ -143,7 +149,7 @@ public class NodeGraph
         throw new RuntimeException("internal error");
     }
     
-    private VertexList convertNodesToVertexWithNodeRecursivly(ArrayList<Node> nodes)
+    private VertexList convertNodesToVertexWithNodeRecursivly(ArrayList<Node> nodes, NetworkHandles networkHandles)
     {
         VertexList resultVertexList;
         ArrayList<Node> remainingNodes;
@@ -177,7 +183,7 @@ public class NodeGraph
             }
             
             // add it
-            resultVertexList.verticesWithNode.add(VertexWithNode.createFromNodeAndVertex(currentNode, createVertexForNode(currentNode)));
+            resultVertexList.verticesWithNode.add(VertexWithNode.createFromNodeAndVertex(currentNode, createVertexForNode(currentNode, networkHandles)));
             
             // look for connected childnodes
             for( Link iterationLink : currentNode.outgoingLinks )
@@ -196,7 +202,7 @@ public class NodeGraph
         return resultVertexList;
     }
     
-    private Object createVertexForNode(Node node)
+    private Object createVertexForNode(Node node, NetworkHandles networkHandles)
     {
         Object vertexForNode;
         Object graphParent;
@@ -205,15 +211,52 @@ public class NodeGraph
         
         if( node.type == NodeTypes.EnumType.FEATURENODE.ordinal() )
         {
-            return graph.insertVertex(graphParent, null, "FeatureNode", 20, 20, 80, 30);
+            FeatureNode featureNode;
+            
+            featureNode = (FeatureNode)node;
+            
+            String featureName;
+            
+            if( featureNode.featureTypeNode.equals(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode) )
+            {
+                featureName = "lineSegmentFeatureLineLength";
+            }
+            else if( featureNode.featureTypeNode.equals(networkHandles.xCoordinatePlatonicPrimitiveNode) )
+            {
+                featureName = "xCoordinate";
+            }
+            else if( featureNode.featureTypeNode.equals(networkHandles.yCoordinatePlatonicPrimitiveNode) )
+            {
+                featureName = "yCoordinate";
+            }
+            else
+            {
+                featureName = "?";
+            }
+            
+            return graph.insertVertex(graphParent, null, "FeatureNode" + "<br>" + featureName, 20, 20, 80, 30);
         }
         else if( node.type == NodeTypes.EnumType.NUMEROSITYNODE.ordinal() )
         {
-            return graph.insertVertex(graphParent, null, "NumerosityNode", 20, 20, 80, 30);
+            NumeriosityNode numeriosityNode;
+            String nodeTextContent;
+            
+            numeriosityNode = (NumeriosityNode)node;
+            
+            nodeTextContent = Integer.toString(numeriosityNode.numerosity);
+            
+            return graph.insertVertex(graphParent, null, "NumerosityNode" + "<br>" + nodeTextContent, 20, 20, 80, 30);
         }
         else if( node.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() )
         {
-            return graph.insertVertex(graphParent, null, "PlatonicPrimitiveInstanceNode", 20, 20, 80, 30);
+            PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode;
+            String primitiveName;
+            
+            platonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode)node;
+            
+            primitiveName = platonicPrimitiveInstanceNode.primitiveNode.platonicType;
+            
+            return graph.insertVertex(graphParent, null, "PlatonicPrimitiveInstanceNode" + "<br>" + primitiveName, 20, 20, 80, 30);
         }
         else if( node.type == NodeTypes.EnumType.PLATONICPRIMITIVENODE.ordinal() )
         {
