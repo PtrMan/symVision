@@ -36,7 +36,7 @@ public class CodeletLtmLookup
         public ArrayList<CodeletInformation> codeletInformations = new ArrayList<CodeletInformation>();
     }
     
-    public void lookupAndPutCodeletsAtCoderackForPrimitiveNode(Node node, Coderack coderack, Network ltm)
+    public void lookupAndPutCodeletsAtCoderackForPrimitiveNode(Node node, Coderack coderack, Network ltm, NetworkHandles networkHandles)
     {
         PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode;
         PlatonicPrimitiveNode currentLtmNodeForPrimitiveNode;
@@ -72,7 +72,7 @@ public class CodeletLtmLookup
                 // we are here if the link is HAS and the type of the linked node is PLATONICPRIMITIVENODE
 
                 currentAttributePrimitiveNode = (PlatonicPrimitiveNode)iterationLink.target;
-
+                
                 // try to lookup the codelet
                 if( currentAttributePrimitiveNode.codeletKey == null )
                 {

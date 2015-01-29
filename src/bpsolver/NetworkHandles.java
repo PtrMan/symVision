@@ -10,6 +10,7 @@ public class NetworkHandles
 {
     public PlatonicPrimitiveNode lineSegmentPlatonicPrimitiveNode;
     public PlatonicPrimitiveNode lineSegmentFeatureLineLengthPrimitiveNode;
+    public PlatonicPrimitiveNode lineSegmentFeatureLineSlopePrimitiveNode;
     
     public PlatonicPrimitiveNode barycenterPlatonicPrimitiveNode;
     public PlatonicPrimitiveNode endpointPlatonicPrimitiveNode;

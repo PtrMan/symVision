@@ -36,7 +36,7 @@ public class RetinaToWorkspaceTranslator
             network.nodes.add(objectNode);
             
             // add all codelet's of the object
-            codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(objectNode, coderack, network);
+            codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(objectNode, coderack, network, networkHandles);
         
             
             createdLineNode = new PlatonicPrimitiveInstanceNode(networkHandles.lineSegmentPlatonicPrimitiveNode);
@@ -52,7 +52,7 @@ public class RetinaToWorkspaceTranslator
             createdLineNode.outgoingLinks.add(createdBackwardLink);
             
             // add all codelet's of it
-            codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdLineNode, coderack, network);
+            codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdLineNode, coderack, network, networkHandles);
             
             resultNodes.add(objectNode);
         }

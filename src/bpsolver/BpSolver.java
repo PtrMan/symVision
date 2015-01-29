@@ -5,6 +5,7 @@ import bpsolver.codelets.LineSegmentLength;
 import bpsolver.ltm.LinkCreator;
 import FargGeneral.network.Network;
 import bpsolver.codelets.BaryCenter;
+import bpsolver.codelets.LineSegmentSlope;
 import bpsolver.nodes.PlatonicPrimitiveNode;
 
 public class BpSolver {
@@ -44,6 +45,7 @@ public class BpSolver {
         networkHandles.endpointPlatonicPrimitiveNode = new PlatonicPrimitiveNode("endpoint", "EndPoint");
         networkHandles.barycenterPlatonicPrimitiveNode = new PlatonicPrimitiveNode("barycenter", "BaryCenter");
         networkHandles.lineSegmentFeatureLineLengthPrimitiveNode = new PlatonicPrimitiveNode("LineSegmentLength", "LineSegmentLength");
+        networkHandles.lineSegmentFeatureLineSlopePrimitiveNode = new PlatonicPrimitiveNode("LineSegmentSlope", "LineSegmentSlope");
         
         networkHandles.xCoordinatePlatonicPrimitiveNode = new PlatonicPrimitiveNode("xCoordinate", null);
         networkHandles.yCoordinatePlatonicPrimitiveNode = new PlatonicPrimitiveNode("yCoordinate", null);
@@ -64,9 +66,10 @@ public class BpSolver {
         
         
         link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.lineSegmentFeatureLineLengthPrimitiveNode);
-        networkHandles.lineSegmentFeatureLineLengthPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.lineSegmentPlatonicPrimitiveNode.outgoingLinks.add(link);
         
-        
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HAS, networkHandles.lineSegmentFeatureLineSlopePrimitiveNode);
+        networkHandles.lineSegmentPlatonicPrimitiveNode.outgoingLinks.add(link);
         
         
         
@@ -121,6 +124,12 @@ public class BpSolver {
         createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.5f));
         
         codeletLtmLookup.registry.put("LineSegmentLength", createdRegistryEntry);
+        
+        createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
+        createdCodelet = new LineSegmentSlope(network, networkHandles);
+        createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.5f));
+        
+        codeletLtmLookup.registry.put("LineSegmentSlope", createdRegistryEntry);
         
         
         createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
