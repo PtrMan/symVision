@@ -49,7 +49,14 @@ public class LineSegmentSlope extends SolverCodelet
         
         diff = Vector2d.FloatHelper.sub(thisLine.p1, thisLine.p2);
         
-        lineSegmentSlope = diff.y / diff.x;
+        if( diff.x == 0.0f )
+        {
+            lineSegmentSlope = Float.POSITIVE_INFINITY;
+        }
+        else
+        {
+            lineSegmentSlope = diff.y / diff.x;
+        }
         
         createdLineSlope = FeatureNode.createFloatNode(networkHandles.lineSegmentFeatureLineSlopePrimitiveNode, lineSegmentSlope, 1);
         
