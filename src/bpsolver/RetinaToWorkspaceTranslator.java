@@ -16,25 +16,6 @@ import misc.Assert;
 
 public class RetinaToWorkspaceTranslator
 {
-
-    private ArrayList<Node> getObjectsFromHashMapWithObjectNodesByGroupId(HashMap<Integer, PlatonicPrimitiveInstanceNode> objectNodesByGroupId)
-    {
-        Object []workspaceNodesAsArray;
-        ArrayList<Node> resultWorkspaceNodes;
-        
-        resultWorkspaceNodes = new ArrayList<>();
-        workspaceNodesAsArray = objectNodesByGroupId.values().toArray();
-        
-        for( Object iterationNode : workspaceNodesAsArray )
-        {
-            resultWorkspaceNodes.add((Node)iterationNode);
-        }
-        
-        return resultWorkspaceNodes;
-    }
-
-
-
     private static class RetinaObjectWithAssociatedPoints
     {
         private RetinaObjectWithAssociatedPoints()
@@ -150,42 +131,6 @@ public class RetinaToWorkspaceTranslator
     }
     
     
-    private static HashMap<Integer, PlatonicPrimitiveInstanceNode> createObjectNodesForObjectIds(ArrayList<RetinaObjectWithAssociatedPoints> retinaObjectsWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup)
-    {
-        HashMap<Integer, PlatonicPrimitiveInstanceNode> objectNodesByGroupId;
-        
-        objectNodesByGroupId = new HashMap<>();
-        
-        for( RetinaObjectWithAssociatedPoints iterationRetinaObject : retinaObjectsWithAssociatedPoints )
-        {
-            PlatonicPrimitiveInstanceNode objectNode;
-            
-            objectNode = getOrCreateObjectNodeByObjectId(objectNodesByGroupId, iterationRetinaObject.objectId, networkHandles);
-            createPlatonicInstanceNodeForRetinaObjectAndLinkToParent(iterationRetinaObject, objectNode, coderack, network, networkHandles, codeletLtmLookup);
-        }
-        
-        return objectNodesByGroupId;
-        
-    }
-
-    private static PlatonicPrimitiveInstanceNode getOrCreateObjectNodeByObjectId(HashMap<Integer, PlatonicPrimitiveInstanceNode> objectNodesByGroupId, int objectId, NetworkHandles networkHandles) {
-        boolean objectNodesByGroupIdContainsObjectId;
-        PlatonicPrimitiveInstanceNode objectNode;
-        
-        objectNodesByGroupIdContainsObjectId = objectNodesByGroupId.containsKey(objectId);
-        
-        if( objectNodesByGroupIdContainsObjectId )
-        {
-            objectNode = objectNodesByGroupId.get(objectId);
-        }
-        else
-        {
-            objectNode = new PlatonicPrimitiveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
-            objectNodesByGroupId.put(objectId, objectNode);
-        }
-        
-        return objectNode;
-    }
     
     
     private static void createPlatonicInstanceNodeForRetinaObjectAndLinkToParent(RetinaObjectWithAssociatedPoints iterationRetinaObject, PlatonicPrimitiveInstanceNode objectNode, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup)
@@ -338,59 +283,6 @@ public class RetinaToWorkspaceTranslator
         }
         
         return groups;
-        /*
-        
-        throw new RuntimeException("TODO TODOT DOOTOD TODOD");
-        
-        
-        int objectId;
-        
-        objectId = 1;
-        
-        for( RetinaObjectWithAssociatedPoints iterationRetinaObject : retinaObjectsWithAssociatedPoints )
-        {
-            iterationRetinaObject.objectId = objectId;
-            objectId++;
-        }
-        
-        objectId = 1;
-        
-        for(;;)
-        {
-            boolean nothingChanged;
-            int lowerI, upperI;
-            
-            nothingChanged = true;
-            
-            for( lowerI = 0; lowerI < retinaObjectsWithAssociatedPoints.size(); lowerI++ )
-            {
-                for( upperI = lowerI+1; upperI < retinaObjectsWithAssociatedPoints.size(); upperI++ )
-                {
-                    if( retinaObjectsWithAssociatedPoints.get(lowerI).objectId == retinaObjectsWithAssociatedPoints.get(upperI).objectId )
-                    {
-                        continue;
-                    }
-                    
-                    if( doRetinaObjectsShareCommonPoints(retinaObjectsWithAssociatedPoints.get(lowerI), retinaObjectsWithAssociatedPoints.get(upperI)) )
-                    {
-                        nothingChanged = false;
-                        
-                        if( retinaObjectsWithAssociatedPoints.get(lowerI).objectId == -1 )
-                        {
-                            retinaObjectsWithAssociatedPoints.get(lowerI).objectId = objectId;
-                            objectId++;
-                        }
-                        
-                        retinaObjectsWithAssociatedPoints.get(upperI).objectId = retinaObjectsWithAssociatedPoints.get(lowerI).objectId;
-                    }
-                }
-            }
-            
-            if( nothingChanged )
-            {
-                break;
-            }
-        }*/
     }
     
     
