@@ -6,6 +6,7 @@ import static Datastructures.Vector2d.FloatHelper.dot;
 import static Datastructures.Vector2d.FloatHelper.getScaled;
 import static Datastructures.Vector2d.FloatHelper.sub;
 import java.util.ArrayList;
+import misc.Assert;
 
 /**
  * 
@@ -85,10 +86,13 @@ public class SingleLineDetector
     
     public ArrayList<Intersection> intersections = new ArrayList<>();
     
-    public boolean isBetweenOrginalStartAndEnd(Vector2d<Float> position) {
+    public boolean isBetweenOrginalStartAndEnd(Vector2d<Float> position)
+    {
         Vector2d<Float> diffAB, diffABnormalizd, diffAPosition;
         float length;
         float dotProduct;
+        
+        Assert.Assert(!isYAxisSingularity(), "is singular!");
 
         // ASK< maybe the length claculation is unnecessary >
 
@@ -123,8 +127,25 @@ public class SingleLineDetector
         diff = Vector2d.FloatHelper.sub(getAProjected(), getBProjected());
         return Vector2d.FloatHelper.normalize(diff);
     }
-
+    
     public Vector2d<Float> projectPointOntoLine(Vector2d<Float> point)
+    {
+        if( isYAxisSingularity() )
+        {
+            return projectPointOntoLineForSignular(point);
+        }
+        else
+        {
+            return projectPointOntoLineForNonsignular(point);
+        }
+    }
+    
+    private Vector2d<Float> projectPointOntoLineForSignular(Vector2d<Float> point)
+    {
+        return new Vector2d<Float>(aFloat.x, point.y);
+    }
+
+    private Vector2d<Float> projectPointOntoLineForNonsignular(Vector2d<Float> point)
     {
         Vector2d<Float> lineDirection;
         Vector2d<Float> diffFromAToPoint;
@@ -139,11 +160,15 @@ public class SingleLineDetector
     
     public boolean isXOfPointInLine(Vector2d<Float> point)
     {
+        Assert.Assert(!isYAxisSingularity(), "is singular!");
+        
         return point.x >= getAProjected().x && point.x <= getBProjected().x;
     }
 
     public float getN()
     {
+        Assert.Assert(!isYAxisSingularity(), "is singular!");
+        
         // TODO< m = inf special handling >
         return aFloat.y - aFloat.x*getM();
     }
@@ -151,7 +176,9 @@ public class SingleLineDetector
     public float getM()
     {
         Vector2d<Float> diff;
-
+        
+        Assert.Assert(!isYAxisSingularity(), "is singular!");
+        
         diff = sub(bFloat, aFloat);
         return diff.y/diff.x;
     }
@@ -190,6 +217,8 @@ public class SingleLineDetector
     {
         float m;
         
+        Assert.Assert(!isYAxisSingularity(), "is singular!");
+        
         m = getM();
         
         return -1.0f/m;
@@ -197,7 +226,22 @@ public class SingleLineDetector
     
     public static Vector2d<Float> intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB)
     {
-        return SingleLineDetector.intersectLinesMN(lineA.getM(), lineA.getN(), lineB.getM(), lineB.getN());
+        Assert.Assert(!lineA.isYAxisSingularity() || !lineB.isYAxisSingularity(), "both lines do have a singularity!");
+        
+        if( !lineA.isYAxisSingularity() && !lineB.isYAxisSingularity() )
+        {
+            return SingleLineDetector.intersectLinesMN(lineA.getM(), lineA.getN(), lineB.getM(), lineB.getN());
+        }
+        else if( lineA.isYAxisSingularity() && !lineB.isYAxisSingularity() )
+        {
+            intersectSingularLineWithMN(lineA, lineB.getM(), lineB.getN());
+        }
+        else if( !lineA.isYAxisSingularity() && lineB.isYAxisSingularity() )
+        {
+            intersectSingularLineWithMN(lineB, lineA.getM(), lineA.getN());
+        }
+        
+        throw new RuntimeException("Internal Error");
     }
     
     // returns null if they are parallel
@@ -217,8 +261,33 @@ public class SingleLineDetector
         return new Vector2d<Float>(x, y);
     }
     
-    public float horizontalOffset; // in case of m = inf
+    public static Vector2d<Float> intersectLineWithMN(SingleLineDetector line, float am, float an)
+    {
+        if( line.isYAxisSingularity() )
+        {
+            return intersectSingularLineWithMN(line, am, an);
+        }
+        else
+        {
+            return intersectLinesMN(line.getM(), line.getN(), am, an);
+        }
+    }
     
+    private static Vector2d<Float> intersectSingularLineWithMN(SingleLineDetector line, float am, float an)
+    {
+        float y;
+        
+        Assert.Assert(line.isYAxisSingularity(), "must be signularity");
+        
+        y = am*line.getAProjected().x + an;
+        
+        return new Vector2d<Float>(line.getAProjected().x, y);
+    }
+    
+    public boolean isYAxisSingularity()
+    {
+        return aFloat.x == bFloat.x;
+    }
     
     
     // tests

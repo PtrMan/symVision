@@ -242,8 +242,8 @@ public class ProcessG
             {
                 final Vector2d<Float> intersectionPositionBegin, intersectionPositionEnd;
                 
-                intersectionPositionBegin = SingleLineDetector.intersectLinesMN(iterationLineDetector.getM(), iterationLineDetector.getN(), curveBeginM, curveBeginN);
-                intersectionPositionEnd = SingleLineDetector.intersectLinesMN(iterationLineDetector.getM(), iterationLineDetector.getN(), curveEndM, curveEndN);
+                intersectionPositionBegin = SingleLineDetector.intersectLineWithMN(iterationLineDetector, curveBeginM, curveBeginN);
+                intersectionPositionEnd = SingleLineDetector.intersectLineWithMN(iterationLineDetector, curveEndM, curveEndN);
                 
                 // examine the intersection positions for inside the image and the neightborhood
                 
