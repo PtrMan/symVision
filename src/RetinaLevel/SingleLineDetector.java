@@ -217,6 +217,9 @@ public class SingleLineDetector
         return new Vector2d<Float>(x, y);
     }
     
+    public float horizontalOffset; // in case of m = inf
+    
+    
     
     // tests
     public static void unittestProjectPoint()
