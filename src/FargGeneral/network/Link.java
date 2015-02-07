@@ -25,10 +25,10 @@ public class Link
     {
         ISPARTOF("ISPARTOF"),
         CONTAINS("CONTAINS"),
-        HAS("HAS"), // used for (platonic) features of platonic primitives in ltm
+        HASFEATURE("HASFEATURE"), // used for (platonic) features of platonic primitives in ltm
         HASATTRIBUTE("HASATTRIBUTE"),
-        ISA("ISA") // "is a"
-        ;
+        ISA("ISA"), // "is a"
+        HASNODE("HASNODE"); // inverse of ISPARTOF, weaker than HAS
         
         private String string;
         

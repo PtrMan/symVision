@@ -6,6 +6,7 @@ import static Datastructures.Vector2d.FloatHelper.dot;
 import static Datastructures.Vector2d.FloatHelper.getScaled;
 import static Datastructures.Vector2d.FloatHelper.sub;
 import java.util.ArrayList;
+import misc.AngleHelper;
 import misc.Assert;
 
 /**
@@ -194,23 +195,10 @@ public class SingleLineDetector
     public static float getAngleBetween(SingleLineDetector a, SingleLineDetector b)
     {
         Vector2d<Float> aNormalizedDirection, bNormalizedDirection;
-        float dotResult;
-        float angleInRad;
-        float angleInDegree;
         
         aNormalizedDirection = a.getNormalizedDirection();
         bNormalizedDirection = b.getNormalizedDirection();
-        
-        dotResult = dot(aNormalizedDirection, bNormalizedDirection);
-        angleInRad = (float)Math.acos(dotResult);
-        angleInDegree = angleInRad * (360.0f/(2.0f*(float)Math.PI));
-        
-        if( angleInDegree > 90.0f )
-        {
-            angleInDegree = 180.0f - angleInDegree;
-        }
-        
-        return angleInDegree;
+        return AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(aNormalizedDirection, bNormalizedDirection);
     }
 
     float getTangentM()
@@ -290,6 +278,7 @@ public class SingleLineDetector
     }
     
     
+    
     // tests
     public static void unittestProjectPoint()
     {
@@ -333,5 +322,45 @@ public class SingleLineDetector
         
         
         int x = 0;
+    }
+
+    public Vector2d<Float> getPositionOfEndpoint(int index)
+    {
+        Assert.Assert(index == 0 || index == 1, "index must be 0 or 1");
+        
+        if( index == 0 )
+        {
+            return aFloat;
+        }
+        else
+        {
+            return bFloat;
+        }
+    }
+    
+    // TODO< figure out if it is the middle >
+    //  for this we need to restructure the function that it does
+    //  * if the line is not a singularity
+    //    -> compare x value if its before the begin or after the end, or in the middle
+    //  * if the line is singularity we have to do the same with the y axis
+    public Intersection.IntersectionPartner.EnumIntersectionEndpointType getIntersectionEndpoint(Vector2d<Float> point)
+    {
+        Vector2d<Float> diff;
+        float distanceBegin, distanceEnd;
+        
+        diff = sub(getAProjected(), point);
+        distanceBegin = Datastructures.Vector2d.FloatHelper.getLength(diff);
+        
+        diff = sub(getBProjected(), point);
+        distanceEnd = Datastructures.Vector2d.FloatHelper.getLength(diff);
+        
+        if( distanceBegin < distanceEnd )
+        {
+            return Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN;
+        }
+        else
+        {
+            return Intersection.IntersectionPartner.EnumIntersectionEndpointType.END;
+        }
     }
 }

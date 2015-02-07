@@ -115,7 +115,7 @@ public class Controller
             
             retinaToWorkspaceTranslator = new RetinaToWorkspaceTranslator();
             
-            ArrayList<Node> objectNodes = retinaToWorkspaceTranslator.createObjectFromLines(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup);
+            ArrayList<Node> objectNodes = retinaToWorkspaceTranslator.createObjectsFromLines(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver.getImageSize());
             
             bpSolver.cycle(500);
             

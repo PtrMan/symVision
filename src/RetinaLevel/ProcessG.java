@@ -32,6 +32,57 @@ public class ProcessG
         }
         
         public ArrayList<CurveElement> curveElements;
+        
+        public Vector2d<Float> getNormalizedTangentAtEndpoint(int index)
+        {
+            Assert.Assert(index >= 0 && index <= 1, "");
+            
+            if( index == 0 )
+            {
+                return curveElements.get(0).calcTangent(0.0f);
+            }
+            else
+            {
+                return curveElements.get(curveElements.size()-1).calcTangent(1.0f);
+            }
+        }
+        
+        public Intersection.IntersectionPartner.EnumIntersectionEndpointType getIntersectionEndpoint(Vector2d<Float> point)
+        {
+            // TODO< other strategy for figuring out if the point is *at* the line and not lear the endpoints >
+            
+            float distToBegin, distToEnd;
+            Vector2d<Float> diff;
+            
+            diff = sub(calcPosition(0.0f), point);
+            distToBegin = getLength(diff);
+            
+            diff = sub(calcPosition(1.0f), point);
+            distToEnd = getLength(diff);
+            
+            if( distToBegin < distToEnd )
+            {
+                return Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN;
+            }
+            else
+            {
+                return Intersection.IntersectionPartner.EnumIntersectionEndpointType.END;
+            }
+        }
+        
+        public Vector2d<Float> calcPosition(float t)
+        {
+            float t2;
+            float rem;
+            int index;
+            
+            t2 = t * (float)curveElements.size();
+            
+            rem = t2 % 1.0f;
+            index = Math.round(t2);
+            
+            return curveElements.get(index).calcPosition(rem);
+        }
     }
     
     
@@ -255,8 +306,8 @@ public class ProcessG
                     Intersection createdIntersection;
 
                     createdIntersection = new Intersection();
-                    createdIntersection.partners[0] = Intersection.IntersectionPartner.makeCurve(iterationCurve);
-                    createdIntersection.partners[1] = Intersection.IntersectionPartner.makeLine(iterationLineDetector);
+                    createdIntersection.partners[0] = new Intersection.IntersectionPartner(RetinaPrimitive.makeCurve(iterationCurve), iterationCurve.getIntersectionEndpoint(intersectionPositionBegin));
+                    createdIntersection.partners[1] = new Intersection.IntersectionPartner(RetinaPrimitive.makeLine(iterationLineDetector), iterationLineDetector.getIntersectionEndpoint(intersectionPositionBegin));
                     createdIntersection.intersectionPosition = Vector2d.ConverterHelper.convertFloatVectorToInt(intersectionPositionBegin);
                     
                     iterationLineDetector.intersections.add(createdIntersection);
@@ -270,8 +321,8 @@ public class ProcessG
                     Intersection createdIntersection;
 
                     createdIntersection = new Intersection();
-                    createdIntersection.partners[0] = Intersection.IntersectionPartner.makeCurve(iterationCurve);
-                    createdIntersection.partners[1] = Intersection.IntersectionPartner.makeLine(iterationLineDetector);
+                    createdIntersection.partners[0] = new Intersection.IntersectionPartner(RetinaPrimitive.makeCurve(iterationCurve), iterationCurve.getIntersectionEndpoint(intersectionPositionEnd));
+                    createdIntersection.partners[1] = new Intersection.IntersectionPartner(RetinaPrimitive.makeLine(iterationLineDetector), iterationLineDetector.getIntersectionEndpoint(intersectionPositionEnd));
                     createdIntersection.intersectionPosition = Vector2d.ConverterHelper.convertFloatVectorToInt(intersectionPositionEnd);
                     
                     iterationLineDetector.intersections.add(createdIntersection);
@@ -323,16 +374,16 @@ public class ProcessG
     {
         for( Intersection iterationIntersection : lineDetector.intersections )
         {
-            Assert.Assert(iterationIntersection.partners[0].type == Intersection.EnumType.LINE, "must be line");
-            Assert.Assert(iterationIntersection.partners[1].type == Intersection.EnumType.LINE, "must be line");
+            Assert.Assert(iterationIntersection.partners[0].primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
+            Assert.Assert(iterationIntersection.partners[1].primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
             
-            if( iterationIntersection.partners[0].line.equals(lineDetector) )
+            if( iterationIntersection.partners[0].primitive.line.equals(lineDetector) )
             {
-                removeIntersectionBetweenLines(iterationIntersection.partners[1].line, lineDetector);
+                removeIntersectionBetweenLines(iterationIntersection.partners[1].primitive.line, lineDetector);
             }
-            else if( iterationIntersection.partners[1].line.equals(lineDetector) )
+            else if( iterationIntersection.partners[1].primitive.line.equals(lineDetector) )
             {
-                removeIntersectionBetweenLines(iterationIntersection.partners[0].line, lineDetector);
+                removeIntersectionBetweenLines(iterationIntersection.partners[0].primitive.line, lineDetector);
             }
         }
     }
@@ -347,15 +398,15 @@ public class ProcessG
             
             iterationIntersection = lineA.intersections.get(intersectionI);
             
-            Assert.Assert(iterationIntersection.partners[0].type == Intersection.EnumType.LINE, "must be line");
-            Assert.Assert(iterationIntersection.partners[1].type == Intersection.EnumType.LINE, "must be line");
+            Assert.Assert(iterationIntersection.partners[0].primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
+            Assert.Assert(iterationIntersection.partners[1].primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
 
-            if( iterationIntersection.partners[0].line.equals(lineB) )
+            if( iterationIntersection.partners[0].primitive.line.equals(lineB) )
             {
                 lineA.intersections.remove(intersectionI);
                 break;
             }
-            else if( iterationIntersection.partners[1].line.equals(lineB) )
+            else if( iterationIntersection.partners[1].primitive.line.equals(lineB) )
             {
                 lineA.intersections.remove(intersectionI);
                 break;
@@ -369,15 +420,15 @@ public class ProcessG
             
             iterationIntersection = lineB.intersections.get(intersectionI);
             
-            Assert.Assert(iterationIntersection.partners[0].type == Intersection.EnumType.LINE, "must be line");
-            Assert.Assert(iterationIntersection.partners[1].type == Intersection.EnumType.LINE, "must be line");
+            Assert.Assert(iterationIntersection.partners[0].primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
+            Assert.Assert(iterationIntersection.partners[1].primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
             
-            if( iterationIntersection.partners[0].line.equals(lineA) )
+            if( iterationIntersection.partners[0].primitive.line.equals(lineA) )
             {
                 lineB.intersections.remove(intersectionI);
                 break;
             }
-            else if( iterationIntersection.partners[1].line.equals(lineA) )
+            else if( iterationIntersection.partners[1].primitive.line.equals(lineA) )
             {
                 lineB.intersections.remove(intersectionI);
                 break;

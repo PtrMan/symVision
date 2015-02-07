@@ -60,7 +60,7 @@ public class CodeletLtmLookup
                 PlatonicPrimitiveNode currentAttributePrimitiveNode;
                 RegisterEntry registerEntry;
 
-                if( iterationLink.type != FargGeneral.network.Link.EnumType.HAS )
+                if( iterationLink.type != FargGeneral.network.Link.EnumType.HASFEATURE )
                 {
                     continue;
                 }

@@ -4,40 +4,23 @@ import Datastructures.Vector2d;
 
 public class Intersection
 {
-    public enum EnumType
-    {
-        LINE,
-        CURVE
-    }
-    
     public static class IntersectionPartner
     {
-        public EnumType type;
-        
-        public SingleLineDetector line;
-        public ProcessG.Curve curve;
-        
-        public static IntersectionPartner makeLine(SingleLineDetector line)
+        public enum EnumIntersectionEndpointType
         {
-            IntersectionPartner resultIntersection;
-            
-            resultIntersection = new IntersectionPartner();
-            resultIntersection.line = line;
-            resultIntersection.type = EnumType.LINE;
-            
-            return resultIntersection;
+            BEGIN,
+            MIDDLE,
+            END
         }
         
-        public static IntersectionPartner makeCurve(ProcessG.Curve curve)
+        public IntersectionPartner(RetinaPrimitive primitive, EnumIntersectionEndpointType intersectionEndpointType)
         {
-            IntersectionPartner resultIntersection;
-            
-            resultIntersection = new IntersectionPartner();
-            resultIntersection.curve = curve;
-            resultIntersection.type = EnumType.CURVE;
-            
-            return resultIntersection;
+            this.primitive = primitive;
+            this.intersectionEndpointType = intersectionEndpointType;
         }
+        
+        public RetinaPrimitive primitive;
+        public EnumIntersectionEndpointType intersectionEndpointType; 
     }
     
     public IntersectionPartner[] partners = new IntersectionPartner[2];

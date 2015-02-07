@@ -2,6 +2,8 @@ package RetinaLevel;
 
 import Datastructures.Map2d;
 import Datastructures.Vector2d;
+import static Datastructures.Vector2d.FloatHelper.getLength;
+import static Datastructures.Vector2d.FloatHelper.sub;
 import bpsolver.HardParameters;
 import java.util.ArrayList;
 
@@ -29,6 +31,7 @@ public class ProcessE
                 }
                 
                 Vector2d<Integer> intersectionPosition;
+                Vector2d<Float> intersectionPositionAsFloat;
                 SingleLineDetector lowLine;
                 SingleLineDetector highLine;
                 
@@ -53,12 +56,14 @@ public class ProcessE
                     continue;
                 }
                 
+                intersectionPositionAsFloat = Vector2d.ConverterHelper.convertIntVectorToFloat(intersectionPosition);
+                
                 // create entry and register stuff ...
                 // TODO< register it on the line itself? >
                 Intersection createdIntersection = new Intersection();
                 createdIntersection.intersectionPosition = intersectionPosition;
-                createdIntersection.partners[0] = Intersection.IntersectionPartner.makeLine(lowLine);
-                createdIntersection.partners[1] = Intersection.IntersectionPartner.makeLine(highLine);
+                createdIntersection.partners[0] = new Intersection.IntersectionPartner(RetinaPrimitive.makeLine(lowLine), lowLine.getIntersectionEndpoint(intersectionPositionAsFloat));
+                createdIntersection.partners[1] = new Intersection.IntersectionPartner(RetinaPrimitive.makeLine(highLine), highLine.getIntersectionEndpoint(intersectionPositionAsFloat));
                 
                 lowLine.intersections.add(createdIntersection);
                 highLine.intersections.add(createdIntersection);
