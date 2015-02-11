@@ -2,6 +2,7 @@ package bpsolver;
 
 import Datastructures.Map2d;
 import Datastructures.Vector2d;
+import FargGeneral.network.Link;
 import FargGeneral.network.Node;
 import RetinaLevel.Intersection;
 import RetinaLevel.ProcessA;
@@ -11,7 +12,11 @@ import RetinaLevel.ProcessD;
 import RetinaLevel.ProcessE;
 import RetinaLevel.ProcessH;
 import RetinaLevel.ProcessM;
+import RetinaLevel.RetinaPrimitive;
 import RetinaLevel.SingleLineDetector;
+import bpsolver.nodes.FeatureNode;
+import bpsolver.nodes.NodeTypes;
+import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -40,9 +45,90 @@ public class BpSolverTest
 
         ArrayList<Node> nodes = getNodesFromImage(image, bpSolver);
         
+        for( Node iterationNode : nodes )
+        {
+            boolean doesHaveAtLeastOneVAnglePoint;
+            
+            doesHaveAtLeastOneVAnglePoint = doesNodeHaveAtLeastOneVAnglePoint(iterationNode, bpSolver.networkHandles);
+            if( doesHaveAtLeastOneVAnglePoint )
+            {
+                // pass
+                int DEBUG0 = 0;
+            }
+        }
+        
+        // fail
+        // TODO
+        
         int x = 0;
         
         // TODO< check for at least one V anglepoint >
+    }
+    
+    private static boolean doesNodeHaveAtLeastOneVAnglePoint(Node node, NetworkHandles networkHandles)
+    {
+        ArrayList<Node> nodeHeap;
+        ArrayList<Node> doneList;
+        
+        doneList = new ArrayList<>();
+        nodeHeap = new ArrayList<>();
+        nodeHeap.add(node);
+        
+        for(;;)
+        {
+            Node currentNode;
+            
+            if( nodeHeap.size() == 0)
+            {
+                return false;
+            }
+            
+            currentNode = nodeHeap.get(0);
+            nodeHeap.remove(0);
+            
+            if( doneList.contains(currentNode) )
+            {
+                continue;
+            }
+            
+            doneList.add(currentNode);
+            
+            for( Link iterationLink : currentNode.outgoingLinks )
+            {
+                nodeHeap.add(iterationLink.target);
+            }
+            
+            if( currentNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() )
+            {
+                PlatonicPrimitiveInstanceNode currentNodeAsPlatonicPrimitiveInstanceNode;
+                
+                currentNodeAsPlatonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode)currentNode;
+                
+                if( currentNodeAsPlatonicPrimitiveInstanceNode.primitiveNode.equals(networkHandles.anglePointNodePlatonicPrimitiveNode) )
+                {
+                    // test if it is a V
+                    for( Link iterationLink : currentNodeAsPlatonicPrimitiveInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) )
+                    {
+                        FeatureNode anglePointTypeFeatureNode;
+                        int anglePointType;
+                        
+                        if( !iterationLink.target.equals(networkHandles.anglePointFeatureTypePrimitiveNode) )
+                        {
+                            continue;
+                        }
+                        // if here -> is a anglePointFeatureTypeNode
+                        
+                        anglePointTypeFeatureNode = (FeatureNode)iterationLink.target;
+                        
+                        anglePointType = anglePointTypeFeatureNode.getValueAsInt();
+                        if( anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.V.ordinal() )
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
     }
     
     private static Map2d<Boolean> drawToImage(BufferedImage javaImage)
@@ -98,7 +184,7 @@ public class BpSolverTest
         processB.process(samples, image);
         processC.process(samples);
         
-        ArrayList<SingleLineDetector> lineDetectors = processD.detectLines(samples);
+        ArrayList<RetinaPrimitive> lineDetectors = processD.detectLines(samples);
         
         ArrayList<Intersection> lineIntersections = new ArrayList<>();
         
@@ -127,7 +213,7 @@ public class BpSolverTest
         
         retinaToWorkspaceTranslator = new RetinaToWorkspaceTranslator();
         
-        ArrayList<Node> objectNodes = retinaToWorkspaceTranslator.createObjectsFromLines(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver.getImageSizeAsFloat());
+        ArrayList<Node> objectNodes = retinaToWorkspaceTranslator.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver.getImageSizeAsFloat());
         
         bpSolver.cycle(500);
         
@@ -135,15 +221,15 @@ public class BpSolverTest
     }
     
     // TODO< refactor out >
-    private static ArrayList<Intersection> getAllLineIntersections(ArrayList<SingleLineDetector> lineDetectors)
+    private static ArrayList<Intersection> getAllLineIntersections(ArrayList<RetinaPrimitive> primitives)
     {
         ArrayList<Intersection> uniqueIntersections;
 
         uniqueIntersections = new ArrayList<>();
 
-        for( SingleLineDetector currentDetector : lineDetectors )
+        for( RetinaPrimitive currentDetector : primitives )
         {
-            findAndAddUniqueIntersections(uniqueIntersections, currentDetector.intersections);
+            findAndAddUniqueIntersections(uniqueIntersections, currentDetector.line.intersections);
         }
 
         return uniqueIntersections;

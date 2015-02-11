@@ -25,4 +25,5 @@ public class NetworkHandles
     
     // has a attribute attached which indicates if it is a vertex, Touch, cross or a K-point
     public PlatonicPrimitiveNode anglePointNodePlatonicPrimitiveNode;
+    public PlatonicPrimitiveNode anglePointFeatureTypePrimitiveNode;
 }

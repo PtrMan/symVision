@@ -52,7 +52,9 @@ public class BpSolver {
         networkHandles.yCoordinatePlatonicPrimitiveNode = new PlatonicPrimitiveNode("yCoordinate", null);
         
         // currently not connected to anything
-        networkHandles.anglePointNodePlatonicPrimitiveNode = new PlatonicPrimitiveNode("VertexNode", null);
+        networkHandles.anglePointNodePlatonicPrimitiveNode = new PlatonicPrimitiveNode("AnglePoint", null);
+        
+        networkHandles.anglePointFeatureTypePrimitiveNode = new PlatonicPrimitiveNode("AnglePointFeatureType", null);
         
         networkHandles.lineStructureAbstractPrimitiveNode.isAbstract = true;
         link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.endpointPlatonicPrimitiveNode);
@@ -109,6 +111,10 @@ public class BpSolver {
         // a object has a barycenter
         link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.barycenterPlatonicPrimitiveNode);
         networkHandles.objectPlatonicPrimitiveNode.outgoingLinks.add(link);
+        
+        
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.anglePointFeatureTypePrimitiveNode);
+        networkHandles.anglePointNodePlatonicPrimitiveNode.outgoingLinks.add(link);
     }
     
     private void initializeNetwork()

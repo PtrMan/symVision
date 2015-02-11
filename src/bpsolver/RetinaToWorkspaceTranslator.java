@@ -12,6 +12,7 @@ import FargGeneral.network.Node;
 import RetinaLevel.Intersection;
 import RetinaLevel.RetinaPrimitive;
 import RetinaLevel.SingleLineDetector;
+import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -132,7 +133,7 @@ public class RetinaToWorkspaceTranslator
      * temporary object to figure out where the intersections are and what type they have
      * 
      */
-    private static class Crosspoint
+    public static class Crosspoint
     {
         public static class RetinaObjectWithAssocWithIntersectionType
         {
@@ -207,6 +208,8 @@ public class RetinaToWorkspaceTranslator
             crosspoint = currentElement.data;
             
             PlatonicPrimitiveInstanceNode createdAnglePointNode;
+            FeatureNode createdAnglePointFeatureNode;
+            Link createdFeatureTypeNodeLink;
             
             createdAnglePointNode = new PlatonicPrimitiveInstanceNode(networkHandles.anglePointNodePlatonicPrimitiveNode);
             // TODO< add codelets >
@@ -225,6 +228,12 @@ public class RetinaToWorkspaceTranslator
                 createdBackwardLink = network.linkCreator.createLink(Link.EnumType.HASNODE, createdAnglePointNode);
                 workspaceNode.outgoingLinks.add(createdBackwardLink);
             }
+            
+            
+            
+            createdAnglePointFeatureNode = FeatureNode.createIntegerNode(networkHandles.anglePointFeatureTypePrimitiveNode, crosspoint.type.ordinal(), 1);
+            createdFeatureTypeNodeLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointFeatureNode);
+            createdAnglePointNode.outgoingLinks.add(createdFeatureTypeNodeLink);
         }
     }
     
