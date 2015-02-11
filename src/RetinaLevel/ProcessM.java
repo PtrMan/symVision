@@ -19,7 +19,7 @@ public class ProcessM
         public boolean processGRated = false; // used to check for invalidated curves and rerate them if necessary
     }
     
-    public void process(ArrayList<SingleLineDetector> lineDetectors)
+    public void process(ArrayList<RetinaPrimitive> lineDetectors)
     {
         if( lineDetectors.isEmpty() )
         {
@@ -34,7 +34,7 @@ public class ProcessM
         return lineParsings;
     }
     
-    private void tryToFindLines(ArrayList<SingleLineDetector> lineDetectors, int numberOfIterations)
+    private void tryToFindLines(ArrayList<RetinaPrimitive> lineDetectors, int numberOfIterations)
     {
         int iteration;
         
@@ -47,22 +47,22 @@ public class ProcessM
         }
     }
     
-    private static void resetMarkingsWithLocking(ArrayList<SingleLineDetector> lineDetectors)
+    private static void resetMarkingsWithLocking(ArrayList<RetinaPrimitive> lineDetectors)
     {
         // TODO< lock >
         resetMarkingsSynchronous(lineDetectors);
         // TODO< unlock >
     }
     
-    private static void resetMarkingsSynchronous(ArrayList<SingleLineDetector> lineDetectors)
+    private static void resetMarkingsSynchronous(ArrayList<RetinaPrimitive> lineDetectors)
     {
-        for( SingleLineDetector iterationDetector : lineDetectors )
+        for( RetinaPrimitive iterationDetector : lineDetectors )
         {
-            iterationDetector.marked = false;
+            iterationDetector.line.marked = false;
         }
     }
 
-    private void selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(ArrayList<SingleLineDetector> lineDetectors)
+    private void selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(ArrayList<RetinaPrimitive> lineDetectors)
     {
         int startLineIndex;
         SingleLineDetector startLineDetector;
@@ -73,7 +73,7 @@ public class ProcessM
         Assert.Assert(!lineDetectors.isEmpty(), "");
         
         startLineIndex = random.nextInt(lineDetectors.size());
-        startLineDetector = lineDetectors.get(startLineIndex);
+        startLineDetector = lineDetectors.get(startLineIndex).line;
         
         lineParsing = findLineParsingForStartLine(startLineDetector);
         lineParsings.add(new LineParsing(lineParsing));

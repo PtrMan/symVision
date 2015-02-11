@@ -158,14 +158,22 @@ public class BpSolver {
     public Coderack coderack = new Coderack();
     public CodeletLtmLookup codeletLtmLookup;
 
-    public Vector2d<Float> getImageSize()
+    public Vector2d<Float> getImageSizeAsFloat()
     {
-        // TODO< retrive from stored variable >
-        
-        return new Vector2d<Float>(100.0f, 100.0f);
+        return Vector2d.ConverterHelper.convertIntVectorToFloat(imageSize);
     }
     
+    public Vector2d<Integer> getImageSize()
+    {
+        return imageSize;
+    }
     
+    public void setImageSize(Vector2d<Integer> imageSize)
+    {
+        this.imageSize = imageSize;
+    }
+    
+    private Vector2d<Integer> imageSize; 
     
     
 }

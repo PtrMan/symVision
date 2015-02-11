@@ -2,6 +2,7 @@ package Datastructures;
 
 import static Datastructures.Vector2d.FloatHelper.getLength;
 import static Datastructures.Vector2d.FloatHelper.sub;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import misc.Assert;
 
@@ -145,7 +146,7 @@ public class SpatialAcceleration<Type>
         Cell[] result;
         int i;
         
-        result = (Cell[])new Object[gridcountX*gridcountY];
+        result = (Cell[]) Array.newInstance(Cell.class, gridcountX*gridcountY);
         
         for( i = 0; i < gridcountX*gridcountY; i++ )
         {
@@ -179,7 +180,7 @@ public class SpatialAcceleration<Type>
     
     private class Cell
     {
-        ArrayList<Element> content;
+        ArrayList<Element> content = new ArrayList<Element>();
     }
     
     private Cell cells[];

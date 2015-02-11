@@ -13,7 +13,7 @@ import misc.Assert;
  */
 public class ProcessH
 {
-    public void process(ArrayList<SingleLineDetector> workingDetectors)
+    public void process(ArrayList<RetinaPrimitive> workingDetectors)
     {
         // called low and high because the index low is always lower than high
         int iteratorLow, iteratorHigh;
@@ -35,9 +35,12 @@ public class ProcessH
                 {
                     SingleLineDetector detectorLow;
                     SingleLineDetector detectorHigh;
-
-                    detectorLow = workingDetectors.get(iteratorLow);
-                    detectorHigh = workingDetectors.get(iteratorHigh);
+                    
+                    Assert.Assert(workingDetectors.get(iteratorLow).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
+                    Assert.Assert(workingDetectors.get(iteratorHigh).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
+                    
+                    detectorLow = workingDetectors.get(iteratorLow).line;
+                    detectorHigh = workingDetectors.get(iteratorHigh).line;
                     
                     if( canDetectorsBeFusedOverlap(detectorLow, detectorHigh) )
                     {
@@ -50,7 +53,7 @@ public class ProcessH
                         workingDetectors.remove(iteratorHigh);
                         workingDetectors.remove(iteratorLow);
 
-                        workingDetectors.add(fusedLineDetector);
+                        workingDetectors.add(RetinaPrimitive.makeLine(fusedLineDetector));
 
                         // we need to repeat the search because we changed the array
                         terminate = false;
@@ -67,7 +70,7 @@ public class ProcessH
                         workingDetectors.remove(iteratorHigh);
                         workingDetectors.remove(iteratorLow);
 
-                        workingDetectors.add(fusedLineDetector);
+                        workingDetectors.add(RetinaPrimitive.makeLine(fusedLineDetector));
 
                         // we need to repeat the search because we changed the array
                         terminate = false;

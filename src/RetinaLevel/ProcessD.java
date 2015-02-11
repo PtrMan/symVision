@@ -128,10 +128,11 @@ public class ProcessD
      * 
      * \return only the surviving line segments
      */
-    public ArrayList<SingleLineDetector> detectLines(ArrayList<ProcessA.Sample> samples)
+    public ArrayList<RetinaPrimitive> detectLines(ArrayList<ProcessA.Sample> samples)
     {
         ArrayList<ProcessA.Sample> workingSamples;
         ArrayList<LineDetectorWithMultiplePoints> multiplePointsLineDetector;
+        ArrayList<RetinaPrimitive> resultSingleDetectors;
         
         final float SAMPLECOUNTLINEDETECTORMULTIPLIER = 3.5f;
         
@@ -224,7 +225,7 @@ public class ProcessD
         deleteMultiPointDetectorsWhereActiviationIsInsuficient(multiplePointsLineDetector);
         
         // split the detectors into one or many lines
-        ArrayList<SingleLineDetector> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector, samples);
+        resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector, samples);
         
         return resultSingleDetectors;
     }
@@ -469,9 +470,9 @@ public class ProcessD
         return max;
     }
     
-    private static ArrayList<SingleLineDetector> splitDetectorsIntoLines(ArrayList<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints, ArrayList<ProcessA.Sample> samples)
+    private static ArrayList<RetinaPrimitive> splitDetectorsIntoLines(ArrayList<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints, ArrayList<ProcessA.Sample> samples)
     {
-        ArrayList<SingleLineDetector> result;
+        ArrayList<RetinaPrimitive> result;
         
         result = new ArrayList<>();
         
@@ -483,7 +484,7 @@ public class ProcessD
         return result;
     }
     
-    private static ArrayList<SingleLineDetector> splitDetectorIntoLines(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints, ArrayList<ProcessA.Sample> samples)
+    private static ArrayList<RetinaPrimitive> splitDetectorIntoLines(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints, ArrayList<ProcessA.Sample> samples)
     {
         if( lineDetectorWithMultiplePoints.isYAxisSingularity() )
         {
@@ -537,15 +538,15 @@ public class ProcessD
     }
     
     
-    private static ArrayList<SingleLineDetector> clusterPointsFromLinedetectorToLinedetectors(ArrayList<Vector2d<Float>> pointPositions, EnumAxis axis)
+    private static ArrayList<RetinaPrimitive> clusterPointsFromLinedetectorToLinedetectors(ArrayList<Vector2d<Float>> pointPositions, EnumAxis axis)
     {
-        ArrayList<SingleLineDetector> resultSingleLineDetectors;
+        ArrayList<RetinaPrimitive> resultSingleLineDetectors;
         boolean nextIsNewLineStart;
         float lastAxisPosition;
         Vector2d<Float> lineStartPosition;
         Vector2d<Float> lastPoint;
         
-        resultSingleLineDetectors = new ArrayList<SingleLineDetector>();
+        resultSingleLineDetectors = new ArrayList<RetinaPrimitive>();
         
         nextIsNewLineStart = true;
 
@@ -572,7 +573,7 @@ public class ProcessD
             else
             {
                 // form a new line
-                resultSingleLineDetectors.add(SingleLineDetector.createFromFloatPositions(lineStartPosition, iterationPoint));
+                resultSingleLineDetectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, iterationPoint)));
 
                 nextIsNewLineStart = true;
             }
@@ -583,7 +584,7 @@ public class ProcessD
 
         if( !nextIsNewLineStart && Helper.getAxis(lastPoint, axis) - lastAxisPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE )
         {
-            resultSingleLineDetectors.add(SingleLineDetector.createFromFloatPositions(lineStartPosition, lastPoint));
+            resultSingleLineDetectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, lastPoint)));
         }
         
         return resultSingleLineDetectors;

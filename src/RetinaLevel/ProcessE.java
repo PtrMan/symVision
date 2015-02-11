@@ -6,6 +6,7 @@ import static Datastructures.Vector2d.FloatHelper.getLength;
 import static Datastructures.Vector2d.FloatHelper.sub;
 import bpsolver.HardParameters;
 import java.util.ArrayList;
+import misc.Assert;
 
 /**
  * finds line intersections
@@ -13,7 +14,8 @@ import java.util.ArrayList;
  */
 public class ProcessE
 {
-    public void process(ArrayList<SingleLineDetector> lineDetectors, Map2d<Boolean> image)
+    // TODO< sort out only the line detectors or make sure only linedetectors get in, remove asserts if its made sure >
+    public void process(ArrayList<RetinaPrimitive> lineDetectors, Map2d<Boolean> image)
     {
         // we examine ALL possible intersections of all lines
         // this is only possible if we have the whole image at an instance
@@ -32,13 +34,16 @@ public class ProcessE
                 
                 Vector2d<Integer> intersectionPosition;
                 Vector2d<Float> intersectionPositionAsFloat;
-                SingleLineDetector lowLine;
-                SingleLineDetector highLine;
+                RetinaPrimitive lowLinePrimitive;
+                RetinaPrimitive highLinePrimitive;
                 
-                lowLine = lineDetectors.get(outerI);
-                highLine = lineDetectors.get(innerI);
+                Assert.Assert(lineDetectors.get(outerI).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
+                Assert.Assert(lineDetectors.get(innerI).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
                 
-                intersectionPosition = intersectLineDetectors(lowLine, highLine);
+                lowLinePrimitive = lineDetectors.get(outerI);
+                highLinePrimitive = lineDetectors.get(innerI);
+                
+                intersectionPosition = intersectLineDetectors(lowLinePrimitive.line, highLinePrimitive.line);
                 
                 if( intersectionPosition == null )
                 {
@@ -62,11 +67,11 @@ public class ProcessE
                 // TODO< register it on the line itself? >
                 Intersection createdIntersection = new Intersection();
                 createdIntersection.intersectionPosition = intersectionPosition;
-                createdIntersection.partners[0] = new Intersection.IntersectionPartner(RetinaPrimitive.makeLine(lowLine), lowLine.getIntersectionEndpoint(intersectionPositionAsFloat));
-                createdIntersection.partners[1] = new Intersection.IntersectionPartner(RetinaPrimitive.makeLine(highLine), highLine.getIntersectionEndpoint(intersectionPositionAsFloat));
+                createdIntersection.partners[0] = new Intersection.IntersectionPartner(lowLinePrimitive, lowLinePrimitive.line.getIntersectionEndpoint(intersectionPositionAsFloat));
+                createdIntersection.partners[1] = new Intersection.IntersectionPartner(highLinePrimitive, highLinePrimitive.line.getIntersectionEndpoint(intersectionPositionAsFloat));
                 
-                lowLine.intersections.add(createdIntersection);
-                highLine.intersections.add(createdIntersection);
+                lowLinePrimitive.line.intersections.add(createdIntersection);
+                highLinePrimitive.line.intersections.add(createdIntersection);
             }
         }
     }

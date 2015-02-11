@@ -15,7 +15,9 @@ import RetinaLevel.SingleLineDetector;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.Set;
 import misc.AngleHelper;
 import misc.Assert;
 
@@ -66,7 +68,7 @@ public class RetinaToWorkspaceTranslator
      * \param network
      * \return the node which is the object node 
      */
-    public ArrayList<Node> createObjectsFromLines(ArrayList<SingleLineDetector> lines, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize)
+    public ArrayList<Node> createObjectsFromRetinaPrimitives(ArrayList<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize)
     {
         ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints;
         HashMap<Integer, PlatonicPrimitiveInstanceNode> objectNodesByGroupId;
@@ -74,9 +76,9 @@ public class RetinaToWorkspaceTranslator
         
         retinaObjectsWithAssociatedPoints = new ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode>();
         
-        for( SingleLineDetector iterationLine : lines )
+        for( RetinaPrimitive iterationPrimitive : primitives )
         {
-            retinaObjectsWithAssociatedPoints.add(associatePointsToLineSegmentRetinaObject(iterationLine));
+            retinaObjectsWithAssociatedPoints.add(associatePointsToRetinaPrimitive(iterationPrimitive));
         }
         
         ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints = createAndPropagateRetinaLevelObjects(retinaObjectsWithAssociatedPoints);
@@ -176,7 +178,7 @@ public class RetinaToWorkspaceTranslator
     {
         public SpatialAcceleration<Crosspoint> spatialForCrosspoints;
         
-        public Map<RetinaPrimitive, RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitveToRetinaObjectWithAssocMap = new HashMap<>(); 
+        public Map<RetinaPrimitive, RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitveToRetinaObjectWithAssocMap = new IdentityHashMap<>(); 
     }
     
     private void createAndLinkAnglePointsAndLink(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize)
@@ -400,12 +402,41 @@ public class RetinaToWorkspaceTranslator
                     RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssoc;
                     
                     createdCrosspointElement = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.new Element();
+                    createdCrosspointElement.data = new Crosspoint();
+                    createdCrosspointElement.position = Vector2d.ConverterHelper.convertIntVectorToFloat(iterationIntersection.intersectionPosition);
+                    
+                    RetinaPrimitive x = iterationIntersection.partners[0].primitive;
+                    Set<RetinaPrimitive> y = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.keySet();
+                    
+                    Object[] array = y.toArray();
+                    
+                    for( int i = 0; i < array.length; i++ )
+                    {
+                        System.out.println(System.identityHashCode(array[i]));
+                    }
+                    
+                    
+                    System.out.println("searched " + System.identityHashCode(iterationIntersection.partners[0].primitive));
                     
                     retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[0].primitive);
-                    createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[0].intersectionEndpointType));
+                    // we can have intersectionpartners which are not inside
+                    // seems to be a bug in clustering or something fishy is going on
+                    // TODO< investigate and add here a assert that the assoc can't be null >
+                    if( retinaObjectWithAssoc != null )
+                    {
+                        createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[0].intersectionEndpointType));
+                    }
+                    
+                    
+                    
+                    
                     
                     retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[1].primitive);
-                    createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[1].intersectionEndpointType));
+                    // TODO SAME
+                    if( retinaObjectWithAssoc != null )
+                    {
+                        createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[1].intersectionEndpointType));
+                    }
                     
                     spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.addElement(createdCrosspointElement);
                 }
@@ -417,15 +448,23 @@ public class RetinaToWorkspaceTranslator
                     nearestCrosspointElement = getNearestCrosspointElement(crosspointsAtPosition, Vector2d.ConverterHelper.convertIntVectorToFloat(iterationIntersection.intersectionPosition));
                     
                     retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[0].primitive);
-                    if( !nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc) )
+                    // TODO SAME
+                    if( retinaObjectWithAssoc != null )
                     {
-                        nearestCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[0].intersectionEndpointType));
+                        if( !nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc) )
+                        {
+                            nearestCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[0].intersectionEndpointType));
+                        }
                     }
                     
                     retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[1].primitive);
-                    if( !nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc) )
+                    // TODO SAME
+                    if( retinaObjectWithAssoc != null )
                     {
-                        nearestCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[1].intersectionEndpointType));
+                        if( !nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc) )
+                        {
+                            nearestCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[1].intersectionEndpointType));
+                        }
                     }
                 }
             }
@@ -670,14 +709,16 @@ public class RetinaToWorkspaceTranslator
     }
     
     
-    private RetinaObjectWithAssociatedPointsAndWorkspaceNode associatePointsToLineSegmentRetinaObject(SingleLineDetector lineSegment)
+    private RetinaObjectWithAssociatedPointsAndWorkspaceNode associatePointsToRetinaPrimitive(RetinaPrimitive primitive)
     {
         RetinaObjectWithAssociatedPointsAndWorkspaceNode resultAssosciation;
         
-        resultAssosciation = new RetinaObjectWithAssociatedPointsAndWorkspaceNode(RetinaPrimitive.makeLine(lineSegment));
+        Assert.Assert(primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "only implemented for linesegment");
+        
+        resultAssosciation = new RetinaObjectWithAssociatedPointsAndWorkspaceNode(primitive);
         resultAssosciation.pointPositions = new ArrayList<>();
-        resultAssosciation.pointPositions.add(lineSegment.getAProjected());
-        resultAssosciation.pointPositions.add(lineSegment.getBProjected());
+        resultAssosciation.pointPositions.add(primitive.line.getAProjected());
+        resultAssosciation.pointPositions.add(primitive.line.getBProjected());
         
         return resultAssosciation;
     }

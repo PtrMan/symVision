@@ -10,9 +10,32 @@ import misc.Assert;
  */
 public class RetinaPrimitive
 {
-
-    public Vector2d<Float> getNormalizedTangentForIntersectionTypeAndT(Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType, float f) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Vector2d<Float> getNormalizedTangentForIntersectionTypeAndT(Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType, float f)
+    {
+        if( type == EnumType.LINESEGMENT )
+        {
+            return line.getNormalizedDirection();
+        }
+        else if( type == EnumType.CURVE )
+        {
+            // TODO< middle and pass over T and/or a type >
+            
+            if( intersectionPartnerType == Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN )
+            {
+                return curve.getNormalizedTangentAtEndpoint(0);
+            }
+            else if( intersectionPartnerType == Intersection.IntersectionPartner.EnumIntersectionEndpointType.END )
+            {
+                return curve.getNormalizedTangentAtEndpoint(1);
+            }
+            else
+            {
+                // TODO
+                return curve.getNormalizedTangentAtEndpoint(0);
+            }
+        }
+        
+        throw new InternalError();
     }
     public enum EnumType
     {
@@ -24,6 +47,11 @@ public class RetinaPrimitive
         
     public SingleLineDetector line;
     public ProcessG.Curve curve;
+    
+    private RetinaPrimitive()
+    {
+        
+    }
     
     public static RetinaPrimitive makeLine(SingleLineDetector line)
     {

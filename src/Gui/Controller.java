@@ -17,6 +17,7 @@ import RetinaLevel.ProcessD;
 import RetinaLevel.ProcessE;
 import RetinaLevel.ProcessH;
 import RetinaLevel.ProcessM;
+import RetinaLevel.RetinaPrimitive;
 import RetinaLevel.SingleLineDetector;
 import bpsolver.BpSolver;
 import bpsolver.CodeletLtmLookup;
@@ -80,7 +81,7 @@ public class Controller
             processB.process(samples, image);
             processC.process(samples);
 
-            ArrayList<SingleLineDetector> lineDetectors = processD.detectLines(samples);
+            ArrayList<RetinaPrimitive> lineDetectors = processD.detectLines(samples);
             
             ArrayList<Intersection> lineIntersections = new ArrayList<>();
             
@@ -115,14 +116,14 @@ public class Controller
             
             retinaToWorkspaceTranslator = new RetinaToWorkspaceTranslator();
             
-            ArrayList<Node> objectNodes = retinaToWorkspaceTranslator.createObjectsFromLines(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver.getImageSize());
+            ArrayList<Node> objectNodes = retinaToWorkspaceTranslator.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver.getImageSizeAsFloat());
             
             bpSolver.cycle(500);
             
             BufferedImage detectorImage;
             Graphics2D graphics;
 
-            detectorImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+            detectorImage = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
             graphics = detectorImage.createGraphics();
             
             // TODO< remove the list of line intersections >
@@ -146,9 +147,9 @@ public class Controller
         
         
         // function in here because we don't know who should have it
-        private static BufferedImage drawToJavaImage(float time)
+        private BufferedImage drawToJavaImage(float time)
         {
-            BufferedImage off_Image = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage off_Image = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D g2 = off_Image.createGraphics();
             g2.setColor(Color.BLACK);
@@ -344,15 +345,20 @@ public class Controller
         }
         
         // TODO< refactor out >
-        private static ArrayList<Intersection> getAllLineIntersections(ArrayList<SingleLineDetector> lineDetectors)
+        private static ArrayList<Intersection> getAllLineIntersections(ArrayList<RetinaPrimitive> lineDetectors)
         {
             ArrayList<Intersection> uniqueIntersections;
             
             uniqueIntersections = new ArrayList<>();
             
-            for( SingleLineDetector currentDetector : lineDetectors )
+            for( RetinaPrimitive currentPrimitive : lineDetectors )
             {
-                findAndAddUniqueIntersections(uniqueIntersections, currentDetector.intersections);
+                if( currentPrimitive.type != RetinaPrimitive.EnumType.LINESEGMENT )
+                {
+                    continue;
+                }
+                
+                findAndAddUniqueIntersections(uniqueIntersections, currentPrimitive.line.intersections);
             }
             
             return uniqueIntersections;
@@ -394,6 +400,8 @@ public class Controller
     
     public static void main(String[] args) {
         BpSolver bpSolver = new BpSolver();
+        
+        bpSolver.setImageSize(new Vector2d<>(100, 100));
         
         Parameters.init();
         
