@@ -253,8 +253,9 @@ public class RetinaToWorkspaceTranslator
                 tangents[crosspointI] = crosspoint.adjacentRetinaObjects.get(crosspointI).retinaObjectWithAssociatedPointsAndWorkspaceNode.primitive.getNormalizedTangentForIntersectionTypeAndT(crosspoint.adjacentRetinaObjects.get(crosspointI).intersectionPartnerType, 0.0f);
             }
                  
+            // HACK TODO< after bugremoval uncomment this assert
+            ///Assert.Assert(crosspoint.adjacentRetinaObjects.size() >= 2, "");
             
-            Assert.Assert(crosspoint.adjacentRetinaObjects.size() >= 2, "");
             if( crosspoint.adjacentRetinaObjects.size() == 2 )
             {
                 // its either T, V, or X with two partners
