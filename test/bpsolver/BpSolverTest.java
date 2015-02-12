@@ -110,15 +110,23 @@ public class BpSolverTest
                     for( Link iterationLink : currentNodeAsPlatonicPrimitiveInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) )
                     {
                         FeatureNode anglePointTypeFeatureNode;
+                        FeatureNode targetFeatureNode;
                         int anglePointType;
                         
-                        if( !iterationLink.target.equals(networkHandles.anglePointFeatureTypePrimitiveNode) )
+                        if( !(iterationLink.target.type == NodeTypes.EnumType.FEATURENODE.ordinal()) )
+                        {
+                            continue;
+                        }
+                        
+                        targetFeatureNode = (FeatureNode)iterationLink.target;
+                        
+                        if( !targetFeatureNode.featureTypeNode.equals(networkHandles.anglePointFeatureTypePrimitiveNode) )
                         {
                             continue;
                         }
                         // if here -> is a anglePointFeatureTypeNode
                         
-                        anglePointTypeFeatureNode = (FeatureNode)iterationLink.target;
+                        anglePointTypeFeatureNode = targetFeatureNode;
                         
                         anglePointType = anglePointTypeFeatureNode.getValueAsInt();
                         if( anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.V.ordinal() )

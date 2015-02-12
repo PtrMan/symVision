@@ -282,7 +282,7 @@ public class RetinaToWorkspaceTranslator
                     
                     angleInDegree = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[1]);
                     
-                    if( angleInDegree > 45.0f )
+                    if( angleInDegree < 45.0f )
                     {
                         crosspoint.type = Crosspoint.EnumAnglePointType.T;
                     }
