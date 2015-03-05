@@ -11,6 +11,7 @@ public class NodeTypes
         FEATURENODE,
         NUMEROSITYNODE,
         PLATONICPRIMITIVENODE,
-        PLATONICPRIMITIVEINSTANCENODE // is a line or is curve or anything
+        PLATONICPRIMITIVEINSTANCENODE, // is a line or is curve or anything
+        ATTRIBUTENODE
     }
 }

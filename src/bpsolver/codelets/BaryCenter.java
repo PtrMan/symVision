@@ -1,5 +1,6 @@
 package bpsolver.codelets;
 
+import bpsolver.HelperFunctions;
 import Datastructures.Vector2d;
 import static Datastructures.Vector2d.FloatHelper.add;
 import static Datastructures.Vector2d.FloatHelper.getScaled;

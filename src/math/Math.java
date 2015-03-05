@@ -11,4 +11,18 @@ public class Math
     {
         return x*x;
     }
+    
+    public static int faculty(int value)
+    {
+        int result, i;
+        
+        result = 1;
+        
+        for( i = 1; i < value; i++ )
+        {
+            result *= i;
+        }
+        
+        return result;
+    }
 }

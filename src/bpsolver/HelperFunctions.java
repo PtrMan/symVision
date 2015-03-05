@@ -1,10 +1,10 @@
-package bpsolver.codelets;
+package bpsolver;
 
 import Datastructures.Vector2d;
 import FargGeneral.network.Link;
 import FargGeneral.network.Network;
-import bpsolver.NetworkHandles;
 import bpsolver.nodes.FeatureNode;
+import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import bpsolver.nodes.PlatonicPrimitiveNode;
 
@@ -32,5 +32,36 @@ public class HelperFunctions
         createdVectorInstanceNode.outgoingLinks.add(linkToYNode);
         
         return createdVectorInstanceNode;
+    }
+    
+    public static Vector2d<Float> getVectorFromVectorAttributeNode(NetworkHandles networkHandles, PlatonicPrimitiveInstanceNode node)
+    {
+        Vector2d<Float> result;
+        
+        result = new Vector2d<>(0.0f, 0.0f);
+        
+        for( Link iterationLink : node.getLinksByType(Link.EnumType.HASATTRIBUTE) )
+        {
+            FeatureNode targetFeatureNode;
+
+            if( iterationLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() )
+            {
+                continue;
+            }
+
+            targetFeatureNode = (FeatureNode)iterationLink.target;
+
+            if( targetFeatureNode.featureTypeNode.equals(networkHandles.xCoordinatePlatonicPrimitiveNode) )
+            {
+                result.x = targetFeatureNode.getValueAsFloat();
+            }
+            else if( targetFeatureNode.featureTypeNode.equals(networkHandles.yCoordinatePlatonicPrimitiveNode) )
+            {
+                result.y = targetFeatureNode.getValueAsFloat();
+            }
+            // else ignore
+        }
+        
+        return result;
     }
 }

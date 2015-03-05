@@ -55,6 +55,7 @@ public class BpSolver {
         networkHandles.anglePointNodePlatonicPrimitiveNode = new PlatonicPrimitiveNode("AnglePoint", null);
         
         networkHandles.anglePointFeatureTypePrimitiveNode = new PlatonicPrimitiveNode("AnglePointFeatureType", null);
+        networkHandles.anglePointPositionPlatonicPrimitiveNode = new PlatonicPrimitiveNode("AnglePointPosition", null);
         
         networkHandles.lineStructureAbstractPrimitiveNode.isAbstract = true;
         link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.endpointPlatonicPrimitiveNode);
@@ -115,6 +116,14 @@ public class BpSolver {
         
         link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.anglePointFeatureTypePrimitiveNode);
         networkHandles.anglePointNodePlatonicPrimitiveNode.outgoingLinks.add(link);
+        
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.anglePointPositionPlatonicPrimitiveNode);
+        networkHandles.anglePointNodePlatonicPrimitiveNode.outgoingLinks.add(link);
+        
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.xCoordinatePlatonicPrimitiveNode);
+        networkHandles.anglePointPositionPlatonicPrimitiveNode.outgoingLinks.add(link);
+        link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.yCoordinatePlatonicPrimitiveNode);
+        networkHandles.anglePointPositionPlatonicPrimitiveNode.outgoingLinks.add(link);
     }
     
     private void initializeNetwork()

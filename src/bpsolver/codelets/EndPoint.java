@@ -1,5 +1,6 @@
 package bpsolver.codelets;
 
+import bpsolver.HelperFunctions;
 import Datastructures.Vector2d;
 import FargGeneral.network.Link;
 import FargGeneral.network.Network;

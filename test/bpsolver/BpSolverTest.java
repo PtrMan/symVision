@@ -14,6 +14,7 @@ import RetinaLevel.ProcessH;
 import RetinaLevel.ProcessM;
 import RetinaLevel.RetinaPrimitive;
 import RetinaLevel.SingleLineDetector;
+import bpsolver.nodes.AttributeNode;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
@@ -109,26 +110,26 @@ public class BpSolverTest
                     // test if it is a V
                     for( Link iterationLink : currentNodeAsPlatonicPrimitiveInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) )
                     {
-                        FeatureNode anglePointTypeFeatureNode;
-                        FeatureNode targetFeatureNode;
+                        AttributeNode anglePointTypeAttributeNode;
+                        AttributeNode targetAttributeNode;
                         int anglePointType;
                         
-                        if( !(iterationLink.target.type == NodeTypes.EnumType.FEATURENODE.ordinal()) )
+                        if( !(iterationLink.target.type == NodeTypes.EnumType.ATTRIBUTENODE.ordinal()) )
                         {
                             continue;
                         }
                         
-                        targetFeatureNode = (FeatureNode)iterationLink.target;
+                        targetAttributeNode = (AttributeNode)iterationLink.target;
                         
-                        if( !targetFeatureNode.featureTypeNode.equals(networkHandles.anglePointFeatureTypePrimitiveNode) )
+                        if( !targetAttributeNode.attributeTypeNode.equals(networkHandles.anglePointFeatureTypePrimitiveNode) )
                         {
                             continue;
                         }
                         // if here -> is a anglePointFeatureTypeNode
                         
-                        anglePointTypeFeatureNode = targetFeatureNode;
+                        anglePointTypeAttributeNode = targetAttributeNode;
                         
-                        anglePointType = anglePointTypeFeatureNode.getValueAsInt();
+                        anglePointType = anglePointTypeAttributeNode.getValueAsInt();
                         if( anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.V.ordinal() )
                         {
                             return true;

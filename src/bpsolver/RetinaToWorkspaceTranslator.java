@@ -12,6 +12,7 @@ import FargGeneral.network.Node;
 import RetinaLevel.Intersection;
 import RetinaLevel.RetinaPrimitive;
 import RetinaLevel.SingleLineDetector;
+import bpsolver.nodes.AttributeNode;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.util.ArrayList;
@@ -148,6 +149,7 @@ public class RetinaToWorkspaceTranslator
         }
         
         public ArrayList<RetinaObjectWithAssocWithIntersectionType> adjacentRetinaObjects = new ArrayList<>();
+        public Vector2d<Float> position;
         
         public enum EnumAnglePointType
         {
@@ -155,8 +157,27 @@ public class RetinaToWorkspaceTranslator
             K,
             V,
             X,
-            T
+            T;
             // TODO
+
+            public static EnumAnglePointType fromInteger(int valueAsInt)
+            {
+                switch( valueAsInt )
+                {
+                    case 0:
+                    return EnumAnglePointType.UNDEFINED;
+                    case 1:
+                    return EnumAnglePointType.K;
+                    case 2:
+                    return EnumAnglePointType.V;
+                    case 3:
+                    return EnumAnglePointType.X;
+                    case 4:
+                    return EnumAnglePointType.T;
+                }
+                
+                throw new InternalError("");
+            }
         }
         
         public EnumAnglePointType type = EnumAnglePointType.UNDEFINED;
@@ -208,8 +229,10 @@ public class RetinaToWorkspaceTranslator
             crosspoint = currentElement.data;
             
             PlatonicPrimitiveInstanceNode createdAnglePointNode;
-            FeatureNode createdAnglePointFeatureNode;
+            AttributeNode createdAnglePointAttributeNode;
             Link createdFeatureTypeNodeLink;
+            Link createdPositionLink;
+            PlatonicPrimitiveInstanceNode createdAnglePointPosition;
             
             createdAnglePointNode = new PlatonicPrimitiveInstanceNode(networkHandles.anglePointNodePlatonicPrimitiveNode);
             // TODO< add codelets >
@@ -231,9 +254,13 @@ public class RetinaToWorkspaceTranslator
             
             
             
-            createdAnglePointFeatureNode = FeatureNode.createIntegerNode(networkHandles.anglePointFeatureTypePrimitiveNode, crosspoint.type.ordinal(), 1);
-            createdFeatureTypeNodeLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointFeatureNode);
+            createdAnglePointAttributeNode = AttributeNode.createIntegerNode(networkHandles.anglePointFeatureTypePrimitiveNode, crosspoint.type.ordinal());
+            createdFeatureTypeNodeLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointAttributeNode);
             createdAnglePointNode.outgoingLinks.add(createdFeatureTypeNodeLink);
+            
+            createdAnglePointPosition = HelperFunctions.createVectorAttributeNode(crosspoint.position, networkHandles.anglePointPositionPlatonicPrimitiveNode, network, networkHandles);
+            createdPositionLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointPosition);
+            createdAnglePointNode.outgoingLinks.add(createdPositionLink);
         }
     }
     
@@ -413,6 +440,7 @@ public class RetinaToWorkspaceTranslator
                     
                     createdCrosspointElement = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.new Element();
                     createdCrosspointElement.data = new Crosspoint();
+                    createdCrosspointElement.data.position = Vector2d.ConverterHelper.convertIntVectorToFloat(iterationIntersection.intersectionPosition);
                     createdCrosspointElement.position = Vector2d.ConverterHelper.convertIntVectorToFloat(iterationIntersection.intersectionPosition);
                     
                     RetinaPrimitive x = iterationIntersection.partners[0].primitive;

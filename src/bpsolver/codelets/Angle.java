@@ -1,0 +1,274 @@
+package bpsolver.codelets;
+
+import Datastructures.Vector2d;
+import static Datastructures.Vector2d.FloatHelper.normalize;
+import static Datastructures.Vector2d.FloatHelper.sub;
+import FargGeneral.network.Link;
+import FargGeneral.network.Network;
+import bpsolver.HelperFunctions;
+import bpsolver.NetworkHandles;
+import bpsolver.RetinaToWorkspaceTranslator;
+import bpsolver.SolverCodelet;
+import bpsolver.nodes.AttributeNode;
+import bpsolver.nodes.NodeTypes;
+import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
+import java.util.ArrayList;
+import java.util.Random;
+import misc.AngleHelper;
+import misc.Assert;
+import static misc.Assert.Assert;
+
+
+/**
+ *
+ * calculates the angle(s) of a anglePoint
+ * should be be called only once!
+ */
+public class Angle extends SolverCodelet
+{
+    private static final int KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE = 10;
+    private static final int KPOINTNUMBEROFCHOSENANGLES = 10; // must be smaller or equal to KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE
+
+    
+    
+    private static class AngleInformation
+    {
+        public AngleInformation(float angle, int count)
+        {
+            this.angle = angle;
+            this.count = count;
+        }
+        
+        public int count; // number of the connections from the anglepoint to the (not jet created) attribute node
+        public float angle;
+    }
+    
+    public Angle(Network network, NetworkHandles networkHandles)
+    {
+        super(network, networkHandles);
+    }
+
+    @Override
+    public void initialize()
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public SolverCodelet cloneObject()
+    {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public RunResult run()
+    {
+        RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType anglePointType;
+        ArrayList<PlatonicPrimitiveInstanceNode> anglePartners;
+        Vector2d<Float> anglePosition;
+        ArrayList<AngleInformation> angleInformations;
+        ArrayList<Float> angles;
+        
+        angleInformations = new ArrayList<>();
+        
+        Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() && ((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(networkHandles.anglePointNodePlatonicPrimitiveNode), "");
+        
+        anglePointType = getAnglePointType((PlatonicPrimitiveInstanceNode)startNode);
+        anglePartners = getPartnersOfAnglepoint((PlatonicPrimitiveInstanceNode)startNode);
+        anglePosition = getAnglePosition((PlatonicPrimitiveInstanceNode)startNode);
+        
+        // checks
+        if( anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.K )
+        {
+            Assert.Assert(anglePartners.size() >= 3, "");
+        }
+        else if( anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.V )
+        {
+            Assert.Assert(anglePartners.size() == 2, "");
+        }
+        else if( anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.X )
+        {
+            Assert.Assert(anglePartners.size() >= 2 && anglePartners.size() <= 4, "");
+        }
+        else if( anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.T )
+        {
+            Assert.Assert(anglePartners.size() == 2 || anglePartners.size() == 3, "");
+        }
+        else
+        {
+            throw new InternalError();
+        }
+        
+        
+        angles = calculateAnglesBetweenPartners(
+            anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.K ? EnumIsKPoint.YES : EnumIsKPoint.NO,
+            anglePartners,
+            anglePosition
+        );
+        angleInformations = bundleAnglesAndCreateAngleInformations(angles);
+        
+        createNodesAndLinkAngleInformation((PlatonicPrimitiveInstanceNode)startNode, anglePointType, angleInformations);
+        
+        return new RunResult(false);
+    }
+    
+    private void createNodesAndLinkAngleInformation(PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType anglePointType, ArrayList<AngleInformation> angleInformations)
+    {
+        for( AngleInformation iterationAngle : angleInformations )
+        {
+            AttributeNode createdAttributeNode;
+            int linkI;
+            
+            createdAttributeNode = AttributeNode.createFloatNode(networkHandles.anglePointFeatureTypePrimitiveNode, iterationAngle.angle);
+            
+            for( linkI = 0; linkI < iterationAngle.count; linkI++ )
+            {
+                Link createdLink;
+                
+                createdLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAttributeNode);
+                
+                anglePointPrimitiveInstanceNode.outgoingLinks.add(createdLink);
+            }
+        }
+    }
+    
+    private RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType getAnglePointType(final PlatonicPrimitiveInstanceNode anglePointNode)
+    {
+        for( Link iterationLink : anglePointNode.getLinksByType(Link.EnumType.HASATTRIBUTE) )
+        {
+            AttributeNode targetAttributeNode;
+            
+            if( iterationLink.target.type != NodeTypes.EnumType.ATTRIBUTENODE.ordinal() )
+            {
+                continue;
+            }
+            
+            targetAttributeNode = (AttributeNode)iterationLink.target;
+            
+            if( !targetAttributeNode.attributeTypeNode.equals(networkHandles.anglePointFeatureTypePrimitiveNode) )
+            {
+                continue;
+            }
+            
+            return RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.fromInteger(targetAttributeNode.getValueAsInt());
+            
+        }
+        
+        throw new InternalError();
+    }
+    
+    private Vector2d<Float> getAnglePosition(PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode)
+    {
+        for( Link iterationLink : platonicPrimitiveInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) )
+        {
+            PlatonicPrimitiveInstanceNode targetNode;
+            
+            if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() )
+            {
+                continue;
+            }
+            
+            targetNode = (PlatonicPrimitiveInstanceNode)iterationLink.target;
+            
+            if( !targetNode.primitiveNode.equals(networkHandles.anglePointPositionPlatonicPrimitiveNode) )
+            {
+                continue;
+            }
+            
+            return HelperFunctions.getVectorFromVectorAttributeNode(networkHandles, targetNode);
+        }
+        
+        throw new InternalError();
+    }
+    
+    private ArrayList<PlatonicPrimitiveInstanceNode> getPartnersOfAnglepoint(final PlatonicPrimitiveInstanceNode anglePointNode)
+    {
+        ArrayList<PlatonicPrimitiveInstanceNode> resultList;
+        
+        resultList = new ArrayList<>();
+        
+        for( Link iterationLink : anglePointNode.getLinksByType(Link.EnumType.ISPARTOF) )
+        {
+            Assert.Assert(iterationLink.target.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "");
+            resultList.add((PlatonicPrimitiveInstanceNode)iterationLink.target);
+        }
+        
+        Assert.Assert(resultList.size() > 0, "");
+        return resultList;
+    }
+    
+    private float measureAngleBetweenPartnersAtPosition(PlatonicPrimitiveInstanceNode a, PlatonicPrimitiveInstanceNode b, Vector2d<Float> position)
+    {
+        Vector2d<Float> tangentA, tangentB;
+        
+        tangentA = getTangentOfPlatonicPrimitiveInstanceAtPosition(a, position);
+        tangentB = getTangentOfPlatonicPrimitiveInstanceAtPosition(b, position);
+        
+        return AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangentA, tangentB);
+    }
+    
+    
+    private Vector2d<Float> getTangentOfPlatonicPrimitiveInstanceAtPosition(PlatonicPrimitiveInstanceNode platonicPrimitive, Vector2d<Float> position)
+    {
+        if( platonicPrimitive.primitiveNode.equals(networkHandles.lineSegmentPlatonicPrimitiveNode) )
+        {
+            Vector2d<Float> diff;
+            
+            diff = sub(platonicPrimitive.p1, platonicPrimitive.p2);
+            return normalize(diff);
+        }
+        else
+        {
+            throw new InternalError("Unexpected type of primitive!");
+        }
+    }
+    
+    
+    private ArrayList<AngleInformation> bundleAnglesAndCreateAngleInformations(ArrayList<Float> angles)
+    {
+        // TODO
+        
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    private ArrayList<Float> calculateAnglesBetweenPartners(EnumIsKPoint isKpoint, ArrayList<PlatonicPrimitiveInstanceNode> anglePartners, Vector2d<Float> anglePosition)
+    {
+        ArrayList<Float> angleResult;
+        
+        angleResult = new ArrayList<>();
+        
+        int numberOfCombinations;
+        
+        numberOfCombinations = math.Math.faculty(anglePartners.size());
+            
+        if( isKpoint == EnumIsKPoint.YES && numberOfCombinations > KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE )
+        {
+            // TODO
+            
+            // NOTE PERFORMANCE< the Fisher yades algorithm is maybe too slow, future will tell >
+        }
+        else
+        {
+            int lower, higher;
+            
+            for( lower = 0; lower < anglePartners.size(); lower++ )
+            {
+                for( higher = lower+1; higher < anglePartners.size(); higher++ )
+                {
+                    angleResult.add(measureAngleBetweenPartnersAtPosition(anglePartners.get(0), anglePartners.get(1), anglePosition));
+                }
+            }
+        }
+        
+        return angleResult;
+    }
+    
+    
+    private enum EnumIsKPoint
+    {
+        NO,
+        YES
+    }
+    
+    private Random random = new Random();
+}
