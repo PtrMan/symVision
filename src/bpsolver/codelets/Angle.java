@@ -10,9 +10,11 @@ import bpsolver.NetworkHandles;
 import bpsolver.RetinaToWorkspaceTranslator;
 import bpsolver.SolverCodelet;
 import bpsolver.nodes.AttributeNode;
+import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import misc.AngleHelper;
 import misc.Assert;
@@ -28,6 +30,8 @@ public class Angle extends SolverCodelet
 {
     private static final int KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE = 10;
     private static final int KPOINTNUMBEROFCHOSENANGLES = 10; // must be smaller or equal to KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE
+
+    
 
     
     
@@ -107,29 +111,41 @@ public class Angle extends SolverCodelet
         );
         angleInformations = bundleAnglesAndCreateAngleInformations(angles);
         
-        createNodesAndLinkAngleInformation((PlatonicPrimitiveInstanceNode)startNode, anglePointType, angleInformations);
+        createNodesAndLinkAngleInformation((PlatonicPrimitiveInstanceNode)startNode, angleInformations);
+        createAndLinkAnglePointType((PlatonicPrimitiveInstanceNode)startNode, anglePointType);
         
         return new RunResult(false);
     }
     
-    private void createNodesAndLinkAngleInformation(PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType anglePointType, ArrayList<AngleInformation> angleInformations)
+    private void createNodesAndLinkAngleInformation(PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, ArrayList<AngleInformation> angleInformations)
     {
         for( AngleInformation iterationAngle : angleInformations )
         {
-            AttributeNode createdAttributeNode;
+            FeatureNode createdFeatureNode;
             int linkI;
             
-            createdAttributeNode = AttributeNode.createFloatNode(networkHandles.anglePointFeatureTypePrimitiveNode, iterationAngle.angle);
+            createdFeatureNode = FeatureNode.createFloatNode(networkHandles.anglePointAngleValuePrimitiveNode, iterationAngle.angle, 1);
             
             for( linkI = 0; linkI < iterationAngle.count; linkI++ )
             {
                 Link createdLink;
                 
-                createdLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAttributeNode);
+                createdLink = network.linkCreator.createLink(Link.EnumType.HASFEATURE, createdFeatureNode);
                 
                 anglePointPrimitiveInstanceNode.outgoingLinks.add(createdLink);
             }
         }
+    }
+    
+    private void createAndLinkAnglePointType(PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType anglePointType)
+    {
+        AttributeNode createAnglePointTypeNode;
+        Link createdLink;
+        
+        createAnglePointTypeNode = AttributeNode.createIntegerNode(networkHandles.anglePointFeatureTypePrimitiveNode, anglePointType.ordinal());
+        
+        createdLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createAnglePointTypeNode);
+        anglePointPrimitiveInstanceNode.outgoingLinks.add(createdLink);
     }
     
     private RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType getAnglePointType(final PlatonicPrimitiveInstanceNode anglePointNode)
@@ -226,9 +242,36 @@ public class Angle extends SolverCodelet
     
     private ArrayList<AngleInformation> bundleAnglesAndCreateAngleInformations(ArrayList<Float> angles)
     {
-        // TODO
+        ArrayList<AngleInformation> resultAngleInformation;
         
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        resultAngleInformation = new ArrayList<>();
+        
+        for( float angle : angles )
+        {
+            boolean similarAngleWasFound;
+            
+            similarAngleWasFound = false;
+            
+            for( AngleInformation iterationAngleInformation : resultAngleInformation )
+            {
+                if( Math.abs(angle - iterationAngleInformation.angle) < ANGLEMAXDIFFERENCE )
+                {
+                    iterationAngleInformation.count++;
+                    similarAngleWasFound = true;
+                    break;
+                }
+            }
+            
+            if( !similarAngleWasFound )
+            {
+                AngleInformation createdAngleInformation;
+                
+                createdAngleInformation = new AngleInformation(angle, 1);
+                resultAngleInformation.add(createdAngleInformation);
+            }
+        }
+        
+        return resultAngleInformation;
     }
 
     private ArrayList<Float> calculateAnglesBetweenPartners(EnumIsKPoint isKpoint, ArrayList<PlatonicPrimitiveInstanceNode> anglePartners, Vector2d<Float> anglePosition)
@@ -271,4 +314,6 @@ public class Angle extends SolverCodelet
     }
     
     private Random random = new Random();
+    
+    private static float ANGLEMAXDIFFERENCE = 5.0f;
 }
