@@ -16,10 +16,10 @@ import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import math.TruncatedFisherYades;
 import misc.AngleHelper;
 import misc.Assert;
 import static misc.Assert.Assert;
-
 
 /**
  *
@@ -31,10 +31,6 @@ public class Angle extends SolverCodelet
     private static final int KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE = 10;
     private static final int KPOINTNUMBEROFCHOSENANGLES = 10; // must be smaller or equal to KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE
 
-    
-
-    
-    
     private static class AngleInformation
     {
         public AngleInformation(float angle, int count)
@@ -61,7 +57,10 @@ public class Angle extends SolverCodelet
     @Override
     public SolverCodelet cloneObject()
     {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        Angle cloned;
+        
+        cloned = new Angle(network, networkHandles);
+        return cloned;
     }
 
     @Override
@@ -286,9 +285,24 @@ public class Angle extends SolverCodelet
             
         if( isKpoint == EnumIsKPoint.YES && numberOfCombinations > KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE )
         {
-            // TODO
+            int i;
             
             // NOTE PERFORMANCE< the Fisher yades algorithm is maybe too slow, future will tell >
+            // NOTE< selection ploic could be better, we measure only one angle per partner, could be many >
+            
+            TruncatedFisherYades truncatedFisherYades;
+            
+            truncatedFisherYades = new TruncatedFisherYades(anglePartners.size()*2, new GeneratorImplementation());
+            
+            for( i = 0; i < KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE; i++)
+            {
+                int partnerIndexA, partnerIndexB;
+                
+                partnerIndexA = (Integer)truncatedFisherYades.takeOne(random);
+                partnerIndexB = (Integer)truncatedFisherYades.takeOne(random);
+                
+                angleResult.add(measureAngleBetweenPartnersAtPosition(anglePartners.get(partnerIndexA), anglePartners.get(partnerIndexB), anglePosition));
+            }
         }
         else
         {
@@ -306,6 +320,15 @@ public class Angle extends SolverCodelet
         return angleResult;
     }
     
+    private static class GeneratorImplementation implements TruncatedFisherYades.IGenerator<Integer>
+    {
+        @Override
+        public Integer generate(int index)
+        {
+            return index;
+        }
+        
+    }
     
     private enum EnumIsKPoint
     {
