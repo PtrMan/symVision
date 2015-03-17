@@ -11,7 +11,9 @@ import bpsolver.CodeletLtmLookup;
 import bpsolver.NetworkHandles;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
+import misc.Assert;
 
 /**
  * Implements basic mechanisms for the translation
@@ -21,7 +23,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy
 {
     public abstract ArrayList<Node> createObjectsFromRetinaPrimitives(ArrayList<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize);
     
-    protected void storeRetinaObjectWithAssocIntoMap(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects)
+    protected void storeRetinaObjectWithAssocIntoMap(List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects)
     {
         for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObjectWithAssoc : arrayOfRetinaObjectWithAssociatedPoints )
         {
@@ -55,13 +57,26 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy
         
         // TODO< store this in a fast access datastructure for more efficient retrival and comparison >
         // for now we store only the point positions, which is super slow
-        public ArrayList<Vector2d<Float>> pointPositions;
+        public List<Vector2d<Float>> pointPositions;
         
         
         public Node workspaceNode = null; // null if it is not set
 
     }
     
+    protected RetinaObjectWithAssociatedPointsAndWorkspaceNode associatePointsToRetinaPrimitive(RetinaPrimitive primitive)
+    {
+        RetinaObjectWithAssociatedPointsAndWorkspaceNode resultAssosciation;
+        
+        Assert.Assert(primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "only implemented for linesegment");
+        
+        resultAssosciation = new RetinaObjectWithAssociatedPointsAndWorkspaceNode(primitive);
+        resultAssosciation.pointPositions = new ArrayList<>();
+        resultAssosciation.pointPositions.add(primitive.line.getAProjected());
+        resultAssosciation.pointPositions.add(primitive.line.getBProjected());
+        
+        return resultAssosciation;
+    }
     
     protected static class SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects
     {
@@ -89,7 +104,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy
             }
         }
         
-        public ArrayList<RetinaObjectWithAssocWithIntersectionType> adjacentRetinaObjects = new ArrayList<>();
+        public List<RetinaObjectWithAssocWithIntersectionType> adjacentRetinaObjects = new ArrayList<>();
         public Vector2d<Float> position;
         
         public enum EnumAnglePointType

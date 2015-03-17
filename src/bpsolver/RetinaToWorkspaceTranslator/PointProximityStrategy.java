@@ -59,19 +59,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
         return resultNodes;
     }
     
-    private RetinaObjectWithAssociatedPointsAndWorkspaceNode associatePointsToRetinaPrimitive(RetinaPrimitive primitive)
-    {
-        RetinaObjectWithAssociatedPointsAndWorkspaceNode resultAssosciation;
-        
-        Assert.Assert(primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "only implemented for linesegment");
-        
-        resultAssosciation = new RetinaObjectWithAssociatedPointsAndWorkspaceNode(primitive);
-        resultAssosciation.pointPositions = new ArrayList<>();
-        resultAssosciation.pointPositions.add(primitive.line.getAProjected());
-        resultAssosciation.pointPositions.add(primitive.line.getBProjected());
-        
-        return resultAssosciation;
-    }
+    
     
     private static ArrayList<Node> getNodesOfNodeAndGroupOfRetinaObject(ArrayList<ObjectNodeWithGroup> objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints)
     {
@@ -331,13 +319,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
         }
     }
     
-    private void storeRetinaObjectWithAssocIntoMap(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects)
-    {
-        for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObjectWithAssoc : arrayOfRetinaObjectWithAssociatedPoints )
-        {
-            spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.put(iterationRetinaObjectWithAssoc.primitive, iterationRetinaObjectWithAssoc);
-        }
-    }
+    
     
     /**
      * 
@@ -616,38 +598,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
     }
     
     
-    private static class RetinaObjectWithAssociatedPointsAndWorkspaceNode
-    {
-        public RetinaObjectWithAssociatedPointsAndWorkspaceNode(RetinaLevel.RetinaPrimitive primitive)
-        {
-            this.primitive = primitive;
-        }
-        
-        public RetinaLevel.RetinaPrimitive primitive;
-        
-        /*
-        private Vector2d<Float> getPositionOfEndpoint(int index)
-        {
-            Assert.Assert(index == 0 || index == 1, "index must be 0 or 1");
-            
-            if( type == EnumType.LINESEGMENT  )
-            {
-                return lineDetector.getPositionOfEndpoint(index);
-            }
-            
-            throw new InternalError("");
-        }
-        */
-
-        
-        // TODO< store this in a fast access datastructure for more efficient retrival and comparison >
-        // for now we store only the point positions, which is super slow
-        public ArrayList<Vector2d<Float>> pointPositions;
-        
-        
-        public Node workspaceNode = null; // null if it is not set
-
-    }
+    
     
     private static class ObjectNodeWithGroup
     {
@@ -704,79 +655,6 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
     }
     
     
-    private static class SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects
-    {
-        public SpatialAcceleration<Crosspoint> spatialForCrosspoints;
-        
-        public Map<RetinaPrimitive, RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitveToRetinaObjectWithAssocMap = new IdentityHashMap<>(); 
-    }
-    
-    /**
-     * 
-     * temporary object to figure out where the intersections are and what type they have
-     * 
-     */
-    public static class Crosspoint
-    {
-        public static class RetinaObjectWithAssocWithIntersectionType
-        {
-            public RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssociatedPointsAndWorkspaceNode;
-            public Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType;
-            
-            public RetinaObjectWithAssocWithIntersectionType(RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssociatedPointsAndWorkspaceNode, Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType)
-            {
-                this.retinaObjectWithAssociatedPointsAndWorkspaceNode = retinaObjectWithAssociatedPointsAndWorkspaceNode;
-                this.intersectionPartnerType = intersectionPartnerType;
-            }
-        }
-        
-        public ArrayList<RetinaObjectWithAssocWithIntersectionType> adjacentRetinaObjects = new ArrayList<>();
-        public Vector2d<Float> position;
-        
-        public enum EnumAnglePointType
-        {
-            UNDEFINED,
-            K,
-            V,
-            X,
-            T;
-            // TODO
-
-            public static EnumAnglePointType fromInteger(int valueAsInt)
-            {
-                switch( valueAsInt )
-                {
-                    case 0:
-                    return EnumAnglePointType.UNDEFINED;
-                    case 1:
-                    return EnumAnglePointType.K;
-                    case 2:
-                    return EnumAnglePointType.V;
-                    case 3:
-                    return EnumAnglePointType.X;
-                    case 4:
-                    return EnumAnglePointType.T;
-                }
-                
-                throw new InternalError("");
-            }
-        }
-        
-        public EnumAnglePointType type = EnumAnglePointType.UNDEFINED;
-        
-        public boolean doesAdjacentRetinaObjectsContain(RetinaObjectWithAssociatedPointsAndWorkspaceNode other)
-        {
-            for( RetinaObjectWithAssocWithIntersectionType adjacentRetinaObject : adjacentRetinaObjects )
-            {
-                if( adjacentRetinaObject.retinaObjectWithAssociatedPointsAndWorkspaceNode.equals(other) )
-                {
-                    return true;
-                }
-            }
-            
-            return false;
-        }
-    }
     
     private static class IndexTuple
     {
