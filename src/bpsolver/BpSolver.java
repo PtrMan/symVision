@@ -56,7 +56,7 @@ public class BpSolver {
         
         networkHandles.anglePointFeatureTypePrimitiveNode = new PlatonicPrimitiveNode("AnglePointFeatureType", null);
         networkHandles.anglePointPositionPlatonicPrimitiveNode = new PlatonicPrimitiveNode("AnglePointPosition", null);
-        networkHandles.anglePointAngleValuePrimitiveNode = new PlatonicPrimitiveNode("AnglePointAngleValue", null);
+        networkHandles.anglePointAngleValuePrimitiveNode = new PlatonicPrimitiveNode("AnglePointAngleValue", "Angle");
         
         networkHandles.lineStructureAbstractPrimitiveNode.isAbstract = true;
         link = network.linkCreator.createLink(FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.endpointPlatonicPrimitiveNode);
@@ -167,6 +167,13 @@ public class BpSolver {
         createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.2f));
         
         codeletLtmLookup.registry.put("EndPoint", createdRegistryEntry);
+        
+        
+        createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
+        createdCodelet = new bpsolver.codelets.Angle(network, networkHandles);
+        createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.2f));
+        
+        codeletLtmLookup.registry.put("Angle", createdRegistryEntry);
         
     }
     

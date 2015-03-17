@@ -99,7 +99,12 @@ public class Angle extends SolverCodelet
         }
         else
         {
-            throw new InternalError();
+            // relates to BUG 0001
+            // we just return when this case triggers
+            return new RunResult(false);
+            
+            // uncomment when the bug is fixed
+            //throw new InternalError();
         }
         
         

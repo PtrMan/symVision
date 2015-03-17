@@ -23,6 +23,18 @@ import java.util.Set;
 import misc.AngleHelper;
 import misc.Assert;
 
+// BUGS
+// BUG 0001
+//     because of the invalid handling of some things in the edge handling code/object custering code
+//     leads to invalid edges/Angles
+
+/**
+ * 
+ * 
+ * 
+ * @author r0b3
+ */
+
 public class RetinaToWorkspaceTranslator
 {
     private static class RetinaObjectWithAssociatedPointsAndWorkspaceNode
@@ -235,7 +247,8 @@ public class RetinaToWorkspaceTranslator
             PlatonicPrimitiveInstanceNode createdAnglePointPosition;
             
             createdAnglePointNode = new PlatonicPrimitiveInstanceNode(networkHandles.anglePointNodePlatonicPrimitiveNode);
-            // TODO< add codelets >
+            // add codelets
+            codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdAnglePointNode, coderack, network, networkHandles);
             
             // linkage
             for(  Crosspoint.RetinaObjectWithAssocWithIntersectionType iterationRetinaObjectWithAssoc : crosspoint.adjacentRetinaObjects )
@@ -290,9 +303,17 @@ public class RetinaToWorkspaceTranslator
             }
                  
             // HACK TODO< after bugremoval uncomment this assert
-            ///Assert.Assert(crosspoint.adjacentRetinaObjects.size() >= 2, "");
+            // relates propably to BUG 0001
+            //Assert.Assert(crosspoint.adjacentRetinaObjects.size() >= 2, "");
             
-            if( crosspoint.adjacentRetinaObjects.size() == 2 )
+            if( crosspoint.adjacentRetinaObjects.size() < 2 )
+            {
+                // we land here when a angle is invalid
+                // relates propably to BUG 0001
+                
+                // we just do nothing
+            }
+            else if( crosspoint.adjacentRetinaObjects.size() == 2 )
             {
                 // its either T, V, or X with two partners
                 
@@ -401,6 +422,14 @@ public class RetinaToWorkspaceTranslator
                     crosspoint.type = Crosspoint.EnumAnglePointType.K;
                 }
             }
+            else
+            {
+                Assert.Assert(crosspoint.adjacentRetinaObjects.size() > 4, "");
+                
+                // can only be a K
+                
+                crosspoint.type = Crosspoint.EnumAnglePointType.K;
+            }
         }
     }
     
@@ -460,6 +489,7 @@ public class RetinaToWorkspaceTranslator
                     // we can have intersectionpartners which are not inside
                     // seems to be a bug in clustering or something fishy is going on
                     // TODO< investigate and add here a assert that the assoc can't be null >
+                    // relates propably to BUG 0001
                     if( retinaObjectWithAssoc != null )
                     {
                         createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[0].intersectionEndpointType));
@@ -471,6 +501,7 @@ public class RetinaToWorkspaceTranslator
                     
                     retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[1].primitive);
                     // TODO SAME
+                    // relates propably to BUG 0001
                     if( retinaObjectWithAssoc != null )
                     {
                         createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[1].intersectionEndpointType));
@@ -487,6 +518,7 @@ public class RetinaToWorkspaceTranslator
                     
                     retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[0].primitive);
                     // TODO SAME
+                    // relates propably to BUG 0001
                     if( retinaObjectWithAssoc != null )
                     {
                         if( !nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc) )
@@ -497,6 +529,7 @@ public class RetinaToWorkspaceTranslator
                     
                     retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[1].primitive);
                     // TODO SAME
+                    // relates propably to BUG 0001
                     if( retinaObjectWithAssoc != null )
                     {
                         if( !nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc) )
