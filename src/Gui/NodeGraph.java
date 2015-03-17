@@ -8,6 +8,7 @@ import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.NumeriosityNode;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
+import bpsolver.nodes.PlatonicPrimitiveNode;
 import com.mxgraph.layout.mxFastOrganicLayout;
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.swing.mxGraphComponent;
@@ -213,26 +214,24 @@ public class NodeGraph
         if( node.type == NodeTypes.EnumType.FEATURENODE.ordinal() )
         {
             FeatureNode featureNode;
+            PlatonicPrimitiveNode featureTypeNodeAsPlatonicPrimitiveNode;
             
             featureNode = (FeatureNode)node;
             
             String featureName;
             
-            if( featureNode.featureTypeNode.equals(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode) )
+            // we try to cast it, if we suceed it is a type which wasn't learned by the system
+            // so we can add the text of the type
+            featureTypeNodeAsPlatonicPrimitiveNode = (PlatonicPrimitiveNode)featureNode.featureTypeNode;
+            
+            if( featureTypeNodeAsPlatonicPrimitiveNode != null )
             {
-                featureName = "lineSegmentFeatureLineLength";
-            }
-            else if( featureNode.featureTypeNode.equals(networkHandles.xCoordinatePlatonicPrimitiveNode) )
-            {
-                featureName = "xCoordinate";
-            }
-            else if( featureNode.featureTypeNode.equals(networkHandles.yCoordinatePlatonicPrimitiveNode) )
-            {
-                featureName = "yCoordinate";
+                featureName = featureTypeNodeAsPlatonicPrimitiveNode.platonicType;
             }
             else
             {
-                featureName = "?";
+                // type was learned by the system
+                featureName = "?(learned)";
             }
             
             return graph.insertVertex(graphParent, null, "FeatureNode" + "<br>" + featureName, 20, 20, 80, 30);
@@ -267,16 +266,22 @@ public class NodeGraph
         {
             AttributeNode attributeNode;
             String attributeName;
+            PlatonicPrimitiveNode attributeTypeNodeAsPlatinicPrimitiveNode;
             
             attributeNode = (AttributeNode)node;
             
-            if( attributeNode.attributeTypeNode.equals(networkHandles.anglePointFeatureTypePrimitiveNode) )
+            // we try to cast it, if we suceed it is a type which wasn't learned by the system
+            // so we can add the text of the type
+            attributeTypeNodeAsPlatinicPrimitiveNode = (PlatonicPrimitiveNode)attributeNode.attributeTypeNode;
+            
+            if( attributeTypeNodeAsPlatinicPrimitiveNode != null )
             {
-                attributeName = "AnglePoint";
+                attributeName = attributeTypeNodeAsPlatinicPrimitiveNode.platonicType;
             }
             else
             {
-                attributeName = "?";
+                // type was learned by the system
+                attributeName = "?(learned)";
             }
             
             return graph.insertVertex(graphParent, null, "AttributeNode" + "<br>" + attributeName, 20, 20, 80, 30);
