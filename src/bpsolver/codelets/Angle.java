@@ -293,18 +293,23 @@ public class Angle extends SolverCodelet
             int i;
             
             // NOTE PERFORMANCE< the Fisher yades algorithm is maybe too slow, future will tell >
-            // NOTE< selection ploic could be better, we measure only one angle per partner, could be many >
+            // NOTE< selection policy could be better, we measure only one angle per partner, could be many >
             
             TruncatedFisherYades truncatedFisherYades;
             
-            truncatedFisherYades = new TruncatedFisherYades(anglePartners.size()*2, new GeneratorImplementation());
+            truncatedFisherYades = new TruncatedFisherYades((anglePartners.size()*anglePartners.size() - anglePartners.size()) / 2, new GeneratorImplementation());
             
             for( i = 0; i < KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE; i++)
             {
+                Tuple<Integer> indices;
                 int partnerIndexA, partnerIndexB;
                 
-                partnerIndexA = (Integer)truncatedFisherYades.takeOne(random);
-                partnerIndexB = (Integer)truncatedFisherYades.takeOne(random);
+                indices = (Tuple<Integer>)truncatedFisherYades.takeOne(random);
+                partnerIndexA = indices.left;
+                partnerIndexB = indices.right;
+                
+                Assert.Assert(partnerIndexA >= 0 && partnerIndexA < anglePartners.size(), "Invalid index");
+                Assert.Assert(partnerIndexB >= 0 && partnerIndexB < anglePartners.size(), "Invalid index");
                 
                 angleResult.add(measureAngleBetweenPartnersAtPosition(anglePartners.get(partnerIndexA), anglePartners.get(partnerIndexB), anglePosition));
             }
@@ -325,14 +330,74 @@ public class Angle extends SolverCodelet
         return angleResult;
     }
     
-    private static class GeneratorImplementation implements TruncatedFisherYades.IGenerator<Integer>
+    private static class GeneratorImplementation implements TruncatedFisherYades.IGenerator<Tuple<Integer>>
     {
-        @Override
-        public Integer generate(int index)
+        public GeneratorImplementation()
         {
-            return index;
         }
         
+        @Override
+        public Tuple<Integer> generate(int index)
+        {
+            Tuple<Integer> triangleIndices;
+            
+            triangleIndices = getIndicesOfTriangle(index);
+            
+            // y+1 because we take the lower triangle in the matrix of the index combinations
+            return new Tuple<>(triangleIndices.left, triangleIndices.right+1);
+        }
+        
+        // calculate the index inside a triangle strip
+        // examples
+        
+        // 0
+        // result 0
+        
+        // 0
+        // xx
+        // result 0xx
+        
+        // 0
+        // xx
+        // 000
+        // result 0xx000
+        
+        // ...
+        private Tuple<Integer> getIndicesOfTriangle(int index)
+        {
+            int width;
+            int remainingIndex;
+            int yIndex;
+            
+            yIndex = 0;
+            width = 1;
+            remainingIndex = index;
+            
+            for(;;)
+            {
+                if( remainingIndex < width )
+                {
+                    return new Tuple<>(remainingIndex, yIndex);
+                }
+                
+                remainingIndex -= width;
+                yIndex++;
+                width++;
+            }
+        }
+        
+    }
+
+    private static class Tuple<T>
+    {
+        public T left;
+        public T right;
+        
+        public Tuple(T left, T right)
+        {
+            this.left = left;
+            this.right = right;
+        }
     }
     
     private enum EnumIsKPoint
