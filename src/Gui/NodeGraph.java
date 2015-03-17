@@ -3,6 +3,7 @@ package Gui;
 import FargGeneral.network.Link;
 import FargGeneral.network.Node;
 import bpsolver.NetworkHandles;
+import bpsolver.nodes.AttributeNode;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.NumeriosityNode;
@@ -261,6 +262,24 @@ public class NodeGraph
         else if( node.type == NodeTypes.EnumType.PLATONICPRIMITIVENODE.ordinal() )
         {
             return graph.insertVertex(graphParent, null, "PlatonicPrimitiveNode", 20, 20, 80, 30);
+        }
+        else if( node.type == NodeTypes.EnumType.ATTRIBUTENODE.ordinal() )
+        {
+            AttributeNode attributeNode;
+            String attributeName;
+            
+            attributeNode = (AttributeNode)node;
+            
+            if( attributeNode.attributeTypeNode.equals(networkHandles.anglePointFeatureTypePrimitiveNode) )
+            {
+                attributeName = "AnglePoint";
+            }
+            else
+            {
+                attributeName = "?";
+            }
+            
+            return graph.insertVertex(graphParent, null, "AttributeNode" + "<br>" + attributeName, 20, 20, 80, 30);
         }
         else
         {
