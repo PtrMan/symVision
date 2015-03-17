@@ -1,8 +1,7 @@
-package bpsolver;
+package bpsolver.RetinaToWorkspaceTranslator;
 
 import Datastructures.SpatialAcceleration;
 import Datastructures.Vector2d;
-import static Datastructures.Vector2d.FloatHelper.dot;
 import static Datastructures.Vector2d.FloatHelper.getLength;
 import static Datastructures.Vector2d.FloatHelper.sub;
 import FargGeneral.Coderack;
@@ -11,9 +10,10 @@ import FargGeneral.network.Network;
 import FargGeneral.network.Node;
 import RetinaLevel.Intersection;
 import RetinaLevel.RetinaPrimitive;
-import RetinaLevel.SingleLineDetector;
+import bpsolver.CodeletLtmLookup;
+import bpsolver.HelperFunctions;
+import bpsolver.NetworkHandles;
 import bpsolver.nodes.AttributeNode;
-import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,13 +29,10 @@ import misc.Assert;
 //     leads to invalid edges/Angles
 
 /**
- * 
- * 
- * 
+ * Strategy for the Retina to Workspace translation which works based on point proximity
  * 
  */
-
-public class RetinaToWorkspaceTranslator
+public class PointProximityStrategy implements ITranslatorStrategy
 {
     /**
      * 
@@ -690,7 +687,7 @@ public class RetinaToWorkspaceTranslator
             {
                 for( RetinaObjectWithAssociatedPointsAndWorkspaceNode innerRetinaObjectWithAssosciatedPoints : b.arrayOfRetinaObjectWithAssociatedPoints )
                 {
-                    if( RetinaToWorkspaceTranslator.doRetinaObjectsShareCommonPoints(outerRetinaObjectWithAssosciatedPoints, innerRetinaObjectWithAssosciatedPoints) )
+                    if( PointProximityStrategy.doRetinaObjectsShareCommonPoints(outerRetinaObjectWithAssosciatedPoints, innerRetinaObjectWithAssosciatedPoints) )
                     {
                         return true;
                     }

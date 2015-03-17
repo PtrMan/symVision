@@ -1,5 +1,6 @@
 package bpsolver;
 
+import bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
 import Datastructures.Map2d;
 import Datastructures.Vector2d;
 import FargGeneral.network.Link;
@@ -130,7 +131,7 @@ public class BpSolverTest
                         anglePointTypeAttributeNode = targetAttributeNode;
                         
                         anglePointType = anglePointTypeAttributeNode.getValueAsInt();
-                        if( anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.V.ordinal() )
+                        if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.V.ordinal() )
                         {
                             return true;
                         }
@@ -218,9 +219,9 @@ public class BpSolverTest
         
         
         
-        RetinaToWorkspaceTranslator retinaToWorkspaceTranslator;
+        PointProximityStrategy retinaToWorkspaceTranslator;
         
-        retinaToWorkspaceTranslator = new RetinaToWorkspaceTranslator();
+        retinaToWorkspaceTranslator = new PointProximityStrategy();
         
         ArrayList<Node> objectNodes = retinaToWorkspaceTranslator.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver.getImageSizeAsFloat());
         

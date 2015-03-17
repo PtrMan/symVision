@@ -7,7 +7,7 @@ import FargGeneral.network.Link;
 import FargGeneral.network.Network;
 import bpsolver.HelperFunctions;
 import bpsolver.NetworkHandles;
-import bpsolver.RetinaToWorkspaceTranslator;
+import bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
 import bpsolver.SolverCodelet;
 import bpsolver.nodes.AttributeNode;
 import bpsolver.nodes.FeatureNode;
@@ -66,7 +66,7 @@ public class Angle extends SolverCodelet
     @Override
     public RunResult run()
     {
-        RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType anglePointType;
+        PointProximityStrategy.Crosspoint.EnumAnglePointType anglePointType;
         ArrayList<PlatonicPrimitiveInstanceNode> anglePartners;
         Vector2d<Float> anglePosition;
         ArrayList<AngleInformation> angleInformations;
@@ -81,19 +81,19 @@ public class Angle extends SolverCodelet
         anglePosition = getAnglePosition((PlatonicPrimitiveInstanceNode)startNode);
         
         // checks
-        if( anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.K )
+        if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.K )
         {
             Assert.Assert(anglePartners.size() >= 3, "");
         }
-        else if( anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.V )
+        else if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.V )
         {
             Assert.Assert(anglePartners.size() == 2, "");
         }
-        else if( anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.X )
+        else if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.X )
         {
             Assert.Assert(anglePartners.size() >= 2 && anglePartners.size() <= 4, "");
         }
-        else if( anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.T )
+        else if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.T )
         {
             Assert.Assert(anglePartners.size() == 2 || anglePartners.size() == 3, "");
         }
@@ -108,8 +108,7 @@ public class Angle extends SolverCodelet
         }
         
         
-        angles = calculateAnglesBetweenPartners(
-            anglePointType == RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.K ? EnumIsKPoint.YES : EnumIsKPoint.NO,
+        angles = calculateAnglesBetweenPartners(anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.K ? EnumIsKPoint.YES : EnumIsKPoint.NO,
             anglePartners,
             anglePosition
         );
@@ -141,7 +140,7 @@ public class Angle extends SolverCodelet
         }
     }
     
-    private void createAndLinkAnglePointType(PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType anglePointType)
+    private void createAndLinkAnglePointType(PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, PointProximityStrategy.Crosspoint.EnumAnglePointType anglePointType)
     {
         AttributeNode createAnglePointTypeNode;
         Link createdLink;
@@ -152,7 +151,7 @@ public class Angle extends SolverCodelet
         anglePointPrimitiveInstanceNode.outgoingLinks.add(createdLink);
     }
     
-    private RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType getAnglePointType(final PlatonicPrimitiveInstanceNode anglePointNode)
+    private PointProximityStrategy.Crosspoint.EnumAnglePointType getAnglePointType(final PlatonicPrimitiveInstanceNode anglePointNode)
     {
         for( Link iterationLink : anglePointNode.getLinksByType(Link.EnumType.HASATTRIBUTE) )
         {
@@ -170,7 +169,7 @@ public class Angle extends SolverCodelet
                 continue;
             }
             
-            return RetinaToWorkspaceTranslator.Crosspoint.EnumAnglePointType.fromInteger(targetAttributeNode.getValueAsInt());
+            return PointProximityStrategy.Crosspoint.EnumAnglePointType.fromInteger(targetAttributeNode.getValueAsInt());
             
         }
         

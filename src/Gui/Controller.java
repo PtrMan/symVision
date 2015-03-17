@@ -23,7 +23,7 @@ import bpsolver.BpSolver;
 import bpsolver.CodeletLtmLookup;
 import bpsolver.NetworkHandles;
 import bpsolver.Parameters;
-import bpsolver.RetinaToWorkspaceTranslator;
+import bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
@@ -112,9 +112,9 @@ public class Controller
             
             
             
-            RetinaToWorkspaceTranslator retinaToWorkspaceTranslator;
+            PointProximityStrategy retinaToWorkspaceTranslator;
             
-            retinaToWorkspaceTranslator = new RetinaToWorkspaceTranslator();
+            retinaToWorkspaceTranslator = new PointProximityStrategy();
             
             ArrayList<Node> objectNodes = retinaToWorkspaceTranslator.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver.getImageSizeAsFloat());
             
