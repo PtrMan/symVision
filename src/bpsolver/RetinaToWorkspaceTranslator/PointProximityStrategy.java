@@ -32,7 +32,7 @@ import misc.Assert;
  * Strategy for the Retina to Workspace translation which works based on point proximity
  * 
  */
-public class PointProximityStrategy implements ITranslatorStrategy
+public class PointProximityStrategy extends AbstractTranslatorStrategy
 {
     /**
      * 
