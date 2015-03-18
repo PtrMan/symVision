@@ -23,6 +23,19 @@ public class Intersection
         public EnumIntersectionEndpointType intersectionEndpointType; 
     }
     
+    public IntersectionPartner getOtherPartner(RetinaPrimitive primary)
+    {
+        if( primary.equals(partners[0]) )
+        {
+            return partners[1];
+        }
+        else
+        {
+            return partners[0];
+        }
+    }
+    
+    
     public IntersectionPartner[] partners = new IntersectionPartner[2];
     
     public Vector2d<Integer> intersectionPosition;

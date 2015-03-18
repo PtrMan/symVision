@@ -5,6 +5,7 @@ import Datastructures.Vector2d;
 import FargGeneral.Coderack;
 import FargGeneral.network.Network;
 import FargGeneral.network.Node;
+import RetinaLevel.Intersection;
 import RetinaLevel.RetinaPrimitive;
 import bpsolver.CodeletLtmLookup;
 import bpsolver.NetworkHandles;
@@ -21,6 +22,8 @@ import java.util.Random;
  */
 public class NearIntersectionStrategy extends AbstractTranslatorStrategy
 {
+
+    
     @Override
     public ArrayList<Node> createObjectsFromRetinaPrimitives(ArrayList<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize)
     {
@@ -52,6 +55,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
         // then pick one at random and put connected (assert unmarked) retinaObjects into the same object and put them out of the map
         // repeat this until no remaining retina object is in the map
         
+        int x = 0; // TODO
         
         
         // TODO< return the objects >
@@ -93,7 +97,6 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
             RetinaPrimitive chosenStartRetinaPrimitive;
             
             chosenStartRetinaPrimitive = pickRandomRetinaPrimitiveFromMap(map, random);
-            map.remove(chosenStartRetinaPrimitive);
             openList.add(chosenStartRetinaPrimitive);
         }
         
@@ -110,11 +113,14 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
             retinaPrimitiveFromOpenList = openList.get(openList.size()-1);
             openList.remove(openList.size()-1);
             
+            // we do this because we are "done" with it
+            map.remove(retinaPrimitiveFromOpenList);
+            // mark it for the same reason
+            retinaPrimitiveFromOpenList.marked = true;
+            
             resultPrimitives.add(retinaPrimitiveFromOpenList);
             
             notYetMarkedConnectedRetinaPrimitives = getNotYetMarkedConnectedRetinaPrimitives(retinaPrimitiveFromOpenList);
-            
-            // TODO< mark them >
             
             openList.addAll(notYetMarkedConnectedRetinaPrimitives);
         }
@@ -135,8 +141,37 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
 
     private static List<RetinaPrimitive> getNotYetMarkedConnectedRetinaPrimitives(RetinaPrimitive retinaPrimitiveFromOpenList)
     {
-        // TODO< get all connected objects and check if they are not marked, if so, add them to the resultlist >
+        List<Intersection> allIntersections;
+        List<RetinaPrimitive> unfilteredIntersectionPartners;
+        List<RetinaPrimitive> filteredIntersectionPartners;
         
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        unfilteredIntersectionPartners = new ArrayList<>();
+        
+        allIntersections = retinaPrimitiveFromOpenList.getIntersections();
+        
+        for( Intersection iterationIntersection : allIntersections )
+        {
+            unfilteredIntersectionPartners.add(iterationIntersection.getOtherPartner(retinaPrimitiveFromOpenList).primitive);
+        }
+        
+        filteredIntersectionPartners = filterRetinaPrimitivesForUnmarkedOnes(unfilteredIntersectionPartners);
+        return filteredIntersectionPartners;
+    }
+    
+    private static List<RetinaPrimitive> filterRetinaPrimitivesForUnmarkedOnes(List<RetinaPrimitive> unfilteredIntersectionPartners)
+    {
+        List<RetinaPrimitive> result;
+        
+        result = new ArrayList<>();
+        
+        for( RetinaPrimitive iterationRetinaPrimitive : unfilteredIntersectionPartners )
+        {
+            if( !iterationRetinaPrimitive.marked )
+            {
+                result.add(iterationRetinaPrimitive);
+            }
+        }
+        
+        return result;
     }
 }
