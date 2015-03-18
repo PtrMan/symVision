@@ -18,6 +18,7 @@ import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import misc.AngleHelper;
@@ -330,7 +331,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
     {
         for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject : arrayOfRetinaObjectWithAssociatedPoints )
         {
-            ArrayList<Intersection> intersections;
+            List<Intersection> intersections;
             
             intersections = iterationRetinaObject.primitive.getIntersections();
             

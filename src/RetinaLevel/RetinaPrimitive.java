@@ -2,6 +2,7 @@ package RetinaLevel;
 
 import Datastructures.Vector2d;
 import java.util.ArrayList;
+import java.util.List;
 import misc.Assert;
 
 /**
@@ -76,7 +77,7 @@ public class RetinaPrimitive
         return resultPrimitive;
     }
     
-    public ArrayList<Intersection> getIntersections()
+    public List<Intersection> getIntersections()
     {
         if( type == EnumType.LINESEGMENT )
         {
