@@ -460,7 +460,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
         PlatonicPrimitiveInstanceNode createdPlatonicInstanceNodeForRetinaObject;
         Link createdForwardLink, createdBackwardLink;
         
-        createdPlatonicInstanceNodeForRetinaObject = createPlatonicInstanceNodeForRetinaObject(iterationRetinaObject, networkHandles);
+        createdPlatonicInstanceNodeForRetinaObject = createPlatonicInstanceNodeForRetinaObject(iterationRetinaObject.primitive, networkHandles);
         iterationRetinaObject.workspaceNode = createdPlatonicInstanceNodeForRetinaObject;
         
         // linkage
@@ -473,22 +473,6 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
         // add all codelet's of it
         codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdPlatonicInstanceNodeForRetinaObject, coderack, network, networkHandles);
 
-    }
-    
-    private static PlatonicPrimitiveInstanceNode createPlatonicInstanceNodeForRetinaObject(RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObject, NetworkHandles networkHandles)
-    {
-        if( retinaObject.primitive.type == RetinaLevel.RetinaPrimitive.EnumType.LINESEGMENT )
-        {
-            PlatonicPrimitiveInstanceNode createdLineNode;
-            
-            createdLineNode = new PlatonicPrimitiveInstanceNode(networkHandles.lineSegmentPlatonicPrimitiveNode);
-            createdLineNode.p1 = retinaObject.primitive.line.getAProjected();
-            createdLineNode.p2 = retinaObject.primitive.line.getBProjected();
-            
-            return createdLineNode;
-        }
-
-        throw new InternalError();
     }
     
     private ArrayList<GroupOfRetinaObjectWithAssociatedPoints> createAndPropagateRetinaLevelObjects(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints)

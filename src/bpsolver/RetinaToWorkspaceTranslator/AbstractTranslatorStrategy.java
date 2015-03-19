@@ -9,6 +9,7 @@ import RetinaLevel.Intersection;
 import RetinaLevel.RetinaPrimitive;
 import bpsolver.CodeletLtmLookup;
 import bpsolver.NetworkHandles;
+import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
@@ -83,6 +84,22 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy
         public SpatialAcceleration<Crosspoint> spatialForCrosspoints;
         
         public Map<RetinaPrimitive, RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitveToRetinaObjectWithAssocMap = new IdentityHashMap<>(); 
+    }
+    
+    protected static PlatonicPrimitiveInstanceNode createPlatonicInstanceNodeForRetinaObject(RetinaPrimitive primitive, NetworkHandles networkHandles)
+    {
+        if( primitive.type == RetinaLevel.RetinaPrimitive.EnumType.LINESEGMENT )
+        {
+            PlatonicPrimitiveInstanceNode createdLineNode;
+            
+            createdLineNode = new PlatonicPrimitiveInstanceNode(networkHandles.lineSegmentPlatonicPrimitiveNode);
+            createdLineNode.p1 = primitive.line.getAProjected();
+            createdLineNode.p2 = primitive.line.getBProjected();
+            
+            return createdLineNode;
+        }
+
+        throw new InternalError();
     }
     
     /**
