@@ -8,12 +8,14 @@
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/NetworkHandles.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/ltm/Link.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/nodes/PlatonicPrimitiveNode.java</file>
+            <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/RetinaToWorkspaceTranslator/AbstractTranslatorStrategy.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/math/RandomUtil.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/nodes/FeatureNode.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/FargGeneral/network/Network.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/codelets/SearchAndFuseRoughtlyEqualElements.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/Gui/GraphWindow.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/SolverCodelet.java</file>
+            <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/RetinaToWorkspaceTranslator/PointProximityStrategy.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/nodes/AttributeNode.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/RetinaLevel/SingleLineDetector.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/pattern/IMatchingUpdate.java</file>
@@ -36,6 +38,7 @@
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/codelets/LineSegmentSlope.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/Datastructures/Map2d.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/RetinaLevel/ProcessH.java</file>
+            <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/RetinaToWorkspaceTranslator/NearIntersectionStrategy.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/math/TruncatedFisherYades.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/pattern/Pattern.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/RetinaLevel/ProcessM.java</file>
@@ -45,13 +48,11 @@
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/Gui/NodeGraph.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/HardParameters.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/pattern/Grouping.java</file>
-            <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/Datastructures/SpatialAcceleration.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/Gui/Interactive.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/math/Math.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/codelets/EndPoint.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/test/bpsolver/BpSolverTest.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/Datastructures/Vector2d.java</file>
-            <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/RetinaToWorkspaceTranslator.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/CodeletLtmLookup.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/HelperFunctions.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/FargGeneral/Codelet.java</file>
@@ -59,6 +60,7 @@
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/Datastructures/Tuple4.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/FargGeneral/PriorityQueue.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/nodes/PlatonicPrimitiveInstanceNode.java</file>
+            <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/bpsolver/RetinaToWorkspaceTranslator/ITranslatorStrategy.java</file>
             <file>file:/C:/Users/r0b3/Documents/GitHub/symVision/src/Gui/Controller.java</file>
         </group>
     </open-files>

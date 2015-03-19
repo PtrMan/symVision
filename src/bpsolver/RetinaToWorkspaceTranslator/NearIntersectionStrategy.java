@@ -3,12 +3,14 @@ package bpsolver.RetinaToWorkspaceTranslator;
 import Datastructures.SpatialAcceleration;
 import Datastructures.Vector2d;
 import FargGeneral.Coderack;
+import FargGeneral.network.Link;
 import FargGeneral.network.Network;
 import FargGeneral.network.Node;
 import RetinaLevel.Intersection;
 import RetinaLevel.RetinaPrimitive;
 import bpsolver.CodeletLtmLookup;
 import bpsolver.NetworkHandles;
+import static bpsolver.RetinaToWorkspaceTranslator.AbstractTranslatorStrategy.createPlatonicInstanceNodeForRetinaObject;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,7 +27,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
 
     
     @Override
-    public ArrayList<Node> createObjectsFromRetinaPrimitives(ArrayList<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize)
+    public List<Node> createObjectsFromRetinaPrimitives(ArrayList<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize)
     {
         SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects;
         List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints;
@@ -45,7 +47,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
         // NOTE< does hashmap work? >
         remainingRetinaObjects = new HashMap<>();
         
-        // TODO< reset markings >
+        resetAllMarkings(primitives);
         
         // algorithm
         
@@ -55,12 +57,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
         // then pick one at random and put connected (assert unmarked) retinaObjects into the same object and put them out of the map
         // repeat this until no remaining retina object is in the map
         
-        int x = 0; // TODO
-        
-        
-        // TODO< return the objects >
-        
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(remainingRetinaObjects, random, network, networkHandles, coderack, codeletLtmLookup);
     }
     
     private List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> convertPrimitivesToRetinaObjectsWithAssoc(List<RetinaPrimitive> primitives)
@@ -174,4 +171,63 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
         
         return result;
     }
+    
+
+    private List<Node> pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(Map<RetinaPrimitive, Boolean> map, Random random, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup)
+    {
+        List<Node> resultObjectNodes;
+        
+        resultObjectNodes = new ArrayList<>();
+        
+        for(;;)
+        {
+            List<RetinaPrimitive> retinaPrimitivesOfObject;
+            
+            if( map.size() == 0 )
+            {
+                return resultObjectNodes;
+            }
+            
+            retinaPrimitivesOfObject = pickRetinaPrimitiveAtRandomAndMarkAndRemoveConnectedPrimitivesAndRetunListOfPrimitives(map, random);
+            
+            PlatonicPrimitiveInstanceNode objectNode;
+            
+            objectNode = new PlatonicPrimitiveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
+            
+            // create for the retinaPrimitives network nodes and link them
+            {
+                for( RetinaPrimitive iterationPrimitive : retinaPrimitivesOfObject )
+                {
+                    PlatonicPrimitiveInstanceNode createdPlatonicInstanceNodeForRetinaObject;
+                    Link createdForwardLink, createdBackwardLink;
+
+                    createdPlatonicInstanceNodeForRetinaObject = createPlatonicInstanceNodeForRetinaObject(iterationPrimitive, networkHandles);
+
+                    // linkage
+                    createdForwardLink = network.linkCreator.createLink(Link.EnumType.CONTAINS, createdPlatonicInstanceNodeForRetinaObject);
+                    objectNode.outgoingLinks.add(createdForwardLink);
+
+                    createdBackwardLink = network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
+                    createdPlatonicInstanceNodeForRetinaObject.outgoingLinks.add(createdBackwardLink);
+
+                    // add all codelet's of it
+                    codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdPlatonicInstanceNodeForRetinaObject, coderack, network, networkHandles);
+                }
+            }
+            
+            resultObjectNodes.add(objectNode);
+        }
+    }
+    
+
+    private void resetAllMarkings(ArrayList<RetinaPrimitive> primitives)
+    {
+        for( RetinaPrimitive iterationPrimitive : primitives )
+        {
+            iterationPrimitive.marked = false;
+        }
+    }
+    
+    private Random random = new Random();
+
 }
