@@ -8,6 +8,7 @@ import RetinaLevel.RetinaPrimitive;
 import bpsolver.CodeletLtmLookup;
 import bpsolver.NetworkHandles;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * All classes which derive from this implement a strategy on how to cluster retinaprimitives into Objects(represented as Nodes)
@@ -19,5 +20,5 @@ import java.util.ArrayList;
  */
 public interface ITranslatorStrategy
 {
-    ArrayList<Node> createObjectsFromRetinaPrimitives(ArrayList<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize);
+    List<Node> createObjectsFromRetinaPrimitives(ArrayList<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize);
 }
