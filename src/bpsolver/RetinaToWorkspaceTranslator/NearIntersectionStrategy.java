@@ -2,6 +2,8 @@ package bpsolver.RetinaToWorkspaceTranslator;
 
 import Datastructures.SpatialAcceleration;
 import Datastructures.Vector2d;
+import static Datastructures.Vector2d.FloatHelper.getLength;
+import static Datastructures.Vector2d.FloatHelper.sub;
 import FargGeneral.Coderack;
 import FargGeneral.network.Link;
 import FargGeneral.network.Network;
@@ -17,6 +19,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
+import misc.Assert;
 
 /**
  * implements a strategy which groups retina objects based on the intersections of retina objects
@@ -39,6 +43,10 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
         
         spatialAccelerationForCrosspointsWithMappingOfRetinaObjects = new SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects();
         spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints = new SpatialAcceleration<>(GRIDCOUNTX, GRIDCOUNTY, imageSize.x, imageSize.y);
+        
+        bundleAllIntersections(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, primitives);
+        calculateAnglePointType(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
+        createLinksAndNodesForAnglePoints(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, coderack, network, networkHandles, codeletLtmLookup);
         
         retinaObjectsWithAssociatedPoints = convertPrimitivesToRetinaObjectsWithAssoc(primitives);
         storeRetinaObjectWithAssocIntoMap(retinaObjectsWithAssociatedPoints, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
@@ -226,6 +234,107 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
         {
             iterationPrimitive.marked = false;
         }
+    }
+    
+    private void bundleAllIntersections(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, List<RetinaPrimitive> listOfRetinaPrimitives)
+    {
+        for( RetinaPrimitive iterationRetinaPrimitive : listOfRetinaPrimitives )
+        {
+            List<Intersection> intersections;
+            
+            intersections = iterationRetinaPrimitive.getIntersections();
+            
+            // we store the intersectionposition and the intersectionpartners
+            
+            for( Intersection iterationIntersection : intersections )
+            {
+                ArrayList<SpatialAcceleration<Crosspoint>.Element> crosspointsAtPosition;
+                
+                crosspointsAtPosition = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getElementsNearPoint(Vector2d.ConverterHelper.convertIntVectorToFloat(iterationIntersection.intersectionPosition), 1000.0f /* TODO const */);
+                
+                if( crosspointsAtPosition.isEmpty() )
+                {
+                    SpatialAcceleration<Crosspoint>.Element createdCrosspointElement;
+                    RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssoc;
+                    
+                    createdCrosspointElement = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.new Element();
+                    createdCrosspointElement.data = new Crosspoint();
+                    createdCrosspointElement.data.position = Vector2d.ConverterHelper.convertIntVectorToFloat(iterationIntersection.intersectionPosition);
+                    createdCrosspointElement.position = Vector2d.ConverterHelper.convertIntVectorToFloat(iterationIntersection.intersectionPosition);
+                    
+                    RetinaPrimitive x = iterationIntersection.partners[0].primitive;
+                    Set<RetinaPrimitive> y = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.keySet();
+                    
+                    Object[] array = y.toArray();
+                    
+                    for( int i = 0; i < array.length; i++ )
+                    {
+                        System.out.println(System.identityHashCode(array[i]));
+                    }
+                    
+                    
+                    System.out.println("searched " + System.identityHashCode(iterationIntersection.partners[0].primitive));
+                    
+                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[0].primitive);
+                    Assert.Assert(retinaObjectWithAssoc != null, "");
+                    createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[0].intersectionEndpointType));
+                    
+                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[1].primitive);
+                    Assert.Assert(retinaObjectWithAssoc != null, "");
+                    createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[1].intersectionEndpointType));
+                    
+                    spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.addElement(createdCrosspointElement);
+                }
+                else
+                {
+                    RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssoc;
+                    SpatialAcceleration<Crosspoint>.Element nearestCrosspointElement;
+                    
+                    nearestCrosspointElement = getNearestCrosspointElement(crosspointsAtPosition, Vector2d.ConverterHelper.convertIntVectorToFloat(iterationIntersection.intersectionPosition));
+                    
+                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[0].primitive);
+                    Assert.Assert(retinaObjectWithAssoc != null, "");
+
+                    if( !nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc) )
+                    {
+                        nearestCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[0].intersectionEndpointType));
+                    }
+                    
+                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[1].primitive);
+                    Assert.Assert(retinaObjectWithAssoc != null, "");
+                    
+                    if( !nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc) )
+                    {
+                        nearestCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[1].intersectionEndpointType));
+                    }
+                    
+                }
+            }
+        }
+    }
+    
+    private static SpatialAcceleration<Crosspoint>.Element getNearestCrosspointElement(ArrayList<SpatialAcceleration<Crosspoint>.Element> crosspointElements, Vector2d<Float> position)
+    {
+        SpatialAcceleration<Crosspoint>.Element nearestElement;
+        float nearestDistance;
+        
+        nearestElement = crosspointElements.get(0);
+        nearestDistance = getLength(sub(crosspointElements.get(0).position, position));
+        
+        for( SpatialAcceleration<Crosspoint>.Element iterationCrosspointElement : crosspointElements )
+        {
+            float distance;
+            
+            distance = getLength(sub(iterationCrosspointElement.position, position));
+            
+            if( distance < nearestDistance )
+            {
+                nearestDistance = distance;
+                nearestElement = iterationCrosspointElement;
+            }
+        }
+        
+        return nearestElement;
     }
     
     private Random random = new Random();
