@@ -114,7 +114,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
         spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints = new SpatialAcceleration<Crosspoint>(GRIDCOUNTX, GRIDCOUNTY, imageSize.x, imageSize.y);
         
         storeRetinaObjectWithAssocIntoMap(arrayOfRetinaObjectWithAssociatedPoints, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
-        bundleAllIntersections(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, arrayOfRetinaObjectWithAssociatedPoints);
+        bundleAllIntersectionsOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, arrayOfRetinaObjectWithAssociatedPoints);
         calculateAnglePointType(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
         createLinksAndNodesForAnglePoints(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, coderack, network, networkHandles, codeletLtmLookup);
     }
@@ -320,20 +320,37 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
         }
     }
     
-    
+    private static List<RetinaPrimitive> getRetinaPrimitivesOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints)
+    {
+        List<RetinaPrimitive> resultRetinaPrimitives;
+        
+        resultRetinaPrimitives = new ArrayList<>();
+        
+        for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject : arrayOfRetinaObjectWithAssociatedPoints )
+        {
+            resultRetinaPrimitives.add(iterationRetinaObject.primitive);
+        }
+        
+        return resultRetinaPrimitives;
+    }
     
     /**
      * 
      * stores all intersections into a spatial acceleration structure
      *  
      */
-    private void bundleAllIntersections(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints)
+    private void bundleAllIntersectionsOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints)
     {
-        for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject : arrayOfRetinaObjectWithAssociatedPoints )
+        bundleAllIntersections(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, getRetinaPrimitivesOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(arrayOfRetinaObjectWithAssociatedPoints));
+    }
+    
+    private void bundleAllIntersections(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, List<RetinaPrimitive> listOfRetinaPrimitives)
+    {
+        for( RetinaPrimitive iterationRetinaPrimitive : listOfRetinaPrimitives )
         {
             List<Intersection> intersections;
             
-            intersections = iterationRetinaObject.primitive.getIntersections();
+            intersections = iterationRetinaPrimitive.getIntersections();
             
             // we store the intersectionposition and the intersectionpartners
             
