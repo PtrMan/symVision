@@ -23,6 +23,8 @@ import bpsolver.BpSolver;
 import bpsolver.CodeletLtmLookup;
 import bpsolver.NetworkHandles;
 import bpsolver.Parameters;
+import bpsolver.RetinaToWorkspaceTranslator.ITranslatorStrategy;
+import bpsolver.RetinaToWorkspaceTranslator.NearIntersectionStrategy;
 import bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
@@ -34,6 +36,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.Timer;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -112,11 +115,11 @@ public class Controller
             
             
             
-            PointProximityStrategy retinaToWorkspaceTranslator;
+            ITranslatorStrategy retinaToWorkspaceTranslatorStrategy;
             
-            retinaToWorkspaceTranslator = new PointProximityStrategy();
+            retinaToWorkspaceTranslatorStrategy = new NearIntersectionStrategy();
             
-            ArrayList<Node> objectNodes = retinaToWorkspaceTranslator.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver.getImageSizeAsFloat());
+            List<Node> objectNodes = retinaToWorkspaceTranslatorStrategy.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver.getImageSizeAsFloat());
             
             bpSolver.cycle(500);
             
