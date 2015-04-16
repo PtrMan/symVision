@@ -1,6 +1,7 @@
 package RetinaLevel;
 
 import Algorithms.FloodFill;
+import Datastructures.IMap2d;
 import Datastructures.Map2d;
 import Datastructures.Vector2d;
 
@@ -45,22 +46,21 @@ class ProcessZFacade
         processZ.setup(imageSize);
     }
 
-    public Map2d<Boolean> getNotMagnifiedOutput()
+    public IMap2d<Boolean> getNotMagnifiedOutput()
     {
         return notMagnifiedOutput;
     }
 
-    public Map2d<Boolean> getMagnifiedOutput()
+    public IMap2d<Boolean> getMagnifiedOutput()
     {
         return magnifiedOutput;
     }
 
     public void process(Map2d<Boolean> input)
     {
-        Map2d<Boolean> copiedInput;
+        IMap2d<Boolean> copiedInput;
 
-        // TODO< copy input image >
-
+        copiedInput = input.copy();
 
         storePixelsIntoHashmap(input);
 
@@ -89,7 +89,7 @@ class ProcessZFacade
         }
     }
 
-    private void takeRandomPixelFromHashmapUntilNoCandidatesAndFillAndDecide(Map2d<Boolean> input)
+    private void takeRandomPixelFromHashmapUntilNoCandidatesAndFillAndDecide(IMap2d<Boolean> input)
     {
         PixelChangeListener pixelChangeListener;
 
@@ -128,7 +128,7 @@ class ProcessZFacade
         }
     }
 
-    private void drawPixelsIntoMap(List<Vector2d<Integer>> pixels, Map2d<Boolean> map)
+    private void drawPixelsIntoMap(List<Vector2d<Integer>> pixels, IMap2d<Boolean> map)
     {
         for( Vector2d<Integer> iterationPosition : pixels )
         {
@@ -150,10 +150,10 @@ class ProcessZFacade
 
     private HashMap<Integer, Boolean> unprocessedPixels = new HashMap<>();
 
-    private Map2d<Boolean> notMagnifiedOutput;
-    private Map2d<Boolean> magnifiedOutput;
+    private IMap2d<Boolean> notMagnifiedOutput;
+    private IMap2d<Boolean> magnifiedOutput;
 
-    private Map2d<Boolean> toMagnify;
+    private IMap2d<Boolean> toMagnify;
 
     private ProcessZ processZ = new ProcessZ();
 }

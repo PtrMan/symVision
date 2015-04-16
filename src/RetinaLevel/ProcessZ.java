@@ -1,5 +1,6 @@
 package RetinaLevel;
 
+import Datastructures.IMap2d;
 import Datastructures.Map2d;
 import Datastructures.Vector2d;
 import Visual.Map2dBinary;
@@ -14,12 +15,12 @@ public class ProcessZ
         this.imageSize = imageSize;
     }
 
-    public void process(Map2d<Boolean> input)
+    public void process(IMap2d<Boolean> input)
     {
-        Map2d<Float> floatNotMagnified;
-        Map2d<Float> floatMagnified;
-        Map2d<Float> floatMagnifiedBlured;
-        Map2d<Boolean> tempResult;
+        IMap2d<Float> floatNotMagnified;
+        IMap2d<Float> floatMagnified;
+        IMap2d<Float> floatMagnifiedBlured;
+        IMap2d<Boolean> tempResult;
 
         floatNotMagnified = new Map2d<>(imageSize.x, imageSize.y);
         floatMagnified = new Map2d<>(imageSize.x*2, imageSize.y*2);
@@ -32,14 +33,14 @@ public class ProcessZ
         magnifiedOutput = Map2dBinary.corode(tempResult);
     }
 
-    public Map2d<Boolean> getMagnifiedOutput()
+    public IMap2d<Boolean> getMagnifiedOutput()
     {
         return magnifiedOutput;
     }
 
     private Vector2d<Integer> imageSize;
 
-    private Map2d<Boolean> magnifiedOutput;
+    private IMap2d<Boolean> magnifiedOutput;
 
     private Map2dTransform<Float> map2dTranform = new Map2dTransform<>();
 
