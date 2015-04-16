@@ -6,7 +6,7 @@ import static java.lang.System.arraycopy;
  *
  * 
  */
-public class Map2d<Type>
+public class Map2d<Type> implements IMap2d<Type>
 {
     public Map2d(int width, int length)
     {
@@ -45,7 +45,7 @@ public class Map2d<Type>
         return length;
     }
     
-    public Map2d<Type> clone()
+    public Map2d<Type> copy()
     {
         Map2d<Type> cloned;
         
