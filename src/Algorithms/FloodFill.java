@@ -1,5 +1,6 @@
 package Algorithms;
 
+import Datastructures.IMap2d;
 import Datastructures.Map2d;
 import Datastructures.Vector2d;
 
@@ -10,7 +11,7 @@ public class FloodFill<Type>
         void seted(Vector2d<Integer> position);
     }
     
-    public void fill(Map2d<Type> map, Vector2d<Integer> position, Vector2d<Integer> mapSize, Type targetColor, Type replacementColor, IPixelSetListener pixelSetListener)
+    public void fill(IMap2d<Type> map, Vector2d<Integer> position, Vector2d<Integer> mapSize, Type targetColor, Type replacementColor, IPixelSetListener pixelSetListener)
     {
         if( targetColor.equals(replacementColor) )
         {
@@ -32,7 +33,7 @@ public class FloodFill<Type>
         fillRangeChecked(map, new Vector2d<>(position.x, position.y-1), mapSize, targetColor, replacementColor, pixelSetListener);
     }
 
-    private void fillRangeChecked(Map2d<Type> map, Vector2d<Integer> position, Vector2d<Integer> mapSize, Type targetColor, Type replacementColor, IPixelSetListener pixelSetListener)
+    private void fillRangeChecked(IMap2d<Type> map, Vector2d<Integer> position, Vector2d<Integer> mapSize, Type targetColor, Type replacementColor, IPixelSetListener pixelSetListener)
     {
         if( position.x < 0 || position.x >= mapSize.x )
         {
