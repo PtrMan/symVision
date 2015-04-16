@@ -1,4 +1,4 @@
-package Misc;
+package Visual;
 
 public class ColorHsl   
 {

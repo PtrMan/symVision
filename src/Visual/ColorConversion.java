@@ -1,8 +1,4 @@
-//
-// Translated by CS2J (http://www.cs2j.com): 11.04.2015 19:51:32
-//
-
-package Misc;
+package Visual;
 
 import Misc.ColorHsl;
 import Misc.ColorRgb;
@@ -15,17 +11,19 @@ public class ColorConversion
         G,
         B
     }
+    
     // http://www.rapidtables.com/convert/color/hsl-to-rgb.htm
-    static public ColorRgb hslToRgb(ColorHsl input) throws Exception {
-        float r = new float();
-        float g = new float();
-        float b = new float();
-        float c = new float();
-        float x = new float();
-        float m = new float();
-        System.Diagnostics.Debug.Assert(input.h >= 0.0f);
-        c = 1.0f - System.Math.Abs(2.0f * input.l - 1.0f) * input.s;
-        x = c * (1.0f - (float)System.Math.Abs((float)((input.h / 0.25f) % 2.0f) - 1.0));
+    static public ColorRgb hslToRgb(ColorHsl input)
+    {
+        float r;
+        float g;
+        float b;
+        float c;
+        float x;
+        float m;
+        misc.Assert.Assert(input.h >= 0.0f, "");
+        c = 1.0f - Math.abs(2.0f * input.l - 1.0f) * input.s;
+        x = c * (1.0f - (float)Math.abs((float)((input.h / 0.25f) % 2.0f) - 1.0));
         m = input.l - c * 0.5f;
         if (input.h < 60.0f / 360.0f)
         {
@@ -69,11 +67,12 @@ public class ColorConversion
         return new ColorRgb(r,g,b);
     }
 
-    static public ColorHsl rgbToHsl(ColorRgb rgb) throws Exception {
+    static public ColorHsl rgbToHsl(ColorRgb rgb)
+    {
         ColorHsl result;
-        float min = new float();
+        float min;
         EnumRgb rgbMin = EnumRgb.R;
-        float max = new float();
+        float max;
         EnumRgb rgbMax = EnumRgb.R;
         result = new ColorHsl();
         rgbMax = EnumRgb.R;
@@ -112,7 +111,7 @@ public class ColorConversion
         }
         else
         {
-            float d = new float();
+            float d;
             d = max - min;
             result.s = (result.l > 0.5f) ? d / (2.0f - max - min) : d / (max + min);
             if (rgbMax == EnumRgb.R)

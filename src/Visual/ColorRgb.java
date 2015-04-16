@@ -1,6 +1,4 @@
-package Misc;
-
-import Misc.ColorRgb;
+package Visual;
 
 public class ColorRgb   
 {
