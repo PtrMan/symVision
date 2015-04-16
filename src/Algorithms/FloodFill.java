@@ -10,7 +10,7 @@ public class FloodFill<Type>
         void seted(Vector2d<Integer> position);
     }
     
-    private void fill(Map2d<Type> map, Vector2d<Integer> position, Vector2d<Integer> mapSize, Type targetColor, Type replacementColor, IPixelSetListener pixelSetListener)
+    public void fill(Map2d<Type> map, Vector2d<Integer> position, Vector2d<Integer> mapSize, Type targetColor, Type replacementColor, IPixelSetListener pixelSetListener)
     {
         if( targetColor.equals(replacementColor) )
         {
