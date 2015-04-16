@@ -1,10 +1,11 @@
 package Visual;
 
+import Datastructures.IMap2d;
 import Datastructures.Map2d;
 
 public class Map2dTransform<Type>
 {
-    public void magnify(Map2d<Type> input, Map2d<Type> output, int factor)
+    public void magnify(IMap2d<Type> input, IMap2d<Type> output, int factor)
     {
         int ix, iy;
 
@@ -17,7 +18,7 @@ public class Map2dTransform<Type>
         }
     }
 
-    private void writeMagnified(Map2d<Type> output, int ix, int iy, Type value, int factor)
+    private void writeMagnified(IMap2d<Type> output, int ix, int iy, Type value, int factor)
     {
         int writeX, writeY;
 

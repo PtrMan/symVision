@@ -1,11 +1,12 @@
 package Visual;
 
+import Datastructures.IMap2d;
 import Datastructures.Map2d;
 
 
 public class Map2dBinary
 {
-    public static Map2d<Boolean> negate(Map2d<Boolean> input)
+    public static IMap2d<Boolean> negate(IMap2d<Boolean> input)
     {
         Map2d<Boolean> result;
         int x, y;
@@ -23,9 +24,9 @@ public class Map2dBinary
         return result;
     }
 
-    public static Map2d<Boolean> corode(Map2d<Boolean> input)
+    public static IMap2d<Boolean> corode(IMap2d<Boolean> input)
     {
-        Map2d<Boolean> result;
+        IMap2d<Boolean> result;
         int x, y;
 
         result = new Map2d<>(input.getWidth(), input.getLength());

@@ -1,10 +1,11 @@
 package Visual;
 
+import Datastructures.IMap2d;
 import Datastructures.Map2d;
 
 public class Map2dConverter
 {
-    public static void booleanToFloat(Map2d<Boolean> input, Map2d<Float> output)
+    public static void booleanToFloat(IMap2d<Boolean> input, IMap2d<Float> output)
     {
         int ix, iy;
 
@@ -20,7 +21,7 @@ public class Map2dConverter
         }
     }
 
-    public static void floatToBoolean(Map2d<Float> input, Map2d<Boolean> output, float threshold)
+    public static void floatToBoolean(IMap2d<Float> input, IMap2d<Boolean> output, float threshold)
     {
         int ix, iy;
 

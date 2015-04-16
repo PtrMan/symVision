@@ -1,13 +1,14 @@
 package misc;
 
+import Datastructures.IMap2d;
 import Datastructures.Map2d;
 
 public class GaussianBlur
 {
-    public static Map2d<Float> blur(int radius, Map2d<Float> input)
+    public static IMap2d<Float> blur(int radius, IMap2d<Float> input)
     {
-        Map2d<Float> resultMap;
-        Map2d<Float> tempMap;
+        IMap2d<Float> resultMap;
+        IMap2d<Float> tempMap;
         float[] kernel;
         int i;
         int di;
@@ -38,7 +39,7 @@ public class GaussianBlur
         return resultMap;
     }
 
-    public static void blurX(Map2d<Float> input, Map2d<Float> output, float[] kernel)
+    public static void blurX(IMap2d<Float> input, IMap2d<Float> output, float[] kernel)
     {
         int x, y;
         int radius = 1 + (kernel.length - 1) / 2;
@@ -63,7 +64,7 @@ public class GaussianBlur
         }
     }
 
-    public static void blurY(Map2d<Float> input, Map2d<Float> output, float[] kernel)
+    public static void blurY(IMap2d<Float> input, IMap2d<Float> output, float[] kernel)
     {
         int x, y;
         int radius = 1 + (kernel.length - 1) / 2;
