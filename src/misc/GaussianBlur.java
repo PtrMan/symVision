@@ -6,9 +6,9 @@ public class GaussianBlur
 {
     public static Map2d<Float> blur(int radius, Map2d<Float> input)
     {
-        Map2d<Float> resultMap = new Map2d<>(input.getWidth(), input.getLength());
-        Map2d<Float> tempMap = new Map2d<>(input.getWidth(), input.getLength());
-        float[] kernel = new float[];
+        Map2d<Float> resultMap;
+        Map2d<Float> tempMap;
+        float[] kernel;
         int i;
         int di;
 
@@ -31,8 +31,8 @@ public class GaussianBlur
             kernel[radius - 1 - di] = normalizedResult;
         }
         
-        resultMap = new Map2d<Float>(input.getWidth(), input.getLength());
-        tempMap = new Map2d<Float>(input.getWidth(), input.getLength());
+        resultMap = new Map2d<>(input.getWidth(), input.getLength());
+        tempMap = new Map2d<>(input.getWidth(), input.getLength());
         blurX(input, tempMap, kernel);
         blurY(tempMap, resultMap, kernel);
         return resultMap;
@@ -46,8 +46,8 @@ public class GaussianBlur
         {
             for (x = 0;x < input.getWidth();x++)
             {
-                int ir = new int();
-                float temp = new float();
+                int ir;
+                float temp;
                 temp = 0.0f;
                 for (ir = -radius;ir < radius - 1;ir++)
                 {
