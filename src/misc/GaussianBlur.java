@@ -1,13 +1,14 @@
+package misc;
 
-
+import Datastructures.Map2d;
 
 public class GaussianBlur
 {
-    public static Map2d<float> blur(int radius, Map2d<float> input)
+    public static Map2d<Float> blur(int radius, Map2d<Float> input)
     {
-        Map2d<float> resultMap = new Map2d<float>();
-        Map2d<float> tempMap = new Map2d<float>();
-        float[] kernel = new float[]();
+        Map2d<Float> resultMap = new Map2d<>(input.getWidth(), input.getLength());
+        Map2d<Float> tempMap = new Map2d<>(input.getWidth(), input.getLength());
+        float[] kernel = new float[];
         int i;
         int di;
 
@@ -15,16 +16,16 @@ public class GaussianBlur
         kernel = new float[(radius - 1) * 2 + 1];
         float variance;
         float normalisation;
-        variance = (float)Math.Sqrt(0.15f);
+        variance = (float)Math.sqrt(0.15f);
         kernel[radius - 1] = 1.0f;
-        normalisation = Misc.Gaussian.calculateGaussianDistribution(0.0f, 0.0f, variance);
+        normalisation = misc.Gaussian.calculateGaussianDistribution(0.0f, 0.0f, variance);
         
         for (di = 1;di < radius;di++)
         {
             float gaussianResult;
             float normalizedResult;
 
-            gaussianResult = Misc.Gaussian.calculateGaussianDistribution((float)(di) / (float)(radius), 0.0f, variance);
+            gaussianResult = misc.Gaussian.calculateGaussianDistribution((float)(di) / (float)(radius), 0.0f, variance);
             normalizedResult = gaussianResult / normalisation;
             kernel[radius - 1 + di] = normalizedResult;
             kernel[radius - 1 - di] = normalizedResult;
@@ -37,10 +38,10 @@ public class GaussianBlur
         return resultMap;
     }
 
-    public static void blurX(Map2d<float> input, Map2d<float> output, float[] kernel)
+    public static void blurX(Map2d<Float> input, Map2d<Float> output, float[] kernel)
     {
         int x, y;
-        int radius = 1 + (kernel.Length - 1) / 2;
+        int radius = 1 + (kernel.length - 1) / 2;
         for (y = 0;y < input.getLength();y++)
         {
             for (x = 0;x < input.getWidth();x++)
@@ -57,15 +58,15 @@ public class GaussianBlur
                      
                     temp += (input.readAt(x + ir, y) * kernel[radius + ir]);
                 }
-                output.writeAt(x, y, temp);
+                output.setAt(x, y, temp);
             }
         }
     }
 
-    public static void blurY(Map2d<float> input, Map2d<float> output, float[] kernel) throws Exception
+    public static void blurY(Map2d<Float> input, Map2d<Float> output, float[] kernel)
     {
         int x, y;
-        int radius = 1 + (kernel.Length - 1) / 2;
+        int radius = 1 + (kernel.length - 1) / 2;
         for (x = 0;x < input.getWidth();x++)
         {
             for (y = 0;y < input.getLength();y++)
@@ -83,7 +84,7 @@ public class GaussianBlur
                      
                     temp += (input.readAt(x, y + ir) * kernel[radius + ir]);
                 }
-                output.writeAt(x, y, temp);
+                output.setAt(x, y, temp);
             }
         }
     }

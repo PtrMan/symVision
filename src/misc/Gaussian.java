@@ -1,5 +1,4 @@
-package Misc;
-
+package misc;
 
 public class Gaussian   
 {
@@ -27,7 +26,7 @@ public class Gaussian
         float gaussianTerm;
 
         distToMean = x * x + y * y;
-        factorA = -1.0f / ((float)System.Math.PI * delta * delta * delta * delta);
+        factorA = -1.0f / ((float)java.lang.Math.PI * delta * delta * delta * delta);
         factorB = 1.0f - distToMean / (2.0f * delta * delta);
         gaussianTerm = gaussianExponentTerm(distToMean,delta);
         return factorA * factorB * gaussianTerm;
@@ -40,7 +39,7 @@ public class Gaussian
      */
     public static float gaussianExponentTerm(float distToMean, float delta)
     {
-        return (float)System.Math.Exp(-0.5f * ((distToMean * distToMean) / (delta * delta)));
+        return (float)java.lang.Math.exp(-0.5f * ((distToMean * distToMean) / (delta * delta)));
     }
 
 }
