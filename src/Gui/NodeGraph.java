@@ -18,6 +18,7 @@ import com.mxgraph.util.mxEventObject;
 import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.view.mxGraph;
 import java.util.ArrayList;
+import java.util.List;
 
 public class NodeGraph
 {
@@ -36,7 +37,7 @@ public class NodeGraph
         return graphComponent;
     }
     
-    public void repopulateAfterNodes(ArrayList<Node> nodes, NetworkHandles networkHandles)
+    public void repopulateAfterNodes(List<Node> nodes, NetworkHandles networkHandles)
     {
         clear();
         populateAfterNodes(nodes, networkHandles);
@@ -62,7 +63,7 @@ public class NodeGraph
         graphComponent = new mxGraphComponent(graph);
     }
     */
-    private void populateAfterNodes(ArrayList<Node> nodes, NetworkHandles networkHandles)
+    private void populateAfterNodes(List<Node> nodes, NetworkHandles networkHandles)
     {
         VertexList verticesWithNode;
         
@@ -151,7 +152,7 @@ public class NodeGraph
         throw new RuntimeException("internal error");
     }
     
-    private VertexList convertNodesToVertexWithNodeRecursivly(ArrayList<Node> nodes, NetworkHandles networkHandles)
+    private VertexList convertNodesToVertexWithNodeRecursivly(List<Node> nodes, NetworkHandles networkHandles)
     {
         VertexList resultVertexList;
         ArrayList<Node> remainingNodes;
