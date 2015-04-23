@@ -41,7 +41,7 @@ public class ProcessA
     
     public void setWorkingImage(Map2d<Boolean> image)
     {
-        workingImage = image.clone();
+        workingImage = image.copy();
     }
 
     /**
