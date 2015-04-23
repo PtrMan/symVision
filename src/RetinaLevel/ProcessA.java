@@ -56,89 +56,41 @@ public class ProcessA
         ArrayList<Sample> resultSamples;
         int hitCount;
         int sampleCount;
-        int checkCounter;
-        int samplePositionsI;
-        
-        final float CHECKAFTERITERATIONS = 3000;
-        
+
         resultSamples = new ArrayList<>();
         
         hitCount = 0;
         sampleCount = 0;
-        checkCounter = 0;
-        samplePositionsI = 0;
-        
-        resizeSamplePositionsForSize(workingImage.getWidth(), workingImage.getLength());
-        
-        for(;;)
-        {
-            int x, y;
-            boolean readBoolean;
-            Vector2d<Integer> samplePosition;
-            
-            // if the array with the precomputed sample positions is depleated we exit
-            if( samplePositions.length <= samplePositionsI )
-            {
-                break;
-            }
-            samplePosition = samplePositions[samplePositionsI];
 
-            readBoolean = workingImage.readAt(samplePosition.x, samplePosition.y);
-            
-            if( readBoolean )
+
+        int x, y;
+
+        for( y = 0; y < workingImage.getLength(); y++ )
+        {
+            for( x = 0; x < workingImage.getWidth(); x++ )
             {
-                addSampleToList(resultSamples, samplePosition.x, samplePosition.y);
-                workingImage.setAt(samplePosition.x, samplePosition.y, false);
-                
-                hitCount++;
-            }
-            
-            if( checkCounter >= CHECKAFTERITERATIONS )
-            {
-                checkCounter = 0;
-                
-                if( (float)hitCount / (float)sampleCount < HardParameters.ProcessA.MINIMALHITRATIOUNTILTERMINATION )
+                sampleCount++;
+
+                if( sampleMaskAtPosition(new Vector2d<>(x, y), MaskDetail0) )
                 {
-                    break;
+                    if( workingImage.readAt(x, y) )
+                    {
+                        hitCount++;
+                        workingImage.setAt(x, y, false);
+
+                        addSampleToList(resultSamples, x, y);
+                    }
                 }
             }
-            
-            sampleCount++;
-            checkCounter++;
-            samplePositionsI++;
         }
+
         
         return resultSamples;
     }
     
     private static void addSampleToList(ArrayList<Sample> samples, int x, int y)
     {
-        samples.add(new Sample(new Vector2d<Integer>(x, y)));
-    }
-    
-    private void resizeSamplePositionsForSize(int width, int height)
-    {
-        int samplePositionsArraySize;
-        int i;
-        
-        samplePositionsArraySize = (int)Math.round((float)(width*height)*(3.0f/4.0));
-
-        if( samplePositions.length >= samplePositionsArraySize )
-        {
-            return;
-        }
-        
-        samplePositions = new Vector2d[samplePositionsArraySize];
-        
-        for( i = 0; i < samplePositionsArraySize; i++ )
-        {
-            int vectorX, vectorY;
-            
-            vectorX = Math.round(RandomUtil.radicalInverse(i, 2)*(float)(width-1));
-            vectorY = Math.round(RandomUtil.radicalInverse(i, 3)*(float)(height-1));
-
-            samplePositions[i] = new Vector2d<Integer>(vectorX, vectorY);
-        }
+        samples.add(new Sample(new Vector2d<>(x, y)));
     }
 
     private static boolean sampleMaskAtPosition(Vector2d<Integer> position, boolean[] mask4by4)
@@ -150,11 +102,8 @@ public class ProcessA
 
         return mask4by4[modX + modY * 4];
     }
-    
-    private Random random = new Random();
+
     private Map2d<Boolean> workingImage;
-    
-    private Vector2d<Integer>[] samplePositions = new Vector2d[0];
 
     private static final boolean[] MaskDetail0 =
             {
