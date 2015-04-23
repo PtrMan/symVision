@@ -42,7 +42,7 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class Controller
 {
-    private static class RecalculateActionListener implements ActionListener
+    public static class RecalculateActionListener implements ActionListener
     {
         
         
@@ -67,7 +67,7 @@ public class Controller
             // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
             bpSolver.coderack.flush();
             
-            BufferedImage javaImage = imageDrawer.drawToJavaImage((float)time);
+            BufferedImage javaImage = imageDrawer.drawToJavaImage((float)time, bpSolver);
             Map2d<Boolean> image = drawToImage(javaImage);
 
             ProcessA processA = new ProcessA();
@@ -132,9 +132,9 @@ public class Controller
             
             // TODO< remove the list of line intersections >
             
-            //drawDetectors(graphics, lineDetectors, lineIntersections, samples);
+            drawDetectors(graphics, lineDetectors, lineIntersections, samples);
             //drawObjectBaryCenters(graphics, objectNodes, bpSolver.networkHandles);
-            drawLineParsings(graphics, lineParsings);
+            //drawLineParsings(graphics, lineParsings);
             
 
             interactive.leftCanvas.setImage(javaImage);
@@ -152,27 +152,7 @@ public class Controller
         
         // function in here because we don't know who should have it
         /**
-        private BufferedImage drawToJavaImage(float time)
-        {
-            time *= 0.1f;
 
-            BufferedImage off_Image = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
-
-            Graphics2D g2 = off_Image.createGraphics();
-            g2.setColor(Color.BLACK);
-
-            //g2.drawLine(10, 10, 30, 20);
-
-            //g2.drawLine(20, 30, 30, 20);
-            
-            ///drawTestTriangle(g2, new Vector2d<>(20.0f, 60.0f), 10.0f, time, (3.0f / (float)Math.sqrt(3)));
-            
-            //drawTestTriangle(g2, new Vector2d<>(60.0f, 60.0f), 10.0f, time * 0.114f, 0.5f*(3.0f / (float)Math.sqrt(3)));
-            
-            g2.drawOval(5, 5, 80, 80);
-            
-            return off_Image;
-        }
         
         private static void drawTestTriangle(Graphics2D graphics, Vector2d<Float> position, float radius, float angle, float relativeSegmentWidth)
         {
@@ -310,12 +290,16 @@ public class Controller
         }
         
 
-        private static void drawDetectors(Graphics2D graphics, ArrayList<SingleLineDetector> lineDetectors, ArrayList<Intersection> intersections, ArrayList<ProcessA.Sample> samples)
+        private static void drawDetectors(Graphics2D graphics, List<RetinaPrimitive> lineDetectors, ArrayList<Intersection> intersections, ArrayList<ProcessA.Sample> samples)
         {
-            for( SingleLineDetector iterationDetector : lineDetectors )
+            for( RetinaPrimitive iterationRetinaPrimitive : lineDetectors )
             {
+                SingleLineDetector iterationDetector;
+
                 Vector2d<Float> aProjectedFloat;
                 Vector2d<Float> bProjectedFloat;
+
+                iterationDetector = iterationRetinaPrimitive.line;
 
                 aProjectedFloat = iterationDetector.aFloat;
                 bProjectedFloat = iterationDetector.bFloat;
@@ -398,33 +382,12 @@ public class Controller
             
         }
         
-        private Interactive interactive;
+        public Interactive interactive;
         private int time;
         
         private BpSolver bpSolver;
         private final NodeGraph nodeGraph;
 
         private IImageDrawer imageDrawer;
-    }
-    
-    public static void main(String[] args) {
-        BpSolver bpSolver = new BpSolver();
-        
-        bpSolver.setImageSize(new Vector2d<>(100, 100));
-        
-        Parameters.init();
-        
-        
-        GraphWindow graphWindow = new GraphWindow();
-        
-        RecalculateActionListener recalculate = new RecalculateActionListener(bpSolver, graphWindow.getNodeGraph());
-        recalculate.interactive = new Interactive();
-        
-        TuningWindow tuningWindow = new TuningWindow();
-        
-        Timer timer = new Timer(2000, recalculate);
-        timer.setInitialDelay(0);
-        timer.start(); 
-        
     }
 }
