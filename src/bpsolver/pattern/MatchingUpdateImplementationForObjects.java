@@ -29,8 +29,15 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
         
         throw new NotImplementedException();
     }
-    
-    
+
+    @Override
+    public float match(Pattern a, Pattern b, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
+    {
+        // TODO
+        throw new NotImplementedException();
+    }
+
+
     private static Node findClosestMatchForSameTypesForPlatonicInstances(Node template, ArrayList<Node> others, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
     {
         Node bestMatchingNode;
