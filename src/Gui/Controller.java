@@ -46,10 +46,11 @@ public class Controller
     {
         
         
-        public RecalculateActionListener(BpSolver bpSolver, NodeGraph nodeGraph)
+        public RecalculateActionListener(BpSolver bpSolver, NodeGraph nodeGraph, IImageDrawer imageDrawer)
         {
             this.bpSolver = bpSolver;
             this.nodeGraph = nodeGraph;
+            this.imageDrawer = imageDrawer;
         }
         
         @Override
@@ -66,7 +67,7 @@ public class Controller
             // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
             bpSolver.coderack.flush();
             
-            BufferedImage javaImage = drawToJavaImage((float)time * 0.1f);
+            BufferedImage javaImage = imageDrawer.drawToJavaImage((float)time);
             Map2d<Boolean> image = drawToImage(javaImage);
 
             ProcessA processA = new ProcessA();
@@ -150,8 +151,11 @@ public class Controller
         
         
         // function in here because we don't know who should have it
+        /**
         private BufferedImage drawToJavaImage(float time)
         {
+            time *= 0.1f;
+
             BufferedImage off_Image = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D g2 = off_Image.createGraphics();
@@ -197,7 +201,7 @@ public class Controller
             pointBInt = new Vector2d<>(Math.round(pointB.x), Math.round(pointB.y));
             
             graphics.drawLine(pointAInt.x, pointAInt.y, pointBInt.x, pointBInt.y);
-        }
+        }*/
         
         private static void drawLineParsings(Graphics2D graphics, ArrayList<ProcessM.LineParsing> lineParsings)
         {
@@ -399,6 +403,8 @@ public class Controller
         
         private BpSolver bpSolver;
         private final NodeGraph nodeGraph;
+
+        private IImageDrawer imageDrawer;
     }
     
     public static void main(String[] args) {
