@@ -140,9 +140,37 @@ public class ProcessA
             samplePositions[i] = new Vector2d<Integer>(vectorX, vectorY);
         }
     }
+
+    private static boolean sampleMaskAtPosition(Vector2d<Integer> position, boolean[] mask4by4)
+    {
+        int modX, modY;
+
+        modX = position.x % 4;
+        modY = position.y % 4;
+
+        return mask4by4[modX + modY * 4];
+    }
     
     private Random random = new Random();
     private Map2d<Boolean> workingImage;
     
     private Vector2d<Integer>[] samplePositions = new Vector2d[0];
+
+    private static final boolean[] MaskDetail0 =
+            {
+                    true, false, false, true,
+                    false, true, true, false,
+                    true, false, true, false,
+                    false, true, false, true
+            };
+
+    private static final boolean[] MaskDetail1 =
+            {
+                    false, false, false, true,
+                    true, false, false, true,
+                    false, true, false, false,
+                    false, false, true, false
+            };
+
+
 }
