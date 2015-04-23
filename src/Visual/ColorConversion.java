@@ -1,7 +1,7 @@
 package Visual;
 
-import Misc.ColorHsl;
-import Misc.ColorRgb;
+import Visual.ColorHsl;
+import Visual.ColorRgb;
 
 public class ColorConversion   
 {
