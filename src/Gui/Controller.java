@@ -2,43 +2,24 @@ package Gui;
 
 import Datastructures.Map2d;
 import Datastructures.Vector2d;
-import static Datastructures.Vector2d.FloatHelper.add;
-import static Datastructures.Vector2d.FloatHelper.getScaled;
-import static Datastructures.Vector2d.FloatHelper.sub;
-import FargGeneral.Coderack;
 import FargGeneral.network.Link;
-import FargGeneral.network.Network;
 import FargGeneral.network.Node;
-import RetinaLevel.Intersection;
-import RetinaLevel.ProcessA;
-import RetinaLevel.ProcessB;
-import RetinaLevel.ProcessC;
-import RetinaLevel.ProcessD;
-import RetinaLevel.ProcessE;
-import RetinaLevel.ProcessH;
-import RetinaLevel.ProcessM;
-import RetinaLevel.RetinaPrimitive;
-import RetinaLevel.SingleLineDetector;
+import RetinaLevel.*;
 import bpsolver.BpSolver;
-import bpsolver.CodeletLtmLookup;
 import bpsolver.NetworkHandles;
-import bpsolver.Parameters;
 import bpsolver.RetinaToWorkspaceTranslator.ITranslatorStrategy;
 import bpsolver.RetinaToWorkspaceTranslator.NearIntersectionStrategy;
-import bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import java.awt.Color;
-import java.awt.Graphics2D;
+
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.Timer;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 public class Controller
 {
@@ -292,6 +273,7 @@ public class Controller
 
         private static void drawDetectors(Graphics2D graphics, List<RetinaPrimitive> lineDetectors, ArrayList<Intersection> intersections, ArrayList<ProcessA.Sample> samples)
         {
+
             for( RetinaPrimitive iterationRetinaPrimitive : lineDetectors )
             {
                 SingleLineDetector iterationDetector;
@@ -304,16 +286,21 @@ public class Controller
                 aProjectedFloat = iterationDetector.aFloat;
                 bProjectedFloat = iterationDetector.bFloat;
                 
-                if( iterationDetector.resultOfCombination )
-                {
-                    graphics.setColor(Color.ORANGE);
-                }
-                else
+                if( iterationDetector.resultOfCombination || false )
                 {
                     graphics.setColor(Color.RED);
                 }
-                
+                else
+                {
+                    graphics.setColor(Color.BLUE);
+                }
+
+                graphics.setStroke(new BasicStroke(2));
                 graphics.drawLine(Math.round(aProjectedFloat.x), Math.round(aProjectedFloat.y), Math.round(bProjectedFloat.x), Math.round(bProjectedFloat.y));
+
+                // for old code
+                // TODO< overwork old code so the stroke is set at the beginning >
+                graphics.setStroke(new BasicStroke(1));
             }
             
             for( Intersection iterationIntersection : intersections )
@@ -323,14 +310,14 @@ public class Controller
                 graphics.drawRect(iterationIntersection.intersectionPosition.x-1, iterationIntersection.intersectionPosition.y-1, 3, 3);
             }
 
-            /*
+
             graphics.setColor(Color.GREEN);
 
             for( ProcessA.Sample iterationSample : samples )
             {
                 graphics.drawLine(iterationSample.position.x, iterationSample.position.y, iterationSample.position.x, iterationSample.position.y);
             }
-            */
+
 
             
         }
