@@ -13,12 +13,13 @@ import bpsolver.HelperFunctions;
 import bpsolver.NetworkHandles;
 import bpsolver.nodes.AttributeNode;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
+import misc.AngleHelper;
+import misc.Assert;
+
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import misc.AngleHelper;
-import misc.Assert;
 
 /**
  * Implements basic mechanisms for the translation
@@ -32,7 +33,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy
     {
         for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObjectWithAssoc : arrayOfRetinaObjectWithAssociatedPoints )
         {
-            spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.put(iterationRetinaObjectWithAssoc.primitive, iterationRetinaObjectWithAssoc);
+            spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.put(iterationRetinaObjectWithAssoc.primitive, iterationRetinaObjectWithAssoc);
         }
     }
     
@@ -287,7 +288,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy
     {
         public SpatialAcceleration<Crosspoint> spatialForCrosspoints;
         
-        public Map<RetinaPrimitive, RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitveToRetinaObjectWithAssocMap = new IdentityHashMap<>(); 
+        public Map<RetinaPrimitive, RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitiveToRetinaObjectWithAssocMap = new IdentityHashMap<>();
     }
     
     protected static PlatonicPrimitiveInstanceNode createPlatonicInstanceNodeForRetinaObject(RetinaPrimitive primitive, NetworkHandles networkHandles)

@@ -11,17 +11,13 @@ import FargGeneral.network.Node;
 import RetinaLevel.Intersection;
 import RetinaLevel.RetinaPrimitive;
 import bpsolver.CodeletLtmLookup;
-import bpsolver.HelperFunctions;
 import bpsolver.NetworkHandles;
-import bpsolver.nodes.AttributeNode;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
-import misc.AngleHelper;
+
 import misc.Assert;
 
 // BUGS
@@ -170,7 +166,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
                     createdCrosspointElement.position = Vector2d.ConverterHelper.convertIntVectorToFloat(iterationIntersection.intersectionPosition);
                     
                     RetinaPrimitive x = iterationIntersection.partners[0].primitive;
-                    Set<RetinaPrimitive> y = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.keySet();
+                    Set<RetinaPrimitive> y = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.keySet();
                     
                     Object[] array = y.toArray();
                     
@@ -182,7 +178,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
                     
                     System.out.println("searched " + System.identityHashCode(iterationIntersection.partners[0].primitive));
                     
-                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[0].primitive);
+                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[0].primitive);
                     // we can have intersectionpartners which are not inside
                     // seems to be a bug in clustering or something fishy is going on
                     // TODO< investigate and add here a assert that the assoc can't be null >
@@ -196,7 +192,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
                     
                     
                     
-                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[1].primitive);
+                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[1].primitive);
                     // TODO SAME
                     // relates propably to BUG 0001
                     if( retinaObjectWithAssoc != null )
@@ -213,7 +209,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
                     
                     nearestCrosspointElement = getNearestCrosspointElement(crosspointsAtPosition, Vector2d.ConverterHelper.convertIntVectorToFloat(iterationIntersection.intersectionPosition));
                     
-                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[0].primitive);
+                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[0].primitive);
                     // TODO SAME
                     // relates propably to BUG 0001
                     if( retinaObjectWithAssoc != null )
@@ -224,7 +220,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
                         }
                     }
                     
-                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[1].primitive);
+                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[1].primitive);
                     // TODO SAME
                     // relates propably to BUG 0001
                     if( retinaObjectWithAssoc != null )
