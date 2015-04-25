@@ -101,7 +101,7 @@ public class FeaturePatternMatching
     // matches two (PlatonicPrimitiveInstanceNode for now) against each other and returns the matching degree
     // takes the activation/priming inside the LTM into account to do so
     // see foundalis disertation 8.2.3 to see how it is compared
-    public float matchAnyNonRecursive(Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist)
+    public float matchAnyNonRecursive(Node nodeA, Node nodeB, NetworkHandles networkHandles)
     {
         // the type is FeatureNode.featureTypeNode
         // only if two elements are in the array the type is 
@@ -122,17 +122,83 @@ public class FeaturePatternMatching
         
         featureNodesByType = new HashMap<>();
         
-        getAllFeatureNodesAndAddToMap(nodeA, featureNodesByType, linkWhitelist);
-        getAllFeatureNodesAndAddToMap(nodeB, featureNodesByType, linkWhitelist);
+        getAllFeatureNodesAndAddToMap(nodeA, featureNodesByType);
+        getAllFeatureNodesAndAddToMap(nodeB, featureNodesByType);
         
         return matchAndWeightFeatureNodesByType(featureNodesByType, networkHandles);
     }
-    
-    
-    // TOOO matchAnyRecursive
+
+    // TODO< document source (chapter of foundalis disertation after the chapter about the nonrecursive version) >
+    // TODO< recurse until reach of lower bound >
     // recursive until lower bound
-    
-    
+    public List<MatchingPathElement> matchAnyRecursive(Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist, int maxDepth)
+    {
+        List<MatchingPathElement> resultMatchingPath;
+
+        resultMatchingPath = new ArrayList<>();
+
+        matchAnyRecursiveInternal(resultMatchingPath, nodeA, nodeB, networkHandles, linkWhitelist, maxDepth, 1);
+
+        return resultMatchingPath;
+    }
+
+    // TODO< helper for calculate rating with strategy >
+
+
+    private void matchAnyRecursiveInternal(List<MatchingPathElement> resultMatchingPath, Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist, int maxDepth, int currentDepth)
+    {
+        int linkIndexA, linkIndexB;
+        MatchingPathElement bestMatchingPathElement;
+
+        if( currentDepth >= maxDepth )
+        {
+            return;
+        }
+
+        bestMatchingPathElement = new MatchingPathElement();
+        bestMatchingPathElement.bestMatchNodeAIndex = -1;
+        bestMatchingPathElement.bestMatchNodeBIndex = -1;
+        bestMatchingPathElement.matchValue = 0.0f;
+
+        for( linkIndexA = 0; linkIndexA < nodeA.outgoingLinks.size(); linkIndexA++ )
+        {
+            for( linkIndexB = 0; linkIndexB < nodeB.outgoingLinks.size(); linkIndexB++ )
+            {
+                Link linkA, linkB;
+                float currentMatchValue;
+
+                linkA = nodeA.outgoingLinks.get(linkIndexA);
+                linkB = nodeB.outgoingLinks.get(linkIndexB);
+
+                if( !doesLinkTypeListContainType(linkWhitelist, linkA.type) || !doesLinkTypeListContainType(linkWhitelist, linkB.type) )
+                {
+                    continue;
+                }
+
+                currentMatchValue = matchAnyNonRecursive(linkA.target, linkB.target, networkHandles);
+
+                if( currentMatchValue > bestMatchingPathElement.matchValue )
+                {
+                    bestMatchingPathElement.matchValue = currentMatchValue;
+                    bestMatchingPathElement.bestMatchNodeAIndex = linkIndexA;
+                    bestMatchingPathElement.bestMatchNodeBIndex = linkIndexB;
+                }
+            }
+        }
+
+        resultMatchingPath.add(bestMatchingPathElement);
+
+        matchAnyRecursiveInternal(resultMatchingPath, nodeA.outgoingLinks.get(bestMatchingPathElement.bestMatchNodeAIndex).target, nodeB.outgoingLinks.get(bestMatchingPathElement.bestMatchNodeBIndex).target, networkHandles, linkWhitelist, maxDepth, currentDepth+1);
+    }
+
+    public class MatchingPathElement
+    {
+        public int bestMatchNodeAIndex;
+        public int bestMatchNodeBIndex;
+
+        public float matchValue;
+    }
+
     /** helper for matchAnyNonRecursive
      * 
      * goes through the map and weights it after the activation in LTM
@@ -188,7 +254,7 @@ public class FeaturePatternMatching
     }
     
     // helper for matchAnyNonRecursive
-    private static void getAllFeatureNodesAndAddToMap(Node node, Map<Node, ArrayList<FeatureNode>> featureNodesByType, List<Link.EnumType> linkWhitelist)
+    private static void getAllFeatureNodesAndAddToMap(Node node, Map<Node, ArrayList<FeatureNode>> featureNodesByType)
     {
         ArrayList<Link> attributeLinksFromNode;
         
@@ -198,12 +264,6 @@ public class FeaturePatternMatching
         {
             FeatureNode targetFeatureNode;
 
-            // check if type not in whitelist
-            if( !doesLinkTypeListContainType(linkWhitelist, iterationAttributeLink.type) )
-            {
-                continue;
-            }
-            
             if( iterationAttributeLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() )
             {
                 continue;
