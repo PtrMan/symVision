@@ -8,13 +8,14 @@ import bpsolver.NetworkHandles;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import misc.Assert;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.integration.BaseAbstractUnivariateIntegrator;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * class which encapuslates feature matching for learning/matching in the workspace/ltm
@@ -100,7 +101,7 @@ public class FeaturePatternMatching
     // matches two (PlatonicPrimitiveInstanceNode for now) against each other and returns the matching degree
     // takes the activation/priming inside the LTM into account to do so
     // see foundalis disertation 8.2.3 to see how it is compared
-    public float matchAnyNonRecursive(Node nodeA, Node nodeB, NetworkHandles networkHandles)
+    public float matchAnyNonRecursive(Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist)
     {
         // the type is FeatureNode.featureTypeNode
         // only if two elements are in the array the type is 
@@ -121,8 +122,8 @@ public class FeaturePatternMatching
         
         featureNodesByType = new HashMap<>();
         
-        getAllFeatureNodesAndAddToMap(nodeA, featureNodesByType);
-        getAllFeatureNodesAndAddToMap(nodeB, featureNodesByType);
+        getAllFeatureNodesAndAddToMap(nodeA, featureNodesByType, linkWhitelist);
+        getAllFeatureNodesAndAddToMap(nodeB, featureNodesByType, linkWhitelist);
         
         return matchAndWeightFeatureNodesByType(featureNodesByType, networkHandles);
     }
@@ -187,7 +188,7 @@ public class FeaturePatternMatching
     }
     
     // helper for matchAnyNonRecursive
-    private static void getAllFeatureNodesAndAddToMap(Node node, Map<Node, ArrayList<FeatureNode>> featureNodesByType)
+    private static void getAllFeatureNodesAndAddToMap(Node node, Map<Node, ArrayList<FeatureNode>> featureNodesByType, List<Link.EnumType> linkWhitelist)
     {
         ArrayList<Link> attributeLinksFromNode;
         
@@ -196,6 +197,12 @@ public class FeaturePatternMatching
         for( Link iterationAttributeLink : attributeLinksFromNode )
         {
             FeatureNode targetFeatureNode;
+
+            // check if type not in whitelist
+            if( !doesLinkTypeListContainType(linkWhitelist, iterationAttributeLink.type) )
+            {
+                continue;
+            }
             
             if( iterationAttributeLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() )
             {
@@ -217,6 +224,20 @@ public class FeaturePatternMatching
                 featureNodesByType.put(targetFeatureNode.featureTypeNode, createdFeatureNodeList);
             }
         }
+    }
+
+    // helper
+    private static boolean doesLinkTypeListContainType(List<Link.EnumType> list, Link.EnumType searchFor)
+    {
+        for( Link.EnumType iterationType : list )
+        {
+            if( iterationType.ordinal() == searchFor.ordinal() )
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
     
     private float matchSameTypeNumerosityWithBothNumberOfObservationsEquals1(FeatureStatistics f1, int numeriosity1, FeatureStatistics f2, int numeriosity2)
