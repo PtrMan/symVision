@@ -2,12 +2,16 @@ package bpsolver;
 
 import Datastructures.Vector2d;
 import FargGeneral.Coderack;
-import bpsolver.codelets.LineSegmentLength;
-import bpsolver.ltm.LinkCreator;
 import FargGeneral.network.Network;
+import FargGeneral.network.Node;
 import bpsolver.codelets.BaryCenter;
+import bpsolver.codelets.LineSegmentLength;
 import bpsolver.codelets.LineSegmentSlope;
+import bpsolver.ltm.LinkCreator;
 import bpsolver.nodes.PlatonicPrimitiveNode;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class BpSolver {
     public static void main(String[] args)
@@ -183,6 +187,9 @@ public class BpSolver {
     public NetworkHandles networkHandles = new NetworkHandles();
     public Coderack coderack = new Coderack();
     public CodeletLtmLookup codeletLtmLookup;
+
+    // all stored patterns
+    public List<Node> patternRootNodes = new ArrayList<>();
 
     public Vector2d<Float> getImageSizeAsFloat()
     {

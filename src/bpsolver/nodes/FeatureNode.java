@@ -83,10 +83,9 @@ public class FeatureNode extends Node {
     private EnumValueType valueType;
     
     private int weight; // used for fair fusing of nodes
-    
-    // TODO< set with constructor >
-    public FeatureStatistics statistics;
-    
+
+    public FeatureStatistics statistics = new FeatureStatistics();
+
     public enum EnumValueType
     {
         INT,

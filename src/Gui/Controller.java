@@ -12,6 +12,7 @@ import bpsolver.RetinaToWorkspaceTranslator.NearIntersectionStrategy;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
+import bpsolver.pattern.FeaturePatternMatching;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -19,6 +20,7 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class Controller
@@ -125,6 +127,52 @@ public class Controller
             // TODO< process workspace nodes >
             
             nodeGraph.repopulateAfterNodes(objectNodes, bpSolver.networkHandles);
+
+            if( true )
+            {
+                final int MAXDEPTH = 3;
+
+                final float minMatchingValue = 0.6f; // TODO< tune >
+
+                FeaturePatternMatching featurePatternMatching;
+
+                featurePatternMatching = new FeaturePatternMatching();
+
+                for( Node iterationNode : objectNodes )
+                {
+                    Node bestPatternNode;
+                    float bestPatternRating;
+
+                    bestPatternNode = null;
+                    bestPatternRating = 0.0f;
+
+                    for( Node patternNode : bpSolver.patternRootNodes )
+                    {
+                        List<FeaturePatternMatching.MatchingPathElement> matchingPathElements;
+                        float matchingValue;
+
+                        matchingPathElements = featurePatternMatching.matchAnyRecursive(iterationNode, patternNode, bpSolver.networkHandles, Arrays.asList(Link.EnumType.CONTAINS), MAXDEPTH);
+                        matchingValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
+
+                        if( matchingValue > minMatchingValue && matchingValue > bestPatternRating )
+                        {
+                            bestPatternNode = patternNode;
+                            bestPatternRating = matchingValue;
+                        }
+                    }
+
+                    if( bestPatternNode != null )
+                    {
+                        // TODO< incorperate new pattern into old >
+                    }
+                    else
+                    {
+                        bpSolver.patternRootNodes.add(iterationNode);
+                    }
+                }
+
+
+            }
             
             time++;
         }

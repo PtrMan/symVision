@@ -11,6 +11,7 @@ import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import misc.Assert;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.integration.BaseAbstractUnivariateIntegrator;
+import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +25,30 @@ import java.util.Map;
  */
 public class FeaturePatternMatching
 {
+    public interface IMatchingPathRatingStrategy
+    {
+        float calculate(List<MatchingPathElement> matchingPathElements);
+    }
+
+    public static class MultiplyMatchingPathRatingStrategy implements  IMatchingPathRatingStrategy
+    {
+
+        @Override
+        public float calculate(List<MatchingPathElement> matchingPathElements)
+        {
+            float result;
+
+            result = 1.0f;
+
+            for( MatchingPathElement iterationMatchingPathElement : matchingPathElements )
+            {
+                result *= iterationMatchingPathElement.matchValue;
+            }
+
+            return result;
+        }
+    }
+
     private class IntegrateTDistributionUpperIntegral implements UnivariateFunction
     {
         public float n;
@@ -142,7 +167,15 @@ public class FeaturePatternMatching
         return resultMatchingPath;
     }
 
-    // TODO< helper for calculate rating with strategy >
+    // helper for calculate rating with strategy
+    public static float calculateRatingWithDefaultStrategy(List<MatchingPathElement> matchingPathElements)
+    {
+        IMatchingPathRatingStrategy strategy;
+
+        strategy = new MultiplyMatchingPathRatingStrategy();
+
+        return strategy.calculate(matchingPathElements);
+    }
 
 
     private void matchAnyRecursiveInternal(List<MatchingPathElement> resultMatchingPath, Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist, int maxDepth, int currentDepth)
@@ -395,13 +428,14 @@ public class FeaturePatternMatching
         
         return (upperIntegral)/((float)Math.sqrt(n-1.0f)*lowerIntegral);
     }
-    
-    public BaseAbstractUnivariateIntegrator integrator;
+
+    // this integrator just for getting started
+    public BaseAbstractUnivariateIntegrator integrator = new SimpsonIntegrator();
     private IntegrateTDistributionUpperIntegral integrateTDistributionUpperIntegral = new IntegrateTDistributionUpperIntegral();
     private IntegrateTDistributionLowerIntegral integrateTDistributionLowerIntegral = new IntegrateTDistributionLowerIntegral();
     private IntegrateEquation8Dot4 integrateEquation8Dot4 = new IntegrateEquation8Dot4();
     
     private final static float SIGMAZERO = 1.0f; // used in the comparison of numerosity nodes
     
-    private final static int INTEGRATEMAXEVAL = 50;
+    private final static int INTEGRATEMAXEVAL = 16;
 }
