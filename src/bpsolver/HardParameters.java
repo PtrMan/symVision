@@ -48,4 +48,10 @@ public class HardParameters
     {
         public final static float LINESEGMENTFEATURELINELENGTH = 0.7f;
     }
+
+    public static class PatternMatching
+    {
+        public static final float MINSIMILARITY = 0.05f; // TODO< tune >
+        public static final int MAXDEPTH = 3;
+    }
 }

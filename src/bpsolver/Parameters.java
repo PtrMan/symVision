@@ -46,20 +46,34 @@ public class Parameters
             return HardParameters.ProcessD.LOCKINGACTIVATIONMSESCALE;
         }
     }
-    
+
+    public static float getPatternMatchingMinSimilarity()
+    {
+        if( ALLOWPATTERNMATCHINGMINSIMILARITY )
+        {
+            return currentPatternMatchingMinSimilarity;
+        }
+        else
+        {
+            return HardParameters.PatternMatching.MINSIMILARITY;
+        }
+    }
+
     public static void init()
     {
         currentProcessdMaxMse = HardParameters.ProcessD.MAXMSE;
         currentProcessdLockingActivationOffset = HardParameters.ProcessD.LOCKINGACTIVATIONOFFSET;
         currentProcessdLockingActivationScale = HardParameters.ProcessD.LOCKINGACTIVATIONMSESCALE;
+        currentPatternMatchingMinSimilarity = HardParameters.PatternMatching.MINSIMILARITY;
     }
     
     public static float currentProcessdMaxMse;
     public static float currentProcessdLockingActivationOffset;
     public static float currentProcessdLockingActivationScale;
-    
+    public static float currentPatternMatchingMinSimilarity;
     
     private final static boolean ALLOWTUNINGPROCESSDMAXMSE = true;
     private final static boolean ALLOWTUNINGPROCESSDLOCKINGACTIVATIONOFFSET = true;
     private final static boolean ALLOWTUNINGPROCESSDLOCKINGACTIVATIONSCALE = true;
+    private final static boolean ALLOWPATTERNMATCHINGMINSIMILARITY = true;
 }

@@ -6,7 +6,9 @@ import FargGeneral.network.Link;
 import FargGeneral.network.Node;
 import RetinaLevel.*;
 import bpsolver.BpSolver;
+import bpsolver.HardParameters;
 import bpsolver.NetworkHandles;
+import bpsolver.Parameters;
 import bpsolver.RetinaToWorkspaceTranslator.ITranslatorStrategy;
 import bpsolver.RetinaToWorkspaceTranslator.NearIntersectionStrategy;
 import bpsolver.nodes.FeatureNode;
@@ -130,10 +132,6 @@ public class Controller
 
             if( true )
             {
-                final int MAXDEPTH = 3;
-
-                final float minSimilarityValue = 0.6f; // TODO< tune >
-
                 FeaturePatternMatching featurePatternMatching;
 
                 featurePatternMatching = new FeaturePatternMatching();
@@ -152,11 +150,11 @@ public class Controller
                         float matchingDistanceValue;
                         float matchingSimilarityValue;
 
-                        matchingPathElements = featurePatternMatching.matchAnyRecursive(iterationNode, patternNode, bpSolver.networkHandles, Arrays.asList(Link.EnumType.CONTAINS), MAXDEPTH);
+                        matchingPathElements = featurePatternMatching.matchAnyRecursive(iterationNode, patternNode, bpSolver.networkHandles, Arrays.asList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
                         matchingDistanceValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
                         matchingSimilarityValue = FeaturePatternMatching.Converter.distanceToSimilarity(matchingDistanceValue);
 
-                        if( matchingSimilarityValue > minSimilarityValue && matchingSimilarityValue > bestPatternSimilarity )
+                        if( matchingSimilarityValue > Parameters.getPatternMatchingMinSimilarity() && matchingSimilarityValue > bestPatternSimilarity )
                         {
                             bestPatternNode = patternNode;
                             bestPatternSimilarity = matchingSimilarityValue;
