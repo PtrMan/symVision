@@ -103,7 +103,7 @@ public class Controller
             
             retinaToWorkspaceTranslatorStrategy = new NearIntersectionStrategy();
             
-            List<Node> objectNodes = retinaToWorkspaceTranslatorStrategy.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver, bpSolver.getImageSizeAsFloat());
+            List<Node> objectNodes = retinaToWorkspaceTranslatorStrategy.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver);
             
             bpSolver.cycle(500);
             

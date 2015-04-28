@@ -28,7 +28,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
 
     
     @Override
-    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, BpSolver bpSolver, Vector2d<Float> imageSize)
+    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, BpSolver bpSolver)
     {
         SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects;
         List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints;
@@ -39,13 +39,13 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
         final int GRIDCOUNTY = 10;
         
         spatialAccelerationForCrosspointsWithMappingOfRetinaObjects = new SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects();
-        spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints = new SpatialAcceleration<>(GRIDCOUNTX, GRIDCOUNTY, imageSize.x, imageSize.y);
+        spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints = new SpatialAcceleration<>(GRIDCOUNTX, GRIDCOUNTY, bpSolver.getImageSize().x, bpSolver.getImageSize().y);
 
-        spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap = createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(primitives, network, networkHandles, coderack, codeletLtmLookup);
+        spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap = NearIntersectionStrategy.createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(primitives, bpSolver);
 
         bundleAllIntersections(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, primitives);
         calculateAnglePointType(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
-        createLinksAndNodesForAnglePoints(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, coderack, network, networkHandles, codeletLtmLookup, bpSolver);
+        createLinksAndNodesForAnglePoints(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, bpSolver);
         
         //retinaObjectsWithAssociatedPoints = convertPrimitivesToRetinaObjectsWithAssoc(primitives);
         //storeRetinaObjectWithAssocIntoMap(retinaObjectsWithAssociatedPoints, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
@@ -53,8 +53,8 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
         
         // NOTE< does hashmap work? >
         remainingRetinaObjects = new HashMap<>();
-        
-        resetAllMarkings(primitives);
+
+        NearIntersectionStrategy.resetAllMarkings(primitives);
         
         // algorithm
         
@@ -64,10 +64,10 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
         // then pick one at random and put connected (assert unmarked) retinaObjects into the same object and put them out of the map
         // repeat this until no remaining retina object is in the map
         
-        return pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(remainingRetinaObjects, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap, random, network, networkHandles, coderack, codeletLtmLookup);
+        return NearIntersectionStrategy.pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(remainingRetinaObjects, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap, random, bpSolver);
     }
 
-    private Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(List<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup)
+    private static Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(List<RetinaPrimitive> primitives, BpSolver bpSolver)
     {
         Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> resultMap;
 
@@ -78,13 +78,13 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
             RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssocPointsAndWorkspace;
             PlatonicPrimitiveInstanceNode createdPlatonicInstanceNodeForRetinaObject;
 
-            createdPlatonicInstanceNodeForRetinaObject = createPlatonicInstanceNodeForRetinaObject(iterationRetinaPrimitive, networkHandles);
+            createdPlatonicInstanceNodeForRetinaObject = createPlatonicInstanceNodeForRetinaObject(iterationRetinaPrimitive, bpSolver.networkHandles);
 
             retinaObjectWithAssocPointsAndWorkspace = new RetinaObjectWithAssociatedPointsAndWorkspaceNode(iterationRetinaPrimitive);
             retinaObjectWithAssocPointsAndWorkspace.workspaceNode = createdPlatonicInstanceNodeForRetinaObject;
 
             // add all codelet's of it
-            codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdPlatonicInstanceNodeForRetinaObject, coderack, network, networkHandles);
+            bpSolver.codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdPlatonicInstanceNodeForRetinaObject, bpSolver.coderack, bpSolver.network, bpSolver.networkHandles);
             
             resultMap.put(iterationRetinaPrimitive, retinaObjectWithAssocPointsAndWorkspace);
         }
@@ -114,7 +114,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
         }
     }
     
-    private List<RetinaPrimitive> pickRetinaPrimitiveAtRandomAndMarkAndRemoveConnectedPrimitivesAndRetunListOfPrimitives(Map<RetinaPrimitive, Boolean> map, Random random)
+    private static List<RetinaPrimitive> pickRetinaPrimitiveAtRandomAndMarkAndRemoveConnectedPrimitivesAndRetunListOfPrimitives(Map<RetinaPrimitive, Boolean> map, Random random)
     {
         List<RetinaPrimitive> resultPrimitives;
         List<RetinaPrimitive> openList;
@@ -205,7 +205,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
     }
     
 
-    private List<Node> pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(Map<RetinaPrimitive, Boolean> map, Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitveToRetinaObjectWithAssocMap, Random random, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup)
+    private static List<Node> pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(Map<RetinaPrimitive, Boolean> map, Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitveToRetinaObjectWithAssocMap, Random random, BpSolver bpSolver)
     {
         List<Node> resultObjectNodes;
         
@@ -224,7 +224,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
             
             PlatonicPrimitiveInstanceNode objectNode;
             
-            objectNode = new PlatonicPrimitiveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
+            objectNode = new PlatonicPrimitiveInstanceNode(bpSolver.networkHandles.objectPlatonicPrimitiveNode);
             
             // create for the retinaPrimitives network nodes and link them
             {
@@ -236,10 +236,10 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
                     nodeForRetinaPrimitive = primitveToRetinaObjectWithAssocMap.get(iterationPrimitive).workspaceNode;
 
                     // linkage
-                    createdForwardLink = network.linkCreator.createLink(Link.EnumType.CONTAINS, nodeForRetinaPrimitive);
+                    createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.CONTAINS, nodeForRetinaPrimitive);
                     objectNode.outgoingLinks.add(createdForwardLink);
 
-                    createdBackwardLink = network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
+                    createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
                     nodeForRetinaPrimitive.outgoingLinks.add(createdBackwardLink);
                 }
             }
@@ -249,7 +249,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
     }
     
 
-    private void resetAllMarkings(List<RetinaPrimitive> primitives)
+    private static void resetAllMarkings(List<RetinaPrimitive> primitives)
     {
         for( RetinaPrimitive iterationPrimitive : primitives )
         {

@@ -1,13 +1,8 @@
 package bpsolver.RetinaToWorkspaceTranslator;
 
-import Datastructures.Vector2d;
-import FargGeneral.Coderack;
-import FargGeneral.network.Network;
 import FargGeneral.network.Node;
 import RetinaLevel.RetinaPrimitive;
 import bpsolver.BpSolver;
-import bpsolver.CodeletLtmLookup;
-import bpsolver.NetworkHandles;
 
 import java.util.List;
 
@@ -21,5 +16,5 @@ import java.util.List;
  */
 public interface ITranslatorStrategy
 {
-    List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, BpSolver bpSolver, Vector2d<Float> imageSize);
+    List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, BpSolver bpSolver);
 }
