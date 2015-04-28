@@ -212,8 +212,8 @@ public class BpSolverTest
         PointProximityStrategy retinaToWorkspaceTranslator;
         
         retinaToWorkspaceTranslator = new PointProximityStrategy();
-        List<Node> objectNodes = retinaToWorkspaceTranslator.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver, bpSolver.getImageSizeAsFloat());
-        
+        List<Node> objectNodes = retinaToWorkspaceTranslator.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver);
+
         bpSolver.cycle(500);
         
         return objectNodes;
