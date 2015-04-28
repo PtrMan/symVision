@@ -164,6 +164,7 @@ public class Controller
                     if( bestPatternNode != null )
                     {
                         // TODO< incorperate new pattern into old >
+                        int debugPoint = 0;
                     }
                     else
                     {

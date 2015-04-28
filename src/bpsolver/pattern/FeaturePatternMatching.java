@@ -224,9 +224,12 @@ public class FeaturePatternMatching
             }
         }
 
-        resultMatchingPath.add(bestMatchingPathElement);
+        if( bestMatchingPathElement.matchValue != 0.0f )
+        {
+            resultMatchingPath.add(bestMatchingPathElement);
 
-        matchAnyRecursiveInternal(resultMatchingPath, nodeA.outgoingLinks.get(bestMatchingPathElement.bestMatchNodeAIndex).target, nodeB.outgoingLinks.get(bestMatchingPathElement.bestMatchNodeBIndex).target, networkHandles, linkWhitelist, maxDepth, currentDepth+1);
+            matchAnyRecursiveInternal(resultMatchingPath, nodeA.outgoingLinks.get(bestMatchingPathElement.bestMatchNodeAIndex).target, nodeB.outgoingLinks.get(bestMatchingPathElement.bestMatchNodeBIndex).target, networkHandles, linkWhitelist, maxDepth, currentDepth+1);
+        }
     }
 
     public class MatchingPathElement
