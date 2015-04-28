@@ -25,6 +25,19 @@ import java.util.Map;
  */
 public class FeaturePatternMatching
 {
+    public static class Converter
+    {
+        /**
+         *
+         *
+         * see Foundalis dissertation page 225   8.2.5 Using difference to compute similarity
+         */
+        public static float distanceToSimilarity(float distance)
+        {
+            return (float)Math.exp(-distance);
+        }
+    }
+
     public interface IMatchingPathRatingStrategy
     {
         float calculate(List<MatchingPathElement> matchingPathElements);
@@ -42,7 +55,7 @@ public class FeaturePatternMatching
 
             for( MatchingPathElement iterationMatchingPathElement : matchingPathElements )
             {
-                result *= iterationMatchingPathElement.matchValue;
+                result *= iterationMatchingPathElement.similarityValue;
             }
 
             return result;
@@ -196,14 +209,15 @@ public class FeaturePatternMatching
         bestMatchingPathElement = new MatchingPathElement();
         bestMatchingPathElement.bestMatchNodeAIndex = -1;
         bestMatchingPathElement.bestMatchNodeBIndex = -1;
-        bestMatchingPathElement.matchValue = 0.0f;
+        bestMatchingPathElement.similarityValue = 0.0f;
 
         for( linkIndexA = 0; linkIndexA < nodeA.outgoingLinks.size(); linkIndexA++ )
         {
             for( linkIndexB = 0; linkIndexB < nodeB.outgoingLinks.size(); linkIndexB++ )
             {
                 Link linkA, linkB;
-                float currentMatchValue;
+                float currentDistance;
+                float currentSimilarity;
 
                 linkA = nodeA.outgoingLinks.get(linkIndexA);
                 linkB = nodeB.outgoingLinks.get(linkIndexB);
@@ -213,18 +227,19 @@ public class FeaturePatternMatching
                     continue;
                 }
 
-                currentMatchValue = matchAnyNonRecursive(linkA.target, linkB.target, networkHandles);
+                currentDistance = matchAnyNonRecursive(linkA.target, linkB.target, networkHandles);
+                currentSimilarity = FeaturePatternMatching.Converter.distanceToSimilarity(currentDistance);
 
-                if( currentMatchValue > bestMatchingPathElement.matchValue )
+                if( currentSimilarity > bestMatchingPathElement.similarityValue)
                 {
-                    bestMatchingPathElement.matchValue = currentMatchValue;
+                    bestMatchingPathElement.similarityValue = currentSimilarity;
                     bestMatchingPathElement.bestMatchNodeAIndex = linkIndexA;
                     bestMatchingPathElement.bestMatchNodeBIndex = linkIndexB;
                 }
             }
         }
 
-        if( bestMatchingPathElement.matchValue != 0.0f )
+        if( bestMatchingPathElement.similarityValue != 0.0f )
         {
             resultMatchingPath.add(bestMatchingPathElement);
 
@@ -237,7 +252,7 @@ public class FeaturePatternMatching
         public int bestMatchNodeAIndex;
         public int bestMatchNodeBIndex;
 
-        public float matchValue;
+        public float similarityValue;
     }
 
     /** helper for matchAnyNonRecursive

@@ -132,7 +132,7 @@ public class Controller
             {
                 final int MAXDEPTH = 3;
 
-                final float minMatchingValue = 0.6f; // TODO< tune >
+                final float minSimilarityValue = 0.6f; // TODO< tune >
 
                 FeaturePatternMatching featurePatternMatching;
 
@@ -141,23 +141,25 @@ public class Controller
                 for( Node iterationNode : objectNodes )
                 {
                     Node bestPatternNode;
-                    float bestPatternRating;
+                    float bestPatternSimilarity;
 
                     bestPatternNode = null;
-                    bestPatternRating = 0.0f;
+                    bestPatternSimilarity = 0.0f;
 
                     for( Node patternNode : bpSolver.patternRootNodes )
                     {
                         List<FeaturePatternMatching.MatchingPathElement> matchingPathElements;
-                        float matchingValue;
+                        float matchingDistanceValue;
+                        float matchingSimilarityValue;
 
                         matchingPathElements = featurePatternMatching.matchAnyRecursive(iterationNode, patternNode, bpSolver.networkHandles, Arrays.asList(Link.EnumType.CONTAINS), MAXDEPTH);
-                        matchingValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
+                        matchingDistanceValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
+                        matchingSimilarityValue = FeaturePatternMatching.Converter.distanceToSimilarity(matchingDistanceValue);
 
-                        if( matchingValue > minMatchingValue && matchingValue > bestPatternRating )
+                        if( matchingSimilarityValue > minSimilarityValue && matchingSimilarityValue > bestPatternSimilarity )
                         {
                             bestPatternNode = patternNode;
-                            bestPatternRating = matchingValue;
+                            bestPatternSimilarity = matchingSimilarityValue;
                         }
                     }
 
