@@ -57,11 +57,14 @@ public class FeaturePatternMatching
         {
             float x;
             float insidePower;
+            float result;
             
             x = (float)d;
 
             insidePower = (n - 1.0f)/(n - 1.0f + x*x);
-            return Math.pow(insidePower, n/2.0f);
+            result = (float)Math.pow(insidePower, n/2.0f);
+
+            return result;
         }
     }
     
@@ -72,10 +75,12 @@ public class FeaturePatternMatching
         public double value(double d)
         {
             float x;
+            float result;
             
             x = (float)d;
+            result = (float)Math.pow(Math.sin(x), n);
 
-            return Math.pow(Math.sin(x), n);
+            return result;
         }
     }
     
