@@ -2,11 +2,10 @@ package RetinaLevel;
 
 import Datastructures.Map2d;
 import Datastructures.Vector2d;
-import static Datastructures.Vector2d.FloatHelper.getLength;
-import static Datastructures.Vector2d.FloatHelper.sub;
 import bpsolver.HardParameters;
-import java.util.ArrayList;
 import misc.Assert;
+
+import java.util.List;
 
 /**
  * finds line intersections
@@ -15,7 +14,7 @@ import misc.Assert;
 public class ProcessE
 {
     // TODO< sort out only the line detectors or make sure only linedetectors get in, remove asserts if its made sure >
-    public void process(ArrayList<RetinaPrimitive> lineDetectors, Map2d<Boolean> image)
+    public void process(List<RetinaPrimitive> lineDetectors, Map2d<Boolean> image)
     {
         // we examine ALL possible intersections of all lines
         // this is only possible if we have the whole image at an instance

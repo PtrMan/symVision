@@ -1,24 +1,24 @@
 package bpsolver.codelets;
 
 import Datastructures.Vector2d;
-import static Datastructures.Vector2d.FloatHelper.normalize;
-import static Datastructures.Vector2d.FloatHelper.sub;
 import FargGeneral.network.Link;
-import FargGeneral.network.Network;
+import bpsolver.BpSolver;
 import bpsolver.HelperFunctions;
-import bpsolver.NetworkHandles;
 import bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
 import bpsolver.SolverCodelet;
 import bpsolver.nodes.AttributeNode;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
 import math.TruncatedFisherYades;
 import misc.AngleHelper;
 import misc.Assert;
+
+import java.util.ArrayList;
+import java.util.Random;
+
+import static Datastructures.Vector2d.FloatHelper.normalize;
+import static Datastructures.Vector2d.FloatHelper.sub;
 import static misc.Assert.Assert;
 
 /**
@@ -43,9 +43,9 @@ public class Angle extends SolverCodelet
         public float angle;
     }
     
-    public Angle(Network network, NetworkHandles networkHandles)
+    public Angle(BpSolver bpSolver)
     {
-        super(network, networkHandles);
+        super(bpSolver);
     }
 
     @Override
@@ -59,7 +59,7 @@ public class Angle extends SolverCodelet
     {
         Angle cloned;
         
-        cloned = new Angle(network, networkHandles);
+        cloned = new Angle(bpSolver);
         return cloned;
     }
 
@@ -74,7 +74,7 @@ public class Angle extends SolverCodelet
         
         angleInformations = new ArrayList<>();
         
-        Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() && ((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(networkHandles.anglePointNodePlatonicPrimitiveNode), "");
+        Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() && ((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(getNetworkHandles().anglePointNodePlatonicPrimitiveNode), "");
         
         anglePointType = getAnglePointType((PlatonicPrimitiveInstanceNode)startNode);
         anglePartners = getPartnersOfAnglepoint((PlatonicPrimitiveInstanceNode)startNode);
@@ -127,13 +127,13 @@ public class Angle extends SolverCodelet
             FeatureNode createdFeatureNode;
             int linkI;
             
-            createdFeatureNode = FeatureNode.createFloatNode(networkHandles.anglePointAngleValuePrimitiveNode, iterationAngle.angle, 1);
+            createdFeatureNode = FeatureNode.createFloatNode(getNetworkHandles().anglePointAngleValuePrimitiveNode, iterationAngle.angle, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().anglePointAngleValuePrimitiveNode));
             
             for( linkI = 0; linkI < iterationAngle.count; linkI++ )
             {
                 Link createdLink;
                 
-                createdLink = network.linkCreator.createLink(Link.EnumType.HASFEATURE, createdFeatureNode);
+                createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASFEATURE, createdFeatureNode);
                 
                 anglePointPrimitiveInstanceNode.outgoingLinks.add(createdLink);
             }
@@ -145,9 +145,9 @@ public class Angle extends SolverCodelet
         AttributeNode createAnglePointTypeNode;
         Link createdLink;
         
-        createAnglePointTypeNode = AttributeNode.createIntegerNode(networkHandles.anglePointFeatureTypePrimitiveNode, anglePointType.ordinal());
+        createAnglePointTypeNode = AttributeNode.createIntegerNode(getNetworkHandles().anglePointFeatureTypePrimitiveNode, anglePointType.ordinal());
         
-        createdLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createAnglePointTypeNode);
+        createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createAnglePointTypeNode);
         anglePointPrimitiveInstanceNode.outgoingLinks.add(createdLink);
     }
     
@@ -164,7 +164,7 @@ public class Angle extends SolverCodelet
             
             targetAttributeNode = (AttributeNode)iterationLink.target;
             
-            if( !targetAttributeNode.attributeTypeNode.equals(networkHandles.anglePointFeatureTypePrimitiveNode) )
+            if( !targetAttributeNode.attributeTypeNode.equals(getNetworkHandles().anglePointFeatureTypePrimitiveNode) )
             {
                 continue;
             }
@@ -189,12 +189,12 @@ public class Angle extends SolverCodelet
             
             targetNode = (PlatonicPrimitiveInstanceNode)iterationLink.target;
             
-            if( !targetNode.primitiveNode.equals(networkHandles.anglePointPositionPlatonicPrimitiveNode) )
+            if( !targetNode.primitiveNode.equals(getNetworkHandles().anglePointPositionPlatonicPrimitiveNode) )
             {
                 continue;
             }
             
-            return HelperFunctions.getVectorFromVectorAttributeNode(networkHandles, targetNode);
+            return HelperFunctions.getVectorFromVectorAttributeNode(getNetworkHandles(), targetNode);
         }
         
         throw new InternalError();
@@ -229,7 +229,7 @@ public class Angle extends SolverCodelet
     
     private Vector2d<Float> getTangentOfPlatonicPrimitiveInstanceAtPosition(PlatonicPrimitiveInstanceNode platonicPrimitive, Vector2d<Float> position)
     {
-        if( platonicPrimitive.primitiveNode.equals(networkHandles.lineSegmentPlatonicPrimitiveNode) )
+        if( platonicPrimitive.primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) )
         {
             Vector2d<Float> diff;
             

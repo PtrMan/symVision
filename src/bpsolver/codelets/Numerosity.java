@@ -1,19 +1,17 @@
 package bpsolver.codelets;
 
-import bpsolver.SolverCodelet;
-import FargGeneral.network.Network;
 import FargGeneral.network.Node;
-import bpsolver.NetworkHandles;
+import bpsolver.BpSolver;
+import bpsolver.SolverCodelet;
 import bpsolver.nodes.NodeTypes;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Random;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
+import java.util.Random;
+
 public class Numerosity extends SolverCodelet {
-    public Numerosity(Network network, NetworkHandles networkHandles)
+    public Numerosity(BpSolver bpSolver)
     {
-        super(network, networkHandles);
+        super(bpSolver);
     }
     
     @Override

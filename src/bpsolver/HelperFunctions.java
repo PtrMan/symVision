@@ -2,7 +2,6 @@ package bpsolver;
 
 import Datastructures.Vector2d;
 import FargGeneral.network.Link;
-import FargGeneral.network.Network;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
@@ -14,7 +13,7 @@ import bpsolver.nodes.PlatonicPrimitiveNode;
  */
 public class HelperFunctions
 {
-    public static PlatonicPrimitiveInstanceNode createVectorAttributeNode(Vector2d<Float> vector, PlatonicPrimitiveNode primitiveNodeType, Network network, NetworkHandles networkHandles)
+    public static PlatonicPrimitiveInstanceNode createVectorAttributeNode(Vector2d<Float> vector, PlatonicPrimitiveNode primitiveNodeType, BpSolver bpSolver)
     {
         PlatonicPrimitiveInstanceNode createdVectorInstanceNode;
         FeatureNode createdXNode;
@@ -24,11 +23,11 @@ public class HelperFunctions
         
         createdVectorInstanceNode = new PlatonicPrimitiveInstanceNode(primitiveNodeType);
         
-        createdXNode = FeatureNode.createFloatNode(networkHandles.xCoordinatePlatonicPrimitiveNode, vector.x, 1);
-        createdYNode = FeatureNode.createFloatNode(networkHandles.yCoordinatePlatonicPrimitiveNode, vector.y, 1);
-        linkToXNode = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdXNode);
+        createdXNode = FeatureNode.createFloatNode(bpSolver.networkHandles.xCoordinatePlatonicPrimitiveNode, vector.x, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(bpSolver.networkHandles.xCoordinatePlatonicPrimitiveNode));
+        createdYNode = FeatureNode.createFloatNode(bpSolver.networkHandles.yCoordinatePlatonicPrimitiveNode, vector.y, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(bpSolver.networkHandles.yCoordinatePlatonicPrimitiveNode));
+        linkToXNode = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdXNode);
         createdVectorInstanceNode.outgoingLinks.add(linkToXNode);
-        linkToYNode = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdYNode);
+        linkToYNode = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdYNode);
         createdVectorInstanceNode.outgoingLinks.add(linkToYNode);
         
         return createdVectorInstanceNode;

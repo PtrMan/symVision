@@ -8,6 +8,7 @@ import FargGeneral.network.Network;
 import FargGeneral.network.Node;
 import RetinaLevel.Intersection;
 import RetinaLevel.RetinaPrimitive;
+import bpsolver.BpSolver;
 import bpsolver.CodeletLtmLookup;
 import bpsolver.HelperFunctions;
 import bpsolver.NetworkHandles;
@@ -27,7 +28,7 @@ import java.util.Map;
  */
 public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy
 {
-    public abstract List<Node> createObjectsFromRetinaPrimitives(ArrayList<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize);
+    public abstract List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, BpSolver bpSolver, Vector2d<Float> imageSize);
     
     protected void storeRetinaObjectWithAssocIntoMap(List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects)
     {
@@ -239,7 +240,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy
         }
     }
     
-    protected void createLinksAndNodesForAnglePoints(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup)
+    protected static void createLinksAndNodesForAnglePoints(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, BpSolver bpSolver)
     {
         for( SpatialAcceleration<Crosspoint>.Element currentElement : spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getContentOfAllCells() )
         {
@@ -278,7 +279,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy
             createdFeatureTypeNodeLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointAttributeNode);
             createdAnglePointNode.outgoingLinks.add(createdFeatureTypeNodeLink);
             
-            createdAnglePointPosition = HelperFunctions.createVectorAttributeNode(crosspoint.position, networkHandles.anglePointPositionPlatonicPrimitiveNode, network, networkHandles);
+            createdAnglePointPosition = HelperFunctions.createVectorAttributeNode(crosspoint.position, networkHandles.anglePointPositionPlatonicPrimitiveNode, bpSolver);
             createdPositionLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointPosition);
             createdAnglePointNode.outgoingLinks.add(createdPositionLink);
         }

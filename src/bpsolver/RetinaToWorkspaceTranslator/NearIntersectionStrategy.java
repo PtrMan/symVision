@@ -8,6 +8,7 @@ import FargGeneral.network.Network;
 import FargGeneral.network.Node;
 import RetinaLevel.Intersection;
 import RetinaLevel.RetinaPrimitive;
+import bpsolver.BpSolver;
 import bpsolver.CodeletLtmLookup;
 import bpsolver.NetworkHandles;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
@@ -27,7 +28,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
 
     
     @Override
-    public List<Node> createObjectsFromRetinaPrimitives(ArrayList<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize)
+    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, BpSolver bpSolver, Vector2d<Float> imageSize)
     {
         SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects;
         List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints;
@@ -44,7 +45,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
 
         bundleAllIntersections(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, primitives);
         calculateAnglePointType(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
-        createLinksAndNodesForAnglePoints(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, coderack, network, networkHandles, codeletLtmLookup);
+        createLinksAndNodesForAnglePoints(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, coderack, network, networkHandles, codeletLtmLookup, bpSolver);
         
         //retinaObjectsWithAssociatedPoints = convertPrimitivesToRetinaObjectsWithAssoc(primitives);
         //storeRetinaObjectWithAssocIntoMap(retinaObjectsWithAssociatedPoints, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
@@ -66,7 +67,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
         return pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(remainingRetinaObjects, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap, random, network, networkHandles, coderack, codeletLtmLookup);
     }
 
-    private Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(ArrayList<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup)
+    private Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(List<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup)
     {
         Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> resultMap;
 
@@ -248,7 +249,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy
     }
     
 
-    private void resetAllMarkings(ArrayList<RetinaPrimitive> primitives)
+    private void resetAllMarkings(List<RetinaPrimitive> primitives)
     {
         for( RetinaPrimitive iterationPrimitive : primitives )
         {

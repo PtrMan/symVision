@@ -1,10 +1,9 @@
 package bpsolver.codelets;
 
-import bpsolver.HelperFunctions;
 import Datastructures.Vector2d;
 import FargGeneral.network.Link;
-import FargGeneral.network.Network;
-import bpsolver.NetworkHandles;
+import bpsolver.BpSolver;
+import bpsolver.HelperFunctions;
 import bpsolver.SolverCodelet;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
@@ -16,9 +15,9 @@ import misc.Assert;
  */
 public class EndPoint extends SolverCodelet
 {
-    public EndPoint(Network network, NetworkHandles networkHandles)
+    public EndPoint(BpSolver bpSolver)
     {
-        super(network, networkHandles);
+        super(bpSolver);
     }
 
     @Override
@@ -31,7 +30,7 @@ public class EndPoint extends SolverCodelet
     public SolverCodelet cloneObject() {
         EndPoint cloned;
         
-        cloned = new EndPoint(network, networkHandles);
+        cloned = new EndPoint(bpSolver);
         
         return cloned;
     }
@@ -52,8 +51,8 @@ public class EndPoint extends SolverCodelet
         {
             Link linkToEndpoint;
             
-            PlatonicPrimitiveInstanceNode createdEndpointInstanceNode = HelperFunctions.createVectorAttributeNode(endPoints[endpointI], networkHandles.endpointPlatonicPrimitiveNode, network, networkHandles);
-            linkToEndpoint = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdEndpointInstanceNode);
+            PlatonicPrimitiveInstanceNode createdEndpointInstanceNode = HelperFunctions.createVectorAttributeNode(endPoints[endpointI], getNetworkHandles().endpointPlatonicPrimitiveNode, bpSolver);
+            linkToEndpoint = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdEndpointInstanceNode);
             startNode.outgoingLinks.add(linkToEndpoint);
         }
         
@@ -66,7 +65,7 @@ public class EndPoint extends SolverCodelet
         
         resultPoints = new Vector2d[2];
         
-        if( platonicPrimitiveInstanceNode.primitiveNode.equals(networkHandles.lineSegmentPlatonicPrimitiveNode) )
+        if( platonicPrimitiveInstanceNode.primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) )
         {
             resultPoints[0] = platonicPrimitiveInstanceNode.p1;
             resultPoints[1] = platonicPrimitiveInstanceNode.p2;

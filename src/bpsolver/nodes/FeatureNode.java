@@ -8,14 +8,14 @@ import bpsolver.FeatureStatistics;
  * foundalis dissertation page 143
  */
 public class FeatureNode extends Node {
-    public static FeatureNode createFloatNode(Node featureTypeNode, float value, int weight)
+    public static FeatureNode createFloatNode(Node featureTypeNode, float value, int weight, float primitiveFeatureMax)
     {
-        return new FeatureNode(featureTypeNode, EnumValueType.FLOAT, value, 0, weight);
+        return new FeatureNode(featureTypeNode, EnumValueType.FLOAT, value, 0, weight, primitiveFeatureMax);
     }
     
-    public static FeatureNode createIntegerNode(Node featureTypeNode, int value, int weight)
+    public static FeatureNode createIntegerNode(Node featureTypeNode, int value, int weight, float primitiveFeatureMax)
     {
-        return new FeatureNode(featureTypeNode, EnumValueType.INT, 0.0f, value, weight);
+        return new FeatureNode(featureTypeNode, EnumValueType.INT, 0.0f, value, weight, primitiveFeatureMax);
     }
     
     /**
@@ -25,7 +25,7 @@ public class FeatureNode extends Node {
      * \param valueFloat
      * \param valueInt 
      */
-    private FeatureNode(Node featureTypeNode, EnumValueType valueType, float valueFloat, int valueInt, int weight)
+    private FeatureNode(Node featureTypeNode, EnumValueType valueType, float valueFloat, int valueInt, int weight, float primitiveFeatureMax)
     {
         super(NodeTypes.EnumType.FEATURENODE.ordinal());
         
@@ -36,6 +36,17 @@ public class FeatureNode extends Node {
         this.featureTypeNode = featureTypeNode;
         
         this.weight = weight;
+
+        if( valueType == EnumValueType.FLOAT )
+        {
+            this.statistics.addValue(valueFloat);
+        }
+        else
+        {
+            this.statistics.addValue(valueInt);
+        }
+
+        this.statistics.primitiveFeatureMax = primitiveFeatureMax;
     }
     
     public float getValueAsFloat()

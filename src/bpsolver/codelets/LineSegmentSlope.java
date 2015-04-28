@@ -2,8 +2,7 @@ package bpsolver.codelets;
 
 import Datastructures.Vector2d;
 import FargGeneral.network.Link;
-import FargGeneral.network.Network;
-import bpsolver.NetworkHandles;
+import bpsolver.BpSolver;
 import bpsolver.SolverCodelet;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
@@ -16,9 +15,9 @@ import misc.Assert;
  */
 public class LineSegmentSlope extends SolverCodelet
 {
-    public LineSegmentSlope(Network network, NetworkHandles networkHandles)
+    public LineSegmentSlope(BpSolver bpSolver)
     {
-        super(network, networkHandles);
+        super(bpSolver);
     }
     
     @Override
@@ -30,7 +29,7 @@ public class LineSegmentSlope extends SolverCodelet
     @Override
     public SolverCodelet cloneObject()
     {
-        return new LineSegmentSlope(network, networkHandles);
+        return new LineSegmentSlope(bpSolver);
     }
 
     @Override
@@ -43,7 +42,7 @@ public class LineSegmentSlope extends SolverCodelet
         Vector2d<Float> diff;
         
         Assert.Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "startNode node type is wrong!");
-        Assert.Assert(((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(networkHandles.lineSegmentPlatonicPrimitiveNode), "startNode is not a line!");
+        Assert.Assert(((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode), "startNode is not a line!");
         
         thisLine = (PlatonicPrimitiveInstanceNode)startNode;
         
@@ -58,9 +57,9 @@ public class LineSegmentSlope extends SolverCodelet
             lineSegmentSlope = diff.y / diff.x;
         }
         
-        createdLineSlope = FeatureNode.createFloatNode(networkHandles.lineSegmentFeatureLineSlopePrimitiveNode, lineSegmentSlope, 1);
+        createdLineSlope = FeatureNode.createFloatNode(getNetworkHandles().lineSegmentFeatureLineSlopePrimitiveNode, lineSegmentSlope, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().lineSegmentFeatureLineSlopePrimitiveNode));
         
-        createdLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdLineSlope);
+        createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdLineSlope);
         thisLine.outgoingLinks.add(createdLink);
         
         return new RunResult(false);

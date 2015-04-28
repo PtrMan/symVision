@@ -2,23 +2,25 @@ package bpsolver.RetinaToWorkspaceTranslator;
 
 import Datastructures.SpatialAcceleration;
 import Datastructures.Vector2d;
-import static Datastructures.Vector2d.FloatHelper.getLength;
-import static Datastructures.Vector2d.FloatHelper.sub;
 import FargGeneral.Coderack;
 import FargGeneral.network.Link;
 import FargGeneral.network.Network;
 import FargGeneral.network.Node;
 import RetinaLevel.Intersection;
 import RetinaLevel.RetinaPrimitive;
+import bpsolver.BpSolver;
 import bpsolver.CodeletLtmLookup;
 import bpsolver.NetworkHandles;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
+import misc.Assert;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
-import misc.Assert;
+import static Datastructures.Vector2d.FloatHelper.getLength;
+import static Datastructures.Vector2d.FloatHelper.sub;
 
 // BUGS
 // BUG 0001
@@ -37,7 +39,8 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
      * \param network
      * \return the node which is the object node 
      */
-    public ArrayList<Node> createObjectsFromRetinaPrimitives(ArrayList<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize)
+    @Override
+    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Network network, NetworkHandles networkHandles, Coderack coderack, CodeletLtmLookup codeletLtmLookup, BpSolver bpSolver, Vector2d<Float> imageSize)
     {
         ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints;
         HashMap<Integer, PlatonicPrimitiveInstanceNode> objectNodesByGroupId;
@@ -51,7 +54,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
         }
         
         ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints = createAndPropagateRetinaLevelObjects(retinaObjectsWithAssociatedPoints);
-        ArrayList<ObjectNodeWithGroup> objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints = createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(groupsOfRetinaObjectsWithAssociatedPoints, coderack, network, networkHandles, codeletLtmLookup, imageSize);
+        ArrayList<ObjectNodeWithGroup> objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints = createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(groupsOfRetinaObjectsWithAssociatedPoints, coderack, network, networkHandles, codeletLtmLookup, bpSolver, imageSize);
         resultNodes = getNodesOfNodeAndGroupOfRetinaObject(objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints);
         return resultNodes;
     }
@@ -72,7 +75,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
         return resultArray;
     }
     
-    private ArrayList<ObjectNodeWithGroup> createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize)
+    private ArrayList<ObjectNodeWithGroup> createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, BpSolver bpSolver, Vector2d<Float> imageSize)
     {
         ArrayList<ObjectNodeWithGroup> resultObjectNodesWithGroup;
         
@@ -85,7 +88,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
             
             objectNode = new PlatonicPrimitiveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
             createPlatonicInstanceNodeForRetinaObjectsAndLinkToParent(iterationGroupOfRetinaObjectWithAssociatedPoints.arrayOfRetinaObjectWithAssociatedPoints, objectNode, coderack, network, networkHandles, codeletLtmLookup);
-            createAndLinkAnglePointsAndLink(iterationGroupOfRetinaObjectWithAssociatedPoints.arrayOfRetinaObjectWithAssociatedPoints, coderack, network, networkHandles, codeletLtmLookup, imageSize);
+            createAndLinkAnglePointsAndLink(iterationGroupOfRetinaObjectWithAssociatedPoints.arrayOfRetinaObjectWithAssociatedPoints, coderack, network, networkHandles, codeletLtmLookup, bpSolver, imageSize);
             
             objectNodeWithGroup = new ObjectNodeWithGroup();
             objectNodeWithGroup.groupOfRetinaObjects = iterationGroupOfRetinaObjectWithAssociatedPoints;
@@ -98,7 +101,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
     }
     
     
-    private void createAndLinkAnglePointsAndLink(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Vector2d<Float> imageSize)
+    private void createAndLinkAnglePointsAndLink(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, BpSolver bpSolver, Vector2d<Float> imageSize)
     {
         SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects;
         
@@ -112,7 +115,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy
         storeRetinaObjectWithAssocIntoMap(arrayOfRetinaObjectWithAssociatedPoints, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
         bundleAllIntersectionsOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, arrayOfRetinaObjectWithAssociatedPoints);
         calculateAnglePointType(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
-        createLinksAndNodesForAnglePoints(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, coderack, network, networkHandles, codeletLtmLookup);
+        AbstractTranslatorStrategy.createLinksAndNodesForAnglePoints(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, coderack, network, networkHandles, codeletLtmLookup, bpSolver);
     }
     
     private static List<RetinaPrimitive> getRetinaPrimitivesOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints)

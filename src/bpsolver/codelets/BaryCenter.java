@@ -1,19 +1,19 @@
 package bpsolver.codelets;
 
-import bpsolver.HelperFunctions;
 import Datastructures.Vector2d;
-import static Datastructures.Vector2d.FloatHelper.add;
-import static Datastructures.Vector2d.FloatHelper.getScaled;
 import FargGeneral.network.Link;
-import FargGeneral.network.Network;
-import bpsolver.NetworkHandles;
+import bpsolver.BpSolver;
+import bpsolver.HelperFunctions;
 import bpsolver.SolverCodelet;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import bpsolver.nodes.PlatonicPrimitiveNode;
-import java.util.ArrayList;
 import misc.Assert;
+
+import java.util.ArrayList;
+
+import static Datastructures.Vector2d.FloatHelper.add;
+import static Datastructures.Vector2d.FloatHelper.getScaled;
 
 // NOTE< a problem could be that the endpoint positions of the line segments are handled per line, and not as a whole >
 // to fix this, we need to have a reference to the dots/points of a line, and union them
@@ -29,9 +29,9 @@ public class BaryCenter extends SolverCodelet
         NO
     }
     
-    public BaryCenter(Network network, NetworkHandles networkHandles, EnumRecalculate recalculate)
+    public BaryCenter(BpSolver bpSolver, EnumRecalculate recalculate)
     {
-        super(network, networkHandles);
+        super(bpSolver);
         this.recalculate = recalculate;
     }
     
@@ -44,7 +44,7 @@ public class BaryCenter extends SolverCodelet
     public SolverCodelet cloneObject() {
         BaryCenter cloned;
         
-        cloned = new BaryCenter(network, networkHandles, recalculate);
+        cloned = new BaryCenter(bpSolver, recalculate);
         
         return cloned;
     }
@@ -82,11 +82,11 @@ public class BaryCenter extends SolverCodelet
                 
                 targetFeatureNode = (FeatureNode)iterationLink.target;
                 
-                if( targetFeatureNode.featureTypeNode.equals(networkHandles.xCoordinatePlatonicPrimitiveNode) )
+                if( targetFeatureNode.featureTypeNode.equals(getNetworkHandles().xCoordinatePlatonicPrimitiveNode) )
                 {
                     targetFeatureNode.setValueAsFloat(calculatedBaryCenter.x);
                 }
-                else if( targetFeatureNode.featureTypeNode.equals(networkHandles.yCoordinatePlatonicPrimitiveNode) )
+                else if( targetFeatureNode.featureTypeNode.equals(getNetworkHandles().yCoordinatePlatonicPrimitiveNode) )
                 {
                     targetFeatureNode.setValueAsFloat(calculatedBaryCenter.y);
                 }
@@ -105,8 +105,8 @@ public class BaryCenter extends SolverCodelet
             // create barycenter node and link it to the object
             // add the coordinate nodes
             
-            createdBaryCenterInstanceNode = HelperFunctions.createVectorAttributeNode(calculatedBaryCenter, networkHandles.barycenterPlatonicPrimitiveNode, network, networkHandles);
-            linkToBaryCenter = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdBaryCenterInstanceNode);
+            createdBaryCenterInstanceNode = HelperFunctions.createVectorAttributeNode(calculatedBaryCenter, getNetworkHandles().barycenterPlatonicPrimitiveNode, bpSolver);
+            linkToBaryCenter = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdBaryCenterInstanceNode);
             startNode.outgoingLinks.add(linkToBaryCenter);
             
         }
@@ -138,7 +138,7 @@ public class BaryCenter extends SolverCodelet
             
             platonicPrimitiveInstanceNodeOfTarget = (PlatonicPrimitiveInstanceNode)iterationLink.target;
             
-            if( !platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(networkHandles.barycenterPlatonicPrimitiveNode) )
+            if( !platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(getNetworkHandles().barycenterPlatonicPrimitiveNode) )
             {
                 continue;
             }
@@ -171,7 +171,7 @@ public class BaryCenter extends SolverCodelet
             
             platonicPrimitiveInstanceNodeOfTarget = (PlatonicPrimitiveInstanceNode)iterationLink.target;
             
-            if( platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(networkHandles.lineSegmentPlatonicPrimitiveNode) )
+            if( platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) )
             {
                 Vector2d<Float> centerOfLine;
                 

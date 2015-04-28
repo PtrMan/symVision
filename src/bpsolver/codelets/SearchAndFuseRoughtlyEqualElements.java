@@ -3,21 +3,22 @@ package bpsolver.codelets;
 import Datastructures.Tuple4;
 import FargGeneral.Codelet;
 import FargGeneral.network.Link;
-import FargGeneral.network.Network;
 import FargGeneral.network.Node;
-import bpsolver.NetworkHandles;
+import bpsolver.BpSolver;
 import bpsolver.HardParameters;
 import bpsolver.SolverCodelet;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveNode;
+import math.DistinctUtility;
+import misc.Assert;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
-import math.DistinctUtility;
+
 import static math.Math.weightFloats;
-import misc.Assert;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 /**
  *
@@ -31,9 +32,9 @@ import sun.reflect.generics.reflectiveObjects.NotImplementedException;
  */
 public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
     // startnode must be a object node
-    public SearchAndFuseRoughtlyEqualElements(Network network, NetworkHandles networkHandles)
+    public SearchAndFuseRoughtlyEqualElements(BpSolver bpSolver)
     {
-        super(network, networkHandles);
+        super(bpSolver);
     }
     
     @Override
@@ -182,7 +183,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         
         Assert.Assert(nodeAAsFeatureNode.featureTypeNode.equals(nodeBAsFeatureNode), "types are not the same");
         
-        if( nodeAAsFeatureNode.featureTypeNode.equals(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode) )
+        if( nodeAAsFeatureNode.featureTypeNode.equals(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode) )
         {
             return areLengthsRoughtlyEqual(nodeAAsFeatureNode, nodeBAsFeatureNode);
         }
@@ -198,7 +199,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         float ratio;
         
         Assert.Assert(nodeA.featureTypeNode.equals(nodeA), "types are not the same");
-        Assert.Assert(nodeA.featureTypeNode.equals(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode), "not a LINESEGMENTLENGTH feature node!");
+        Assert.Assert(nodeA.featureTypeNode.equals(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode), "not a LINESEGMENTLENGTH feature node!");
         
         lengthMin = Math.min(nodeA.getValueAsFloat(), nodeB.getValueAsFloat());
         lengthMax = Math.max(nodeA.getValueAsFloat(), nodeB.getValueAsFloat());
@@ -218,8 +219,8 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         
         combinedNode = combineFeatureNodes(relinkInfoTuple.e0, relinkInfoTuple.e2);
         
-        nodeA.outgoingLinks.set(linkIndexOfNodeA, network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));
-        nodeB.outgoingLinks.set(linkIndexOfNodeB, network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));
+        nodeA.outgoingLinks.set(linkIndexOfNodeA, getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));
+        nodeB.outgoingLinks.set(linkIndexOfNodeB, getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));
     }
     
     private FeatureNode combineFeatureNodes(FeatureNode nodeA, FeatureNode nodeB)
@@ -231,7 +232,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         
         Assert.Assert(nodeA.featureTypeNode.equals(nodeB.featureTypeNode), "assert failed");
         
-        if( nodeA.featureTypeNode.equals(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode) )
+        if( nodeA.featureTypeNode.equals(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode) )
         {
             valueA = nodeA.getValueAsFloat();
             weightAsIntA = nodeA.getWeight();
@@ -241,7 +242,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
             weightedValue = weightFloat(valueA, weightAsIntA, valueB, weightAsIntB);
             weightSum = weightAsIntA + weightAsIntB;
             
-            return FeatureNode.createFloatNode(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode, weightedValue, weightSum);
+            return FeatureNode.createFloatNode(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode, weightedValue, weightSum, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode));
         }
         else
         {

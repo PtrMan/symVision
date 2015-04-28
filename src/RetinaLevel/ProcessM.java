@@ -1,8 +1,10 @@
 package RetinaLevel;
 
-import java.util.ArrayList;
-import java.util.Random;
 import misc.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class ProcessM
 {
@@ -19,7 +21,7 @@ public class ProcessM
         public boolean processGRated = false; // used to check for invalidated curves and rerate them if necessary
     }
     
-    public void process(ArrayList<RetinaPrimitive> lineDetectors)
+    public void process(List<RetinaPrimitive> lineDetectors)
     {
         if( lineDetectors.isEmpty() )
         {
@@ -34,7 +36,7 @@ public class ProcessM
         return lineParsings;
     }
     
-    private void tryToFindLines(ArrayList<RetinaPrimitive> lineDetectors, int numberOfIterations)
+    private void tryToFindLines(List<RetinaPrimitive> lineDetectors, int numberOfIterations)
     {
         int iteration;
         
@@ -47,14 +49,14 @@ public class ProcessM
         }
     }
     
-    private static void resetMarkingsWithLocking(ArrayList<RetinaPrimitive> lineDetectors)
+    private static void resetMarkingsWithLocking(List<RetinaPrimitive> lineDetectors)
     {
         // TODO< lock >
         resetMarkingsSynchronous(lineDetectors);
         // TODO< unlock >
     }
     
-    private static void resetMarkingsSynchronous(ArrayList<RetinaPrimitive> lineDetectors)
+    private static void resetMarkingsSynchronous(List<RetinaPrimitive> lineDetectors)
     {
         for( RetinaPrimitive iterationDetector : lineDetectors )
         {
@@ -62,7 +64,7 @@ public class ProcessM
         }
     }
 
-    private void selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(ArrayList<RetinaPrimitive> lineDetectors)
+    private void selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(List<RetinaPrimitive> lineDetectors)
     {
         int startLineIndex;
         SingleLineDetector startLineDetector;

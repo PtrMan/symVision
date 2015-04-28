@@ -1,10 +1,9 @@
 package bpsolver.codelets;
 
 import Datastructures.Vector2d;
-import bpsolver.NetworkHandles;
-import bpsolver.SolverCodelet;
 import FargGeneral.network.Link;
-import FargGeneral.network.Network;
+import bpsolver.BpSolver;
+import bpsolver.SolverCodelet;
 import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
@@ -17,9 +16,9 @@ import misc.Assert;
  */
 public class LineSegmentLength extends SolverCodelet
 {
-    public LineSegmentLength(Network network, NetworkHandles networkHandles)
+    public LineSegmentLength(BpSolver bpSolver)
     {
-        super(network, networkHandles);
+        super(bpSolver);
     }
     
     @Override
@@ -31,15 +30,15 @@ public class LineSegmentLength extends SolverCodelet
         Link createdLink;
         
         Assert.Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "startNode node type is wrong!");
-        Assert.Assert(((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(networkHandles.lineSegmentPlatonicPrimitiveNode), "startNode is not a line!");
+        Assert.Assert(((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode), "startNode is not a line!");
         
         thisLine = (PlatonicPrimitiveInstanceNode)startNode;
         
         lineSegmentLength = Vector2d.FloatHelper.getLength(Vector2d.FloatHelper.sub(thisLine.p1, thisLine.p2));
         
-        createdLineSegmentLength = FeatureNode.createFloatNode(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode, lineSegmentLength, 1);
+        createdLineSegmentLength = FeatureNode.createFloatNode(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode, lineSegmentLength, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode));
         
-        createdLink = network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdLineSegmentLength);
+        createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdLineSegmentLength);
         thisLine.outgoingLinks.add(createdLink);
         
         return new RunResult(false);
@@ -56,7 +55,7 @@ public class LineSegmentLength extends SolverCodelet
     {
         LineSegmentLength cloned;
         
-        cloned = new LineSegmentLength(network, networkHandles);
+        cloned = new LineSegmentLength(bpSolver);
         
         return cloned;
     }

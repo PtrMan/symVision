@@ -15,10 +15,9 @@ import FargGeneral.network.Node;
  */
 public abstract class SolverCodelet extends Codelet
 {
-    public SolverCodelet(Network network, NetworkHandles networkHandles)
+    public SolverCodelet(BpSolver bpSolver)
     {
-        this.network = network;
-        this.networkHandles = networkHandles;
+        this.bpSolver = bpSolver;
     }
     
     public void setStartNode(Node startNode)
@@ -30,8 +29,17 @@ public abstract class SolverCodelet extends Codelet
     public abstract void initialize();
     
     public abstract SolverCodelet cloneObject();
-    
-    protected Network network;
-    protected NetworkHandles networkHandles;
+
+    protected Network getNetwork()
+    {
+        return bpSolver.network;
+    }
+
+    protected NetworkHandles getNetworkHandles()
+    {
+        return bpSolver.networkHandles;
+    }
+
+    protected BpSolver bpSolver;
     protected Node startNode;
 }

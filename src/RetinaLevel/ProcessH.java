@@ -1,11 +1,13 @@
 package RetinaLevel;
 
 import Datastructures.Vector2d;
-import static Datastructures.Vector2d.FloatHelper.sub;
-import static Datastructures.Vector2d.FloatHelper.getLength;
 import bpsolver.HardParameters;
-import java.util.ArrayList;
 import misc.Assert;
+
+import java.util.List;
+
+import static Datastructures.Vector2d.FloatHelper.getLength;
+import static Datastructures.Vector2d.FloatHelper.sub;
 
 /**
  * tries to combine linedetectors
@@ -13,7 +15,7 @@ import misc.Assert;
  */
 public class ProcessH
 {
-    public void process(ArrayList<RetinaPrimitive> workingDetectors)
+    public void process(List<RetinaPrimitive> workingDetectors)
     {
         // called low and high because the index low is always lower than high
         int iteratorLow, iteratorHigh;

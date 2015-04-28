@@ -1,31 +1,21 @@
 package bpsolver;
 
-import bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
 import Datastructures.Map2d;
 import Datastructures.Vector2d;
 import FargGeneral.network.Link;
 import FargGeneral.network.Node;
-import RetinaLevel.Intersection;
-import RetinaLevel.ProcessA;
-import RetinaLevel.ProcessB;
-import RetinaLevel.ProcessC;
-import RetinaLevel.ProcessD;
-import RetinaLevel.ProcessE;
-import RetinaLevel.ProcessH;
-import RetinaLevel.ProcessM;
-import RetinaLevel.RetinaPrimitive;
-import RetinaLevel.SingleLineDetector;
+import RetinaLevel.*;
+import bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
 import bpsolver.nodes.AttributeNode;
-import bpsolver.nodes.FeatureNode;
 import bpsolver.nodes.NodeTypes;
 import bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import java.awt.Color;
-import java.awt.Graphics2D;
+import org.junit.Test;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.util.ArrayList;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import java.util.List;
 
 public class BpSolverTest
 {
@@ -45,7 +35,7 @@ public class BpSolverTest
         BufferedImage javaImage = drawToJavaImage(bpSolver);
         Map2d<Boolean> image = drawToImage(javaImage);
 
-        ArrayList<Node> nodes = getNodesFromImage(image, bpSolver);
+        List<Node> nodes = getNodesFromImage(image, bpSolver);
         
         for( Node iterationNode : nodes )
         {
@@ -174,7 +164,7 @@ public class BpSolverTest
         return off_Image;
     }
     
-    private ArrayList<Node> getNodesFromImage(Map2d<Boolean> image, BpSolver bpSolver)
+    private List<Node> getNodesFromImage(Map2d<Boolean> image, BpSolver bpSolver)
     {
         // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
         bpSolver.coderack.flush();
@@ -194,7 +184,7 @@ public class BpSolverTest
         processB.process(samples, image);
         processC.process(samples);
         
-        ArrayList<RetinaPrimitive> lineDetectors = processD.detectLines(samples);
+        List<RetinaPrimitive> lineDetectors = processD.detectLines(samples);
         
         ArrayList<Intersection> lineIntersections = new ArrayList<>();
         
@@ -222,8 +212,7 @@ public class BpSolverTest
         PointProximityStrategy retinaToWorkspaceTranslator;
         
         retinaToWorkspaceTranslator = new PointProximityStrategy();
-        
-        ArrayList<Node> objectNodes = retinaToWorkspaceTranslator.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver.getImageSizeAsFloat());
+        List<Node> objectNodes = retinaToWorkspaceTranslator.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver.network, bpSolver.networkHandles, bpSolver.coderack, bpSolver.codeletLtmLookup, bpSolver, bpSolver.getImageSizeAsFloat());
         
         bpSolver.cycle(500);
         
@@ -231,7 +220,7 @@ public class BpSolverTest
     }
     
     // TODO< refactor out >
-    private static ArrayList<Intersection> getAllLineIntersections(ArrayList<RetinaPrimitive> primitives)
+    private static ArrayList<Intersection> getAllLineIntersections(List<RetinaPrimitive> primitives)
     {
         ArrayList<Intersection> uniqueIntersections;
 

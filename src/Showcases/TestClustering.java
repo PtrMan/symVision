@@ -46,6 +46,7 @@ public class TestClustering
         BpSolver bpSolver = new BpSolver();
 
         bpSolver.setImageSize(new Vector2d<>(100, 100));
+        bpSolver.setup();
 
         Parameters.init();
 

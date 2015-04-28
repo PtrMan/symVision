@@ -23,13 +23,17 @@ public class BpSolver {
     
     public BpSolver()
     {
+    }
+
+    public void setup()
+    {
         initializeNetwork();
         setupLtmFactoryDefault();
+        initializePlatonicPrimitiveDatabase();
         initializeCodeletLtmLookup();
     }
     
-    public void cycle(int cycleCount)
-    {
+    public void cycle(int cycleCount) {
         coderack.cycle(cycleCount);
     }
     
@@ -147,38 +151,47 @@ public class BpSolver {
         codeletLtmLookup = new CodeletLtmLookup();
         
         createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
-        createdCodelet = new LineSegmentLength(network, networkHandles);
+        createdCodelet = new LineSegmentLength(this);
         createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.5f));
         
         codeletLtmLookup.registry.put("LineSegmentLength", createdRegistryEntry);
         
         createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
-        createdCodelet = new LineSegmentSlope(network, networkHandles);
+        createdCodelet = new LineSegmentSlope(this);
         createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.5f));
         
         codeletLtmLookup.registry.put("LineSegmentSlope", createdRegistryEntry);
         
         
         createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
-        createdCodelet = new BaryCenter(network, networkHandles, BaryCenter.EnumRecalculate.NO);
+        createdCodelet = new BaryCenter(this, BaryCenter.EnumRecalculate.NO);
         createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.1f));
         
         codeletLtmLookup.registry.put("BaryCenter", createdRegistryEntry);
         
         
         createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
-        createdCodelet = new bpsolver.codelets.EndPoint(network, networkHandles);
+        createdCodelet = new bpsolver.codelets.EndPoint(this);
         createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.2f));
         
         codeletLtmLookup.registry.put("EndPoint", createdRegistryEntry);
         
         
         createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
-        createdCodelet = new bpsolver.codelets.Angle(network, networkHandles);
+        createdCodelet = new bpsolver.codelets.Angle(this);
         createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.2f));
         
         codeletLtmLookup.registry.put("Angle", createdRegistryEntry);
         
+    }
+
+    private void initializePlatonicPrimitiveDatabase()
+    {
+        platonicPrimitiveDatabase.calculatorsForMaxValueOfPlatonicPrimitiveNode.put(networkHandles.xCoordinatePlatonicPrimitiveNode, new PlatonicPrimitiveDatabase.ConstantValueMaxValueCalculator(getImageSizeAsFloat().x));
+        platonicPrimitiveDatabase.calculatorsForMaxValueOfPlatonicPrimitiveNode.put(networkHandles.yCoordinatePlatonicPrimitiveNode, new PlatonicPrimitiveDatabase.ConstantValueMaxValueCalculator(getImageSizeAsFloat().y));
+        platonicPrimitiveDatabase.calculatorsForMaxValueOfPlatonicPrimitiveNode.put(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode, new PlatonicPrimitiveDatabase.ConstantValueMaxValueCalculator((float)Math.sqrt(getImageSizeAsFloat().x*getImageSizeAsFloat().x + getImageSizeAsFloat().y*getImageSizeAsFloat().y)));
+        platonicPrimitiveDatabase.calculatorsForMaxValueOfPlatonicPrimitiveNode.put(networkHandles.lineSegmentFeatureLineSlopePrimitiveNode, new PlatonicPrimitiveDatabase.ConstantValueMaxValueCalculator(getImageSizeAsFloat().y));
+        platonicPrimitiveDatabase.calculatorsForMaxValueOfPlatonicPrimitiveNode.put(networkHandles.anglePointAngleValuePrimitiveNode, new PlatonicPrimitiveDatabase.ConstantValueMaxValueCalculator(360.0f));
     }
     
     // both ltm and workspace
@@ -187,6 +200,7 @@ public class BpSolver {
     public NetworkHandles networkHandles = new NetworkHandles();
     public Coderack coderack = new Coderack();
     public CodeletLtmLookup codeletLtmLookup;
+    public PlatonicPrimitiveDatabase platonicPrimitiveDatabase = new PlatonicPrimitiveDatabase();
 
     // all stored patterns
     public List<Node> patternRootNodes = new ArrayList<>();
