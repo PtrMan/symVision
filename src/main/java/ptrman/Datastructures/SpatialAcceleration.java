@@ -1,10 +1,12 @@
 package ptrman.Datastructures;
 
-import static ptrman.Datastructures.Vector2d.FloatHelper.getLength;
-import static ptrman.Datastructures.Vector2d.FloatHelper.sub;
+import ptrman.misc.Assert;
+
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import ptrman.misc.Assert;
+
+import static ptrman.Datastructures.Vector2d.FloatHelper.getLength;
+import static ptrman.Datastructures.Vector2d.FloatHelper.sub;
 
 /**
  *
@@ -171,16 +173,17 @@ public class SpatialAcceleration<Type>
     }
 
     
-    
+    //would help to make this static class
     public class Element
     {
         public Vector2d<Float> position;
         public Type data;
     }
-    
+
+    //would help to make this static class
     private class Cell
     {
-        ArrayList<Element> content = new ArrayList<Element>();
+        public final ArrayList<Element> content = new ArrayList<Element>();
     }
     
     private Cell cells[];

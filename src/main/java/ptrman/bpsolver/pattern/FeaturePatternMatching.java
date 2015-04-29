@@ -273,13 +273,13 @@ public class FeaturePatternMatching
             return 0.0f;
         }
         
-        for( Node iterationTypeNode : featureNodesByType.keySet() )
+        for(Map.Entry<Node, ArrayList<FeatureNode>> nodeArrayListEntry : featureNodesByType.entrySet())
         {
             float weight;
             float featureDistance;
             ArrayList<FeatureNode> featureNodesForType;
             
-            featureNodesForType = featureNodesByType.get(iterationTypeNode);
+            featureNodesForType = nodeArrayListEntry.getValue();
             
             if( featureNodesForType.size() == 2 )
             {
@@ -290,7 +290,7 @@ public class FeaturePatternMatching
                 featureDistance = 0.0f;
             }
             
-            weight = (iterationTypeNode.activiation + getSystemWeightOfPlatonicFeatureType(iterationTypeNode, networkHandles)) * 0.5f;
+            weight = (nodeArrayListEntry.getKey().activiation + getSystemWeightOfPlatonicFeatureType(nodeArrayListEntry.getKey(), networkHandles)) * 0.5f;
             
             upperSum += (featureDistance * weight);
             weightSum += weight;
@@ -335,7 +335,7 @@ public class FeaturePatternMatching
             {
                 ArrayList<FeatureNode> createdFeatureNodeList;
                 
-                createdFeatureNodeList = new ArrayList<>();
+                createdFeatureNodeList = new ArrayList<>(1);
                 createdFeatureNodeList.add(targetFeatureNode);
                 featureNodesByType.put(targetFeatureNode.featureTypeNode, createdFeatureNodeList);
             }

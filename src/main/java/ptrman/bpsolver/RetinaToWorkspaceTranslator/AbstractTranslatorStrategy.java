@@ -42,7 +42,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy
             this.primitive = primitive;
         }
         
-        public ptrman.RetinaLevel.RetinaPrimitive primitive;
+        public final ptrman.RetinaLevel.RetinaPrimitive primitive;
         
         /*
         private Vector2d<Float> getPositionOfEndpoint(int index)
