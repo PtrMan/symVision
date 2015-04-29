@@ -1,6 +1,7 @@
-package Visual;
+package ptrman.Visual;
 
-import Datastructures.IMap2d;
+
+import ptrman.Datastructures.IMap2d;
 
 /**
  *
