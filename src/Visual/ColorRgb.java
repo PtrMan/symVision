@@ -13,9 +13,9 @@ public class ColorRgb
         this.b = b;
     }
 
-    public float getMagnitude()
+    public float getScaledNormalizedMagnitude(ColorRgb scale)
     {
-        return (r + g + b) * 0.33333333333333f;
+        return (r*scale.r + g*scale.g + b*scale.b) * 1.0f/(scale.r+scale.g+scale.b);
     }
 
 }
