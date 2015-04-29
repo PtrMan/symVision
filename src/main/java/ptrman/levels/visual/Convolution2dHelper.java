@@ -22,11 +22,13 @@ public class Convolution2dHelper
             for( x = 0; x < size.x; x++ )
             {
                 float fx, fy;
+                float value;
 
                 fx = (float)x*2.0f - 1.0f;
                 fy = (float)y*2.0f - 1.0f;
 
-                Kernels.calcMarrHildrethOperator(new Vector2d<>(fx, fy), sigma);
+                value = Kernels.calcMarrHildrethOperator(new Vector2d<>(fx, fy), sigma);
+                kernel.setAt(x, y, value);
             }
         }
 
