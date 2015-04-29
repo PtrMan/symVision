@@ -11,6 +11,11 @@ public class Math
     {
         return x*x;
     }
+
+    public static float squaredDistance(float x, float y)
+    {
+        return power2(x)+power2(y);
+    }
     
     public static int faculty(int value)
     {
