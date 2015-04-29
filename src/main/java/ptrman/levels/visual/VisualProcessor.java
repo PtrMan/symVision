@@ -3,6 +3,10 @@ package ptrman.levels.visual;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
+import ptrman.meter.event.DurationStartMeter;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -78,6 +82,14 @@ public class VisualProcessor
             public float sigma;
         }
 
+        public ProcessingChain()
+        {
+            durationMeters.put("convertColorToGray", new DurationStartMeter("convertColorToGray", true, 1.0, false));
+            durationMeters.put("zeroCrossingConvolution", new DurationStartMeter("zeroCrossingConvolution", true, 1.0, false));
+            durationMeters.put("zeroCrossingToBoolean", new DurationStartMeter("zeroCrossingToBoolean", true, 1.0, false));
+
+        }
+
         public void setup(Vector2d<Integer> imageSize, ColorRgb colorToGrayColorScale, MarrHildrethOperatorParameter grayImageZeroCrossingParameter)
         {
             grayImage = new Map2d<>(imageSize.x, imageSize.y);
@@ -100,10 +112,17 @@ public class VisualProcessor
 
             IMap2d<Float> zeroCrossings;
 
+            durationMeters.get("convertColorToGray").start();
             convertColorToGrayImage(inputColorImage, grayImage, colorToGrayColorScale);
+            durationMeters.get("convertColorToGray").stop();
 
+            durationMeters.get("zeroCrossingConvolution").start();
             zeroCrossings = Convolution2d.convolution(grayImage, grayImageZeroCrossingKernel);
+            durationMeters.get("zeroCrossingConvolution").stop();
+
+            durationMeters.get("zeroCrossingToBoolean").start();
             convertZeroCrossingFloatToBoolean(zeroCrossings, zeroCrossingBinary);
+            durationMeters.get("zeroCrossingToBoolean").stop();
         }
 
         public IMap2d<Boolean> getZeroCrossingBinary()
@@ -117,5 +136,7 @@ public class VisualProcessor
         private IMap2d<Boolean> zeroCrossingBinary;
 
         private ColorRgb colorToGrayColorScale;
+
+        public Map<String, DurationStartMeter> durationMeters = new HashMap<>();
     }
 }
