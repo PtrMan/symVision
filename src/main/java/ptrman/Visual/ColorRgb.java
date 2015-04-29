@@ -1,4 +1,4 @@
-package Visual;
+package ptrman.Visual;
 
 public class ColorRgb   
 {
