@@ -1,7 +1,7 @@
 package ptrman.bpsolver.RetinaToWorkspaceTranslator;
 
 import ptrman.FargGeneral.network.Node;
-import ptrman.RetinaLevel.RetinaPrimitive;
+import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.bpsolver.BpSolver;
 
 import java.util.List;

@@ -4,7 +4,7 @@ import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
-import ptrman.RetinaLevel.*;
+import ptrman.levels.retina.*;
 import ptrman.bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
 import ptrman.bpsolver.nodes.AttributeNode;
 import ptrman.bpsolver.nodes.NodeTypes;

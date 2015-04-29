@@ -1,4 +1,4 @@
-package ptrman.Visual;
+package ptrman.levels.visual;
 
 public class ColorRgb   
 {

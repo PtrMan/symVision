@@ -4,7 +4,7 @@ import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
-import ptrman.RetinaLevel.*;
+import ptrman.levels.retina.*;
 import ptrman.bpsolver.BpSolver;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.NetworkHandles;

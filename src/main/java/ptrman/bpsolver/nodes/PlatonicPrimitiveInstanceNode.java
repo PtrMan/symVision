@@ -2,7 +2,7 @@ package ptrman.bpsolver.nodes;
 
 import ptrman.Datastructures.Vector2d;
 import ptrman.FargGeneral.network.Node;
-import ptrman.RetinaLevel.ProcessG;
+import ptrman.levels.retina.ProcessG;
 
 /**
  * is a instance of a platonic primitive, for example a line or a curve

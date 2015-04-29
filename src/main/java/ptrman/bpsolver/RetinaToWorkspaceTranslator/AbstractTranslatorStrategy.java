@@ -4,8 +4,8 @@ import ptrman.Datastructures.SpatialAcceleration;
 import ptrman.Datastructures.Vector2d;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
-import ptrman.RetinaLevel.Intersection;
-import ptrman.RetinaLevel.RetinaPrimitive;
+import ptrman.levels.retina.Intersection;
+import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.bpsolver.BpSolver;
 import ptrman.bpsolver.HelperFunctions;
 import ptrman.bpsolver.NetworkHandles;
@@ -37,12 +37,12 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy
     
     protected static class RetinaObjectWithAssociatedPointsAndWorkspaceNode
     {
-        public RetinaObjectWithAssociatedPointsAndWorkspaceNode(ptrman.RetinaLevel.RetinaPrimitive primitive)
+        public RetinaObjectWithAssociatedPointsAndWorkspaceNode(ptrman.levels.retina.RetinaPrimitive primitive)
         {
             this.primitive = primitive;
         }
         
-        public final ptrman.RetinaLevel.RetinaPrimitive primitive;
+        public final ptrman.levels.retina.RetinaPrimitive primitive;
         
         /*
         private Vector2d<Float> getPositionOfEndpoint(int index)
@@ -291,7 +291,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy
     
     protected static PlatonicPrimitiveInstanceNode createPlatonicInstanceNodeForRetinaObject(RetinaPrimitive primitive, NetworkHandles networkHandles)
     {
-        if( primitive.type == ptrman.RetinaLevel.RetinaPrimitive.EnumType.LINESEGMENT )
+        if( primitive.type == ptrman.levels.retina.RetinaPrimitive.EnumType.LINESEGMENT )
         {
             PlatonicPrimitiveInstanceNode createdLineNode;
             
