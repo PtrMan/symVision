@@ -13,11 +13,18 @@ public class Convolution2d
         float[][] inputAsMatrix, kernelAsMatrix;
         IMap2d<Float> resultMap;
         int x, y;
+        int i;
 
         inputAsMatrix = convertMapToArray(input);
         kernelAsMatrix = convertMapToArray(inputKernel);
 
         resultMap = new Map2d<>(input.getWidth(), input.getLength());
+
+        // TODO optimize for cpu? (opencl is senseless)
+        for( i = 0; i < input.getWidth()*input.getLength(); i++ )
+        {
+            resultMap.setAt(i % input.getWidth(), i / input.getWidth(), 0.0f);
+        }
 
         for( y = 0; y < input.getLength() - inputKernel.getLength(); y++ )
         {
@@ -57,6 +64,11 @@ public class Convolution2d
         int x, y;
 
         result = new float[map.getWidth()][map.getLength()];
+
+        for( y = 0; y < map.getLength(); y++ )
+        {
+            result[y] = new float[map.getWidth()];
+        }
 
         for( y = 0; y < map.getLength(); y++ )
         {

@@ -78,6 +78,12 @@ public class VisualProcessor
     {
         public static class MarrHildrethOperatorParameter
         {
+            public MarrHildrethOperatorParameter(int filterSize, float sigma)
+            {
+                this.filterSize = filterSize;
+                this.sigma = sigma;
+            }
+
             public int filterSize;
             public float sigma;
         }
