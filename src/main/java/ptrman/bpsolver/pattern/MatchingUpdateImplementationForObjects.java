@@ -4,9 +4,9 @@ import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.NetworkHandles;
+import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.misc.Assert;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -69,7 +69,25 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
         currentMatchNodeAdditional.outgoingLinks.get(currentMatchLastPathElement.bestMatchNodeBIndex).strength += additionalStrength;
         // TODO< limit it in some way? >
 
-        throw new NotImplementedException();
+        // update the statistics
+        Node lastOrginalNode;
+        Node lastAdditionalNode;
+        FeatureNode lastOrginalNodeAsFeatureNode;
+        FeatureNode lastAdditionalNodeAsFeatureNode;
+
+        lastOrginalNode = orginal.exemplars.get(0).outgoingLinks.get(currentMatchLastPathElement.bestMatchNodeAIndex).target;
+        lastAdditionalNode = additional.exemplars.get(0).outgoingLinks.get(currentMatchLastPathElement.bestMatchNodeBIndex).target;
+
+        // NOTE< should we just build around this case with an if? >
+        Assert.Assert(lastOrginalNode.type == NodeTypes.EnumType.FEATURENODE.ordinal(), "lastOrginalNode is not a featurenode as expected");
+
+        lastOrginalNodeAsFeatureNode = (FeatureNode)lastOrginalNode;
+        lastAdditionalNodeAsFeatureNode = (FeatureNode)lastAdditionalNode;
+
+        lastOrginalNodeAsFeatureNode.statistics.addValuesFromStatistics(lastAdditionalNodeAsFeatureNode.statistics);
+
+        // simply return (the recombined) orginal...
+        return orginal;
     }
 
     @Override
