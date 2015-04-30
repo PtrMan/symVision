@@ -10,7 +10,7 @@ import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.misc.Assert;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static ptrman.Datastructures.Vector2d.FloatHelper.add;
 import static ptrman.Datastructures.Vector2d.FloatHelper.getScaled;
@@ -122,7 +122,7 @@ public class BaryCenter extends SolverCodelet
     // returns null if the object has no BaryCenter
     private PlatonicPrimitiveInstanceNode getBaryCenterNodeOfObject()
     {
-        ArrayList<Link> linksOfObject;
+        List<Link> linksOfObject;
         
         linksOfObject = startNode.getLinksByType(Link.EnumType.HASATTRIBUTE);
         
@@ -153,7 +153,7 @@ public class BaryCenter extends SolverCodelet
     {
         Vector2d<Float> baryCenter;
         float weight = 0.0f;
-        ArrayList<Link> linksOfObject;
+        List<Link> linksOfObject;
         
         baryCenter = new Vector2d<Float>(0.0f, 0.0f);
         

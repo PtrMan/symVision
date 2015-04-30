@@ -312,7 +312,7 @@ public class FeaturePatternMatching
     // helper for matchAnyNonRecursive
     private static void getAllFeatureNodesAndAddToMap(Node node, Map<Node, ArrayList<FeatureNode>> featureNodesByType)
     {
-        ArrayList<Link> attributeLinksFromNode;
+        List<Link> attributeLinksFromNode;
         
         attributeLinksFromNode = node.getLinksByType(Link.EnumType.HASATTRIBUTE);
         

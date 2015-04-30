@@ -14,8 +14,8 @@ import ptrman.math.DistinctUtility;
 import ptrman.misc.Assert;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 
 import static ptrman.math.Math.weightFloats;
@@ -39,7 +39,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
     
     @Override
     public Codelet.RunResult run() {
-        ArrayList<Integer> distinctEdgeIndices;
+        List<Integer> distinctEdgeIndices;
         Node nodeA, nodeB;
         HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> commonChildnodesOfNodes;
         

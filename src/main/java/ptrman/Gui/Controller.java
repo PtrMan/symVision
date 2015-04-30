@@ -64,15 +64,15 @@ public class Controller
             ProcessM processM = new ProcessM();
 
             processA.setWorkingImage(image);
-            ArrayList<ProcessA.Sample> samples = processA.sampleImage();
+            List<ProcessA.Sample> samples = processA.sampleImage();
 
 
             processB.process(samples, image);
             processC.process(samples);
 
-            ArrayList<RetinaPrimitive> lineDetectors = processD.detectLines(samples);
+            List<RetinaPrimitive> lineDetectors = processD.detectLines(samples);
             
-            ArrayList<Intersection> lineIntersections = new ArrayList<>();
+            List<Intersection> lineIntersections = new ArrayList<>();
             
             
             
@@ -90,7 +90,7 @@ public class Controller
                 lineIntersections = getAllLineIntersections(lineDetectors);
             }
             
-            ArrayList<ProcessM.LineParsing> lineParsings = new ArrayList<>();
+            List<ProcessM.LineParsing> lineParsings = new ArrayList<>();
             
             if( enableProcessM )
             {
@@ -320,7 +320,7 @@ public class Controller
         }
         
 
-        private static void drawDetectors(Graphics2D graphics, List<RetinaPrimitive> lineDetectors, ArrayList<Intersection> intersections, ArrayList<ProcessA.Sample> samples)
+        private static void drawDetectors(Graphics2D graphics, List<RetinaPrimitive> lineDetectors, List<Intersection> intersections, List<ProcessA.Sample> samples)
         {
 
             for( RetinaPrimitive iterationRetinaPrimitive : lineDetectors )
@@ -372,9 +372,9 @@ public class Controller
         }
         
         // TODO< refactor out >
-        private static ArrayList<Intersection> getAllLineIntersections(ArrayList<RetinaPrimitive> lineDetectors)
+        private static List<Intersection> getAllLineIntersections(List<RetinaPrimitive> lineDetectors)
         {
-            ArrayList<Intersection> uniqueIntersections;
+            List<Intersection> uniqueIntersections;
             
             uniqueIntersections = new ArrayList<>();
             
@@ -392,7 +392,7 @@ public class Controller
         }
         
         // modifies uniqueIntersections
-        private static void findAndAddUniqueIntersections(ArrayList<Intersection> uniqueIntersections, ArrayList<Intersection> intersections)
+        private static void findAndAddUniqueIntersections(List<Intersection> uniqueIntersections, List<Intersection> intersections)
         {
             for( Intersection currentOuterIntersection : intersections )
             {

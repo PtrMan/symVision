@@ -178,7 +178,7 @@ public class BpSolverTest
         ProcessM processM = new ProcessM();
         
         processA.setWorkingImage(image);
-        ArrayList<ProcessA.Sample> samples = processA.sampleImage();
+        List<ProcessA.Sample> samples = processA.sampleImage();
         
         
         processB.process(samples, image);
@@ -200,7 +200,7 @@ public class BpSolverTest
         lineIntersections = getAllLineIntersections(lineDetectors);
         
         
-        ArrayList<ProcessM.LineParsing> lineParsings = new ArrayList<>();
+        List<ProcessM.LineParsing> lineParsings = new ArrayList<>();
         
         processM.process(lineDetectors);
         
