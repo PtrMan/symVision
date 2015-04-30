@@ -22,7 +22,7 @@ public class TestVisualProcessor1
 
         BufferedImage img = null;
         try {
-            img = ImageIO.read(new File("/home/r0b3/github/symVision/samples/whiteBackgroundTeddy.jpg"));
+            img = ImageIO.read(new File("/home/r0b3/flowerMini.png"));
         } catch (IOException e) {
             int x = 0;
         }
@@ -32,7 +32,7 @@ public class TestVisualProcessor1
         VisualProcessor.ProcessingChain processingChain;
 
         processingChain = new VisualProcessor.ProcessingChain();
-        processingChain.setup(imageSize, new ColorRgb(1.0f, 1.0f, 1.0f), new VisualProcessor.ProcessingChain.MarrHildrethOperatorParameter(64, 10.0f));
+        processingChain.setup(imageSize, new ColorRgb(1.0f, 1.0f, 1.0f), new VisualProcessor.ProcessingChain.MarrHildrethOperatorParameter(10, 0.25f));
 
         inputMap = Map2dImageConverter.convertImageToMap(img);
 

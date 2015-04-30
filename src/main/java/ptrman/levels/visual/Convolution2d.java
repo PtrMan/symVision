@@ -65,9 +65,9 @@ public class Convolution2d
 
         result = new float[map.getWidth()][map.getLength()];
 
-        for( y = 0; y < map.getLength(); y++ )
+        for( y = 0; y < map.getWidth(); y++ )
         {
-            result[y] = new float[map.getWidth()];
+            result[y] = new float[map.getLength()];
         }
 
         for( y = 0; y < map.getLength(); y++ )

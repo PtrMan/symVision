@@ -61,7 +61,18 @@ public class VisualProcessor
             @Override
             public Boolean calculate(Float value)
             {
-                return value > 0.0f;
+                boolean result;
+
+                // HACK
+                // NOTE maybe our kernel is wrong
+                result = value * 1000.0f > 0.45f;
+
+                if( result )
+                {
+                    int x = 0;
+                }
+
+                return result;
             }
         }
 
