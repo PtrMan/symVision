@@ -1,9 +1,10 @@
 package ptrman.levels.retina;
 
-import ptrman.Datastructures.Map2d;
+import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Tuple2;
 import ptrman.Datastructures.Vector2d;
-import java.util.ArrayList;
+
+import java.util.List;
 
 
 /**
@@ -16,7 +17,7 @@ public class ProcessB
      * 
      * we use the whole image, in phaeaco he worked with the incomplete image witht the guiding of processA, this is not implemented that way 
      */
-    public void process(ArrayList<ProcessA.Sample> samples, Map2d<Boolean> image)
+    public void process(List<ProcessA.Sample> samples, IMap2d<Boolean> image)
     {
         Vector2d<Integer> foundPosition;
         
@@ -44,7 +45,7 @@ public class ProcessB
      * 
      * \return null if no point could be found in the radius 
      */
-    private static Tuple2<Vector2d<Integer>, Integer> findNearestPositionWhereMapIs(boolean value, Vector2d<Integer> position, Map2d<Boolean> image, int radius)
+    private static Tuple2<Vector2d<Integer>, Integer> findNearestPositionWhereMapIs(boolean value, Vector2d<Integer> position, IMap2d<Boolean> image, int radius)
     {
         Vector2d<Integer> outwardIteratorOffsetUnbound;
         Vector2d<Integer> borderMin;
@@ -52,13 +53,13 @@ public class ProcessB
         Vector2d<Integer> one;
         Vector2d<Integer> positionAsInt;
 
-        outwardIteratorOffsetUnbound = new Vector2d<Integer>(0, 0);
-        borderMin = new Vector2d<Integer>(0, 0);
-        borderMax = new Vector2d<Integer>(image.getWidth(), image.getLength());
+        outwardIteratorOffsetUnbound = new Vector2d<>(0, 0);
+        borderMin = new Vector2d<>(0, 0);
+        borderMax = new Vector2d<>(image.getWidth(), image.getLength());
 
         positionAsInt = position;
 
-        one = new Vector2d<Integer>(1, 1);
+        one = new Vector2d<>(1, 1);
 
         for(;;)
         {

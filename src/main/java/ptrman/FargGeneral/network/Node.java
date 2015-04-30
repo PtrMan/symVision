@@ -1,6 +1,7 @@
 package ptrman.FargGeneral.network;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public abstract class Node
 {
@@ -11,7 +12,7 @@ public abstract class Node
     
     public int conceptualDepth; // control decayrate
     
-    public ArrayList<Link> outgoingLinks = new ArrayList<Link>();
+    public List<Link> outgoingLinks = new ArrayList<>();
     //public ArrayList<Link> incommingLinks = new ArrayList<Link>(); // only bidirection links are in here
     
     public Node(int type)
@@ -30,11 +31,11 @@ public abstract class Node
     }
     
     // TODO< good place to access a Map of the links >
-    public ArrayList<Link> getLinksByType(Link.EnumType type)
+    public List<Link> getLinksByType(Link.EnumType type)
     {
-        ArrayList<Link> result;
+        List<Link> result;
         
-        result = new ArrayList<Link>();
+        result = new ArrayList<>();
         
         for( Link iterationLink : outgoingLinks )
         {

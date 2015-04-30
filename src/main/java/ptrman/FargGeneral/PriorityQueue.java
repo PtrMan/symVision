@@ -1,12 +1,14 @@
 package ptrman.FargGeneral;
 
-import java.util.ArrayList;
-import java.util.Random;
 import ptrman.misc.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class PriorityQueue<Type>
 {
-    public class QueueElement
+    public static class QueueElement<Type>
     {
         public Type value;
         public float priority = 0.0f;
@@ -59,10 +61,10 @@ public class PriorityQueue<Type>
         return dequeueQueueElement().value;
     }
     
-    public QueueElement dequeueQueueElement()
+    public QueueElement<Type> dequeueQueueElement()
     {
         int chosenIndex;
-        QueueElement result;
+        QueueElement<Type> result;
         
         chosenIndex = getNextQueueIndex();
         result = queue.get(chosenIndex);
@@ -115,7 +117,7 @@ public class PriorityQueue<Type>
     }
 
     // the queue is sorted by priority
-    private ArrayList<QueueElement> queue = new ArrayList<>();
+    private List<QueueElement> queue = new ArrayList<>();
 
     
     private Random random;

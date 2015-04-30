@@ -1,21 +1,17 @@
 package ptrman.levels.retina;
 
+import org.apache.commons.math3.linear.*;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
-import static ptrman.Datastructures.Vector2d.ConverterHelper.convertIntVectorToFloat;
-import static ptrman.Datastructures.Vector2d.FloatHelper.add;
-import static ptrman.Datastructures.Vector2d.FloatHelper.getLength;
-import static ptrman.Datastructures.Vector2d.FloatHelper.normalize;
-import static ptrman.Datastructures.Vector2d.FloatHelper.sub;
 import ptrman.bpsolver.HardParameters;
+import ptrman.misc.Assert;
+
 import java.util.ArrayList;
 import java.util.Arrays;
-import ptrman.misc.Assert;
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.linear.DecompositionSolver;
-import org.apache.commons.math3.linear.LUDecomposition;
-import org.apache.commons.math3.linear.RealVector;
+import java.util.List;
+
+import static ptrman.Datastructures.Vector2d.ConverterHelper.convertIntVectorToFloat;
+import static ptrman.Datastructures.Vector2d.FloatHelper.*;
 
 /** curve detection
  *
@@ -31,7 +27,7 @@ public class ProcessG
             this.curveElements = curveElements;
         }
         
-        public ArrayList<CurveElement> curveElements;
+        public List<CurveElement> curveElements;
         
         public Vector2d<Float> getNormalizedTangentAtEndpoint(int index)
         {
@@ -89,7 +85,7 @@ public class ProcessG
     // test, works
     public static void testPoints()
     {
-        ArrayList<Vector2d<Float>> testPoints;
+        List<Vector2d<Float>> testPoints;
         
         testPoints = new ArrayList<>();
         testPoints.add(new Vector2d<>(1.0f, 5.0f));
@@ -607,7 +603,7 @@ public class ProcessG
     
     
     
-    private static Curve calculatePolynominalsAndReturnCurve(ArrayList<Vector2d<Float>> points)
+    private static Curve calculatePolynominalsAndReturnCurve(List<Vector2d<Float>> points)
     {
         RealVector solvedA_2_i;
         RealVector solvedA_1_i;
@@ -634,7 +630,7 @@ public class ProcessG
     
     // builds a linear equation for the a|b_2,i values and returns the coefficients
     // NOTE< points must be for sure sorted by x axis? >
-    private static RealVector solveLinearEquationFor2ForPoints(ArrayList<Vector2d<Float>> points, EnumAxis axis)
+    private static RealVector solveLinearEquationFor2ForPoints(List<Vector2d<Float>> points, EnumAxis axis)
     {
         Array2DRowRealMatrix matrix;
         RealVector constants;
@@ -682,7 +678,7 @@ public class ProcessG
     
     // calculates the (A|B)_1_i after Formula (9a) (foundalis dissertation page 422)
     // note that the result vector is one shorter than the input vector
-    private static RealVector calculate_1_i(ArrayList<Vector2d<Float>> points, RealVector a_2_i, EnumAxis axis)
+    private static RealVector calculate_1_i(List<Vector2d<Float>> points, RealVector a_2_i, EnumAxis axis)
     {
         RealVector result;
         
@@ -699,7 +695,7 @@ public class ProcessG
     }
     
     // calculate the (A|B)_3_i after formula (7)
-    private static RealVector calculate_2_i(ArrayList<Vector2d<Float>> points, RealVector solved_2_i)
+    private static RealVector calculate_2_i(List<Vector2d<Float>> points, RealVector solved_2_i)
     {
         RealVector result;
         
@@ -714,7 +710,7 @@ public class ProcessG
     }
     
     // "calculate" the (A|B)_0_i after formula (4)
-    private static RealVector calculate_0_i(ArrayList<Vector2d<Float>> points, EnumAxis axis)
+    private static RealVector calculate_0_i(List<Vector2d<Float>> points, EnumAxis axis)
     {
         RealVector result;
         
@@ -760,7 +756,7 @@ public class ProcessG
     }
     
     
-    private static float getAxisValueForPointOfArray(ArrayList<Vector2d<Float>> points, int index, EnumAxis axis)
+    private static float getAxisValueForPointOfArray(List<Vector2d<Float>> points, int index, EnumAxis axis)
     {
         return getAxisValueForPoint(points.get(index), axis);
     }

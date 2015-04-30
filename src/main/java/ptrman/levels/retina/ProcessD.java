@@ -1,22 +1,19 @@
 package ptrman.levels.retina;
 
+import org.apache.commons.math3.stat.regression.SimpleRegression;
 import ptrman.Datastructures.Vector2d;
-import static ptrman.Datastructures.Vector2d.FloatHelper.add;
-import static ptrman.Datastructures.Vector2d.FloatHelper.dot;
-import static ptrman.Datastructures.Vector2d.FloatHelper.getLength;
-import static ptrman.Datastructures.Vector2d.FloatHelper.getScaled;
-import static ptrman.Datastructures.Vector2d.FloatHelper.sub;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.Parameters;
-import java.util.ArrayList;
-import static java.util.Collections.sort;
-import java.util.Comparator;
-import java.util.Random;
-
-import org.apache.commons.math3.stat.regression.SimpleRegression;
-
 import ptrman.math.DistinctUtility;
 import ptrman.misc.Assert;
+
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Random;
+
+import static java.util.Collections.sort;
+import static ptrman.Datastructures.Vector2d.FloatHelper.*;
 
 // TODO< remove detectors which are removable which have a activation less than <constant> * sumofAllActivations >
 /**
@@ -41,7 +38,7 @@ public class ProcessD
         }
         
         
-        public ArrayList<Integer> integratedSampleIndices = new ArrayList<>();
+        public List<Integer> integratedSampleIndices = new ArrayList<>();
         
         public float m, n;
         
@@ -127,11 +124,11 @@ public class ProcessD
      * 
      * \return only the surviving line segments
      */
-    public ArrayList<RetinaPrimitive> detectLines(ArrayList<ProcessA.Sample> samples)
+    public List<RetinaPrimitive> detectLines(List<ProcessA.Sample> samples)
     {
-        ArrayList<ProcessA.Sample> workingSamples;
-        ArrayList<LineDetectorWithMultiplePoints> multiplePointsLineDetector;
-        ArrayList<RetinaPrimitive> resultSingleDetectors;
+        List<ProcessA.Sample> workingSamples;
+        List<LineDetectorWithMultiplePoints> multiplePointsLineDetector;
+        List<RetinaPrimitive> resultSingleDetectors;
         
         final float SAMPLECOUNTLINEDETECTORMULTIPLIER = 3.5f;
         
@@ -145,6 +142,8 @@ public class ProcessD
         {
             {
                 int centerPointIndex;
+                List<Vector2d<Float>> positionsOfSamples;
+                RegressionForLineResult regressionResult;
                 
                 // to form a new line detector choose one point at random and chose n points in the neighborhood
                 // this increases the chances that it lies on a (small) line
@@ -169,8 +168,7 @@ public class ProcessD
                 
                 createdLineDetector = new LineDetectorWithMultiplePoints(chosenPointIndices);
                 
-                ArrayList<Vector2d<Float>> positionsOfSamples;
-                RegressionForLineResult regressionResult;
+
                 
                 positionsOfSamples = getPositionsOfSamplesOfDetector(createdLineDetector, workingSamples);
             
@@ -238,7 +236,7 @@ public class ProcessD
      * \param workingSamples
      * \param count 
      */
-    private void choosePointIndicesInsideRadius(int centerPointIndex, ArrayList<Integer> alreadyIntegratedPointIndices, ArrayList<ProcessA.Sample> workingSamples, int count)
+    private void choosePointIndicesInsideRadius(int centerPointIndex, List<Integer> alreadyIntegratedPointIndices, List<ProcessA.Sample> workingSamples, int count)
     {
         final int MAXTRIES = 20;
         
@@ -253,7 +251,7 @@ public class ProcessD
         for( counter = 0; counter < count; )
         {
             int chosenPointIndex;
-            ArrayList<Integer> chosenPointIndexAsList;
+            List<Integer> chosenPointIndexAsList;
             Vector2d<Integer> chosenPointPositionAsInt;
             Vector2d<Float> chosenPointPosition;
             
@@ -306,10 +304,10 @@ public class ProcessD
     }
     
     
-    private static void tryToIntegratePointIntoAllLineDetectors(int sampleIndex, ArrayList<LineDetectorWithMultiplePoints> multiplePointsLineDetector, ArrayList<ProcessA.Sample> workingSamples) {
+    private static void tryToIntegratePointIntoAllLineDetectors(int sampleIndex, List<LineDetectorWithMultiplePoints> multiplePointsLineDetector, List<ProcessA.Sample> workingSamples) {
         for( LineDetectorWithMultiplePoints iteratorDetector : multiplePointsLineDetector )
         {
-            ArrayList<Vector2d<Float>> positionsOfSamples;
+            List<Vector2d<Float>> positionsOfSamples;
             RegressionForLineResult regressionResult;
             ProcessA.Sample currentSample;
 
@@ -340,9 +338,9 @@ public class ProcessD
         }
     }
     
-    private static ArrayList<Vector2d<Float>> getPositionsOfSamplesOfDetector(LineDetectorWithMultiplePoints detector, ArrayList<ProcessA.Sample> workingSamples)
+    private static List<Vector2d<Float>> getPositionsOfSamplesOfDetector(LineDetectorWithMultiplePoints detector, List<ProcessA.Sample> workingSamples)
     {
-        ArrayList<Vector2d<Float>> resultPositions;
+        List<Vector2d<Float>> resultPositions;
         
         resultPositions = new ArrayList<>();
         
@@ -363,7 +361,7 @@ public class ProcessD
      * works by counting the "overlapping" pixel coordinates, chooses the axis with the less overlappings
      *  
      */
-    private static RegressionForLineResult calcRegressionForPoints(ArrayList<Vector2d<Float>> positions)
+    private static RegressionForLineResult calcRegressionForPoints(List<Vector2d<Float>> positions)
     {
         SimpleRegression regression;
         
@@ -420,7 +418,7 @@ public class ProcessD
         return regressionResultForLine;
     }
     
-    private static int calcCountOfOverlappingPixelsForAxis(ArrayList<Vector2d<Float>> positions, EnumAxis axis) {
+    private static int calcCountOfOverlappingPixelsForAxis(List<Vector2d<Float>> positions, EnumAxis axis) {
         float maxCoordinatOnAxis;
         int arraysizeOfDimension;
         int[] dimensionCounter;
@@ -455,7 +453,7 @@ public class ProcessD
     }
     
     // used to calculate the arraysize
-    private static float getMaximalCoordinateForPoints(ArrayList<Vector2d<Float>> positions, EnumAxis axis)
+    private static float getMaximalCoordinateForPoints(List<Vector2d<Float>> positions, EnumAxis axis)
     {
         float max;
         
@@ -469,9 +467,9 @@ public class ProcessD
         return max;
     }
     
-    private static ArrayList<RetinaPrimitive> splitDetectorsIntoLines(ArrayList<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints, ArrayList<ProcessA.Sample> samples)
+    private static List<RetinaPrimitive> splitDetectorsIntoLines(List<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints, List<ProcessA.Sample> samples)
     {
-        ArrayList<RetinaPrimitive> result;
+        List<RetinaPrimitive> result;
         
         result = new ArrayList<>();
         
@@ -483,13 +481,13 @@ public class ProcessD
         return result;
     }
     
-    private static ArrayList<RetinaPrimitive> splitDetectorIntoLines(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints, ArrayList<ProcessA.Sample> samples)
+    private static List<RetinaPrimitive> splitDetectorIntoLines(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints, List<ProcessA.Sample> samples)
     {
         if( lineDetectorWithMultiplePoints.isYAxisSingularity() )
         {
             // handle the special case where its all on one x coordinate
             
-            ArrayList<Vector2d<Float>> samplePositions;
+            List<Vector2d<Float>> samplePositions;
             
             samplePositions = new ArrayList<>();
             
@@ -509,7 +507,7 @@ public class ProcessD
         }
         else
         {
-            ArrayList<Vector2d<Float>> projectedPointPositions;
+            List<Vector2d<Float>> projectedPointPositions;
             
             projectedPointPositions = new ArrayList<>();
             
@@ -524,7 +522,7 @@ public class ProcessD
                 Vector2d<Float> projectedSamplePosition;
 
                 samplePositionAsInt = samples.get(iterationSampleIndex).position;
-                samplePosition = new Vector2d<Float>((float)samplePositionAsInt.x, (float)samplePositionAsInt.y);
+                samplePosition = new Vector2d<>((float)samplePositionAsInt.x, (float)samplePositionAsInt.y);
                 projectedSamplePosition = lineDetectorWithMultiplePoints.projectPointOntoLine(samplePosition);
 
                 projectedPointPositions.add(projectedSamplePosition);
@@ -537,15 +535,15 @@ public class ProcessD
     }
     
     
-    private static ArrayList<RetinaPrimitive> clusterPointsFromLinedetectorToLinedetectors(ArrayList<Vector2d<Float>> pointPositions, EnumAxis axis)
+    private static List<RetinaPrimitive> clusterPointsFromLinedetectorToLinedetectors(List<Vector2d<Float>> pointPositions, EnumAxis axis)
     {
-        ArrayList<RetinaPrimitive> resultSingleLineDetectors;
+        List<RetinaPrimitive> resultSingleLineDetectors;
         boolean nextIsNewLineStart;
         float lastAxisPosition;
         Vector2d<Float> lineStartPosition;
         Vector2d<Float> lastPoint;
         
-        resultSingleLineDetectors = new ArrayList<RetinaPrimitive>();
+        resultSingleLineDetectors = new ArrayList<>();
         
         nextIsNewLineStart = true;
 
@@ -589,7 +587,7 @@ public class ProcessD
         return resultSingleLineDetectors;
     }
     
-    private static void deleteMultiPointDetectorsWhereActiviationIsInsuficient(ArrayList<LineDetectorWithMultiplePoints> lineDetectors)
+    private static void deleteMultiPointDetectorsWhereActiviationIsInsuficient(List<LineDetectorWithMultiplePoints> lineDetectors)
     {
         int detectorI;
         
@@ -616,9 +614,9 @@ public class ProcessD
         detector.isLocked |= detector.getActivation() > Parameters.getProcessdLockingActivation();
     }
     
-    private static ArrayList<ProcessA.Sample> filterEndosceletonPoints(ArrayList<ProcessA.Sample> samples)
+    private static List<ProcessA.Sample> filterEndosceletonPoints(List<ProcessA.Sample> samples)
     {
-        ArrayList<ProcessA.Sample> filtered;
+        List<ProcessA.Sample> filtered;
         
         filtered = new ArrayList<>();
         

@@ -1,15 +1,16 @@
 package ptrman.math;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 public class DistinctUtility
 {
-    public static ArrayList<Integer> getTwoDisjunctNumbers(Random random, int max)
+    public static List<Integer> getTwoDisjunctNumbers(Random random, int max)
     {
         int randomNumber;
-        ArrayList<Integer> temporaryList;
-        ArrayList<Integer> additionalNumbers;
+        List<Integer> temporaryList;
+        List<Integer> additionalNumbers;
         
         randomNumber = random.nextInt(max);
         temporaryList = new ArrayList<>();
@@ -20,12 +21,12 @@ public class DistinctUtility
         return temporaryList;
     }
     
-    public static ArrayList<Integer> getDisjuctNumbersTo(Random random, ArrayList<Integer> numbers, int count, int max)
+    public static List<Integer> getDisjuctNumbersTo(Random random, List<Integer> numbers, int count, int max)
     {
         int counter;
-        ArrayList<Integer> disjunctNumbers;
+        List<Integer> disjunctNumbers;
         
-        disjunctNumbers = new ArrayList<Integer>();
+        disjunctNumbers = new ArrayList<>();
         
         for( counter = 0; counter < count; counter++ )
         {

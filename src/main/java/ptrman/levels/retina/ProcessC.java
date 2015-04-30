@@ -1,8 +1,10 @@
 package ptrman.levels.retina;
 
 import ptrman.Datastructures.Vector2d;
+
+import java.util.List;
+
 import static java.lang.System.arraycopy;
-import java.util.ArrayList;
 
 /**
  *
@@ -29,7 +31,7 @@ public class ProcessC
         public boolean used = false; // used for the sorted array
     }
     
-    public void process(ArrayList<ProcessA.Sample> samples)
+    public void process(List<ProcessA.Sample> samples)
     {
         int outerI, innerI;
         
@@ -125,7 +127,7 @@ public class ProcessC
         
         integerDiff = Vector2d.IntegerHelper.sub(a.position, b.position);
         
-        return (float)Math.sqrt((float)(integerDiff.x*integerDiff.x + integerDiff.y*integerDiff.y));
+        return (float)Math.sqrt( (float)(integerDiff.x*integerDiff.x + integerDiff.y*integerDiff.y));
     }
     
     private static boolean noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(SampleWithDistance[] neightborArray, ProcessA.Sample compareSample)

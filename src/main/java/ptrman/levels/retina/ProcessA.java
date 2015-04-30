@@ -1,9 +1,10 @@
 package ptrman.levels.retina;
 
-import ptrman.Datastructures.Map2d;
+import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  *
@@ -37,7 +38,7 @@ public class ProcessA
     }
     
     
-    public void setWorkingImage(Map2d<Boolean> image)
+    public void setWorkingImage(IMap2d<Boolean> image)
     {
         workingImage = image.copy();
     }
@@ -49,9 +50,9 @@ public class ProcessA
      * 
      *  
      */
-    public ArrayList<Sample> sampleImage()
+    public List<Sample> sampleImage()
     {
-        ArrayList<Sample> resultSamples;
+        List<Sample> resultSamples;
         int hitCount;
         int sampleCount;
 
@@ -86,7 +87,7 @@ public class ProcessA
         return resultSamples;
     }
     
-    private static void addSampleToList(ArrayList<Sample> samples, int x, int y)
+    private static void addSampleToList(List<Sample> samples, int x, int y)
     {
         samples.add(new Sample(new Vector2d<>(x, y)));
     }
@@ -101,7 +102,7 @@ public class ProcessA
         return mask4by4[modX + modY * 4];
     }
 
-    private Map2d<Boolean> workingImage;
+    private IMap2d<Boolean> workingImage;
 
     private static final boolean[] MaskDetail0 =
             {

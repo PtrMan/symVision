@@ -10,12 +10,12 @@ public class ProcessM
 {
     public class LineParsing
     {
-        public LineParsing(ArrayList<SingleLineDetector> lineParsing)
+        public LineParsing(List<SingleLineDetector> lineParsing)
         {
             this.lineParsing = lineParsing;
         }
         
-        public ArrayList<SingleLineDetector> lineParsing;
+        public List<SingleLineDetector> lineParsing;
         
         public float processGInterestRating = 0.0f; // rating or interest of the parsing for processG to be a candidate of a curve
         public boolean processGRated = false; // used to check for invalidated curves and rerate them if necessary
@@ -31,7 +31,7 @@ public class ProcessM
         tryToFindLines(lineDetectors, 1);
     }
     
-    public ArrayList<LineParsing> getLineParsings()
+    public List<LineParsing> getLineParsings()
     {
         return lineParsings;
     }
@@ -94,12 +94,12 @@ public class ProcessM
         SingleLineDetector currentLineDetector;
         ArrayList<SingleLineDetector> resultLineParsing;
         
-        resultLineParsing = new ArrayList<SingleLineDetector>();
+        resultLineParsing = new ArrayList<>();
         currentLineDetector = startLineDetector;
         
         for(;;)
         {
-            ArrayList<Intersection> remainingIntersections;
+            List<Intersection> remainingIntersections;
             
             remainingIntersections = deepCopyIntersections(currentLineDetector.intersections);
             
@@ -153,8 +153,8 @@ public class ProcessM
         }
     }
     
-    private static ArrayList<Intersection> deepCopyIntersections(ArrayList<Intersection> intersections) {
-        ArrayList<Intersection> copyed;
+    private static List<Intersection> deepCopyIntersections(List<Intersection> intersections) {
+        List<Intersection> copyed;
         
         copyed = new ArrayList<>();
         
@@ -169,5 +169,5 @@ public class ProcessM
     
     private Random random = new Random();
     
-    private ArrayList<LineParsing> lineParsings = new ArrayList<>();
+    private List<LineParsing> lineParsings = new ArrayList<>();
 }

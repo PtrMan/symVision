@@ -1,6 +1,6 @@
 package ptrman.levels.retina;
 
-import ptrman.Datastructures.Map2d;
+import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.misc.Assert;
@@ -14,7 +14,7 @@ import java.util.List;
 public class ProcessE
 {
     // TODO< sort out only the line detectors or make sure only linedetectors get in, remove asserts if its made sure >
-    public void process(List<RetinaPrimitive> lineDetectors, Map2d<Boolean> image)
+    public void process(List<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image)
     {
         // we examine ALL possible intersections of all lines
         // this is only possible if we have the whole image at an instance
@@ -85,17 +85,17 @@ public class ProcessE
             return null;
         }
         
-        return new Vector2d<Integer>(Math.round(intersectionFloat.x), Math.round(intersectionFloat.y));
+        return new Vector2d<>(Math.round(intersectionFloat.x), Math.round(intersectionFloat.y));
     }
     
     // public because its used in processG
-    public static boolean isPointInsideImage(Vector2d<Integer> position, Map2d<Boolean> image)
+    public static boolean isPointInsideImage(Vector2d<Integer> position, IMap2d<Boolean> image)
     {
         return position.x >= 0 && position.x < image.getWidth() && position.y >= 0 && position.y < image.getLength();
     }
     
     // public because its used in processG    
-    public static boolean isNeightborhoodPixelSet(Vector2d<Integer> position, Map2d<Boolean> image)
+    public static boolean isNeightborhoodPixelSet(Vector2d<Integer> position, IMap2d<Boolean> image)
     {
         Vector2d<Integer> min, max;
         int ix, iy;
