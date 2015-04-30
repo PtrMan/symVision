@@ -1,8 +1,9 @@
 package ptrman.bpsolver.pattern;
 
 import ptrman.bpsolver.NetworkHandles;
-import java.util.ArrayList;
+
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -12,7 +13,7 @@ import java.util.Set;
  */
 public class Grouping
 {
-    public static Set<Pattern> group(ArrayList<Pattern> exemplarsSet, float clusteringThreshold, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
+    public static Set<Pattern> group(List<Pattern> exemplarsSet, float clusteringThreshold, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
     {
         Set<Pattern> patterns;
         Set<Pattern> knownExemplars;
