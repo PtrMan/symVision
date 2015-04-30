@@ -70,6 +70,7 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
         // TODO< limit it in some way? >
 
         // update the statistics
+        // TODO< update the statistics of the other FeatureNodes along the way and at the bottom ? >
         Node lastOrginalNode;
         Node lastAdditionalNode;
         FeatureNode lastOrginalNodeAsFeatureNode;
