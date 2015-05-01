@@ -228,7 +228,7 @@ public class SingleLineDetector
             intersectSingularLineWithMN(lineB, lineA.getM(), lineA.getN());
         }
         
-        System.err.println("intersectLineDetectors: Internal Error");
+        // both lines are a singularity, there is no intersection
         return null;
     }
     
