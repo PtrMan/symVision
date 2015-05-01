@@ -43,6 +43,9 @@ public class TestClustering
 
     public static void main(String[] args)
     {
+        JFrame j = new JFrame("TestClustering");
+
+
         BpSolver bpSolver = new BpSolver();
 
         bpSolver.setImageSize(new Vector2d<>(100, 100));
@@ -54,12 +57,22 @@ public class TestClustering
         GraphWindow graphWindow = new GraphWindow();
 
         Controller.RecalculateActionListener recalculate = new Controller.RecalculateActionListener(bpSolver, graphWindow.getNodeGraph(), new InputDrawer());
-        recalculate.interactive = new Interactive();
 
-        TuningWindow tuningWindow = new TuningWindow();
 
-        Timer timer = new Timer(2000, recalculate);
+
+
+        Timer timer = new Timer(1000, recalculate);
         timer.setInitialDelay(0);
         timer.start();
+
+        JSplitPane s = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+        s.setLeftComponent(recalculate.interactive = new Interactive());
+        s.setRightComponent(graphWindow.getComponent());
+
+        j.getContentPane().setLayout(new BorderLayout());
+        j.getContentPane().add(new TuningWindow(), BorderLayout.SOUTH);
+        j.getContentPane().add(s, BorderLayout.CENTER);
+        j.setSize(1024, 1000);
+        j.setVisible(true);
     }
 }

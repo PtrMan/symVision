@@ -2,24 +2,23 @@ package ptrman.Gui;
 
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.Parameters;
-import java.awt.GridLayout;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JSlider;
+
+import javax.swing.*;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
+import java.awt.*;
 
 /**
  *
  * 
  */
-public class TuningWindow extends JFrame
+public class TuningWindow extends JPanel
 {
     public TuningWindow()
     {
-        super("");
-        setBounds(50,50,300,300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        super();
+        //setBounds(50,50,300,300);
+
         buildGui();
         setVisible(true);
     }

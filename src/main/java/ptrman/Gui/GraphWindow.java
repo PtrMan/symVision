@@ -1,31 +1,31 @@
 package ptrman.Gui;
 
 import javax.swing.*;
-import java.awt.*;
 
 /**
  *
  * 
  */
-public class GraphWindow extends JFrame
+public class GraphWindow //extends JPanel
 {
     public GraphWindow()
     {
-        super("");
-        setBounds(50,50,300,300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        buildGui();
-        setVisible(true);
+        super();
+
+        //buildGui();
+        //setVisible(true);
     }
     
-    private void buildGui()
-    {
-        
-        setLayout(new GridLayout(1, 1));
-        
-        getContentPane().add(nodeGraph.getGraph());
-    }
-    
+//    private void buildGui()
+//    {
+//
+//        setLayout(new GridLayout(1, 1));
+//
+//        add(nodeGraph.getGraph(), );
+//    }
+
+    public JComponent getComponent() { return nodeGraph.getGraph(); }
+
     public NodeGraph getNodeGraph()
     {
         return nodeGraph;

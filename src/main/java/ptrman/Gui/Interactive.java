@@ -1,15 +1,13 @@
 package ptrman.Gui;
 
-import java.awt.*;
 import javax.swing.*;
+import java.awt.*;
 
-public class Interactive extends JFrame
+public class Interactive extends JPanel
 {
     public Interactive()
     {
-        super("");
-        setBounds(50,50,300,300);
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        super();
 
         
 
