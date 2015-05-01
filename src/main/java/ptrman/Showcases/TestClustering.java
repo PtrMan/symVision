@@ -8,6 +8,8 @@ import ptrman.bpsolver.Parameters;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileFilter;
 
 /**
  *
@@ -41,6 +43,14 @@ public class TestClustering
         }
     }
 
+    static class ImageFileFilter implements FileFilter {
+
+        public boolean accept(File file) {
+            String extension = file.getName().toLowerCase();
+            return extension.endsWith(".jpg") || extension.endsWith(".png") || extension.endsWith(".gif");
+        }
+    }
+
     public static void main(String[] args)
     {
         JFrame j = new JFrame("TestClustering");
@@ -65,14 +75,31 @@ public class TestClustering
         timer.setInitialDelay(0);
         timer.start();
 
-        JSplitPane s = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-        s.setLeftComponent(recalculate.interactive = new Interactive());
-        s.setRightComponent(graphWindow.getComponent());
+        Container panel = j.getContentPane();
 
-        j.getContentPane().setLayout(new BorderLayout());
-        j.getContentPane().add(new TuningWindow(), BorderLayout.SOUTH);
-        j.getContentPane().add(s, BorderLayout.CENTER);
+
+        panel.setLayout(new BorderLayout());
+
+        {
+            JSplitPane s = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
+            s.setLeftComponent(recalculate.interactive = new Interactive());
+            s.setRightComponent(graphWindow.getComponent());
+            panel.add(s, BorderLayout.CENTER);
+        }
+
+        panel.add(new TuningWindow(), BorderLayout.SOUTH);
+        {
+
+            Component fc = FileChooser.newComponent(new File("/home/me/"), new ImageFileFilter(), true, f -> {
+                System.out.println("loading " + f);
+            });
+            fc.setPreferredSize(new Dimension(200, 200));
+            panel.add(fc, BorderLayout.WEST);
+        }
+
         j.setSize(1024, 1000);
         j.setVisible(true);
+
+        j.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 }

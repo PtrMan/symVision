@@ -27,8 +27,8 @@ public class Interactive extends JPanel
         
     }
     
-    public GCanvas leftCanvas;
-    public GCanvas rightCanvas;
+    public final GCanvas leftCanvas;
+    public final GCanvas rightCanvas;
     
     
     public class GCanvas extends Canvas

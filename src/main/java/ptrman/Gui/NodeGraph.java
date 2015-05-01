@@ -1,23 +1,17 @@
 package ptrman.Gui;
 
-import ptrman.FargGeneral.network.Link;
-import ptrman.FargGeneral.network.Node;
-import ptrman.bpsolver.NetworkHandles;
-import ptrman.bpsolver.nodes.AttributeNode;
-import ptrman.bpsolver.nodes.FeatureNode;
-import ptrman.bpsolver.nodes.NodeTypes;
-import ptrman.bpsolver.nodes.NumeriosityNode;
-import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import ptrman.bpsolver.nodes.PlatonicPrimitiveNode;
 import com.mxgraph.layout.mxFastOrganicLayout;
 import com.mxgraph.layout.mxIGraphLayout;
 import com.mxgraph.swing.mxGraphComponent;
-import com.mxgraph.swing.util.mxMorphing;
-import com.mxgraph.util.mxEvent;
-import com.mxgraph.util.mxEventObject;
-import com.mxgraph.util.mxEventSource.mxIEventListener;
 import com.mxgraph.view.mxGraph;
+import ptrman.FargGeneral.network.Link;
+import ptrman.FargGeneral.network.Node;
+import ptrman.bpsolver.NetworkHandles;
+import ptrman.bpsolver.nodes.*;
+
+import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 
 public class NodeGraph
@@ -29,7 +23,7 @@ public class NodeGraph
     {
         graphComponent = new mxGraphComponent(graph);
         
-        graph.setHtmlLabels(true);
+        //graph.setHtmlLabels(true);
     }
     
     public mxGraphComponent getGraph()
@@ -82,6 +76,9 @@ public class NodeGraph
         
         mxIGraphLayout layout = new mxFastOrganicLayout(graph);
 
+        layout.execute(graph.getDefaultParent());
+
+        /*
         // layout using morphing
         graph.getModel().beginUpdate();
         try {
@@ -100,6 +97,7 @@ public class NodeGraph
 
             morph.startAnimation();
         }
+        */
     }
     
     private void populateEdgesBetweenNodes(VertexList vertexList)
@@ -155,12 +153,12 @@ public class NodeGraph
     private VertexList convertNodesToVertexWithNodeRecursivly(List<Node> nodes, NetworkHandles networkHandles)
     {
         VertexList resultVertexList;
-        ArrayList<Node> remainingNodes;
-        Object graphParent;
+        Deque<Node> remainingNodes;
+        //Object graphParent;
         
         resultVertexList = new VertexList();
         
-        remainingNodes = new ArrayList<>();
+        remainingNodes = new ArrayDeque<>();
         
         for( Node iterationNode : nodes )
         {
@@ -176,9 +174,8 @@ public class NodeGraph
                 break;
             }
             
-            currentNode = remainingNodes.get(0);
-            remainingNodes.remove(0);
-            
+            currentNode = remainingNodes.removeFirst();
+
             // we don't need to create/inert it if it is already in there
             if( resultVertexList.existsVertexWthNodeByNode(currentNode) )
             {
@@ -332,7 +329,7 @@ public class NodeGraph
         Node node;
         Object vertexForNode;
         
-        ArrayList<VertexWithNode> outgoingVerticesWithNode = new ArrayList<>();
+        public final ArrayList<VertexWithNode> outgoingVerticesWithNode = new ArrayList<>();
         
         public static VertexWithNode createFromNodeAndVertex(Node node, Object vertexForNode)
         {
