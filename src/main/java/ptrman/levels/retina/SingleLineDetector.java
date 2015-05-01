@@ -1,13 +1,12 @@
 package ptrman.levels.retina;
 
 import ptrman.Datastructures.Vector2d;
-import static ptrman.Datastructures.Vector2d.FloatHelper.add;
-import static ptrman.Datastructures.Vector2d.FloatHelper.dot;
-import static ptrman.Datastructures.Vector2d.FloatHelper.getScaled;
-import static ptrman.Datastructures.Vector2d.FloatHelper.sub;
-import java.util.ArrayList;
 import ptrman.misc.AngleHelper;
 import ptrman.misc.Assert;
+
+import java.util.ArrayList;
+
+import static ptrman.Datastructures.Vector2d.FloatHelper.*;
 
 /**
  * 
@@ -229,7 +228,8 @@ public class SingleLineDetector
             intersectSingularLineWithMN(lineB, lineA.getM(), lineA.getN());
         }
         
-        throw new RuntimeException("Internal Error");
+        System.err.println("intersectLineDetectors: Internal Error");
+        return null;
     }
     
     // returns null if they are parallel

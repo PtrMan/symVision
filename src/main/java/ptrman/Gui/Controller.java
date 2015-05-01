@@ -425,5 +425,10 @@ public class Controller
         private final NodeGraph nodeGraph;
 
         private IImageDrawer imageDrawer;
+
+        public Interactive setInteractive(Interactive interactive) {
+            this.interactive = interactive;
+            return interactive;
+        }
     }
 }
