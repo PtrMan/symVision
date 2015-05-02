@@ -3,9 +3,9 @@ package ptrman.Gui;
 import javax.swing.*;
 import java.awt.*;
 
-public class Interactive extends JPanel
+public class DualConvas extends JPanel
 {
-    public Interactive()
+    public DualConvas()
     {
         super();
 

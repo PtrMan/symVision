@@ -1,19 +1,29 @@
 package ptrman.bpsolver;
 
+import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.FargGeneral.Coderack;
+import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Network;
 import ptrman.FargGeneral.network.Node;
+import ptrman.bpsolver.RetinaToWorkspaceTranslator.ITranslatorStrategy;
+import ptrman.bpsolver.RetinaToWorkspaceTranslator.NearIntersectionStrategy;
 import ptrman.bpsolver.codelets.BaryCenter;
 import ptrman.bpsolver.codelets.LineSegmentLength;
 import ptrman.bpsolver.codelets.LineSegmentSlope;
 import ptrman.bpsolver.ltm.LinkCreator;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveNode;
+import ptrman.bpsolver.pattern.FeaturePatternMatching;
+import ptrman.levels.retina.*;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class BpSolver {
+
+
+
     public static void main(String[] args)
     {
         Parameters.init();
@@ -35,6 +45,123 @@ public class BpSolver {
     
     public void cycle(int cycleCount) {
         coderack.cycle(cycleCount);
+    }
+
+
+    public void recalculate(IMap2d<Boolean> image)
+    {
+        final boolean enableProcessH = true;
+        final boolean enableProcessE = true;
+        final boolean enableProcessM = true;
+
+        final int NUMBEROFCYCLES = 500;
+
+        // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
+        coderack.flush();
+
+        ProcessA processA = new ProcessA();
+        ProcessB processB = new ProcessB();
+        ProcessC processC = new ProcessC();
+        ProcessD processD = new ProcessD();
+        ProcessH processH = new ProcessH();
+        ProcessE processE = new ProcessE();
+        ProcessM processM = new ProcessM();
+
+        processA.setWorkingImage(image);
+        List<ProcessA.Sample> samples = processA.sampleImage();
+
+
+        processB.process(samples, image);
+        processC.process(samples);
+
+        List<RetinaPrimitive> lineDetectors = processD.detectLines(samples);
+
+        List<Intersection> lineIntersections = new ArrayList<>();
+
+
+
+        if( enableProcessH )
+        {
+            processH.process(lineDetectors);
+        }
+
+
+
+        if( enableProcessE )
+        {
+            processE.process(lineDetectors, image);
+
+            lineIntersections = getAllLineIntersections(lineDetectors);
+        }
+
+        List<ProcessM.LineParsing> lineParsings = new ArrayList<>();
+
+        if( enableProcessM )
+        {
+            processM.process(lineDetectors);
+
+            lineParsings = processM.getLineParsings();
+        }
+
+
+
+        ITranslatorStrategy retinaToWorkspaceTranslatorStrategy;
+
+        retinaToWorkspaceTranslatorStrategy = new NearIntersectionStrategy();
+
+        List<Node> objectNodes = retinaToWorkspaceTranslatorStrategy.createObjectsFromRetinaPrimitives(lineDetectors, this);
+
+        cycle(NUMBEROFCYCLES);
+
+
+
+        if( true )
+        {
+            FeaturePatternMatching featurePatternMatching;
+
+            featurePatternMatching = new FeaturePatternMatching();
+
+            for( Node iterationNode : objectNodes )
+            {
+                Node bestPatternNode;
+                float bestPatternSimilarity;
+
+                bestPatternNode = null;
+                bestPatternSimilarity = 0.0f;
+
+                for( Node patternNode : patternRootNodes )
+                {
+                    List<FeaturePatternMatching.MatchingPathElement> matchingPathElements;
+                    float matchingDistanceValue;
+                    float matchingSimilarityValue;
+
+                    matchingPathElements = featurePatternMatching.matchAnyRecursive(iterationNode, patternNode, networkHandles, Arrays.asList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
+                    matchingDistanceValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
+                    matchingSimilarityValue = FeaturePatternMatching.Converter.distanceToSimilarity(matchingDistanceValue);
+
+                    if( matchingSimilarityValue > Parameters.getPatternMatchingMinSimilarity() && matchingSimilarityValue > bestPatternSimilarity )
+                    {
+                        bestPatternNode = patternNode;
+                        bestPatternSimilarity = matchingSimilarityValue;
+                    }
+                }
+
+                if( bestPatternNode != null )
+                {
+                    // TODO< incorperate new pattern into old >
+                    int debugPoint = 0;
+                }
+                else
+                {
+                    patternRootNodes.add(iterationNode);
+                }
+            }
+        }
+
+        lastFrameObjectNodes = objectNodes;
+        lastFrameRetinaPrimitives = lineDetectors; // for now only the line detectors TODO
+        lastFrameSamples = samples;
+        lastFrameIntersections = lineIntersections; // TODO< other intersections too >
     }
     
     /**
@@ -193,7 +320,65 @@ public class BpSolver {
         platonicPrimitiveDatabase.calculatorsForMaxValueOfPlatonicPrimitiveNode.put(networkHandles.lineSegmentFeatureLineSlopePrimitiveNode, new PlatonicPrimitiveDatabase.ConstantValueMaxValueCalculator(getImageSizeAsFloat().y));
         platonicPrimitiveDatabase.calculatorsForMaxValueOfPlatonicPrimitiveNode.put(networkHandles.anglePointAngleValuePrimitiveNode, new PlatonicPrimitiveDatabase.ConstantValueMaxValueCalculator(360.0f));
     }
-    
+
+
+
+
+
+
+    // TODO< refactor out >
+    private static List<Intersection> getAllLineIntersections(List<RetinaPrimitive> lineDetectors)
+    {
+        List<Intersection> uniqueIntersections;
+
+        uniqueIntersections = new ArrayList<>();
+
+        for( RetinaPrimitive currentPrimitive : lineDetectors )
+        {
+            if( currentPrimitive.type != RetinaPrimitive.EnumType.LINESEGMENT )
+            {
+                continue;
+            }
+
+            findAndAddUniqueIntersections(uniqueIntersections, currentPrimitive.line.intersections);
+        }
+
+        return uniqueIntersections;
+    }
+
+    // modifies uniqueIntersections
+    private static void findAndAddUniqueIntersections(List<Intersection> uniqueIntersections, List<Intersection> intersections)
+    {
+        for( Intersection currentOuterIntersection : intersections )
+        {
+            boolean found;
+
+            found = false;
+
+            for( Intersection currentUnqiueIntersection : uniqueIntersections )
+            {
+                if( currentUnqiueIntersection.equals(currentOuterIntersection) )
+                {
+                    found = true;
+                    break;
+                }
+            }
+
+            if( !found )
+            {
+                uniqueIntersections.add(currentOuterIntersection);
+            }
+        }
+
+
+    }
+
+
+
+
+
+
+
     // both ltm and workspace
     // the difference is that the nodes of the workspace may all be deleted
     public Network network = new Network();
@@ -222,5 +407,8 @@ public class BpSolver {
     
     private Vector2d<Integer> imageSize; 
     
-    
+    public List<Node> lastFrameObjectNodes;
+    public List<RetinaPrimitive> lastFrameRetinaPrimitives;
+    public List<ProcessA.Sample> lastFrameSamples;
+    public List<Intersection> lastFrameIntersections;
 }

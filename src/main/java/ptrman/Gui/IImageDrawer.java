@@ -9,5 +9,5 @@ import java.awt.image.BufferedImage;
  */
 public interface IImageDrawer
 {
-    BufferedImage drawToJavaImage(float time, BpSolver bpSolver);
+    BufferedImage drawToJavaImage(BpSolver bpSolver);
 }

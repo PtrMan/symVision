@@ -1,5 +1,7 @@
 package ptrman.Showcases;
 
+import ptrman.Datastructures.IMap2d;
+import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.*;
 import ptrman.bpsolver.BpSolver;
@@ -8,7 +10,10 @@ import ptrman.bpsolver.Parameters;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
@@ -30,10 +35,7 @@ public class TestClustering {
         BufferedImage off_Image;
 
         @Override
-        public BufferedImage drawToJavaImage(float time, BpSolver bpSolver) {
-            time *= 0.1f;
-
-
+        public BufferedImage drawToJavaImage(BpSolver bpSolver) {
             if (off_Image == null || off_Image.getWidth() != RETINA_WIDTH || off_Image.getHeight() != RETINA_HEIGHT) {
                 off_Image = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             }
@@ -78,6 +80,64 @@ public class TestClustering {
         }
     }
 
+    /**
+     *
+     * gets called when the next frame should be drawn
+     *
+     * delegates to all parts
+     *
+     */
+    private static class TimerActionListener implements ActionListener {
+
+
+        public TimerActionListener(BpSolver bpSolver, IImageDrawer imageDrawer,  IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas) {
+            this.bpSolver = bpSolver;
+            this.imageDrawer = imageDrawer;
+            this.introspectControlPanel = introspectControlPanel;
+            this.nodeGraph = nodeGraph;
+            this.dualCanvas = dualCanvas;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            BufferedImage image;
+            IMap2d<Boolean> map;
+
+            // TODO< pull image from source >
+            // for now imageDrawer does this
+            image = imageDrawer.drawToJavaImage(bpSolver);
+
+            map = TestClustering.translateFromImageToMap(image);
+
+
+            bpSolver.recalculate(map);
+
+            if( introspectControlPanel.getIntrospectionState() )
+            {
+                nodeGraph.repopulateAfterNodes(bpSolver.lastFrameObjectNodes, bpSolver.networkHandles);
+            }
+
+            dualCanvas.leftCanvas.setImage(image);
+
+            BufferedImage detectorImage;
+
+            detectorImage = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
+
+            Graphics2D graphics = (Graphics2D)detectorImage.getGraphics();
+
+            // TODO create graphics and draw it to a created image and put the image into the canvas
+            DebugDrawingHelper.drawDetectors(graphics, bpSolver.lastFrameRetinaPrimitives, bpSolver.lastFrameIntersections, bpSolver.lastFrameSamples);
+
+            dualCanvas.rightCanvas.setImage(detectorImage);
+        }
+
+        private BpSolver bpSolver;
+        private final IImageDrawer imageDrawer;
+        private IntrospectControlPanel introspectControlPanel;
+        private NodeGraph nodeGraph;
+        private DualConvas dualCanvas;
+    }
+
     public TestClustering() {
         JFrame j = new JFrame("TestClustering");
 
@@ -91,11 +151,15 @@ public class TestClustering {
 
         GraphWindow graphWindow = new GraphWindow();
 
-        Controller.RecalculateActionListener recalculate = new Controller.RecalculateActionListener(bpSolver, graphWindow.getNodeGraph(),
-                new InputDrawer());
+
+        IntrospectControlPanel introspectControlPanel;
+
+        introspectControlPanel = new IntrospectControlPanel();
+
+        DualConvas dualCanvas = new DualConvas();
 
 
-        Timer timer = new Timer(1000, recalculate);
+        Timer timer = new Timer(1000, new TimerActionListener(bpSolver, new InputDrawer(), introspectControlPanel, graphWindow.getNodeGraph(), dualCanvas));
         timer.setInitialDelay(0);
         timer.start();
 
@@ -105,10 +169,20 @@ public class TestClustering {
         panel.setLayout(new BorderLayout());
 
         {
-            JSplitPane s = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
-            s.setLeftComponent(recalculate.setInteractive(new Interactive()));
-            s.setRightComponent(graphWindow.getComponent());
-            panel.add(s, BorderLayout.CENTER);
+
+
+
+
+            GridLayout experimentLayout = new GridLayout(3,1);
+
+            final JPanel compsToExperiment = new JPanel();
+            compsToExperiment.setLayout(experimentLayout);
+
+            compsToExperiment.add(introspectControlPanel.getPanel());
+            compsToExperiment.add(dualCanvas);
+            compsToExperiment.add(graphWindow.getComponent());
+
+            panel.add(compsToExperiment, BorderLayout.CENTER);
         }
 
         panel.add(new TuningWindow(), BorderLayout.SOUTH);
@@ -130,5 +204,27 @@ public class TestClustering {
 
     public static void main(String[] args) {
         new TestClustering();
+    }
+
+
+
+    // TODO< move this into the functionality of the visual processor >
+    private static IMap2d<Boolean> translateFromImageToMap(BufferedImage javaImage) {
+        DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
+
+        int bufferI;
+        IMap2d<Boolean> convertedToMap;
+
+        convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
+
+        for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ )
+        {
+            boolean convertedPixel;
+
+            convertedPixel = imageBuffer.getElem(bufferI) != 0;
+            convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(), convertedPixel);
+        }
+
+        return convertedToMap;
     }
 }
