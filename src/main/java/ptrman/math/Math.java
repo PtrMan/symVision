@@ -12,9 +12,27 @@ public class Math
         return x*x;
     }
 
-    public static float squaredDistance(float x, float y)
+    // SUPERCOMPILATION candidate
+    public static float squaredDistance(float[] data)
     {
-        return power2(x)+power2(y);
+        float result;
+        int i;
+
+        // we play supercompiler
+        // SUPERCOMPILATION remove this when we use supercompilation
+        if( data.length == 2 )
+        {
+            return power2(data[0]) + power2(data[1]);
+        }
+
+        result = 0.0f;
+
+        for( i = 0; i < data.length; i++ )
+        {
+            result += power2(data[i]);
+        }
+
+        return result;
     }
     
     public static int faculty(int value)
@@ -29,5 +47,10 @@ public class Math
         }
         
         return result;
+    }
+
+    public static float clamp01(float value)
+    {
+        return java.lang.Math.min(1.0f, java.lang.Math.max(value, 0.0f));
     }
 }
