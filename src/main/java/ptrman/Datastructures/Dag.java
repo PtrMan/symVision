@@ -7,14 +7,14 @@ import java.util.List;
  *
  */
 public class Dag<Type> {
-    public static class Element<Type2> {
-        public Element(Type2 content)
+    public class Element {
+        public Element(Type content)
         {
             this.content = content;
         }
 
         public List<Integer> childIndices = new ArrayList<>();
-        public Type2 content;
+        public Type content;
     }
 
     public void addElement(Element element)
