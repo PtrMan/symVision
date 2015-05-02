@@ -105,25 +105,20 @@ public class Map2dDither {
             return closest;
         }
 
-        public static IMap2d<Boolean> floydSteinbergDitheringFloatToBoolean(IMap2d<Float> input) {
+        public static void floydSteinbergDitheringFloatToBoolean(IMap2d<Float> input, IMap2d<Boolean> resultAboveThreshold) {
             IMap2d<IValue> temporaryResult;
             IMap2d<IValue> temporaryInput;
             IMap2d<Float> result;
-            IMap2d<Boolean> resultAboveThreshold;
             final ValueFloat[] palette = new ValueFloat[]{new ValueFloat(0.0f), new ValueFloat(1.0f)};
 
             temporaryInput = covertFromFloatToValueFloat(input);
             temporaryResult = calculate(temporaryInput, palette);
             result = convertFromValueFromToFloat(temporaryResult);
-            resultAboveThreshold = convertFromFloatToBooleanNotEqualZero(result);
-            return resultAboveThreshold;
+            convertFromFloatToBooleanNotEqualZeroInPlace(result, resultAboveThreshold);
         }
 
-        private static IMap2d<Boolean> convertFromFloatToBooleanNotEqualZero(IMap2d<Float> input) {
-            IMap2d<Boolean> result;
+        private static void convertFromFloatToBooleanNotEqualZeroInPlace(IMap2d<Float> input, IMap2d<Boolean> result) {
             int x, y;
-
-            result = new Map2d<>(input.getWidth(), input.getLength());
 
             for( y = 0; y < input.getLength(); y++ )
             {
@@ -132,8 +127,6 @@ public class Map2dDither {
                     result.setAt(x, y, input.readAt(x, y) != 0.0f);
                 }
             }
-
-            return result;
         }
 
         private static IMap2d<Float> convertFromValueFromToFloat(IMap2d<IValue> input) {

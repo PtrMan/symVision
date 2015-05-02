@@ -1,10 +1,14 @@
 package ptrman.levels.visual;
 
+import ptrman.Datastructures.Dag;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.meter.event.DurationStartMeter;
+import ptrman.misc.Assert;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +17,20 @@ import java.util.Map;
  */
 public class VisualProcessor
 {
+    public static class ThresholdMap2dMapperFunction implements Map2dMapper.IMap2dMapper<Float, Boolean>
+    {
+        public ThresholdMap2dMapperFunction(float threshold) {
+            this.threshold = threshold;
+        }
 
+        @Override
+        public Boolean calculate(Float value)
+        {
+            return value > threshold;
+        }
+
+        private final float threshold;
+    }
 
     /**
      *
@@ -50,43 +67,15 @@ public class VisualProcessor
         mapper.map(imageMapper, inputColorImage, outputGrayImage);
     }
 
-    /**
-     *
-     * TODO opencl
-     */
-    private static void convertZeroCrossingFloatToBoolean(IMap2d<Float> input, IMap2d<Boolean> result)
-    {
-        class ConvertFloatZeroCrossingToBoolean implements Map2dMapper.IMap2dMapper<Float, Boolean>
-        {
-            @Override
-            public Boolean calculate(Float value)
-            {
-                boolean result;
-
-                // HACK
-                // NOTE maybe our kernel is wrong
-                result = value * 1000.0f > 0.45f;
-
-                if( result )
-                {
-                    int x = 0;
-                }
-
-                return result;
-            }
-        }
-
-        ConvertFloatZeroCrossingToBoolean imageMapper;
-        Map2dMapper.Mapper<Float, Boolean> mapper;
-
-        imageMapper = new ConvertFloatZeroCrossingToBoolean();
-        mapper = new Map2dMapper.Mapper<>();
-
-        mapper.map(imageMapper, input, result);
-    }
 
     public static class ProcessingChain
     {
+        public enum EnumMapType {
+            COLOR,
+            BOOLEAN,
+            FLOAT
+        }
+
         public static class MarrHildrethOperatorParameter
         {
             public MarrHildrethOperatorParameter(int filterSize, float sigma)
@@ -99,9 +88,91 @@ public class VisualProcessor
             public float sigma;
         }
 
+        public interface IFilter<TypeInput, TypeOutput> {
+            void apply(IMap2d<TypeInput> input, IMap2d<TypeOutput> output);
+        }
+
+        public static class DitheringFilter implements IFilter<Float, Boolean> {
+            @Override
+            public void apply(IMap2d<Float> input, IMap2d<Boolean> output) {
+                Map2dDither.Generic.floydSteinbergDitheringFloatToBoolean(input, output);
+            }
+        }
+
+        public static class ThresholdFilter implements IFilter<Float, Boolean> {
+            public ThresholdFilter(float threshold) {
+                this.threshold = threshold;
+            }
+
+            @Override
+            public void apply(IMap2d<Float> input, IMap2d<Boolean> output) {
+                ThresholdMap2dMapperFunction imageMapper;
+                Map2dMapper.Mapper<Float, Boolean> mapper;
+
+                imageMapper = new ThresholdMap2dMapperFunction(threshold);
+                mapper = new Map2dMapper.Mapper<>();
+
+                mapper.map(imageMapper, input, output);
+            }
+
+            private final float threshold;
+
+        }
+
+
+
+        public abstract static class ChainElement {
+            public ChainElement(EnumMapType inputType, EnumMapType outputType, String meterName) {
+                this.inputType = inputType;
+                this.outputType = outputType;
+                durationMeters = new DurationStartMeter(meterName, true, 1.0, false);
+            }
+
+            public abstract void apply();
+
+            public EnumMapType inputType, outputType;
+            public DurationStartMeter durationMeters;
+        }
+
+        public abstract static class ApplyChainElement<InputType, ResultType> extends ChainElement {
+            public ApplyChainElement(EnumMapType inputType, EnumMapType outputType, String meterName, Vector2d<Integer> imageSize, IFilter<InputType, ResultType> filter) {
+                super(inputType, outputType, meterName);
+                result = new Map2d<>(imageSize.x, imageSize.y);
+                this.filter = filter;
+            }
+
+            public void apply() {
+                durationMeters.start();
+                filter.apply(input, result);
+                durationMeters.stop();
+            }
+
+            public IMap2d<InputType> input;
+            public IMap2d<ResultType> result;
+            private IFilter<InputType, ResultType> filter;
+        }
+
+        public static class ChainElementFloatFloat extends ApplyChainElement<Float, Float> {
+            public ChainElementFloatFloat(IFilter<Float, Float> filter, String meterName, Vector2d<Integer> imageSize) {
+                super(EnumMapType.FLOAT, EnumMapType.FLOAT, meterName, imageSize, filter);
+            }
+        }
+
+        public static class ChainElementFloatBoolean extends ApplyChainElement<Float, Boolean> {
+            public ChainElementFloatBoolean(IFilter<Float, Boolean> filter, String meterName, Vector2d<Integer> imageSize) {
+                super(EnumMapType.FLOAT, EnumMapType.BOOLEAN, meterName, imageSize, filter);
+            }
+        }
+
+        public static class ChainElementColorFloat extends ApplyChainElement<ColorRgb, Float> {
+            public ChainElementColorFloat(IFilter<ColorRgb, Float> filter, String meterName, Vector2d<Integer> imageSize) {
+                super(EnumMapType.COLOR, EnumMapType.FLOAT, meterName, imageSize, filter);
+            }
+        }
+
         public ProcessingChain()
         {
-            durationMeters.put("convertColorToGray", new DurationStartMeter("convertColorToGray", true, 1.0, false));
+
             durationMeters.put("zeroCrossingConvolution", new DurationStartMeter("zeroCrossingConvolution", true, 1.0, false));
             durationMeters.put("zeroCrossingToBoolean", new DurationStartMeter("zeroCrossingToBoolean", true, 1.0, false));
 
@@ -119,33 +190,94 @@ public class VisualProcessor
 
         public void filterChain(IMap2d<ColorRgb> inputColorImage)
         {
-            /**
-             * first we transform the inputimage to blackwhite
-             * then we calculate the zero crossings of it.
-             *
-             * This seems to be a natural image processing principle because it works with grayscale image and color images in the same way.
-             *
-             */
+            Deque<Integer> chainIndicesToProcess;
+            boolean processFromInput;
 
+
+
+            chainIndicesToProcess = new ArrayDeque<>();
+
+            processFromInput = true;
+            chainIndicesToProcess.add(0);
+
+            for(;;) {
+                int currentDagElementIndex;
+                Dag<ChainElement>.Element currentDagElement;
+                //EnumMapType filterOutputType;
+
+                IMap2d MapForFilterOutput;
+
+                if( chainIndicesToProcess.isEmpty() ) {
+                    break;
+                }
+
+                currentDagElementIndex = chainIndicesToProcess.peek();
+
+                currentDagElement = filterChainDag.elements.get(currentDagElementIndex);
+                //filterOutputType = currentDagElement.content.outputType;
+
+                if( processFromInput ) {
+                    ChainElementColorFloat chainElement;
+
+                    processFromInput = false;
+
+                    Assert.Assert(currentDagElement.content.inputType == EnumMapType.COLOR, "");
+                    Assert.Assert(currentDagElement.content.outputType == EnumMapType.FLOAT, "");
+
+                    chainElement = (ChainElementColorFloat)currentDagElement.content;
+
+                    chainElement.input = inputColorImage;
+                }
+
+                currentDagElement.content.apply();
+
+                MapForFilterOutput = ((ApplyChainElement)currentDagElement.content).result;
+
+
+                for( int iterationChildIndex : currentDagElement.childIndices ) {
+                    Dag<ChainElement>.Element iterationDagElement;
+
+                    iterationDagElement = filterChainDag.elements.get(iterationChildIndex);
+
+                    Assert.Assert(iterationDagElement.content.inputType == currentDagElement.content.outputType, "Types of filters are incompatible");
+
+                    ((ApplyChainElement)currentDagElement.content).input = MapForFilterOutput;
+                }
+
+                chainIndicesToProcess.addAll(currentDagElement.childIndices);
+            }
+
+
+            /*
             IMap2d<Float> zeroCrossings;
 
             durationMeters.get("convertColorToGray").start();
             convertColorToGrayImage(inputColorImage, grayImage, colorToGrayColorScale);
             durationMeters.get("convertColorToGray").stop();
 
+
+
             durationMeters.get("zeroCrossingConvolution").start();
             zeroCrossings = Convolution2d.convolution(grayImage, grayImageZeroCrossingKernel);
             durationMeters.get("zeroCrossingConvolution").stop();
 
             durationMeters.get("zeroCrossingToBoolean").start();
-            convertZeroCrossingFloatToBoolean(zeroCrossings, zeroCrossingBinary);
+            // threshold is 0.00045f for the MarrHildreth filter
+            //convertZeroCrossingFloatToBoolean(zeroCrossings, zeroCrossingBinary);
             durationMeters.get("zeroCrossingToBoolean").stop();
+            */
+
         }
 
-        public IMap2d<Boolean> getZeroCrossingBinary()
-        {
-            return zeroCrossingBinary;
+        /*
+        private void applyChainElement(ChainElement chainElement) {
+            switch( chainElement.type ) {
+                case COLOR_FLOAT:
+                    ((ChainElementColorFloat)chainElement).apply();
+            }
         }
+        */
+
 
         private IMap2d<Float> grayImageZeroCrossingKernel;
         private IMap2d<Float> grayImage;
@@ -155,5 +287,8 @@ public class VisualProcessor
         private ColorRgb colorToGrayColorScale;
 
         public Map<String, DurationStartMeter> durationMeters = new HashMap<>();
+
+        // entry is [0]
+        public Dag<ChainElement> filterChainDag = new Dag<>();
     }
 }
