@@ -30,12 +30,12 @@ public class ProcessD {
 
     
     private static class LineDetectorWithMultiplePoints {
-        public LineDetectorWithMultiplePoints(ArrayList<Integer> integratedSampleIndices) {
+        public LineDetectorWithMultiplePoints(List<Integer> integratedSampleIndices) {
             this.integratedSampleIndices = integratedSampleIndices;
         }
         
         
-        public List<Integer> integratedSampleIndices = new ArrayList<>();
+        public List<Integer> integratedSampleIndices;
         
         public float m, n;
         
@@ -112,19 +112,18 @@ public class ProcessD {
      * \return only the surviving line segments
      */
     public List<RetinaPrimitive> detectLines(List<ProcessA.Sample> samples) {
-        List<ProcessA.Sample> workingSamples;
-        List<LineDetectorWithMultiplePoints> multiplePointsLineDetector;
-        List<RetinaPrimitive> resultSingleDetectors;
-        
         final float SAMPLECOUNTLINEDETECTORMULTIPLIER = 3.5f;
-        
-        multiplePointsLineDetector = new ArrayList<>();
-        
-        workingSamples = filterEndosceletonPoints(samples);
-        
-        int counter;
-        
-        for( counter = 0; counter < Math.round((float)samples.size()*SAMPLECOUNTLINEDETECTORMULTIPLIER); counter++ ) {{
+
+        List<LineDetectorWithMultiplePoints> multiplePointsLineDetector = new ArrayList<>();
+
+        List<ProcessA.Sample> workingSamples = filterEndosceletonPoints(samples);
+
+        if( workingSamples.isEmpty() ) {
+            return new ArrayList<>();
+        }
+
+        for( int counter = 0; counter < Math.round((float)samples.size()*SAMPLECOUNTLINEDETECTORMULTIPLIER); counter++ ) {
+            {
                 int centerPointIndex;
                 List<Vector2d<Float>> positionsOfSamples;
                 RegressionForLineResult regressionResult;
@@ -133,7 +132,7 @@ public class ProcessD {
                 // this increases the chances that it lies on a (small) line
                 centerPointIndex = random.nextInt(workingSamples.size());
                 
-                ArrayList<Integer> chosenPointIndices = new ArrayList<Integer>();
+                List<Integer> chosenPointIndices = new ArrayList<>();
                 chosenPointIndices.add(centerPointIndex);
                 
                 // modifies chosenPointIndices
@@ -187,10 +186,7 @@ public class ProcessD {
             
             // try to include a random sample into the detectors
             if( false ) {
-                int sampleIndex;
-
-                sampleIndex = random.nextInt(workingSamples.size());
-
+                int sampleIndex = random.nextInt(workingSamples.size());
 
                 // try to integrate the current sample into line(s)
                 tryToIntegratePointIntoAllLineDetectors(sampleIndex, multiplePointsLineDetector, workingSamples);
@@ -201,7 +197,7 @@ public class ProcessD {
         deleteMultiPointDetectorsWhereActiviationIsInsuficient(multiplePointsLineDetector);
         
         // split the detectors into one or many lines
-        resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector, samples);
+        List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector, samples);
         
         return resultSingleDetectors;
     }
