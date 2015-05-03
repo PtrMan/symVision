@@ -5,6 +5,7 @@ import ptrman.Datastructures.Vector2d;
 import java.util.List;
 
 import static java.lang.System.arraycopy;
+import static ptrman.Datastructures.Vector2d.IntegerHelper.sub;
 
 /**
  *
@@ -28,28 +29,19 @@ public class ProcessC {
     }
     
     public void process(List<ProcessA.Sample> samples) {
-        int outerI, innerI;
-        
-        for( outerI = 0; outerI < samples.size(); outerI++ ) {
-            SampleWithDistance[] sortedArray;
-            ProcessA.Sample outerSample;
+        for( int outerI = 0; outerI < samples.size(); outerI++ ) {
+            SampleWithDistance[] sortedArray = createSortedArray();
+
+            ProcessA.Sample outerSample = samples.get(outerI);
             
-            sortedArray = createSortedArray();
-            
-            outerSample = samples.get(outerI);
-            
-            for( innerI = 0; innerI < samples.size(); innerI++ ) {
-                ProcessA.Sample innerSample;
-                float distance;
-                
-                if( outerI == innerI )
-                {
+            for( int innerI = 0; innerI < samples.size(); innerI++ ) {
+                if( outerI == innerI ) {
                     continue;
                 }
+
+                ProcessA.Sample innerSample = samples.get(innerI);
                 
-                innerSample = samples.get(innerI);
-                
-                distance = calculateDistanceBetweenSamples(outerSample, innerSample);
+                float distance = calculateDistanceBetweenSamples(outerSample, innerSample);
                 putSampleWithDistanceIntoSortedArray(new SampleWithDistance(innerSample, distance), sortedArray);
             }
             
@@ -69,9 +61,7 @@ public class ProcessC {
      * \param sortedArray lower values are more left
      */
     private static void putSampleWithDistanceIntoSortedArray(SampleWithDistance newElement, SampleWithDistance[] sortedArray) {
-        int i;
-        
-        for( i = 0; i < sortedArray.length; i++ ) {
+        for( int i = 0; i < sortedArray.length; i++ ) {
             if( !sortedArray[i].used ) {
                 // array element is not set, its save to set it to the newElement
                 sortedArray[i] = newElement;
@@ -95,12 +85,9 @@ public class ProcessC {
     }
     
     private static SampleWithDistance[] createSortedArray() {
-        SampleWithDistance[] result;
-        int i;
+        SampleWithDistance[] result = new SampleWithDistance[8];
         
-        result = new SampleWithDistance[8];
-        
-        for( i = 0; i < result.length; i++ ) {
+        for( int i = 0; i < result.length; i++ ) {
             result[i] = new SampleWithDistance();
         }
         
@@ -110,18 +97,15 @@ public class ProcessC {
     private static float calculateDistanceBetweenSamples(ProcessA.Sample a, ProcessA.Sample b) {
         Vector2d<Integer> integerDiff;
         
-        integerDiff = Vector2d.IntegerHelper.sub(a.position, b.position);
+        integerDiff = sub(a.position, b.position);
         
         return (float)Math.sqrt( (float)(integerDiff.x*integerDiff.x + integerDiff.y*integerDiff.y));
     }
     
     private static boolean noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(SampleWithDistance[] neightborArray, ProcessA.Sample compareSample) {
-        int i;
-        int numberOfNeightborsWithAltitudeStrictlyGreaterThan;
+        int numberOfNeightborsWithAltitudeStrictlyGreaterThan = 0;
         
-        numberOfNeightborsWithAltitudeStrictlyGreaterThan = 0;
-        
-        for( i = 0; i < neightborArray.length; i++ ) {
+        for( int i = 0; i < neightborArray.length; i++ ) {
             if( !neightborArray[i].used ) {
                 return true;
             }
