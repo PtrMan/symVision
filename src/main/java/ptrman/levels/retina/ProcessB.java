@@ -6,6 +6,9 @@ import ptrman.Datastructures.Vector2d;
 
 import java.util.List;
 
+import static ptrman.Datastructures.Vector2d.FloatHelper.getLength;
+import static ptrman.Datastructures.Vector2d.FloatHelper.sub;
+
 
 /**
  *
@@ -73,7 +76,7 @@ public class ProcessB {
                         valueAtPoint = image.readAt(x, y);
 
                         if (valueAtPoint == value) {
-                            return new Tuple2(new Vector2d<Integer>(x, y), Vector2d.FloatHelper.getLength(new Vector2d<>((float)x, (float)y)));
+                            return new Tuple2(new Vector2d<Integer>(x, y), getLength(sub(new Vector2d<>((float) x, (float) y), Vector2d.ConverterHelper.convertIntVectorToFloat(position))));
                         }
                     }
                 }
