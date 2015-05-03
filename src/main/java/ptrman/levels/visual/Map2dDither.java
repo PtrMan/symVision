@@ -65,7 +65,7 @@ public class Map2dDither {
             for (y = 0; y < input.getLength(); y++) {
                 for (x = 0; x < input.getWidth(); x++) {
 
-                    IValue oldValue = input.readAt(x, y);
+                    IValue oldValue = d.readAt(x, y);
                     IValue newValue = findClosestPaletteColor(oldValue, palette);
 
                     input.setAt(x, y, newValue);
@@ -90,7 +90,7 @@ public class Map2dDither {
                 }
             }
 
-            return d;
+            return input;
         }
 
         private static IValue findClosestPaletteColor(IValue c, IValue[] palette) {
