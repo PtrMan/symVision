@@ -135,7 +135,7 @@ public class DebugDrawingHelper {
             if( showAltitude ) {
                 float altitudeAsGreen;
 
-                if( !iterationSample.isAltidudeValid()) {
+                if( !iterationSample.isAltitudeValid()) {
                     altitudeAsGreen = 0.5f;
                 }
                 else {

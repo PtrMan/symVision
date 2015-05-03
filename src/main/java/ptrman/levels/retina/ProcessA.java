@@ -22,7 +22,7 @@ public class ProcessA {
             this.position = position;
         }
         
-        public boolean isAltidudeValid() {
+        public boolean isAltitudeValid() {
             return altitude != Float.NaN;
         }
         
