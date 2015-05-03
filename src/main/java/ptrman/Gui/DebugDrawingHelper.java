@@ -128,16 +128,31 @@ public class DebugDrawingHelper {
         */
 
         for( ProcessA.Sample iterationSample : samples ) {
-            float altitudeAsGreen;
+            boolean showAltitude = false;
 
-            if( !iterationSample.isAltidudeValid()) {
-                altitudeAsGreen = 0.5f;
+            if( showAltitude ) {
+                float altitudeAsGreen;
+
+                if( !iterationSample.isAltidudeValid()) {
+                    altitudeAsGreen = 0.5f;
+                }
+                else {
+                    altitudeAsGreen = 0.5f + (1.0f - 0.5f) * java.lang.Math.min(1.0f, iterationSample.altitude / 10.0f);
+                }
+
+                graphics.setColor(new Color(0.0f, altitudeAsGreen, 0.0f));
             }
             else {
-                altitudeAsGreen = 0.5f + (1.0f - 0.5f) * java.lang.Math.min(1.0f, iterationSample.altitude / 10.0f);
+                // show if it is a endosceleton point or not
+
+                if( iterationSample.type == ProcessA.Sample.EnumType.ENDOSCELETON ) {
+                    graphics.setColor(Color.GREEN);
+                }
+                else {
+                    graphics.setColor(Color.PINK);
+                }
             }
 
-            graphics.setColor(new Color(0.0f, altitudeAsGreen, 0.0f));
 
             graphics.drawLine(iterationSample.position.x, iterationSample.position.y, iterationSample.position.x, iterationSample.position.y);
         }
