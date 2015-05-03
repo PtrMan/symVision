@@ -42,16 +42,16 @@ public class ProcessC {
                 ProcessA.Sample innerSample = samples.get(innerI);
                 
                 float distance = calculateDistanceBetweenSamples(outerSample, innerSample);
+
                 putSampleWithDistanceIntoSortedArray(new SampleWithDistance(innerSample, distance), sortedArray);
             }
             
             
             if( noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(sortedArray, outerSample) ) {
-                outerSample.type = ProcessA.Sample.EnumType.ENDOSCELETON;
-            }
-            else
-            {
                 outerSample.type = ProcessA.Sample.EnumType.EXOSCELETON;
+            }
+            else {
+                outerSample.type = ProcessA.Sample.EnumType.ENDOSCELETON;
             }
         }
     }
@@ -65,6 +65,7 @@ public class ProcessC {
             if( !sortedArray[i].used ) {
                 // array element is not set, its save to set it to the newElement
                 sortedArray[i] = newElement;
+                sortedArray[i].used = true;
                 
                 return;
             }
@@ -78,6 +79,10 @@ public class ProcessC {
                     i+1,
                     sortedArray.length-1-i
                 );
+
+                // add
+                sortedArray[i] = newElement;
+                sortedArray[i].used = true;
                 
                 return;
             }
@@ -104,15 +109,22 @@ public class ProcessC {
     
     private static boolean noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(SampleWithDistance[] neightborArray, ProcessA.Sample compareSample) {
         int numberOfNeightborsWithAltitudeStrictlyGreaterThan = 0;
-        
+
+        System.out.println("---");
+
         for( int i = 0; i < neightborArray.length; i++ ) {
             if( !neightborArray[i].used ) {
                 return true;
             }
             // else here
-            
-            if( neightborArray[i].sample.altitude > compareSample.altitude ) {
+
+            System.out.println("i = " + (""+i));
+
+            if( neightborArray[i].sample.altitude < compareSample.altitude ) {
                 numberOfNeightborsWithAltitudeStrictlyGreaterThan++;
+
+                System.out.println("numberOfNeightborsWithAltitudeStrictlyGreaterThan " + (""+numberOfNeightborsWithAltitudeStrictlyGreaterThan));
+
                 
                 if( numberOfNeightborsWithAltitudeStrictlyGreaterThan > 2 ) {
                     return false;
