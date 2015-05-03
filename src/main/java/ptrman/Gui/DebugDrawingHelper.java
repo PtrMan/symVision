@@ -93,6 +93,7 @@ public class DebugDrawingHelper {
 
 
     public static void drawDetectors(Graphics2D graphics, List<RetinaPrimitive> lineDetectors, List<Intersection> intersections, List<ProcessA.Sample> samples) {
+
         for( RetinaPrimitive iterationRetinaPrimitive : lineDetectors ) {
             SingleLineDetector iterationDetector;
 
@@ -118,17 +119,26 @@ public class DebugDrawingHelper {
             // TODO< overwork old code so the stroke is set at the beginning >
             graphics.setStroke(new BasicStroke(1));
         }
-
+        /*
         for( Intersection iterationIntersection : intersections ) {
             graphics.setColor(Color.BLUE);
 
             graphics.drawRect(iterationIntersection.intersectionPosition.x-1, iterationIntersection.intersectionPosition.y-1, 3, 3);
         }
-
-
-        graphics.setColor(Color.GREEN);
+        */
 
         for( ProcessA.Sample iterationSample : samples ) {
+            float altitudeAsGreen;
+
+            if( !iterationSample.isAltidudeValid()) {
+                altitudeAsGreen = 0.5f;
+            }
+            else {
+                altitudeAsGreen = 0.5f + (1.0f - 0.5f) * java.lang.Math.min(1.0f, iterationSample.altitude / 10.0f);
+            }
+
+            graphics.setColor(new Color(0.0f, altitudeAsGreen, 0.0f));
+
             graphics.drawLine(iterationSample.position.x, iterationSample.position.y, iterationSample.position.x, iterationSample.position.y);
         }
     }
