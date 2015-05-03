@@ -4,6 +4,7 @@ import org.junit.Test;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.ProcessA;
 import ptrman.levels.retina.ProcessC;
+import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,15 @@ public class ProcessCTest {
         ProcessC processC = new ProcessC();
 
         processC.process(samples);
+
+        for( int i = 0; i < samples.size(); i++ ) {
+            if( i == 4 ) {
+                Assert.Assert(samples.get(i).type == ProcessA.Sample.EnumType.ENDOSCELETON, "must be endosceleton");
+            }
+            else {
+                Assert.Assert(samples.get(i).type == ProcessA.Sample.EnumType.EXOSCELETON, "must be exosceleton");
+            }
+        }
 
 
     }

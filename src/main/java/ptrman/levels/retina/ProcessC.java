@@ -48,10 +48,10 @@ public class ProcessC {
             
             
             if( noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(sortedArray, outerSample) ) {
-                outerSample.type = ProcessA.Sample.EnumType.ENDOSCELETON;
+                outerSample.type = ProcessA.Sample.EnumType.EXOSCELETON;
             }
             else {
-                outerSample.type = ProcessA.Sample.EnumType.EXOSCELETON;
+                outerSample.type = ProcessA.Sample.EnumType.ENDOSCELETON;
             }
         }
     }
