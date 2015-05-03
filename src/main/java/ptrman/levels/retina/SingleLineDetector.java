@@ -193,8 +193,6 @@ public class SingleLineDetector {
     }
     
     public static Vector2d<Float> intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB) {
-        Assert.Assert(!lineA.isYAxisSingularity() || !lineB.isYAxisSingularity(), "both lines do have a singularity!");
-        
         if( !lineA.isYAxisSingularity() && !lineB.isYAxisSingularity() ) {
             return SingleLineDetector.intersectLinesMN(lineA.getM(), lineA.getN(), lineB.getM(), lineB.getN());
         }
