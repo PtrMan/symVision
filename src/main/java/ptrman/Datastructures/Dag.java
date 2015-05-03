@@ -7,20 +7,20 @@ import java.util.List;
  *
  */
 public class Dag<Type> {
-    public class Element {
-        public Element(Type content)
+    public static class Element<ElementType> {
+        public Element(ElementType content)
         {
             this.content = content;
         }
 
         public List<Integer> childIndices = new ArrayList<>();
-        public Type content;
+        public ElementType content;
     }
 
-    public void addElement(Element element)
+    public void addElement(Element<Type> element)
     {
         elements.add(element);
     }
 
-    public List<Element> elements = new ArrayList<>();
+    public List<Element<Type>> elements = new ArrayList<>();
 }

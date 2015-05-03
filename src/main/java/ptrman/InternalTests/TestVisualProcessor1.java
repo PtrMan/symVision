@@ -1,20 +1,11 @@
 package ptrman.InternalTests;
 
-import ptrman.Datastructures.IMap2d;
-import ptrman.Datastructures.Vector2d;
-import ptrman.levels.visual.ColorRgb;
-import ptrman.levels.visual.Map2dImageConverter;
-import ptrman.levels.visual.VisualProcessor;
-
-import javax.imageio.ImageIO;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-
 public class TestVisualProcessor1
 {
     public static void main(String[] args)
     {
+        /* outdated
+
         Vector2d<Integer> imageSize;
         IMap2d<ColorRgb> inputMap;
         IMap2d<Boolean> zeroCrossingsMap;
@@ -47,5 +38,6 @@ public class TestVisualProcessor1
         }
         catch(IOException e) {
         }
+        */
     }
 }

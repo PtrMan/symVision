@@ -81,7 +81,7 @@ public class Map2dDither {
                     }
 
                     if (y + 1 < input.getLength()) {
-                        d.setAt(x + 1, y, d.readAt(x + 1, y).add(error.mulScalar(5.0f / 16.0f)));
+                        d.setAt(x, y + 1, d.readAt(x, y + 1).add(error.mulScalar(5.0f / 16.0f)));
                     }
 
                     if (x + 1 < input.getWidth() && y + 1 < input.getLength()) {

@@ -1,11 +1,14 @@
 package ptrman.Showcases;
 
+import ptrman.Datastructures.Dag;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.*;
 import ptrman.bpsolver.BpSolver;
 import ptrman.bpsolver.Parameters;
+import ptrman.levels.visual.ColorRgb;
+import ptrman.levels.visual.VisualProcessor;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -90,27 +93,35 @@ public class TestClustering {
     private static class TimerActionListener implements ActionListener {
 
 
-        public TimerActionListener(BpSolver bpSolver, IImageDrawer imageDrawer,  IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas) {
+
+        public TimerActionListener(BpSolver bpSolver, IImageDrawer imageDrawer,  IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas, VisualProcessor.ProcessingChain processingChain) {
             this.bpSolver = bpSolver;
             this.imageDrawer = imageDrawer;
             this.introspectControlPanel = introspectControlPanel;
             this.nodeGraph = nodeGraph;
             this.dualCanvas = dualCanvas;
+            this.processingChain = processingChain;
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
             BufferedImage image;
-            IMap2d<Boolean> map;
+            IMap2d<Boolean> mapBoolean;
+            IMap2d<ColorRgb> mapColor;
 
             // TODO< pull image from source >
             // for now imageDrawer does this
             image = imageDrawer.drawToJavaImage(bpSolver);
 
-            map = TestClustering.translateFromImageToMap(image);
 
 
-            bpSolver.recalculate(map);
+            mapColor = TestClustering.translateFromImageToMap(image);
+
+            processingChain.filterChain(mapColor);
+
+            mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement)processingChain.filterChainDag.elements.get(1).content).result;
+
+            bpSolver.recalculate(mapBoolean);
 
             if( introspectControlPanel.getIntrospectionState() )
             {
@@ -136,10 +147,12 @@ public class TestClustering {
         private IntrospectControlPanel introspectControlPanel;
         private NodeGraph nodeGraph;
         private DualConvas dualCanvas;
+        private final VisualProcessor.ProcessingChain processingChain;
     }
 
     public TestClustering() {
         JFrame j = new JFrame("TestClustering");
+
 
 
         BpSolver bpSolver = new BpSolver();
@@ -147,6 +160,51 @@ public class TestClustering {
         bpSolver.setup();
 
         Parameters.init();
+
+
+        VisualProcessor.ProcessingChain processingChain;
+
+        // setup the processing chain
+
+        processingChain = new VisualProcessor.ProcessingChain();
+
+        Dag.Element newDagElement;
+
+        newDagElement = new Dag.Element(
+                new VisualProcessor.ProcessingChain.ChainElementColorFloat(
+                        new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
+                        "convertRgbToGrayscale",
+                        bpSolver.getImageSize()
+                )
+        );
+        newDagElement.childIndices.add(1);
+
+        processingChain.filterChainDag.elements.add(newDagElement);
+
+
+        newDagElement = new Dag.Element(
+                new VisualProcessor.ProcessingChain.ChainElementFloatBoolean(
+                        new VisualProcessor.ProcessingChain.DitheringFilter(),
+                        "dither",
+                        bpSolver.getImageSize()
+                )
+        );
+
+        processingChain.filterChainDag.elements.add(newDagElement);
+
+
+
+
+        /*
+        new VisualProcessor.ProcessingChain.ChainElementColorFloat(
+                        new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(
+                                new ColorRgb(1.0f, 1.0f, 1.0f)),
+                                "convertRgbToGrayscale",
+                                bpSolver.getImageSize()
+                        )
+                )
+         */
+
 
 
         GraphWindow graphWindow = new GraphWindow();
@@ -159,7 +217,7 @@ public class TestClustering {
         DualConvas dualCanvas = new DualConvas();
 
 
-        Timer timer = new Timer(1000, new TimerActionListener(bpSolver, new InputDrawer(), introspectControlPanel, graphWindow.getNodeGraph(), dualCanvas));
+        Timer timer = new Timer(1000, new TimerActionListener(bpSolver, new InputDrawer(), introspectControlPanel, graphWindow.getNodeGraph(), dualCanvas, processingChain));
         timer.setInitialDelay(0);
         timer.start();
 
@@ -209,20 +267,25 @@ public class TestClustering {
 
 
     // TODO< move this into the functionality of the visual processor >
-    private static IMap2d<Boolean> translateFromImageToMap(BufferedImage javaImage) {
+    private static IMap2d<ColorRgb> translateFromImageToMap(BufferedImage javaImage) {
         DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
 
         int bufferI;
-        IMap2d<Boolean> convertedToMap;
+        IMap2d<ColorRgb> convertedToMap;
 
         convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
 
         for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ )
         {
-            boolean convertedPixel;
+            int pixelValue;
 
-            convertedPixel = imageBuffer.getElem(bufferI) != 0;
-            convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(), convertedPixel);
+            pixelValue = imageBuffer.getElem(bufferI);
+
+            int r = (pixelValue >> 16) & 0xff;
+            int g = (pixelValue >> 8) & 0xff;
+            int b = (pixelValue >> 0) & 0xff;
+
+            convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(), new ColorRgb((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f));
         }
 
         return convertedToMap;

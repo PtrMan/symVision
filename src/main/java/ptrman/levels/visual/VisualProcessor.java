@@ -9,8 +9,6 @@ import ptrman.misc.Assert;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  *
@@ -32,41 +30,21 @@ public class VisualProcessor
         private final float threshold;
     }
 
-    /**
-     *
-     * color to grayscale
-     *
-     * encapsulated for readable code
-     *
-     * TODO opencl
-     */
-    private static void convertColorToGrayImage(IMap2d<ColorRgb> inputColorImage, IMap2d<Float> outputGrayImage, ColorRgb colorScale)
+    public static class ConvertToGrayImageMap2dMapperFunction implements Map2dMapper.IMap2dMapper<ColorRgb, Float>
     {
-        class ConvertToGrayImageMap2dMapper implements Map2dMapper.IMap2dMapper<ColorRgb, Float>
+        private final ColorRgb colorScale;
+
+        public ConvertToGrayImageMap2dMapperFunction(ColorRgb colorScale)
         {
-            private final ColorRgb colorScale;
-
-            public ConvertToGrayImageMap2dMapper(ColorRgb colorScale)
-            {
-                this.colorScale = colorScale;
-            }
-
-            @Override
-            public Float calculate(ColorRgb value)
-            {
-                return value.getScaledNormalizedMagnitude(colorScale);
-            }
+            this.colorScale = colorScale;
         }
 
-        ConvertToGrayImageMap2dMapper imageMapper;
-        Map2dMapper.Mapper<ColorRgb, Float> mapper;
-
-        imageMapper = new ConvertToGrayImageMap2dMapper(colorScale);
-        mapper = new Map2dMapper.Mapper<>();
-
-        mapper.map(imageMapper, inputColorImage, outputGrayImage);
+        @Override
+        public Float calculate(ColorRgb value)
+        {
+            return value.getScaledNormalizedMagnitude(colorScale);
+        }
     }
-
 
     public static class ProcessingChain
     {
@@ -117,6 +95,25 @@ public class VisualProcessor
 
             private final float threshold;
 
+        }
+
+        public static class ConvertColorRgbToGrayscaleFilter implements IFilter<ColorRgb, Float> {
+            public ConvertColorRgbToGrayscaleFilter(ColorRgb colorToGrayColorScale) {
+                this.colorToGrayColorScale = colorToGrayColorScale;
+            }
+
+            @Override
+            public void apply(IMap2d<ColorRgb> input, IMap2d<Float> output) {
+                ConvertToGrayImageMap2dMapperFunction mapperFunction;
+                Map2dMapper.Mapper<ColorRgb, Float> mapper;
+
+                mapperFunction = new ConvertToGrayImageMap2dMapperFunction(colorToGrayColorScale);
+                mapper = new Map2dMapper.Mapper<>();
+
+                mapper.map(mapperFunction, input, output);
+            }
+
+            private final ColorRgb colorToGrayColorScale;
         }
 
 
@@ -170,22 +167,10 @@ public class VisualProcessor
             }
         }
 
-        public ProcessingChain()
-        {
 
-            durationMeters.put("zeroCrossingConvolution", new DurationStartMeter("zeroCrossingConvolution", true, 1.0, false));
-            durationMeters.put("zeroCrossingToBoolean", new DurationStartMeter("zeroCrossingToBoolean", true, 1.0, false));
 
-        }
+        public ProcessingChain() {
 
-        public void setup(Vector2d<Integer> imageSize, ColorRgb colorToGrayColorScale, MarrHildrethOperatorParameter grayImageZeroCrossingParameter)
-        {
-            grayImage = new Map2d<>(imageSize.x, imageSize.y);
-            zeroCrossingBinary = new Map2d<>(imageSize.x, imageSize.y);
-
-            grayImageZeroCrossingKernel = Convolution2dHelper.calculateMarrHildrethOperator(new Vector2d<>(grayImageZeroCrossingParameter.filterSize, grayImageZeroCrossingParameter.filterSize), grayImageZeroCrossingParameter.sigma);
-
-            this.colorToGrayColorScale = colorToGrayColorScale;
         }
 
         public void filterChain(IMap2d<ColorRgb> inputColorImage)
@@ -202,8 +187,7 @@ public class VisualProcessor
 
             for(;;) {
                 int currentDagElementIndex;
-                Dag<ChainElement>.Element currentDagElement;
-                //EnumMapType filterOutputType;
+                Dag.Element<ChainElement> currentDagElement;
 
                 IMap2d MapForFilterOutput;
 
@@ -211,10 +195,9 @@ public class VisualProcessor
                     break;
                 }
 
-                currentDagElementIndex = chainIndicesToProcess.peek();
+                currentDagElementIndex = chainIndicesToProcess.pollFirst();
 
                 currentDagElement = filterChainDag.elements.get(currentDagElementIndex);
-                //filterOutputType = currentDagElement.content.outputType;
 
                 if( processFromInput ) {
                     ChainElementColorFloat chainElement;
@@ -235,58 +218,20 @@ public class VisualProcessor
 
 
                 for( int iterationChildIndex : currentDagElement.childIndices ) {
-                    Dag<ChainElement>.Element iterationDagElement;
+                    Dag.Element<ChainElement> iterationDagElement;
 
                     iterationDagElement = filterChainDag.elements.get(iterationChildIndex);
 
                     Assert.Assert(iterationDagElement.content.inputType == currentDagElement.content.outputType, "Types of filters are incompatible");
 
-                    ((ApplyChainElement)currentDagElement.content).input = MapForFilterOutput;
+                    ((ApplyChainElement)iterationDagElement.content).input = MapForFilterOutput;
                 }
 
                 chainIndicesToProcess.addAll(currentDagElement.childIndices);
             }
 
 
-            /*
-            IMap2d<Float> zeroCrossings;
-
-            durationMeters.get("convertColorToGray").start();
-            convertColorToGrayImage(inputColorImage, grayImage, colorToGrayColorScale);
-            durationMeters.get("convertColorToGray").stop();
-
-
-
-            durationMeters.get("zeroCrossingConvolution").start();
-            zeroCrossings = Convolution2d.convolution(grayImage, grayImageZeroCrossingKernel);
-            durationMeters.get("zeroCrossingConvolution").stop();
-
-            durationMeters.get("zeroCrossingToBoolean").start();
-            // threshold is 0.00045f for the MarrHildreth filter
-            //convertZeroCrossingFloatToBoolean(zeroCrossings, zeroCrossingBinary);
-            durationMeters.get("zeroCrossingToBoolean").stop();
-            */
-
         }
-
-        /*
-        private void applyChainElement(ChainElement chainElement) {
-            switch( chainElement.type ) {
-                case COLOR_FLOAT:
-                    ((ChainElementColorFloat)chainElement).apply();
-            }
-        }
-        */
-
-
-        private IMap2d<Float> grayImageZeroCrossingKernel;
-        private IMap2d<Float> grayImage;
-
-        private IMap2d<Boolean> zeroCrossingBinary;
-
-        private ColorRgb colorToGrayColorScale;
-
-        public Map<String, DurationStartMeter> durationMeters = new HashMap<>();
 
         // entry is [0]
         public Dag<ChainElement> filterChainDag = new Dag<>();
