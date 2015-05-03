@@ -45,6 +45,9 @@ public class TestClustering {
             Graphics2D g2 = off_Image.createGraphics();
 
             if (currentFile == null) {
+                g2.setColor(Color.WHITE);
+
+                g2.drawRect(0, 0, off_Image.getWidth(), off_Image.getHeight());
 
                 g2.setColor(Color.BLACK);
 
@@ -184,7 +187,8 @@ public class TestClustering {
 
         newDagElement = new Dag.Element(
                 new VisualProcessor.ProcessingChain.ChainElementFloatBoolean(
-                        new VisualProcessor.ProcessingChain.DitheringFilter(),
+                        //new VisualProcessor.ProcessingChain.DitheringFilter(),
+                        new VisualProcessor.ProcessingChain.ThresholdFilter(0.5f),
                         "dither",
                         bpSolver.getImageSize()
                 )
@@ -279,11 +283,13 @@ public class TestClustering {
         {
             int pixelValue;
 
-            pixelValue = imageBuffer.getElem(bufferI);
+            pixelValue = javaImage.getRGB(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth());
 
-            int r = (pixelValue >> 16) & 0xff;
-            int g = (pixelValue >> 8) & 0xff;
-            int b = (pixelValue >> 0) & 0xff;
+            Color c = new Color(pixelValue);
+
+            int r = c.getRed();
+            int g = c.getGreen();
+            int b = c.getBlue();
 
             convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(), new ColorRgb((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f));
         }

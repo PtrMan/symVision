@@ -15,7 +15,7 @@ public class ColorRgb
 
     public float getScaledNormalizedMagnitude(ColorRgb scale)
     {
-        return (r*scale.r + g*scale.g + b*scale.b) * 1.0f/(scale.r+scale.g+scale.b);
+        return (r*scale.r + g*scale.g + b*scale.b) * (1.0f/(scale.r+scale.g+scale.b));
     }
 
     public ColorRgb add(ColorRgb other)
