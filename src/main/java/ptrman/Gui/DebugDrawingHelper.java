@@ -93,7 +93,7 @@ public class DebugDrawingHelper {
 
 
     public static void drawDetectors(Graphics2D graphics, List<RetinaPrimitive> lineDetectors, List<Intersection> intersections, List<ProcessA.Sample> samples) {
-
+        /*
         for( RetinaPrimitive iterationRetinaPrimitive : lineDetectors ) {
             SingleLineDetector iterationDetector;
 
@@ -119,6 +119,8 @@ public class DebugDrawingHelper {
             // TODO< overwork old code so the stroke is set at the beginning >
             graphics.setStroke(new BasicStroke(1));
         }
+        */
+
         /*
         for( Intersection iterationIntersection : intersections ) {
             graphics.setColor(Color.BLUE);
@@ -149,7 +151,7 @@ public class DebugDrawingHelper {
                     graphics.setColor(Color.GREEN);
                 }
                 else {
-                    graphics.setColor(Color.PINK);
+                    graphics.setColor(Color.RED);
                 }
             }
 
