@@ -8,15 +8,12 @@ import ptrman.levels.visual.Map2dConverter;
 import ptrman.levels.visual.Map2dTransform;
 import ptrman.misc.GaussianBlur;
 
-public class ProcessZ
-{
-    public void setup(Vector2d<Integer> imageSize)
-    {
+public class ProcessZ {
+    public void setup(Vector2d<Integer> imageSize) {
         this.imageSize = imageSize;
     }
 
-    public void process(IMap2d<Boolean> input)
-    {
+    public void process(IMap2d<Boolean> input) {
         IMap2d<Float> floatNotMagnified;
         IMap2d<Float> floatMagnified;
         IMap2d<Float> floatMagnifiedBlured;
@@ -33,8 +30,7 @@ public class ProcessZ
         magnifiedOutput = Map2dBinary.corode(tempResult);
     }
 
-    public IMap2d<Boolean> getMagnifiedOutput()
-    {
+    public IMap2d<Boolean> getMagnifiedOutput() {
         return magnifiedOutput;
     }
 

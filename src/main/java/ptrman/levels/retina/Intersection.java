@@ -2,19 +2,15 @@ package ptrman.levels.retina;
 
 import ptrman.Datastructures.Vector2d;
 
-public class Intersection
-{
-    public static class IntersectionPartner
-    {
-        public enum EnumIntersectionEndpointType
-        {
+public class Intersection {
+    public static class IntersectionPartner {
+        public enum EnumIntersectionEndpointType {
             BEGIN,
             MIDDLE,
             END
         }
         
-        public IntersectionPartner(RetinaPrimitive primitive, EnumIntersectionEndpointType intersectionEndpointType)
-        {
+        public IntersectionPartner(RetinaPrimitive primitive, EnumIntersectionEndpointType intersectionEndpointType) {
             this.primitive = primitive;
             this.intersectionEndpointType = intersectionEndpointType;
         }
@@ -23,14 +19,11 @@ public class Intersection
         public EnumIntersectionEndpointType intersectionEndpointType; 
     }
     
-    public IntersectionPartner getOtherPartner(RetinaPrimitive primary)
-    {
-        if( primary.equals(partners[0]) )
-        {
+    public IntersectionPartner getOtherPartner(RetinaPrimitive primary) {
+        if( primary.equals(partners[0]) ) {
             return partners[1];
         }
-        else
-        {
+        else {
             return partners[0];
         }
     }

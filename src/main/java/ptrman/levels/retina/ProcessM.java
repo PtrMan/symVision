@@ -6,12 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class ProcessM
-{
-    public class LineParsing
-    {
-        public LineParsing(List<SingleLineDetector> lineParsing)
-        {
+public class ProcessM {
+    public class LineParsing {
+        public LineParsing(List<SingleLineDetector> lineParsing) {
             this.lineParsing = lineParsing;
         }
         
@@ -21,10 +18,8 @@ public class ProcessM
         public boolean processGRated = false; // used to check for invalidated curves and rerate them if necessary
     }
     
-    public void process(List<RetinaPrimitive> lineDetectors)
-    {
-        if( lineDetectors.isEmpty() )
-        {
+    public void process(List<RetinaPrimitive> lineDetectors) {
+        if( lineDetectors.isEmpty() ) {
             return;
         }
         
@@ -36,36 +31,30 @@ public class ProcessM
         return lineParsings;
     }
     
-    private void tryToFindLines(List<RetinaPrimitive> lineDetectors, int numberOfIterations)
-    {
+    private void tryToFindLines(List<RetinaPrimitive> lineDetectors, int numberOfIterations) {
         int iteration;
         
         lineParsings.clear();
         
-        for( iteration = 0; iteration < numberOfIterations; iteration++ )
-        {
+        for( iteration = 0; iteration < numberOfIterations; iteration++ ) {
             resetMarkingsWithLocking(lineDetectors);
             selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(lineDetectors);
         }
     }
     
-    private static void resetMarkingsWithLocking(List<RetinaPrimitive> lineDetectors)
-    {
+    private static void resetMarkingsWithLocking(List<RetinaPrimitive> lineDetectors) {
         // TODO< lock >
         resetMarkingsSynchronous(lineDetectors);
         // TODO< unlock >
     }
     
-    private static void resetMarkingsSynchronous(List<RetinaPrimitive> lineDetectors)
-    {
-        for( RetinaPrimitive iterationDetector : lineDetectors )
-        {
+    private static void resetMarkingsSynchronous(List<RetinaPrimitive> lineDetectors) {
+        for( RetinaPrimitive iterationDetector : lineDetectors ) {
             iterationDetector.line.marked = false;
         }
     }
 
-    private void selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(List<RetinaPrimitive> lineDetectors)
-    {
+    private void selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(List<RetinaPrimitive> lineDetectors) {
         int startLineIndex;
         SingleLineDetector startLineDetector;
         ArrayList<SingleLineDetector> lineParsing;
@@ -89,28 +78,24 @@ public class ProcessM
      * 
      * --- the lines are locked
      */
-    private ArrayList<SingleLineDetector> findLineParsingForStartLine(SingleLineDetector startLineDetector)
-    {
+    private ArrayList<SingleLineDetector> findLineParsingForStartLine(SingleLineDetector startLineDetector) {
         SingleLineDetector currentLineDetector;
         ArrayList<SingleLineDetector> resultLineParsing;
         
         resultLineParsing = new ArrayList<>();
         currentLineDetector = startLineDetector;
         
-        for(;;)
-        {
+        for(;;) {
             List<Intersection> remainingIntersections;
             
             remainingIntersections = deepCopyIntersections(currentLineDetector.intersections);
             
             // choose from the remaining intersections one and check it if it leads to a nonmarked edge
-            for(;;)
-            {
+            for(;;) {
                 int indexOfChosenRemainingIntersections;
                 Intersection currentIntersection;
                 
-                if( remainingIntersections.isEmpty() )
-                {
+                if( remainingIntersections.isEmpty() ) {
                     // if we don't have any edges we can't go to any other edge/line, so the "search" is terminated
                     
                     return resultLineParsing;
@@ -125,10 +110,8 @@ public class ProcessM
                 Assert.Assert(currentIntersection.partners[1].primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "is not line");
                 
                 // check out if the other side was already marked, if so, continue search for a unmarked edge/line
-                if( currentIntersection.partners[0].primitive.line.equals(currentLineDetector) )
-                {
-                    if( currentIntersection.partners[1].primitive.line.marked )
-                    {
+                if( currentIntersection.partners[0].primitive.line.equals(currentLineDetector) ) {
+                    if( currentIntersection.partners[1].primitive.line.marked ) {
                         continue;
                     }
                     // else we are here
@@ -137,10 +120,8 @@ public class ProcessM
                     resultLineParsing.add(currentIntersection.partners[1].primitive.line);
                     currentLineDetector = currentIntersection.partners[1].primitive.line;
                 }
-                else
-                {
-                    if( currentIntersection.partners[0].primitive.line.marked )
-                    {
+                else {
+                    if( currentIntersection.partners[0].primitive.line.marked ) {
                         continue;
                     }
                     // else we are here
@@ -158,15 +139,13 @@ public class ProcessM
         
         copyed = new ArrayList<>();
         
-        for( Intersection iterationIntersection : intersections )
-        {
+        for( Intersection iterationIntersection : intersections ) {
             copyed.add(iterationIntersection);
         }
         
         return copyed;
     }
-    
-    
+
     private Random random = new Random();
     
     private List<LineParsing> lineParsings = new ArrayList<>();

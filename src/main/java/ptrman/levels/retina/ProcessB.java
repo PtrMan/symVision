@@ -11,25 +11,21 @@ import java.util.List;
  *
  * calculates the altitude
  */
-public class ProcessB
-{
+public class ProcessB {
     /**
      * 
      * we use the whole image, in phaeaco he worked with the incomplete image witht the guiding of processA, this is not implemented that way 
      */
-    public void process(List<ProcessA.Sample> samples, IMap2d<Boolean> image)
-    {
+    public void process(List<ProcessA.Sample> samples, IMap2d<Boolean> image) {
         Vector2d<Integer> foundPosition;
         
         final int MAXRADIUS = 10;
         
-        for( ProcessA.Sample iterationSample : samples )
-        {
+        for( ProcessA.Sample iterationSample : samples ) {
             Tuple2<Vector2d<Integer>, Integer> nearestResult;
             
             nearestResult = findNearestPositionWhereMapIs(false, iterationSample.position, image, MAXRADIUS);
-            if( nearestResult == null )
-            {
+            if( nearestResult == null ) {
                 iterationSample.altitude = ((MAXRADIUS+1)*2)*((MAXRADIUS+1)*2);
                 continue;
             }
@@ -45,8 +41,7 @@ public class ProcessB
      * 
      * \return null if no point could be found in the radius 
      */
-    private static Tuple2<Vector2d<Integer>, Integer> findNearestPositionWhereMapIs(boolean value, Vector2d<Integer> position, IMap2d<Boolean> image, int radius)
-    {
+    private static Tuple2<Vector2d<Integer>, Integer> findNearestPositionWhereMapIs(boolean value, Vector2d<Integer> position, IMap2d<Boolean> image, int radius) {
         Vector2d<Integer> outwardIteratorOffsetUnbound;
         Vector2d<Integer> borderMin;
         Vector2d<Integer> borderMax;
@@ -61,15 +56,12 @@ public class ProcessB
 
         one = new Vector2d<>(1, 1);
 
-        for(;;)
-        {
+        for(;;) {
             Vector2d<Integer> iteratorOffsetBoundMin;
             Vector2d<Integer> iteratorOffsetBoundMax;
-            int x, y;
             int depthCounter;
             
-            if (-outwardIteratorOffsetUnbound.x > radius)
-            {
+            if (-outwardIteratorOffsetUnbound.x > radius) {
                 break;
             }
 
@@ -78,19 +70,15 @@ public class ProcessB
             
             depthCounter = 0;
             
-            for (y = iteratorOffsetBoundMin.y; y < iteratorOffsetBoundMax.y; y++ )
-            {
-                for( x = iteratorOffsetBoundMin.x; x < iteratorOffsetBoundMax.x; x++ )
-                {
+            for( int y = iteratorOffsetBoundMin.y; y < iteratorOffsetBoundMax.y; y++ ) {
+                for( int x = iteratorOffsetBoundMin.x; x < iteratorOffsetBoundMax.x; x++ ) {
                     // just find at the border
-                    if (y == (iteratorOffsetBoundMin.y) || y == iteratorOffsetBoundMax.y - 1 || x == (iteratorOffsetBoundMin.x) || x == iteratorOffsetBoundMax.x - 1)
-                    {
+                    if (y == (iteratorOffsetBoundMin.y) || y == iteratorOffsetBoundMax.y - 1 || x == (iteratorOffsetBoundMin.x) || x == iteratorOffsetBoundMax.x - 1) {
                         boolean valueAtPoint;
 
                         valueAtPoint = image.readAt(x, y);
 
-                        if (valueAtPoint == value)
-                        {
+                        if (valueAtPoint == value) {
                             return new Tuple2(new Vector2d<Integer>(x, y), depthCounter);
                         }
                     }

@@ -5,6 +5,7 @@ import ptrman.misc.AngleHelper;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static ptrman.Datastructures.Vector2d.FloatHelper.*;
 
@@ -14,14 +15,11 @@ import static ptrman.Datastructures.Vector2d.FloatHelper.*;
  *    * a.x < b.x
  * 
  */
-public class SingleLineDetector
-{
-    private SingleLineDetector()
-    {
+public class SingleLineDetector {
+    private SingleLineDetector() {
     }
 
-    public static SingleLineDetector createFromIntegerPositions(Vector2d<Integer> a, Vector2d<Integer> b)
-    {
+    public static SingleLineDetector createFromIntegerPositions(Vector2d<Integer> a, Vector2d<Integer> b) {
         SingleLineDetector createdDetector;
 
         createdDetector = new SingleLineDetector();
@@ -38,8 +36,7 @@ public class SingleLineDetector
         return createdDetector;
     }
 
-    public static SingleLineDetector createFromFloatPositions(Vector2d<Float> a, Vector2d<Float> b)
-    {
+    public static SingleLineDetector createFromFloatPositions(Vector2d<Float> a, Vector2d<Float> b) {
         SingleLineDetector createdDetector;
 
         createdDetector = new SingleLineDetector();
@@ -61,10 +58,8 @@ public class SingleLineDetector
      * swaps a and b if necessary to fullfil the invariant
      * 
      */
-    private void fullfillABInvariant()
-    {
-        if( aFloat.x > bFloat.x )
-        {
+    private void fullfillABInvariant() {
+        if( aFloat.x > bFloat.x ) {
             Vector2d<Float> temp;
 
             temp = aFloat;
@@ -84,10 +79,9 @@ public class SingleLineDetector
     public boolean marked = false; // used for marking in other (multithreading syncronous) processes
     public boolean markedPartOfCurve = false; // used for processG
     
-    public ArrayList<Intersection> intersections = new ArrayList<>();
+    public List<Intersection> intersections = new ArrayList<>();
     
-    public boolean isBetweenOrginalStartAndEnd(Vector2d<Float> position)
-    {
+    public boolean isBetweenOrginalStartAndEnd(Vector2d<Float> position) {
         Vector2d<Float> diffAB, diffABnormalizd, diffAPosition;
         float length;
         float dotProduct;
@@ -96,8 +90,8 @@ public class SingleLineDetector
 
         // ASK< maybe the length claculation is unnecessary >
 
-        diffAB = new Vector2d<Float>(bFloat.x - aFloat.x, bFloat.y - aFloat.y);
-        diffAPosition = new Vector2d<Float>(position.x - aFloat.x, position.y - aFloat.y);
+        diffAB = new Vector2d<>(bFloat.x - aFloat.x, bFloat.y - aFloat.y);
+        diffAPosition = new Vector2d<>(position.x - aFloat.x, position.y - aFloat.y);
 
         length = (float)Math.sqrt(diffAB.x*diffAB.x + diffAB.y*diffAB.y);
         diffAB.x /= length;
@@ -109,44 +103,36 @@ public class SingleLineDetector
     }
     
     // TODO< rename to getA >
-    public Vector2d<Float> getAProjected()
-    {
+    public Vector2d<Float> getAProjected() {
         return aFloat;
     }
     
     // TODO< rename to getB >
-    public Vector2d<Float> getBProjected()
-    {
+    public Vector2d<Float> getBProjected() {
         return bFloat;
     }
 
-    public Vector2d<Float> getNormalizedDirection()
-    {
+    public Vector2d<Float> getNormalizedDirection() {
         Vector2d<Float> diff;
 
         diff = Vector2d.FloatHelper.sub(getAProjected(), getBProjected());
         return Vector2d.FloatHelper.normalize(diff);
     }
     
-    public Vector2d<Float> projectPointOntoLine(Vector2d<Float> point)
-    {
-        if( isYAxisSingularity() )
-        {
+    public Vector2d<Float> projectPointOntoLine(Vector2d<Float> point) {
+        if( isYAxisSingularity() ) {
             return projectPointOntoLineForSignular(point);
         }
-        else
-        {
+        else {
             return projectPointOntoLineForNonsignular(point);
         }
     }
     
-    private Vector2d<Float> projectPointOntoLineForSignular(Vector2d<Float> point)
-    {
+    private Vector2d<Float> projectPointOntoLineForSignular(Vector2d<Float> point) {
         return new Vector2d<Float>(aFloat.x, point.y);
     }
 
-    private Vector2d<Float> projectPointOntoLineForNonsignular(Vector2d<Float> point)
-    {
+    private Vector2d<Float> projectPointOntoLineForNonsignular(Vector2d<Float> point) {
         Vector2d<Float> lineDirection;
         Vector2d<Float> diffFromAToPoint;
         float dotResult;
@@ -158,23 +144,20 @@ public class SingleLineDetector
         return add(new Vector2d<>(0.0f, getN()), getScaled(lineDirection, dotResult));
     }
     
-    public boolean isXOfPointInLine(Vector2d<Float> point)
-    {
+    public boolean isXOfPointInLine(Vector2d<Float> point) {
         Assert.Assert(!isYAxisSingularity(), "is singular!");
         
         return point.x >= getAProjected().x && point.x <= getBProjected().x;
     }
 
-    public float getN()
-    {
+    public float getN() {
         Assert.Assert(!isYAxisSingularity(), "is singular!");
         
         // TODO< m = inf special handling >
         return aFloat.y - aFloat.x*getM();
     }
 
-    public float getM()
-    {
+    public float getM() {
         Vector2d<Float> diff;
         
         Assert.Assert(!isYAxisSingularity(), "is singular!");
@@ -191,8 +174,7 @@ public class SingleLineDetector
         return ptrman.Datastructures.Vector2d.FloatHelper.getLength(diff);
     }
     
-    public static float getAngleBetween(SingleLineDetector a, SingleLineDetector b)
-    {
+    public static float getAngleBetween(SingleLineDetector a, SingleLineDetector b) {
         Vector2d<Float> aNormalizedDirection, bNormalizedDirection;
         
         aNormalizedDirection = a.getNormalizedDirection();
@@ -200,8 +182,7 @@ public class SingleLineDetector
         return AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(aNormalizedDirection, bNormalizedDirection);
     }
 
-    float getTangentM()
-    {
+    float getTangentM() {
         float m;
         
         Assert.Assert(!isYAxisSingularity(), "is singular!");
@@ -211,20 +192,16 @@ public class SingleLineDetector
         return -1.0f/m;
     }
     
-    public static Vector2d<Float> intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB)
-    {
+    public static Vector2d<Float> intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB) {
         Assert.Assert(!lineA.isYAxisSingularity() || !lineB.isYAxisSingularity(), "both lines do have a singularity!");
         
-        if( !lineA.isYAxisSingularity() && !lineB.isYAxisSingularity() )
-        {
+        if( !lineA.isYAxisSingularity() && !lineB.isYAxisSingularity() ) {
             return SingleLineDetector.intersectLinesMN(lineA.getM(), lineA.getN(), lineB.getM(), lineB.getN());
         }
-        else if( lineA.isYAxisSingularity() && !lineB.isYAxisSingularity() )
-        {
+        else if( lineA.isYAxisSingularity() && !lineB.isYAxisSingularity() ) {
             intersectSingularLineWithMN(lineA, lineB.getM(), lineB.getN());
         }
-        else if( !lineA.isYAxisSingularity() && lineB.isYAxisSingularity() )
-        {
+        else if( !lineA.isYAxisSingularity() && lineB.isYAxisSingularity() ) {
             intersectSingularLineWithMN(lineB, lineA.getM(), lineA.getN());
         }
         
@@ -233,8 +210,7 @@ public class SingleLineDetector
     }
     
     // returns null if they are parallel
-    public static Vector2d<Float> intersectLinesMN(float am, float an, float bm, float bn)
-    {
+    public static Vector2d<Float> intersectLinesMN(float am, float an, float bm, float bn) {
         float x, y;
         
         // parallel check
@@ -249,20 +225,16 @@ public class SingleLineDetector
         return new Vector2d<Float>(x, y);
     }
     
-    public static Vector2d<Float> intersectLineWithMN(SingleLineDetector line, float am, float an)
-    {
-        if( line.isYAxisSingularity() )
-        {
+    public static Vector2d<Float> intersectLineWithMN(SingleLineDetector line, float am, float an) {
+        if( line.isYAxisSingularity() ) {
             return intersectSingularLineWithMN(line, am, an);
         }
-        else
-        {
+        else {
             return intersectLinesMN(line.getM(), line.getN(), am, an);
         }
     }
     
-    private static Vector2d<Float> intersectSingularLineWithMN(SingleLineDetector line, float am, float an)
-    {
+    private static Vector2d<Float> intersectSingularLineWithMN(SingleLineDetector line, float am, float an) {
         float y;
         
         Assert.Assert(line.isYAxisSingularity(), "must be signularity");
@@ -280,8 +252,7 @@ public class SingleLineDetector
     
     
     // tests
-    public static void unittestProjectPoint()
-    {
+    public static void unittestProjectPoint() {
         SingleLineDetector testLine;
         Vector2d<Float> point;
         Vector2d<Float> projectedPoint;
@@ -291,12 +262,10 @@ public class SingleLineDetector
         
         projectedPoint = testLine.projectPointOntoLine(point);
         
-        if( projectedPoint.x < 1.0f + 0.01f && projectedPoint.x > 1.0f - 0.01f && projectedPoint.y < 2.0f + 0.01f && projectedPoint.y > 2.0f - 0.01f ) 
-        {
+        if( projectedPoint.x < 1.0f + 0.01f && projectedPoint.x > 1.0f - 0.01f && projectedPoint.y < 2.0f + 0.01f && projectedPoint.y > 2.0f - 0.01f ) {
             // all fine
         }
-        else
-        {
+        else {
             throw new RuntimeException("Unittest failed (1)");
         }
         
@@ -306,12 +275,10 @@ public class SingleLineDetector
         
         projectedPoint = testLine.projectPointOntoLine(point);
         
-        if( projectedPoint.x < 2.0f + 0.01f && projectedPoint.x > 2.0f - 0.01f && projectedPoint.y < 2.0f + 0.01f && projectedPoint.y > 2.0f - 0.01f ) 
-        {
+        if( projectedPoint.x < 2.0f + 0.01f && projectedPoint.x > 2.0f - 0.01f && projectedPoint.y < 2.0f + 0.01f && projectedPoint.y > 2.0f - 0.01f ) {
             // all fine
         }
-        else
-        {
+        else {
             throw new RuntimeException("Unittest failed (1)");
         }
         
@@ -319,21 +286,15 @@ public class SingleLineDetector
         point = new Vector2d<Float>(2.0f, 1.0f);
         
         projectedPoint = testLine.projectPointOntoLine(point);
-        
-        
-        int x = 0;
     }
 
-    public Vector2d<Float> getPositionOfEndpoint(int index)
-    {
+    public Vector2d<Float> getPositionOfEndpoint(int index) {
         Assert.Assert(index == 0 || index == 1, "index must be 0 or 1");
         
-        if( index == 0 )
-        {
+        if( index == 0 ) {
             return aFloat;
         }
-        else
-        {
+        else {
             return bFloat;
         }
     }
@@ -343,8 +304,7 @@ public class SingleLineDetector
     //  * if the line is not a singularity
     //    -> compare x value if its before the begin or after the end, or in the middle
     //  * if the line is singularity we have to do the same with the y axis
-    public Intersection.IntersectionPartner.EnumIntersectionEndpointType getIntersectionEndpoint(Vector2d<Float> point)
-    {
+    public Intersection.IntersectionPartner.EnumIntersectionEndpointType getIntersectionEndpoint(Vector2d<Float> point) {
         Vector2d<Float> diff;
         float distanceBegin, distanceEnd;
         
@@ -354,12 +314,10 @@ public class SingleLineDetector
         diff = sub(getBProjected(), point);
         distanceEnd = ptrman.Datastructures.Vector2d.FloatHelper.getLength(diff);
         
-        if( distanceBegin < distanceEnd )
-        {
+        if( distanceBegin < distanceEnd ) {
             return Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN;
         }
-        else
-        {
+        else {
             return Intersection.IntersectionPartner.EnumIntersectionEndpointType.END;
         }
     }

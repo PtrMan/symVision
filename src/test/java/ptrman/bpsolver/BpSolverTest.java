@@ -17,16 +17,13 @@ import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BpSolverTest
-{
-    public BpSolverTest()
-    {
+public class BpSolverTest {
+    public BpSolverTest() {
         Parameters.init();
     }
 
     @Test
-    public void testAnglePointV()
-    {
+    public void testAnglePointV() {
         BpSolver bpSolver = new BpSolver();
         bpSolver.setImageSize(new Vector2d<>(100, 100));
         
@@ -37,13 +34,11 @@ public class BpSolverTest
 
         List<Node> nodes = getNodesFromImage(image, bpSolver);
         
-        for( Node iterationNode : nodes )
-        {
+        for( Node iterationNode : nodes ) {
             boolean doesHaveAtLeastOneVAnglePoint;
             
             doesHaveAtLeastOneVAnglePoint = doesNodeHaveAtLeastOneVAnglePoint(iterationNode, bpSolver.networkHandles);
-            if( doesHaveAtLeastOneVAnglePoint )
-            {
+            if( doesHaveAtLeastOneVAnglePoint ) {
                 // pass
                 int DEBUG0 = 0;
             }
@@ -57,8 +52,7 @@ public class BpSolverTest
         // TODO< check for at least one V anglepoint >
     }
     
-    private static boolean doesNodeHaveAtLeastOneVAnglePoint(Node node, NetworkHandles networkHandles)
-    {
+    private static boolean doesNodeHaveAtLeastOneVAnglePoint(Node node, NetworkHandles networkHandles) {
         ArrayList<Node> nodeHeap;
         ArrayList<Node> doneList;
         
@@ -66,54 +60,45 @@ public class BpSolverTest
         nodeHeap = new ArrayList<>();
         nodeHeap.add(node);
         
-        for(;;)
-        {
+        for(;;) {
             Node currentNode;
             
-            if( nodeHeap.size() == 0)
-            {
+            if( nodeHeap.size() == 0) {
                 return false;
             }
             
             currentNode = nodeHeap.get(0);
             nodeHeap.remove(0);
             
-            if( doneList.contains(currentNode) )
-            {
+            if( doneList.contains(currentNode) ) {
                 continue;
             }
             
             doneList.add(currentNode);
             
-            for( Link iterationLink : currentNode.outgoingLinks )
-            {
+            for( Link iterationLink : currentNode.outgoingLinks ) {
                 nodeHeap.add(iterationLink.target);
             }
             
-            if( currentNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() )
-            {
+            if( currentNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
                 PlatonicPrimitiveInstanceNode currentNodeAsPlatonicPrimitiveInstanceNode;
                 
                 currentNodeAsPlatonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode)currentNode;
                 
-                if( currentNodeAsPlatonicPrimitiveInstanceNode.primitiveNode.equals(networkHandles.anglePointNodePlatonicPrimitiveNode) )
-                {
+                if( currentNodeAsPlatonicPrimitiveInstanceNode.primitiveNode.equals(networkHandles.anglePointNodePlatonicPrimitiveNode) ) {
                     // test if it is a V
-                    for( Link iterationLink : currentNodeAsPlatonicPrimitiveInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) )
-                    {
+                    for( Link iterationLink : currentNodeAsPlatonicPrimitiveInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
                         AttributeNode anglePointTypeAttributeNode;
                         AttributeNode targetAttributeNode;
                         int anglePointType;
                         
-                        if( !(iterationLink.target.type == NodeTypes.EnumType.ATTRIBUTENODE.ordinal()) )
-                        {
+                        if( !(iterationLink.target.type == NodeTypes.EnumType.ATTRIBUTENODE.ordinal()) ) {
                             continue;
                         }
                         
                         targetAttributeNode = (AttributeNode)iterationLink.target;
                         
-                        if( !targetAttributeNode.attributeTypeNode.equals(networkHandles.anglePointFeatureTypePrimitiveNode) )
-                        {
+                        if( !targetAttributeNode.attributeTypeNode.equals(networkHandles.anglePointFeatureTypePrimitiveNode) ) {
                             continue;
                         }
                         // if here -> is a anglePointFeatureTypeNode
@@ -121,8 +106,7 @@ public class BpSolverTest
                         anglePointTypeAttributeNode = targetAttributeNode;
                         
                         anglePointType = anglePointTypeAttributeNode.getValueAsInt();
-                        if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.V.ordinal() )
-                        {
+                        if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.V.ordinal() ) {
                             return true;
                         }
                     }
@@ -131,8 +115,7 @@ public class BpSolverTest
         }
     }
     
-    private static Map2d<Boolean> drawToImage(BufferedImage javaImage)
-    {
+    private static Map2d<Boolean> drawToImage(BufferedImage javaImage) {
         DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
 
         int bufferI;
@@ -140,8 +123,7 @@ public class BpSolverTest
 
         convertedToMap = new Map2d<Boolean>(javaImage.getWidth(), javaImage.getHeight());
 
-        for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ )
-        {
+        for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ ) {
             boolean convertedPixel;
 
             convertedPixel = imageBuffer.getElem(bufferI) != 0;
@@ -151,8 +133,7 @@ public class BpSolverTest
         return convertedToMap;
     }
     
-    private BufferedImage drawToJavaImage(BpSolver bpSolver)
-    {
+    private BufferedImage drawToJavaImage(BpSolver bpSolver) {
         BufferedImage off_Image = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g2 = off_Image.createGraphics();
@@ -164,8 +145,7 @@ public class BpSolverTest
         return off_Image;
     }
     
-    private List<Node> getNodesFromImage(Map2d<Boolean> image, BpSolver bpSolver)
-    {
+    private List<Node> getNodesFromImage(Map2d<Boolean> image, BpSolver bpSolver) {
         // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
         bpSolver.coderack.flush();
         
@@ -186,7 +166,7 @@ public class BpSolverTest
         
         List<RetinaPrimitive> lineDetectors = processD.detectLines(samples);
         
-        ArrayList<Intersection> lineIntersections = new ArrayList<>();
+        List<Intersection> lineIntersections = new ArrayList<>();
         
         
         
@@ -220,14 +200,10 @@ public class BpSolverTest
     }
     
     // TODO< refactor out >
-    private static ArrayList<Intersection> getAllLineIntersections(List<RetinaPrimitive> primitives)
-    {
-        ArrayList<Intersection> uniqueIntersections;
+    private static List<Intersection> getAllLineIntersections(List<RetinaPrimitive> primitives) {
+        List<Intersection> uniqueIntersections = new ArrayList<>();
 
-        uniqueIntersections = new ArrayList<>();
-
-        for( RetinaPrimitive currentDetector : primitives )
-        {
+        for( RetinaPrimitive currentDetector : primitives ) {
             findAndAddUniqueIntersections(uniqueIntersections, currentDetector.line.intersections);
         }
 
@@ -236,30 +212,22 @@ public class BpSolverTest
 
 
     // modifies uniqueIntersections
-    private static void findAndAddUniqueIntersections(ArrayList<Intersection> uniqueIntersections, ArrayList<Intersection> intersections)
-    {
-        for( Intersection currentOuterIntersection : intersections )
-        {
+    private static void findAndAddUniqueIntersections(List<Intersection> uniqueIntersections, List<Intersection> intersections) {
+        for( Intersection currentOuterIntersection : intersections ) {
             boolean found;
 
             found = false;
 
-            for( Intersection currentUnqiueIntersection : uniqueIntersections )
-            {
-                if( currentUnqiueIntersection.equals(currentOuterIntersection) )
-                {
+            for( Intersection currentUnqiueIntersection : uniqueIntersections ) {
+                if( currentUnqiueIntersection.equals(currentOuterIntersection) ) {
                     found = true;
                     break;
                 }
             }
 
-            if( !found )
-            {
+            if( !found ) {
                 uniqueIntersections.add(currentOuterIntersection);
             }
         }
-
-
     }
-    
 }

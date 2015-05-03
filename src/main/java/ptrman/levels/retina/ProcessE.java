@@ -11,23 +11,16 @@ import java.util.List;
  * finds line intersections
  * 
  */
-public class ProcessE
-{
+public class ProcessE {
     // TODO< sort out only the line detectors or make sure only linedetectors get in, remove asserts if its made sure >
-    public void process(List<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image)
-    {
+    public void process(List<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
         // we examine ALL possible intersections of all lines
         // this is only possible if we have the whole image at an instance
         // we assume here that this is the case
-        
-        int outerI, innerI;
-        
-        for( outerI = 0; outerI < lineDetectors.size(); outerI++ )
-        {
-            for( innerI = 0; innerI < lineDetectors.size(); innerI++ )
-            {
-                if( innerI == outerI )
-                {
+
+        for( int outerI = 0; outerI < lineDetectors.size(); outerI++ ) {
+            for( int innerI = 0; innerI < lineDetectors.size(); innerI++ ) {
+                if( innerI == outerI ) {
                     continue;
                 }
                 
@@ -44,19 +37,16 @@ public class ProcessE
                 
                 intersectionPosition = intersectLineDetectors(lowLinePrimitive.line, highLinePrimitive.line);
                 
-                if( intersectionPosition == null )
-                {
+                if( intersectionPosition == null ) {
                     continue;
                 }
                 
-                if( !isPointInsideImage(intersectionPosition, image) )
-                {
+                if( !isPointInsideImage(intersectionPosition, image) ) {
                     continue;
                 }
                 
                 // examine neighborhood of intersection position
-                if( !isNeightborhoodPixelSet(intersectionPosition, image) )
-                {
+                if( !isNeightborhoodPixelSet(intersectionPosition, image) ) {
                     continue;
                 }
                 
@@ -75,13 +65,11 @@ public class ProcessE
         }
     }
     
-    private static Vector2d<Integer> intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB)
-    {
+    private static Vector2d<Integer> intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB) {
         Vector2d<Float> intersectionFloat;
         
         intersectionFloat = SingleLineDetector.intersectLineDetectors(lineA, lineB);
-        if( intersectionFloat == null )
-        {
+        if( intersectionFloat == null ) {
             return null;
         }
         
@@ -89,28 +77,22 @@ public class ProcessE
     }
     
     // public because its used in processG
-    public static boolean isPointInsideImage(Vector2d<Integer> position, IMap2d<Boolean> image)
-    {
+    public static boolean isPointInsideImage(Vector2d<Integer> position, IMap2d<Boolean> image) {
         return position.x >= 0 && position.x < image.getWidth() && position.y >= 0 && position.y < image.getLength();
     }
     
     // public because its used in processG    
-    public static boolean isNeightborhoodPixelSet(Vector2d<Integer> position, IMap2d<Boolean> image)
-    {
+    public static boolean isNeightborhoodPixelSet(Vector2d<Integer> position, IMap2d<Boolean> image) {
         Vector2d<Integer> min, max;
-        int ix, iy;
         
         final int SEARCHRADIUS = HardParameters.ProcessE.NEIGHTBORHOODSEARCHRADIUS;
         
         min = new Vector2d<>(Math.max(0, position.x - SEARCHRADIUS), Math.max(0, position.y - SEARCHRADIUS));
         max = new Vector2d<>(Math.min(image.getWidth()-1, position.x + SEARCHRADIUS), Math.min(image.getLength()-1, position.y + SEARCHRADIUS));
         
-        for( iy = min.y; iy <= max.y; iy++ )
-        {
-            for( ix = min.x; ix <= max.x; ix++ )
-            {
-                if( image.readAt(ix, iy) )
-                {
+        for( int iy = min.y; iy <= max.y; iy++ ) {
+            for( int ix = min.x; ix <= max.x; ix++ ) {
+                if( image.readAt(ix, iy) ) {
                     return true;
                 }
             }

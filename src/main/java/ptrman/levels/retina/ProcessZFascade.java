@@ -17,18 +17,14 @@ import java.util.List;
  * Too small segments get magnified with ProcessZ
  *
  */
-class ProcessZFacade
-{
-    private class PixelChangeListener implements FloodFill.IPixelSetListener
-    {
-        public PixelChangeListener(ProcessZFacade processZFacade)
-        {
+class ProcessZFacade {
+    private class PixelChangeListener implements FloodFill.IPixelSetListener {
+        public PixelChangeListener(ProcessZFacade processZFacade) {
             this.processZFacade = processZFacade;
         }
 
         @Override
-        public void seted(Vector2d<Integer> position)
-        {
+        public void seted(Vector2d<Integer> position) {
             processZFacade.unprocessedPixels.remove(position.x + position.y * processZFacade.imageSize.x);
             setPixelPositions.add(position);
         }
@@ -38,26 +34,22 @@ class ProcessZFacade
         public List<Vector2d<Integer>> setPixelPositions = new ArrayList<>();
     }
 
-    public void setup(Vector2d<Integer> imageSize, int numberOfPixelsManificationThreshold)
-    {
+    public void setup(Vector2d<Integer> imageSize, int numberOfPixelsManificationThreshold) {
         this.imageSize = imageSize;
         this.numberOfPixelsMagnificationThreshold = numberOfPixelsManificationThreshold;
 
         processZ.setup(imageSize);
     }
 
-    public IMap2d<Boolean> getNotMagnifiedOutput()
-    {
+    public IMap2d<Boolean> getNotMagnifiedOutput() {
         return notMagnifiedOutput;
     }
 
-    public IMap2d<Boolean> getMagnifiedOutput()
-    {
+    public IMap2d<Boolean> getMagnifiedOutput() {
         return magnifiedOutput;
     }
 
-    public void process(Map2d<Boolean> input)
-    {
+    public void process(Map2d<Boolean> input) {
         IMap2d<Boolean> copiedInput;
 
         copiedInput = input.copy();
@@ -73,36 +65,27 @@ class ProcessZFacade
         magnify();
     }
 
-    private void storePixelsIntoHashmap(Map2d<Boolean> input)
-    {
-        int ix, iy;
-
-        for( iy = 0; iy < input.getLength(); iy++ )
-        {
-            for( ix = 0; ix < input.getWidth(); ix++ )
-            {
-                if( input.readAt(ix, iy) )
-                {
+    private void storePixelsIntoHashmap(Map2d<Boolean> input) {
+        for( int iy = 0; iy < input.getLength(); iy++ ) {
+            for( int ix = 0; ix < input.getWidth(); ix++ ) {
+                if( input.readAt(ix, iy) ) {
                     unprocessedPixels.put(ix + iy * imageSize.x, Boolean.TRUE);
                 }
             }
         }
     }
 
-    private void takeRandomPixelFromHashmapUntilNoCandidatesAndFillAndDecide(IMap2d<Boolean> input)
-    {
+    private void takeRandomPixelFromHashmapUntilNoCandidatesAndFillAndDecide(IMap2d<Boolean> input) {
         PixelChangeListener pixelChangeListener;
 
         pixelChangeListener = new PixelChangeListener(this);
 
-        for(;;)
-        {
+        for(;;) {
             Integer[] setOfUnprocessedPixelsAsArray;
             int pixelAdress;
             int x, y;
 
-            if( unprocessedPixels.isEmpty() )
-            {
+            if( unprocessedPixels.isEmpty() ) {
                 break;
             }
 
@@ -114,12 +97,10 @@ class ProcessZFacade
             floodFill.fill(input, new Vector2d<>(x, y), imageSize, Boolean.TRUE, Boolean.FALSE, pixelChangeListener);
 
             // TODO< decide with a propability if the filled patch should be magnified or not >
-            if( pixelChangeListener.setPixelPositions.size() < numberOfPixelsMagnificationThreshold)
-            {
+            if( pixelChangeListener.setPixelPositions.size() < numberOfPixelsMagnificationThreshold) {
                 drawPixelsIntoMap(pixelChangeListener.setPixelPositions, toMagnify);
             }
-            else
-            {
+            else {
                 drawPixelsIntoMap(pixelChangeListener.setPixelPositions, notMagnifiedOutput);
             }
 
@@ -128,16 +109,13 @@ class ProcessZFacade
         }
     }
 
-    private void drawPixelsIntoMap(List<Vector2d<Integer>> pixels, IMap2d<Boolean> map)
-    {
-        for( Vector2d<Integer> iterationPosition : pixels )
-        {
+    private void drawPixelsIntoMap(List<Vector2d<Integer>> pixels, IMap2d<Boolean> map) {
+        for( Vector2d<Integer> iterationPosition : pixels ) {
             map.setAt(iterationPosition.x, iterationPosition.y, true);
         }
     }
 
-    private void magnify()
-    {
+    private void magnify() {
         processZ.process(toMagnify);
         magnifiedOutput = processZ.getMagnifiedOutput();
     }

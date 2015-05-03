@@ -10,12 +10,9 @@ import java.util.List;
  *
  * samples from the input image and puts the set pixels into a queue (is for now just a list)
  */
-public class ProcessA
-{
-    public static class Sample
-    {
-        public enum EnumType
-        {
+public class ProcessA {
+    public static class Sample {
+        public enum EnumType {
             ENDOSCELETON,
             EXOSCELETON
         }
@@ -33,13 +30,10 @@ public class ProcessA
         public Vector2d<Integer> position;
         public int altitude = -1;
         public EnumType type;
-        
-        
     }
     
     
-    public void setWorkingImage(IMap2d<Boolean> image)
-    {
+    public void setWorkingImage(IMap2d<Boolean> image) {
         workingImage = image.copy();
     }
 
@@ -50,8 +44,7 @@ public class ProcessA
      * 
      *  
      */
-    public List<Sample> sampleImage()
-    {
+    public List<Sample> sampleImage() {
         List<Sample> resultSamples;
         int hitCount;
         int sampleCount;
@@ -61,19 +54,12 @@ public class ProcessA
         hitCount = 0;
         sampleCount = 0;
 
-
-        int x, y;
-
-        for( y = 0; y < workingImage.getLength(); y++ )
-        {
-            for( x = 0; x < workingImage.getWidth(); x++ )
-            {
+        for( int y = 0; y < workingImage.getLength(); y++ ) {
+            for( int x = 0; x < workingImage.getWidth(); x++ ) {
                 sampleCount++;
 
-                if( sampleMaskAtPosition(new Vector2d<>(x, y), MaskDetail0) )
-                {
-                    if( workingImage.readAt(x, y) )
-                    {
+                if( sampleMaskAtPosition(new Vector2d<>(x, y), MaskDetail0) ) {
+                    if( workingImage.readAt(x, y) ) {
                         hitCount++;
                         workingImage.setAt(x, y, false);
 
@@ -83,17 +69,14 @@ public class ProcessA
             }
         }
 
-        
         return resultSamples;
     }
     
-    private static void addSampleToList(List<Sample> samples, int x, int y)
-    {
+    private static void addSampleToList(List<Sample> samples, int x, int y) {
         samples.add(new Sample(new Vector2d<>(x, y)));
     }
 
-    private static boolean sampleMaskAtPosition(Vector2d<Integer> position, boolean[] mask4by4)
-    {
+    private static boolean sampleMaskAtPosition(Vector2d<Integer> position, boolean[] mask4by4) {
         int modX, modY;
 
         modX = position.x % 4;

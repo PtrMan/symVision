@@ -1,36 +1,29 @@
 package ptrman.levels.retina;
 
 import ptrman.Datastructures.Vector2d;
+import ptrman.misc.Assert;
 
 import java.util.List;
-import ptrman.misc.Assert;
 
 /**
  *
  * 
  */
-public class RetinaPrimitive
-{
-    public Vector2d<Float> getNormalizedTangentForIntersectionTypeAndT(Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType, float f)
-    {
-        if( type == EnumType.LINESEGMENT )
-        {
+public class RetinaPrimitive {
+    public Vector2d<Float> getNormalizedTangentForIntersectionTypeAndT(Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType, float f) {
+        if( type == EnumType.LINESEGMENT ) {
             return line.getNormalizedDirection();
         }
-        else if( type == EnumType.CURVE )
-        {
+        else if( type == EnumType.CURVE ) {
             // TODO< middle and pass over T and/or a type >
             
-            if( intersectionPartnerType == Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN )
-            {
+            if( intersectionPartnerType == Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN ) {
                 return curve.getNormalizedTangentAtEndpoint(0);
             }
-            else if( intersectionPartnerType == Intersection.IntersectionPartner.EnumIntersectionEndpointType.END )
-            {
+            else if( intersectionPartnerType == Intersection.IntersectionPartner.EnumIntersectionEndpointType.END ) {
                 return curve.getNormalizedTangentAtEndpoint(1);
             }
-            else
-            {
+            else {
                 // TODO
                 return curve.getNormalizedTangentAtEndpoint(0);
             }
@@ -38,8 +31,8 @@ public class RetinaPrimitive
         
         throw new InternalError();
     }
-    public enum EnumType
-    {
+
+    public enum EnumType {
         LINESEGMENT,
         CURVE
     }
@@ -50,13 +43,10 @@ public class RetinaPrimitive
     public ProcessG.Curve curve;
     public boolean marked = false; // used in algorithms for marking of the RetinaPrimitive for various algorithms
     
-    private RetinaPrimitive()
-    {
-        
+    private RetinaPrimitive() {
     }
     
-    public static RetinaPrimitive makeLine(SingleLineDetector line)
-    {
+    public static RetinaPrimitive makeLine(SingleLineDetector line) {
         RetinaPrimitive resultPrimitive;
 
         resultPrimitive = new RetinaPrimitive();
@@ -66,8 +56,7 @@ public class RetinaPrimitive
         return resultPrimitive;
     }
 
-    public static RetinaPrimitive makeCurve(ProcessG.Curve curve)
-    {
+    public static RetinaPrimitive makeCurve(ProcessG.Curve curve) {
         RetinaPrimitive resultPrimitive;
 
         resultPrimitive = new RetinaPrimitive();
@@ -77,26 +66,21 @@ public class RetinaPrimitive
         return resultPrimitive;
     }
     
-    public List<Intersection> getIntersections()
-    {
-        if( type == EnumType.LINESEGMENT )
-        {
+    public List<Intersection> getIntersections() {
+        if( type == EnumType.LINESEGMENT ) {
             return line.intersections;
         }
 
         throw new InternalError();
     }
     
-    public Vector2d<Float> getNormalizedTangentOnEndpoint(int index)
-    {
+    public Vector2d<Float> getNormalizedTangentOnEndpoint(int index) {
         Assert.Assert(index >= 0 && index <= 1, "");
         
-        if( type == EnumType.LINESEGMENT )
-        {
+        if( type == EnumType.LINESEGMENT ) {
             return line.getNormalizedDirection();
         }
-        else if( type == EnumType.CURVE )
-        {
+        else if( type == EnumType.CURVE ) {
             return curve.getNormalizedTangentAtEndpoint(index);
         }
         

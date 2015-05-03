@@ -24,16 +24,13 @@ import static ptrman.Datastructures.Vector2d.FloatHelper.*;
  * each line detector either will survive or decay if it doesn't receive enought fitting points
  * 
  */
-public class ProcessD
-{
+public class ProcessD {
     // just for debugging as a flag, is actually true
     public final static boolean ENABLELOCKING = false;
 
     
-    private static class LineDetectorWithMultiplePoints
-    {
-        public LineDetectorWithMultiplePoints(ArrayList<Integer> integratedSampleIndices)
-        {
+    private static class LineDetectorWithMultiplePoints {
+        public LineDetectorWithMultiplePoints(ArrayList<Integer> integratedSampleIndices) {
             this.integratedSampleIndices = integratedSampleIndices;
         }
         
@@ -51,21 +48,17 @@ public class ProcessD
             return integratedSampleIndices.contains(index);
         }
         
-        public float getActivation()
-        {
+        public float getActivation() {
             return (float)integratedSampleIndices.size() + (Parameters.getProcessdMaxMse() - mse)*Parameters.getProcessdLockingActivationScale();
         }
         
-        public Vector2d<Float> projectPointOntoLine(Vector2d<Float> point)
-        {
-            if( isYAxisSingularity() )
-            {
+        public Vector2d<Float> projectPointOntoLine(Vector2d<Float> point) {
+            if( isYAxisSingularity() ) {
                 // call isn't allowed
                 throw new RuntimeException("internal error");
                 //return projectPointOntoLineForSingular(point);
             }
-            else
-            {
+            else {
                 return projectPointOntoLineForNonsingular(point);
             }
         }
@@ -75,8 +68,7 @@ public class ProcessD
             return new Vector2d<Float>(point.x, horizontalOffset);
         }*/
         
-        public Vector2d<Float> projectPointOntoLineForNonsingular(Vector2d<Float> point)
-        {
+        public Vector2d<Float> projectPointOntoLineForNonsingular(Vector2d<Float> point) {
             Vector2d<Float> lineDirection;
             Vector2d<Float> diffFromAToPoint;
             float dotResult;
@@ -88,27 +80,22 @@ public class ProcessD
             return add(new Vector2d<>(0.0f, n), getScaled(lineDirection, dotResult));
         }
         
-        private Vector2d<Float> getNormalizedDirection()
-        {
-            if( isYAxisSingularity() )
-            {
+        private Vector2d<Float> getNormalizedDirection() {
+            if( isYAxisSingularity() ) {
                 throw new RuntimeException("internal error");
                 //return new Vector2d<Float>(0.0f, 1.0f);
             }
-            else
-            {
+            else {
                 return Vector2d.FloatHelper.normalize(new Vector2d<>(1.0f, m));
             }
         }
         
         // TODO< just simply test flag >
-        public boolean isYAxisSingularity()
-        {
+        public boolean isYAxisSingularity() {
             return Float.isInfinite(m);
         }
         
-        public float getHorizontalOffset(ArrayList<ProcessA.Sample> samples)
-        {
+        public float getHorizontalOffset(ArrayList<ProcessA.Sample> samples) {
             int sampleIndex;
             
             Assert.Assert(isYAxisSingularity(), "");
@@ -124,8 +111,7 @@ public class ProcessD
      * 
      * \return only the surviving line segments
      */
-    public List<RetinaPrimitive> detectLines(List<ProcessA.Sample> samples)
-    {
+    public List<RetinaPrimitive> detectLines(List<ProcessA.Sample> samples) {
         List<ProcessA.Sample> workingSamples;
         List<LineDetectorWithMultiplePoints> multiplePointsLineDetector;
         List<RetinaPrimitive> resultSingleDetectors;
@@ -138,9 +124,7 @@ public class ProcessD
         
         int counter;
         
-        for( counter = 0; counter < Math.round((float)samples.size()*SAMPLECOUNTLINEDETECTORMULTIPLIER); counter++ )
-        {
-            {
+        for( counter = 0; counter < Math.round((float)samples.size()*SAMPLECOUNTLINEDETECTORMULTIPLIER); counter++ ) {{
                 int centerPointIndex;
                 List<Vector2d<Float>> positionsOfSamples;
                 RegressionForLineResult regressionResult;
@@ -155,8 +139,7 @@ public class ProcessD
                 // modifies chosenPointIndices
                 choosePointIndicesInsideRadius(chosenPointIndices.get(0), chosenPointIndices, workingSamples, HardParameters.ProcessD.EARLYCANDIDATECOUNT-1);
                 
-                if( chosenPointIndices.size() < 2 )
-                {
+                if( chosenPointIndices.size() < 2 ) {
                     // ignore potential detectors with less than two points
                     continue;
                 }
@@ -176,8 +159,7 @@ public class ProcessD
                 
                 Assert.Assert(createdLineDetector.integratedSampleIndices.size() >= 2, "");
                 // the regression mse is not defined if it are only two points
-                if( createdLineDetector.integratedSampleIndices.size() == 2 )
-                {
+                if( createdLineDetector.integratedSampleIndices.size() == 2 ) {
                     // TODO< calculate m and n for the two point case >
                     
                     createdLineDetector.mse = 0.0f;
@@ -189,10 +171,8 @@ public class ProcessD
 
                     multiplePointsLineDetector.add(createdLineDetector);
                 }
-                else
-                {
-                    if( regressionResult.mse < Parameters.getProcessdMaxMse() )
-                    {
+                else {
+                    if( regressionResult.mse < Parameters.getProcessdMaxMse() ) {
                         createdLineDetector.mse = regressionResult.mse;
 
                         createdLineDetector.n = regressionResult.n;
@@ -206,8 +186,7 @@ public class ProcessD
             }
             
             // try to include a random sample into the detectors
-            if( false )
-            {
+            if( false ) {
                 int sampleIndex;
 
                 sampleIndex = random.nextInt(workingSamples.size());
@@ -236,8 +215,7 @@ public class ProcessD
      * \param workingSamples
      * \param count 
      */
-    private void choosePointIndicesInsideRadius(int centerPointIndex, List<Integer> alreadyIntegratedPointIndices, List<ProcessA.Sample> workingSamples, int count)
-    {
+    private void choosePointIndicesInsideRadius(int centerPointIndex, List<Integer> alreadyIntegratedPointIndices, List<ProcessA.Sample> workingSamples, int count) {
         final int MAXTRIES = 20;
         
         Vector2d<Integer> centerPositionAsInt;
@@ -248,8 +226,7 @@ public class ProcessD
         centerPosition = Vector2d.ConverterHelper.convertIntVectorToFloat(centerPositionAsInt);
         
         tryCounter = 0;
-        for( counter = 0; counter < count; )
-        {
+        for( counter = 0; counter < count; ) {
             int chosenPointIndex;
             List<Integer> chosenPointIndexAsList;
             Vector2d<Integer> chosenPointPositionAsInt;
@@ -265,8 +242,7 @@ public class ProcessD
             chosenPointPositionAsInt = workingSamples.get(chosenPointIndex).position;
             chosenPointPosition = Vector2d.ConverterHelper.convertIntVectorToFloat(chosenPointPositionAsInt);
             
-            if( Helper.isDistanceBetweenPositionsBelow(centerPosition, chosenPointPosition, HardParameters.ProcessD.EARLYCANDIDATEMAXDISTANCE) )
-            {
+            if( Helper.isDistanceBetweenPositionsBelow(centerPosition, chosenPointPosition, HardParameters.ProcessD.EARLYCANDIDATEMAXDISTANCE) ) {
                 alreadyIntegratedPointIndices.add(chosenPointIndex);
                 
                 // we have one more point, so increment counter
@@ -275,29 +251,23 @@ public class ProcessD
                 continue;
             }
             
-            if( tryCounter >= MAXTRIES )
-            {
+            if( tryCounter >= MAXTRIES ) {
                 return;
             }
         }
     }
     
     // TODO< belongs into dedicated helper >
-    static private class Helper
-    {
-        private static boolean isDistanceBetweenPositionsBelow(Vector2d<Float> a, Vector2d<Float> b, float maxDistance)
-        {
+    static private class Helper {
+        private static boolean isDistanceBetweenPositionsBelow(Vector2d<Float> a, Vector2d<Float> b, float maxDistance) {
             return getLength(sub(a, b)) < maxDistance;
         }
         
-        private static float getAxis(Vector2d<Float> vector, EnumAxis axis)
-        {
-            if( axis == EnumAxis.X )
-            {
+        private static float getAxis(Vector2d<Float> vector, EnumAxis axis) {
+            if( axis == EnumAxis.X ) {
                 return vector.x;
             }
-            else
-            {
+            else {
                 return vector.y;
             }
         }
@@ -305,16 +275,14 @@ public class ProcessD
     
     
     private static void tryToIntegratePointIntoAllLineDetectors(int sampleIndex, List<LineDetectorWithMultiplePoints> multiplePointsLineDetector, List<ProcessA.Sample> workingSamples) {
-        for( LineDetectorWithMultiplePoints iteratorDetector : multiplePointsLineDetector )
-        {
+        for( LineDetectorWithMultiplePoints iteratorDetector : multiplePointsLineDetector ) {
             List<Vector2d<Float>> positionsOfSamples;
             RegressionForLineResult regressionResult;
             ProcessA.Sample currentSample;
 
             currentSample = workingSamples.get(sampleIndex);
 
-            if( iteratorDetector.doesContainSampleIndex(sampleIndex) )
-            {
+            if( iteratorDetector.doesContainSampleIndex(sampleIndex) ) {
                 continue;
             }
             // else we are here
@@ -324,8 +292,7 @@ public class ProcessD
             
             regressionResult = calcRegressionForPoints(positionsOfSamples);
             
-            if( regressionResult.mse < Parameters.getProcessdMaxMse() )
-            {
+            if( regressionResult.mse < Parameters.getProcessdMaxMse() ) {
                 iteratorDetector.mse = regressionResult.mse;
 
                 iteratorDetector.integratedSampleIndices.add(sampleIndex);
@@ -338,14 +305,12 @@ public class ProcessD
         }
     }
     
-    private static List<Vector2d<Float>> getPositionsOfSamplesOfDetector(LineDetectorWithMultiplePoints detector, List<ProcessA.Sample> workingSamples)
-    {
+    private static List<Vector2d<Float>> getPositionsOfSamplesOfDetector(LineDetectorWithMultiplePoints detector, List<ProcessA.Sample> workingSamples) {
         List<Vector2d<Float>> resultPositions;
         
         resultPositions = new ArrayList<>();
         
-        for( int iterationSampleIndex : detector.integratedSampleIndices )
-        {
+        for( int iterationSampleIndex : detector.integratedSampleIndices ) {
             ProcessA.Sample currentSample;
             Vector2d<Float> convertedPosition;
             
@@ -361,8 +326,7 @@ public class ProcessD
      * works by counting the "overlapping" pixel coordinates, chooses the axis with the less overlappings
      *  
      */
-    private static RegressionForLineResult calcRegressionForPoints(List<Vector2d<Float>> positions)
-    {
+    private static RegressionForLineResult calcRegressionForPoints(List<Vector2d<Float>> positions) {
         SimpleRegression regression;
         
         int overlappingPixelsOnX, overlappingPixelsOnY;
@@ -376,12 +340,10 @@ public class ProcessD
         
         regressionResultForLine = new RegressionForLineResult();
         
-        if( overlappingPixelsOnX <= overlappingPixelsOnY )
-        {
+        if( overlappingPixelsOnX <= overlappingPixelsOnY ) {
             // regression on x axis
             
-            for( Vector2d<Float> iterationPosition : positions )
-            {
+            for( Vector2d<Float> iterationPosition : positions ) {
                 regression.addData(iterationPosition.x, iterationPosition.y);
             }
             
@@ -389,16 +351,14 @@ public class ProcessD
             regressionResultForLine.n = (float)regression.getIntercept();
             regressionResultForLine.m = (float)regression.getSlope();
         }
-        else
-        {
+        else {
             float regressionM, n, m, regressionN;
             Vector2d<Float> pointOnRegressionLine;
             
             // regression on y axis
             // we switch x and y and calculate m and n from the regression result
             
-            for( Vector2d<Float> iterationPosition : positions )
-            {
+            for( Vector2d<Float> iterationPosition : positions ) {
                 regression.addData(iterationPosition.y, iterationPosition.x);
             }
             
@@ -431,8 +391,7 @@ public class ProcessD
         arraysizeOfDimension = Math.round(maxCoordinatOnAxis)+1;
         dimensionCounter = new int[arraysizeOfDimension];
         
-        for( Vector2d<Float> iterationPosition : positions )
-        {
+        for( Vector2d<Float> iterationPosition : positions ) {
             int dimensionCounterIndex;
             
             dimensionCounterIndex = Math.round(Helper.getAxis(iterationPosition, axis));
@@ -441,10 +400,8 @@ public class ProcessD
         }
         
         // count the "rows" where the count is greater than 1
-        for( arrayI = 0; arrayI < dimensionCounter.length; arrayI++ )
-        {
-            if( dimensionCounter[arrayI] > 1 )
-            {
+        for( arrayI = 0; arrayI < dimensionCounter.length; arrayI++ ) {
+            if( dimensionCounter[arrayI] > 1 ) {
                 overlappingCounter++;
             }
         }
@@ -453,46 +410,39 @@ public class ProcessD
     }
     
     // used to calculate the arraysize
-    private static float getMaximalCoordinateForPoints(List<Vector2d<Float>> positions, EnumAxis axis)
-    {
+    private static float getMaximalCoordinateForPoints(List<Vector2d<Float>> positions, EnumAxis axis) {
         float max;
         
         max = 0;
         
-        for( Vector2d<Float> iterationPosition : positions )
-        {
+        for( Vector2d<Float> iterationPosition : positions ) {
             max = Math.max(max, Helper.getAxis(iterationPosition, axis));
         }
         
         return max;
     }
     
-    private static List<RetinaPrimitive> splitDetectorsIntoLines(List<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints, List<ProcessA.Sample> samples)
-    {
+    private static List<RetinaPrimitive> splitDetectorsIntoLines(List<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints, List<ProcessA.Sample> samples) {
         List<RetinaPrimitive> result;
         
         result = new ArrayList<>();
         
-        for( LineDetectorWithMultiplePoints iterationDetector : lineDetectorsWithMultiplePoints )
-        {
+        for( LineDetectorWithMultiplePoints iterationDetector : lineDetectorsWithMultiplePoints ) {
             result.addAll(splitDetectorIntoLines(iterationDetector, samples));
         }
         
         return result;
     }
     
-    private static List<RetinaPrimitive> splitDetectorIntoLines(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints, List<ProcessA.Sample> samples)
-    {
-        if( lineDetectorWithMultiplePoints.isYAxisSingularity() )
-        {
+    private static List<RetinaPrimitive> splitDetectorIntoLines(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints, List<ProcessA.Sample> samples) {
+        if( lineDetectorWithMultiplePoints.isYAxisSingularity() ) {
             // handle the special case where its all on one x coordinate
             
             List<Vector2d<Float>> samplePositions;
             
             samplePositions = new ArrayList<>();
             
-            for( int iterationSampleIndex : lineDetectorWithMultiplePoints.integratedSampleIndices )
-            {
+            for( int iterationSampleIndex : lineDetectorWithMultiplePoints.integratedSampleIndices ) {
                 Vector2d<Integer> samplePositionAsInt;
                 Vector2d<Float> samplePosition;
 
@@ -505,8 +455,7 @@ public class ProcessD
             
             return clusterPointsFromLinedetectorToLinedetectors(samplePositions, EnumAxis.Y);
         }
-        else
-        {
+        else {
             List<Vector2d<Float>> projectedPointPositions;
             
             projectedPointPositions = new ArrayList<>();
@@ -515,8 +464,7 @@ public class ProcessD
             // and then "cluster" the lines after the distance between succeeding points
             
             // project
-            for( int iterationSampleIndex : lineDetectorWithMultiplePoints.integratedSampleIndices )
-            {
+            for( int iterationSampleIndex : lineDetectorWithMultiplePoints.integratedSampleIndices ) {
                 Vector2d<Integer> samplePositionAsInt;
                 Vector2d<Float> samplePosition;
                 Vector2d<Float> projectedSamplePosition;
@@ -535,8 +483,7 @@ public class ProcessD
     }
     
     
-    private static List<RetinaPrimitive> clusterPointsFromLinedetectorToLinedetectors(List<Vector2d<Float>> pointPositions, EnumAxis axis)
-    {
+    private static List<RetinaPrimitive> clusterPointsFromLinedetectorToLinedetectors(List<Vector2d<Float>> pointPositions, EnumAxis axis) {
         List<RetinaPrimitive> resultSingleLineDetectors;
         boolean nextIsNewLineStart;
         float lastAxisPosition;
@@ -550,10 +497,8 @@ public class ProcessD
         lineStartPosition = pointPositions.get(0);
         lastAxisPosition = Helper.getAxis(pointPositions.get(0), axis);
 
-        for( Vector2d<Float> iterationPoint : pointPositions )
-        {
-            if( nextIsNewLineStart )
-            {
+        for( Vector2d<Float> iterationPoint : pointPositions ) {
+            if( nextIsNewLineStart ) {
                 lineStartPosition = iterationPoint;
                 lastAxisPosition = Helper.getAxis(iterationPoint, axis);
 
@@ -563,12 +508,10 @@ public class ProcessD
             }
             // else we are here
 
-            if( Helper.getAxis(iterationPoint, axis) - lastAxisPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE )
-            {
+            if( Helper.getAxis(iterationPoint, axis) - lastAxisPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE ) {
                 lastAxisPosition = Helper.getAxis(iterationPoint, axis);
             }
-            else
-            {
+            else {
                 // form a new line
                 resultSingleLineDetectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, iterationPoint)));
 
@@ -579,51 +522,42 @@ public class ProcessD
         // form a new line for the last point
         lastPoint = pointPositions.get(pointPositions.size()-1);
 
-        if( !nextIsNewLineStart && Helper.getAxis(lastPoint, axis) - lastAxisPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE )
-        {
+        if( !nextIsNewLineStart && Helper.getAxis(lastPoint, axis) - lastAxisPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE ) {
             resultSingleLineDetectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, lastPoint)));
         }
         
         return resultSingleLineDetectors;
     }
     
-    private static void deleteMultiPointDetectorsWhereActiviationIsInsuficient(List<LineDetectorWithMultiplePoints> lineDetectors)
-    {
+    private static void deleteMultiPointDetectorsWhereActiviationIsInsuficient(List<LineDetectorWithMultiplePoints> lineDetectors) {
         int detectorI;
         
-        if( !ENABLELOCKING )
-        {
+        if( !ENABLELOCKING ) {
             return;
         }
         
-        for( detectorI = lineDetectors.size()-1; detectorI >= 0; detectorI-- )
-        {
+        for( detectorI = lineDetectors.size()-1; detectorI >= 0; detectorI-- ) {
             LineDetectorWithMultiplePoints discardCandidate;
             
             discardCandidate = lineDetectors.get(detectorI);
             
-            if( !discardCandidate.isLocked )
-            {
+            if( !discardCandidate.isLocked ) {
                 lineDetectors.remove(detectorI);
             }
         }
     }
     
-    private static void lockDetectorIfItHasEnoughtActivation(LineDetectorWithMultiplePoints detector)
-    {
+    private static void lockDetectorIfItHasEnoughtActivation(LineDetectorWithMultiplePoints detector) {
         detector.isLocked |= detector.getActivation() > Parameters.getProcessdLockingActivation();
     }
     
-    private static List<ProcessA.Sample> filterEndosceletonPoints(List<ProcessA.Sample> samples)
-    {
+    private static List<ProcessA.Sample> filterEndosceletonPoints(List<ProcessA.Sample> samples) {
         List<ProcessA.Sample> filtered;
         
         filtered = new ArrayList<>();
         
-        for( ProcessA.Sample iterationSample : samples )
-        {
-            if( iterationSample.type == ProcessA.Sample.EnumType.ENDOSCELETON )
-            {
+        for( ProcessA.Sample iterationSample : samples ) {
+            if( iterationSample.type == ProcessA.Sample.EnumType.ENDOSCELETON ) {
                 filtered.add(iterationSample);
             }
         }
@@ -633,8 +567,7 @@ public class ProcessD
     
     public Random random = new Random();
     
-    private static class VectorComperatorByAxis implements Comparator<Vector2d<Float>>
-    {
+    private static class VectorComperatorByAxis implements Comparator<Vector2d<Float>> {
         
         public VectorComperatorByAxis(EnumAxis axis)
         {
@@ -643,8 +576,7 @@ public class ProcessD
         
         @Override
         public int compare(Vector2d<Float> a, Vector2d<Float> b) {
-            if( Helper.getAxis(a, axis) > Helper.getAxis(b, axis) )
-            {
+            if( Helper.getAxis(a, axis) > Helper.getAxis(b, axis) ) {
                 return 1;
             }
             
@@ -654,15 +586,13 @@ public class ProcessD
         private final EnumAxis axis;
     }
     
-    private static class RegressionForLineResult
-    {
+    private static class RegressionForLineResult {
         public float mse;
         
         public float m, n;
     }
     
-    private enum EnumAxis
-    {
+    private enum EnumAxis {
         X,
         Y
     }
