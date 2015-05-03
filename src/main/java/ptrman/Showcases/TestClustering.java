@@ -131,7 +131,7 @@ public class TestClustering {
                 nodeGraph.repopulateAfterNodes(bpSolver.lastFrameObjectNodes, bpSolver.networkHandles);
             }
 
-            dualCanvas.leftCanvas.setImage(image);
+            dualCanvas.leftCanvas.setImage(translateFromMapToImage(mapBoolean));
 
             BufferedImage detectorImage;
 
@@ -187,8 +187,7 @@ public class TestClustering {
 
         newDagElement = new Dag.Element(
                 new VisualProcessor.ProcessingChain.ChainElementFloatBoolean(
-                        //new VisualProcessor.ProcessingChain.DitheringFilter(),
-                        new VisualProcessor.ProcessingChain.ThresholdFilter(0.5f),
+                        new VisualProcessor.ProcessingChain.DitheringFilter(),
                         "dither",
                         bpSolver.getImageSize()
                 )
@@ -295,5 +294,29 @@ public class TestClustering {
         }
 
         return convertedToMap;
+    }
+
+    private static BufferedImage translateFromMapToImage(IMap2d<Boolean> map) {
+        BufferedImage result;
+        int x, y;
+
+        result = new BufferedImage(map.getWidth(), map.getLength(), BufferedImage.TYPE_INT_ARGB);
+
+        for( y = 0; y < map.getLength(); y++ ) {
+            for( x = 0; x < map.getLength(); x++ ) {
+                boolean booleanValue;
+
+                booleanValue = map.readAt(x, y);
+
+                if( booleanValue ) {
+                    result.setRGB(x, y, 0xffffffff);
+                }
+                else {
+                    result.setRGB(x, y, 0xff000000);
+                }
+            }
+        }
+
+        return result;
     }
 }
