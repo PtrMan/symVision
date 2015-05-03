@@ -17,7 +17,7 @@ public class Map2d<Type> implements IMap2d<Type>
     
     public Type readAt(int x, int y)
     {
-        if( x < 0 || x >= width || y < 0 || y >= length )
+        if( !inBounds(new Vector2d<>(x, y)) )
         {
             throw new RuntimeException("access error");
         }
@@ -27,7 +27,7 @@ public class Map2d<Type> implements IMap2d<Type>
     
     public void setAt(int x, int y, Type value)
     {
-        if( x < 0 || x > width || y < 0 || y > length )
+        if( !inBounds(new Vector2d<>(x, y)) )
         {
             throw new RuntimeException("access error");
         }
@@ -44,7 +44,12 @@ public class Map2d<Type> implements IMap2d<Type>
     {
         return length;
     }
-    
+
+    @Override
+    public boolean inBounds(Vector2d<Integer> position) {
+        return position.x >= 0 && position.x < width && position.y >= 0 && position.y < length;
+    }
+
     public Map2d<Type> copy()
     {
         Map2d<Type> cloned;

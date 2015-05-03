@@ -8,5 +8,7 @@ public interface IMap2d<Type>
     int getWidth();
     int getLength();
 
+    boolean inBounds(Vector2d<Integer> position);
+
     Map2d<Type> copy();
 }
