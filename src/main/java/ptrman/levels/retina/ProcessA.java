@@ -22,13 +22,12 @@ public class ProcessA {
             this.position = position;
         }
         
-        public boolean isAltidudeValid()
-        {
-            return altitude != -1;
+        public boolean isAltidudeValid() {
+            return altitude != Float.NaN;
         }
         
         public Vector2d<Integer> position;
-        public int altitude = -1;
+        public float altitude = Float.NaN;
         public EnumType type;
     }
     

@@ -19,10 +19,10 @@ public class ProcessB {
     public void process(List<ProcessA.Sample> samples, IMap2d<Boolean> image) {
         Vector2d<Integer> foundPosition;
         
-        final int MAXRADIUS = 10;
+        final int MAXRADIUS = 30;
         
         for( ProcessA.Sample iterationSample : samples ) {
-            Tuple2<Vector2d<Integer>, Integer> nearestResult;
+            Tuple2<Vector2d<Integer>, Float> nearestResult;
             
             nearestResult = findNearestPositionWhereMapIs(false, iterationSample.position, image, MAXRADIUS);
             if( nearestResult == null ) {
@@ -41,7 +41,7 @@ public class ProcessB {
      * 
      * \return null if no point could be found in the radius 
      */
-    private static Tuple2<Vector2d<Integer>, Integer> findNearestPositionWhereMapIs(boolean value, Vector2d<Integer> position, IMap2d<Boolean> image, int radius) {
+    private static Tuple2<Vector2d<Integer>, Float> findNearestPositionWhereMapIs(boolean value, Vector2d<Integer> position, IMap2d<Boolean> image, int radius) {
         Vector2d<Integer> outwardIteratorOffsetUnbound;
         Vector2d<Integer> borderMin;
         Vector2d<Integer> borderMax;
@@ -57,19 +57,13 @@ public class ProcessB {
         one = new Vector2d<>(1, 1);
 
         for(;;) {
-            Vector2d<Integer> iteratorOffsetBoundMin;
-            Vector2d<Integer> iteratorOffsetBoundMax;
-            int depthCounter;
-            
             if (-outwardIteratorOffsetUnbound.x > radius) {
                 break;
             }
 
-            iteratorOffsetBoundMin = Vector2d.IntegerHelper.max4(borderMin, Vector2d.IntegerHelper.add(outwardIteratorOffsetUnbound, positionAsInt), Vector2d.IntegerHelper.add(outwardIteratorOffsetUnbound, positionAsInt), Vector2d.IntegerHelper.add(outwardIteratorOffsetUnbound, positionAsInt));
-            iteratorOffsetBoundMax = Vector2d.IntegerHelper.min4(borderMax, Vector2d.IntegerHelper.add(Vector2d.IntegerHelper.add(Vector2d.IntegerHelper.getScaled(outwardIteratorOffsetUnbound, -1), one), positionAsInt), borderMax, borderMax);
-            
-            depthCounter = 0;
-            
+            Vector2d<Integer> iteratorOffsetBoundMin = Vector2d.IntegerHelper.max4(borderMin, Vector2d.IntegerHelper.add(outwardIteratorOffsetUnbound, positionAsInt), Vector2d.IntegerHelper.add(outwardIteratorOffsetUnbound, positionAsInt), Vector2d.IntegerHelper.add(outwardIteratorOffsetUnbound, positionAsInt));
+            Vector2d<Integer> iteratorOffsetBoundMax = Vector2d.IntegerHelper.min4(borderMax, Vector2d.IntegerHelper.add(Vector2d.IntegerHelper.add(Vector2d.IntegerHelper.getScaled(outwardIteratorOffsetUnbound, -1), one), positionAsInt), borderMax, borderMax);
+
             for( int y = iteratorOffsetBoundMin.y; y < iteratorOffsetBoundMax.y; y++ ) {
                 for( int x = iteratorOffsetBoundMin.x; x < iteratorOffsetBoundMax.x; x++ ) {
                     // just find at the border
@@ -79,11 +73,9 @@ public class ProcessB {
                         valueAtPoint = image.readAt(x, y);
 
                         if (valueAtPoint == value) {
-                            return new Tuple2(new Vector2d<Integer>(x, y), depthCounter);
+                            return new Tuple2(new Vector2d<Integer>(x, y), Vector2d.FloatHelper.getLength(new Vector2d<>((float)x, (float)y)));
                         }
                     }
-                    
-                    depthCounter++;
                 }
             }
 
