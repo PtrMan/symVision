@@ -19,6 +19,8 @@ import ptrman.levels.retina.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class BpSolver {
 
@@ -59,9 +61,11 @@ public class BpSolver {
         // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
         coderack.flush();
 
+        Queue<ProcessA.Sample> queueToProcessF = new ConcurrentLinkedQueue<>();
+
         ProcessA processA = new ProcessA();
         ProcessB processB = new ProcessB();
-        ProcessC processC = new ProcessC();
+        ProcessC processC = new ProcessC(queueToProcessF);
         ProcessD processD = new ProcessD();
         ProcessH processH = new ProcessH();
         ProcessE processE = new ProcessE();

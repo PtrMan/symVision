@@ -3,6 +3,7 @@ package ptrman.levels.retina;
 import ptrman.Datastructures.Vector2d;
 
 import java.util.List;
+import java.util.Queue;
 
 import static java.lang.System.arraycopy;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.sub;
@@ -26,6 +27,10 @@ public class ProcessC {
         public float distance;
         
         public boolean used = false; // used for the sorted array
+    }
+
+    public ProcessC(Queue<ProcessA.Sample> queueToProcessF) {
+        this.queueToProcessF = queueToProcessF;
     }
     
     public void process(List<ProcessA.Sample> samples) {
@@ -134,5 +139,6 @@ public class ProcessC {
         
         return true;
     }
-    
+
+    private final Queue<ProcessA.Sample> queueToProcessF;
 }
