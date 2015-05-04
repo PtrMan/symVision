@@ -1,5 +1,6 @@
 package ptrman.levels.retina;
 
+import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 
@@ -17,17 +18,17 @@ public class ProcessA {
             EXOSCELETON
         }
         
-        public Sample(Vector2d<Integer> position)
+        public Sample(ArrayRealVector position)
         {
             this.position = position;
         }
         
         public boolean isAltitudeValid() {
-            return altitude != Float.NaN;
+            return altitude != Double.NaN;
         }
         
-        public Vector2d<Integer> position;
-        public float altitude = Float.NaN;
+        public ArrayRealVector position;
+        public double altitude = Double.NaN;
         public EnumType type;
     }
     
@@ -72,7 +73,7 @@ public class ProcessA {
     }
     
     private static void addSampleToList(List<Sample> samples, int x, int y) {
-        samples.add(new Sample(new Vector2d<>(x, y)));
+        samples.add(new Sample(new ArrayRealVector(new double[]{(double)x, (double)y})));
     }
 
     private static boolean sampleMaskAtPosition(Vector2d<Integer> position, boolean[] mask4by4) {

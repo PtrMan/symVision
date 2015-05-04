@@ -1,6 +1,6 @@
 package ptrman.levels.retina;
 
-import ptrman.Datastructures.Vector2d;
+import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.misc.Assert;
 
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.List;
  * 
  */
 public class RetinaPrimitive {
-    public Vector2d<Float> getNormalizedTangentForIntersectionTypeAndT(Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType, float f) {
+    public ArrayRealVector getNormalizedTangentForIntersectionTypeAndT(Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType, double f) {
         if( type == EnumType.LINESEGMENT ) {
             return line.getNormalizedDirection();
         }
@@ -74,7 +74,7 @@ public class RetinaPrimitive {
         throw new InternalError();
     }
     
-    public Vector2d<Float> getNormalizedTangentOnEndpoint(int index) {
+    public ArrayRealVector getNormalizedTangentOnEndpoint(int index) {
         Assert.Assert(index >= 0 && index <= 1, "");
         
         if( type == EnumType.LINESEGMENT ) {

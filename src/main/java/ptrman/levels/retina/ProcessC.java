@@ -1,12 +1,9 @@
 package ptrman.levels.retina;
 
-import ptrman.Datastructures.Vector2d;
-
 import java.util.List;
 import java.util.Queue;
 
 import static java.lang.System.arraycopy;
-import static ptrman.Datastructures.Vector2d.IntegerHelper.sub;
 
 /**
  *
@@ -14,7 +11,7 @@ import static ptrman.Datastructures.Vector2d.IntegerHelper.sub;
  */
 public class ProcessC {
     private static class SampleWithDistance {
-        public SampleWithDistance(ProcessA.Sample sample, float distance) {
+        public SampleWithDistance(ProcessA.Sample sample, double distance) {
             this.sample = sample;
             this.distance = distance;
             used = true;
@@ -24,7 +21,7 @@ public class ProcessC {
         }
         
         public ProcessA.Sample sample;
-        public float distance;
+        public double distance;
         
         public boolean used = false; // used for the sorted array
     }
@@ -46,7 +43,7 @@ public class ProcessC {
 
                 ProcessA.Sample innerSample = samples.get(innerI);
                 
-                float distance = calculateDistanceBetweenSamples(outerSample, innerSample);
+                double distance = calculateDistanceBetweenSamples(outerSample, innerSample);
 
                 putSampleWithDistanceIntoSortedArray(new SampleWithDistance(innerSample, distance), sortedArray);
             }
@@ -104,12 +101,8 @@ public class ProcessC {
         return result;
     }
     
-    private static float calculateDistanceBetweenSamples(ProcessA.Sample a, ProcessA.Sample b) {
-        Vector2d<Integer> integerDiff;
-        
-        integerDiff = sub(a.position, b.position);
-        
-        return (float)Math.sqrt( (float)(integerDiff.x*integerDiff.x + integerDiff.y*integerDiff.y));
+    private static double calculateDistanceBetweenSamples(ProcessA.Sample a, ProcessA.Sample b) {
+        return a.position.getDistance(b.position);
     }
     
     private static boolean noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(SampleWithDistance[] neightborArray, ProcessA.Sample compareSample) {

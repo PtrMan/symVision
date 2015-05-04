@@ -1,13 +1,10 @@
 package ptrman.levels.retina;
 
-import ptrman.Datastructures.Vector2d;
+import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.bpsolver.HardParameters;
 import ptrman.misc.Assert;
 
 import java.util.List;
-
-import static ptrman.Datastructures.Vector2d.FloatHelper.getLength;
-import static ptrman.Datastructures.Vector2d.FloatHelper.sub;
 
 /**
  * tries to combine linedetectors
@@ -83,23 +80,20 @@ public class ProcessH {
     // overlap case
     private static boolean canDetectorsBeFusedOverlap(SingleLineDetector detectorA, SingleLineDetector detectorB) {
         // TODO< vertical special case >
-        
-        Vector2d<Float> projectedABegin, projectedAEnd;
-        Vector2d<Float> projectedBBegin, projectedBEnd;
-        
+
         SingleLineDetector inplaceDetectorA, inplaceDetectorB;
         
-        projectedABegin = detectorA.getAProjected();
-        projectedAEnd = detectorA.getBProjected();
-        projectedBBegin = detectorB.getAProjected();
-        projectedBEnd = detectorB.getBProjected();
+        ArrayRealVector projectedABegin = detectorA.getAProjected();
+        ArrayRealVector projectedAEnd = detectorA.getBProjected();
+        ArrayRealVector projectedBBegin = detectorB.getAProjected();
+        ArrayRealVector projectedBEnd = detectorB.getBProjected();
         
         inplaceDetectorA = detectorA;
         inplaceDetectorB = detectorB;
         
         // we need to sort them after the x of the begin, so ABegin.x is always the lowest
-        if( projectedBBegin.x < projectedABegin.x ) {
-            Vector2d<Float> tempBegin, tempEnd;
+        if( projectedBBegin.getDataRef()[0] < projectedABegin.getDataRef()[0] ) {
+            ArrayRealVector tempBegin, tempEnd;
             SingleLineDetector tempDetector;
             
             
@@ -141,20 +135,19 @@ public class ProcessH {
     private static SingleLineDetector fuseLineDetectorsOverlap(SingleLineDetector detectorA, SingleLineDetector detectorB) {
         // TODO< vertical special case >
         
-        Vector2d<Float> projectedABegin, projectedAEnd;
-        Vector2d<Float> projectedBBegin, projectedBEnd;
         SingleLineDetector fusedLineDetector;
         
         // we fuse them with taking the lowest begin-x as the begin and the other as the end
         
-        projectedABegin = detectorA.getAProjected();
-        projectedAEnd = detectorA.getBProjected();
-        projectedBBegin = detectorB.getAProjected();
-        projectedBEnd = detectorB.getBProjected();
+        ArrayRealVector projectedABegin = detectorA.getAProjected();
+        ArrayRealVector projectedAEnd = detectorA.getBProjected();
+        ArrayRealVector projectedBBegin = detectorB.getAProjected();
+        ArrayRealVector projectedBEnd = detectorB.getBProjected();
         
         // we need to sort them after the x of the begin, so ABegin.x is always the lowest
-        if( projectedBBegin.x < projectedABegin.x ) {
-            Vector2d<Float> tempBegin, tempEnd;
+        // TODO BUG FIXME< the variables after the switching are not used >
+        if( projectedBBegin.getDataRef()[0] < projectedABegin.getDataRef()[0] ) {
+            ArrayRealVector tempBegin, tempEnd;
             
             tempBegin = projectedABegin;
             projectedABegin = projectedBBegin;
@@ -175,18 +168,18 @@ public class ProcessH {
         // TODO< vertical special case >
         
         // which case?
-        if( vectorXBetweenInclusive(detectorA.aFloat, detectorA.bFloat, detectorB.aFloat) && vectorXBetweenInclusive(detectorA.aFloat, detectorA.bFloat, detectorB.bFloat)  ) {
+        if( vectorXBetweenInclusive(detectorA.a, detectorA.b, detectorB.a) && vectorXBetweenInclusive(detectorA.a, detectorA.b, detectorB.b)  ) {
             // detectorB inside detectorA ?
-            if( isProjectedPointOntoLineBelowDistanceLimit(detectorB.aFloat, detectorA) && isProjectedPointOntoLineBelowDistanceLimit(detectorB.bFloat, detectorA)  ) {
+            if( isProjectedPointOntoLineBelowDistanceLimit(detectorB.a, detectorA) && isProjectedPointOntoLineBelowDistanceLimit(detectorB.b, detectorA)  ) {
                 return true;
             }
             else {
                 return false;
             }
         }
-        else if( vectorXBetweenInclusive(detectorB.aFloat, detectorB.bFloat, detectorA.aFloat) && vectorXBetweenInclusive(detectorB.aFloat, detectorB.bFloat, detectorA.bFloat) ) {
+        else if( vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.a) && vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.b) ) {
             // detectorA inside detectorB ?
-            if( isProjectedPointOntoLineBelowDistanceLimit(detectorA.aFloat, detectorB) && isProjectedPointOntoLineBelowDistanceLimit(detectorA.bFloat, detectorB)  ) {
+            if( isProjectedPointOntoLineBelowDistanceLimit(detectorA.a, detectorB) && isProjectedPointOntoLineBelowDistanceLimit(detectorA.b, detectorB)  ) {
                 return true;
             }
             else {
@@ -205,19 +198,19 @@ public class ProcessH {
         // TODO< vertical special case >
         
         // which case?
-        if( vectorXBetweenInclusive(detectorA.aFloat, detectorA.bFloat, detectorB.aFloat) && vectorXBetweenInclusive(detectorA.aFloat, detectorA.bFloat, detectorB.bFloat)  ) {
+        if( vectorXBetweenInclusive(detectorA.a, detectorA.b, detectorB.a) && vectorXBetweenInclusive(detectorA.a, detectorA.b, detectorB.b)  ) {
             // detectorB inside detectorA
             
-            fusedLineDetector = SingleLineDetector.createFromFloatPositions(detectorA.aFloat, detectorA.bFloat);
+            fusedLineDetector = SingleLineDetector.createFromFloatPositions(detectorA.a, detectorA.b);
             fusedLineDetector.resultOfCombination = true;
             return fusedLineDetector;
         }
         else {
-            Assert.Assert(vectorXBetweenInclusive(detectorB.aFloat, detectorB.bFloat, detectorA.aFloat) && vectorXBetweenInclusive(detectorB.aFloat, detectorB.bFloat, detectorA.bFloat), "");
+            Assert.Assert(vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.a) && vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.b), "");
             
             // detectorA inside detectorB
             
-            fusedLineDetector = SingleLineDetector.createFromFloatPositions(detectorB.aFloat, detectorB.bFloat);
+            fusedLineDetector = SingleLineDetector.createFromFloatPositions(detectorB.a, detectorB.b);
             fusedLineDetector.resultOfCombination = true;
             return fusedLineDetector;
         }
@@ -227,20 +220,17 @@ public class ProcessH {
      * checks if the value.x is between min.x and max.x
      *  
      */
-    private static boolean vectorXBetween(Vector2d<Float> min, Vector2d<Float> max, Vector2d<Float> value) {
-        return value.x > min.x && value.x < max.x;
+    private static boolean vectorXBetween(ArrayRealVector min, ArrayRealVector max, ArrayRealVector value) {
+        return value.getDataRef()[0] > min.getDataRef()[0] && value.getDataRef()[0] < max.getDataRef()[0];
     }
     
-    private static boolean vectorXBetweenInclusive(Vector2d<Float> min, Vector2d<Float> max, Vector2d<Float> value) {
-        return value.x >= min.x && value.x <= max.x;
+    private static boolean vectorXBetweenInclusive(ArrayRealVector min, ArrayRealVector max, ArrayRealVector value) {
+        return value.getDataRef()[0] >= min.getDataRef()[0] && value.getDataRef()[0] <= max.getDataRef()[0];
     }
     
-    private static boolean isProjectedPointOntoLineBelowDistanceLimit(Vector2d<Float> point, SingleLineDetector line) {
-        Vector2d<Float> projectedPoint;
-        float distanceBetweenProjectedAndPoint;
-        
-        projectedPoint = line.projectPointOntoLine(point);
-        distanceBetweenProjectedAndPoint = getLength(sub(projectedPoint, point));
+    private static boolean isProjectedPointOntoLineBelowDistanceLimit(ArrayRealVector point, SingleLineDetector line) {
+        ArrayRealVector projectedPoint = line.projectPointOntoLine(point);
+        double distanceBetweenProjectedAndPoint = projectedPoint.getDistance(point);
         
         //System.out.println("line A (" + line.aFloat.x.toString() + "," + line.aFloat.y.toString() + ") B (" + line.bFloat.x.toString() + "," + line.bFloat.y.toString() + ")");
         //System.out.println("point (" + point.x.toString() + "," + point.y.toString() + ")");

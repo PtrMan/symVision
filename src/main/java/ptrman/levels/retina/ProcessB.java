@@ -8,6 +8,7 @@ import java.util.List;
 
 import static ptrman.Datastructures.Vector2d.FloatHelper.getLength;
 import static ptrman.Datastructures.Vector2d.FloatHelper.sub;
+import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 
 /**
@@ -25,9 +26,9 @@ public class ProcessB {
         final int MAXRADIUS = 30;
         
         for( ProcessA.Sample iterationSample : samples ) {
-            Tuple2<Vector2d<Integer>, Float> nearestResult;
+            Tuple2<Vector2d<Integer>, Double> nearestResult;
             
-            nearestResult = findNearestPositionWhereMapIs(false, iterationSample.position, image, MAXRADIUS);
+            nearestResult = findNearestPositionWhereMapIs(false, arrayRealVectorToInteger(iterationSample.position), image, MAXRADIUS);
             if( nearestResult == null ) {
                 iterationSample.altitude = ((MAXRADIUS+1)*2)*((MAXRADIUS+1)*2);
                 continue;
@@ -44,7 +45,7 @@ public class ProcessB {
      * 
      * \return null if no point could be found in the radius 
      */
-    private static Tuple2<Vector2d<Integer>, Float> findNearestPositionWhereMapIs(boolean value, Vector2d<Integer> position, IMap2d<Boolean> image, int radius) {
+    private static Tuple2<Vector2d<Integer>, Double> findNearestPositionWhereMapIs(boolean value, Vector2d<Integer> position, IMap2d<Boolean> image, int radius) {
         Vector2d<Integer> outwardIteratorOffsetUnbound;
         Vector2d<Integer> borderMin;
         Vector2d<Integer> borderMax;
@@ -76,7 +77,7 @@ public class ProcessB {
                         valueAtPoint = image.readAt(x, y);
 
                         if (valueAtPoint == value) {
-                            return new Tuple2(new Vector2d<Integer>(x, y), getLength(sub(new Vector2d<>((float) x, (float) y), Vector2d.ConverterHelper.convertIntVectorToFloat(position))));
+                            return new Tuple2(new Vector2d<>(x, y), (double)getLength(sub(new Vector2d<>((float) x, (float) y), Vector2d.ConverterHelper.convertIntVectorToFloat(position))));
                         }
                     }
                 }

@@ -1,6 +1,6 @@
 package ptrman.bpsolver.nodes;
 
-import ptrman.Datastructures.Vector2d;
+import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.FargGeneral.network.Node;
 import ptrman.levels.retina.ProcessG;
 
@@ -22,8 +22,8 @@ public class PlatonicPrimitiveInstanceNode extends Node
     // used to store data
     // linesegment : uses p1 and p2
     // point       : uses p1
-    public Vector2d<Float> p1;
-    public Vector2d<Float> p2;
+    public ArrayRealVector p1;
+    public ArrayRealVector p2;
     
     public ProcessG.Curve curve; // in case of a curve its the curve, can be null if it is not a curve
 }

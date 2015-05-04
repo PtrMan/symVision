@@ -1,7 +1,7 @@
 package ptrman.bpsolver;
 
+import org.apache.commons.math3.linear.ArrayRealVector;
 import org.junit.Test;
-import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.ProcessA;
 import ptrman.levels.retina.ProcessC;
 import ptrman.misc.Assert;
@@ -20,46 +20,46 @@ public class ProcessCTest {
         ProcessA.Sample createdSample;
 
 
-        createdSample = new ProcessA.Sample(new Vector2d<>(0, 0));
+        createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{0, 0}));
         createdSample.altitude = (float)Math.sqrt(0.0f);
         samples.add(createdSample);
 
-        createdSample = new ProcessA.Sample(new Vector2d<>(1, 0));
+        createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{1, 0}));
         createdSample.altitude = (float)Math.sqrt(0.0f);
         samples.add(createdSample);
 
-        createdSample = new ProcessA.Sample(new Vector2d<>(2, 0));
+        createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{2, 0}));
         createdSample.altitude = (float)Math.sqrt(0.0f);
         samples.add(createdSample);
 
 
-        createdSample = new ProcessA.Sample(new Vector2d<>(0, 1));
+        createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{0, 1}));
         createdSample.altitude = (float)Math.sqrt(0.0f);
         samples.add(createdSample);
 
-        createdSample = new ProcessA.Sample(new Vector2d<>(1, 1));
+        createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{1, 1}));
         createdSample.altitude = (float)Math.sqrt(2.0f);
         samples.add(createdSample);
 
-        createdSample = new ProcessA.Sample(new Vector2d<>(2, 1));
+        createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{2, 1}));
         createdSample.altitude = (float)Math.sqrt(0.0f);
         samples.add(createdSample);
 
 
-        createdSample = new ProcessA.Sample(new Vector2d<>(0, 2));
+        createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{0, 2}));
         createdSample.altitude = (float)Math.sqrt(0.0f);
         samples.add(createdSample);
 
-        createdSample = new ProcessA.Sample(new Vector2d<>(1, 2));
+        createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{1, 2}));
         createdSample.altitude = (float)Math.sqrt(0.0f);
         samples.add(createdSample);
 
-        createdSample = new ProcessA.Sample(new Vector2d<>(2, 2));
+        createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{2, 2}));
         createdSample.altitude = (float)Math.sqrt(0.0f);
         samples.add(createdSample);
 
 
-        ProcessC processC = new ProcessC();
+        ProcessC processC = new ProcessC(null);
 
         processC.process(samples);
 

@@ -1,6 +1,6 @@
 package ptrman.bpsolver.codelets;
 
-import ptrman.Datastructures.Vector2d;
+import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.FargGeneral.network.Link;
 import ptrman.bpsolver.BpSolver;
 import ptrman.bpsolver.HelperFunctions;
@@ -12,8 +12,7 @@ import ptrman.misc.Assert;
 
 import java.util.List;
 
-import static ptrman.Datastructures.Vector2d.FloatHelper.add;
-import static ptrman.Datastructures.Vector2d.FloatHelper.getScaled;
+import static ptrman.math.ArrayRealVectorHelper.getScaled;
 
 // NOTE< a problem could be that the endpoint positions of the line segments are handled per line, and not as a whole >
 // to fix this, we need to have a reference to the dots/points of a line, and union them
@@ -21,16 +20,13 @@ import static ptrman.Datastructures.Vector2d.FloatHelper.getScaled;
  *
  * calculates the barycenter (center of gravity) of an object
  */
-public class BaryCenter extends SolverCodelet
-{
-    public enum EnumRecalculate
-    {
+public class BaryCenter extends SolverCodelet {
+    public enum EnumRecalculate {
         YES,
         NO
     }
     
-    public BaryCenter(BpSolver bpSolver, EnumRecalculate recalculate)
-    {
+    public BaryCenter(BpSolver bpSolver, EnumRecalculate recalculate) {
         super(bpSolver);
         this.recalculate = recalculate;
     }
@@ -50,20 +46,15 @@ public class BaryCenter extends SolverCodelet
     }
 
     @Override
-    public RunResult run()
-    {
-        Vector2d<Float> calculatedBaryCenter;
-        
-        if( hasObjectAlreadyABaryCenter() && recalculate == EnumRecalculate.NO )
-        {
+    public RunResult run() {
+        if( hasObjectAlreadyABaryCenter() && recalculate == EnumRecalculate.NO ) {
             return new RunResult(false);
         }
         
-        calculatedBaryCenter = calculateBaryCenter();
+        final ArrayRealVector calculatedBaryCenter = calculateBaryCenter();
         
         // now we store the calculated barycenter
-        if( hasObjectAlreadyABaryCenter() )
-        {
+        if( hasObjectAlreadyABaryCenter() ) {
             PlatonicPrimitiveInstanceNode baryCenterInstanceNode;
             
             baryCenterInstanceNode = getBaryCenterNodeOfObject();
@@ -71,30 +62,23 @@ public class BaryCenter extends SolverCodelet
             
             // update the coordinate nodes
             
-            for( Link iterationLink : baryCenterInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) )
-            {
-                FeatureNode targetFeatureNode;
-                
-                if( iterationLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() )
-                {
+            for( Link iterationLink : baryCenterInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
+                if( iterationLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() ) {
                     continue;
                 }
                 
-                targetFeatureNode = (FeatureNode)iterationLink.target;
+                final FeatureNode targetFeatureNode = (FeatureNode)iterationLink.target;
                 
-                if( targetFeatureNode.featureTypeNode.equals(getNetworkHandles().xCoordinatePlatonicPrimitiveNode) )
-                {
-                    targetFeatureNode.setValueAsFloat(calculatedBaryCenter.x);
+                if( targetFeatureNode.featureTypeNode.equals(getNetworkHandles().xCoordinatePlatonicPrimitiveNode) ) {
+                    targetFeatureNode.setValueAsFloat(calculatedBaryCenter.getDataRef()[0]);
                 }
-                else if( targetFeatureNode.featureTypeNode.equals(getNetworkHandles().yCoordinatePlatonicPrimitiveNode) )
-                {
-                    targetFeatureNode.setValueAsFloat(calculatedBaryCenter.y);
+                else if( targetFeatureNode.featureTypeNode.equals(getNetworkHandles().yCoordinatePlatonicPrimitiveNode) ) {
+                    targetFeatureNode.setValueAsFloat(calculatedBaryCenter.getDataRef()[1]);
                 }
                 // else ignore
             }
         }
-        else
-        {
+        else {
             // NOTE< we don't add the Nodes to the list here, because this makes managment more easy >
             
             PlatonicPrimitiveInstanceNode createdBaryCenterInstanceNode;
@@ -114,32 +98,24 @@ public class BaryCenter extends SolverCodelet
         return new RunResult(recalculate == EnumRecalculate.YES);
     }
 
-    private boolean hasObjectAlreadyABaryCenter()
-    {
+    private boolean hasObjectAlreadyABaryCenter() {
         return getBaryCenterNodeOfObject() != null;
     }
     
     // returns null if the object has no BaryCenter
-    private PlatonicPrimitiveInstanceNode getBaryCenterNodeOfObject()
-    {
-        List<Link> linksOfObject;
-        
-        linksOfObject = startNode.getLinksByType(Link.EnumType.HASATTRIBUTE);
-        
-        for( Link iterationLink : linksOfObject )
-        {
+    private PlatonicPrimitiveInstanceNode getBaryCenterNodeOfObject() {
+        final List<Link>  linksOfObject = startNode.getLinksByType(Link.EnumType.HASATTRIBUTE);
+        for( Link iterationLink : linksOfObject ) {
             PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNodeOfTarget;
             
-            if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() )
-            {
+            if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
                 continue;
             }
             // is platonic primitive instance node
             
             platonicPrimitiveInstanceNodeOfTarget = (PlatonicPrimitiveInstanceNode)iterationLink.target;
             
-            if( !platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(getNetworkHandles().barycenterPlatonicPrimitiveNode) )
-            {
+            if( !platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(getNetworkHandles().barycenterPlatonicPrimitiveNode) ) {
                 continue;
             }
             
@@ -149,44 +125,31 @@ public class BaryCenter extends SolverCodelet
         return null;
     }
     
-    private Vector2d<Float> calculateBaryCenter()
-    {
-        Vector2d<Float> baryCenter;
+    private ArrayRealVector calculateBaryCenter() {
         float weight = 0.0f;
-        List<Link> linksOfObject;
+
+        ArrayRealVector baryCenter = new ArrayRealVector(new double[]{0.0, 0.0});
         
-        baryCenter = new Vector2d<Float>(0.0f, 0.0f);
-        
-        linksOfObject = startNode.getLinksByType(Link.EnumType.CONTAINS);
-        
-        for( Link iterationLink : linksOfObject )
-        {
+        final List<Link> linksOfObject = startNode.getLinksByType(Link.EnumType.CONTAINS);
+        for( Link iterationLink : linksOfObject ) {
             PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNodeOfTarget;
             
-            if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() )
-            {
+            if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
                 continue;
             }
             // is platonic primitive instance node
             
             platonicPrimitiveInstanceNodeOfTarget = (PlatonicPrimitiveInstanceNode)iterationLink.target;
             
-            if( platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) )
-            {
-                Vector2d<Float> centerOfLine;
+            if( platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) ) {
+                final ArrayRealVector centerOfLine = getScaled(platonicPrimitiveInstanceNodeOfTarget.p1.add(platonicPrimitiveInstanceNodeOfTarget.p2), 0.5);
                 
-                centerOfLine = getScaled(add(platonicPrimitiveInstanceNodeOfTarget.p1, platonicPrimitiveInstanceNodeOfTarget.p2), 0.5f);
-                
-                if( weight == 0.0f )
-                {
+                if( weight == 0.0f ) {
                     baryCenter = centerOfLine;
                     weight = 1.0f;
                 }
-                else
-                {
-                    Vector2d<Float> tempVector;
-                    
-                    tempVector = add(baryCenter, getScaled(centerOfLine, 1.0f/weight));
+                else {
+                    ArrayRealVector tempVector = baryCenter.add(getScaled(centerOfLine, 1.0f / weight));
                     tempVector = getScaled(tempVector, 1.0f/(weight+1.0f));
                     
                     weight += 1.0f;

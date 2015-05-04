@@ -8,7 +8,7 @@ import ptrman.bpsolver.FeatureStatistics;
  * foundalis dissertation page 143
  */
 public class FeatureNode extends Node {
-    public static FeatureNode createFloatNode(Node featureTypeNode, float value, int weight, float primitiveFeatureMax)
+    public static FeatureNode createFloatNode(Node featureTypeNode, double value, int weight, float primitiveFeatureMax)
     {
         return new FeatureNode(featureTypeNode, EnumValueType.FLOAT, value, 0, weight, primitiveFeatureMax);
     }
@@ -25,7 +25,7 @@ public class FeatureNode extends Node {
      * \param valueFloat
      * \param valueInt 
      */
-    private FeatureNode(Node featureTypeNode, EnumValueType valueType, float valueFloat, int valueInt, int weight, float primitiveFeatureMax)
+    private FeatureNode(Node featureTypeNode, EnumValueType valueType, double valueFloat, int valueInt, int weight, float primitiveFeatureMax)
     {
         super(NodeTypes.EnumType.FEATURENODE.ordinal());
         
@@ -39,7 +39,7 @@ public class FeatureNode extends Node {
 
         if( valueType == EnumValueType.FLOAT )
         {
-            this.statistics.addValue(valueFloat);
+            this.statistics.addValue((float)valueFloat);
         }
         else
         {
@@ -49,7 +49,7 @@ public class FeatureNode extends Node {
         this.statistics.primitiveFeatureMax = primitiveFeatureMax;
     }
     
-    public float getValueAsFloat()
+    public double getValueAsFloat()
     {
         if( valueType != EnumValueType.FLOAT )
         {
@@ -69,7 +69,7 @@ public class FeatureNode extends Node {
         return valueInt;
     }
     
-    public void setValueAsFloat(float value)
+    public void setValueAsFloat(double value)
     {
         valueType = EnumValueType.FLOAT;
         valueFloat = value;
@@ -89,7 +89,7 @@ public class FeatureNode extends Node {
     public Node featureTypeNode; // node in ltm, which is either a platonic primitive node (with the type of a feature) or a node which is a learned type (triangle, etc)
     // is compared by reference (isEqual), because the node can be of any valid type
     
-    private float valueFloat;
+    private double valueFloat;
     private int valueInt;
     private EnumValueType valueType;
     

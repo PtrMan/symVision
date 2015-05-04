@@ -1,9 +1,11 @@
 package ptrman.math;
 
-public class Math
-{
-    public static float weightFloats(float valueA, float weightA, float valueB, float weightB)
-    {
+public class Math {
+    public static float weightFloats(final float valueA, final float weightA, final float valueB, final float weightB) {
+        return (valueA*weightA + valueB*weightB)/(weightA + weightB);
+    }
+
+    public static double weightDoubles(final double valueA, final double weightA, final double valueB, final double weightB) {
         return (valueA*weightA + valueB*weightB)/(weightA + weightB);
     }
     

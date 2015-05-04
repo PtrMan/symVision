@@ -151,7 +151,7 @@ public class BpSolverTest {
         
         ProcessA processA = new ProcessA();
         ProcessB processB = new ProcessB();
-        ProcessC processC = new ProcessC();
+        ProcessC processC = new ProcessC(null);
         ProcessD processD = new ProcessD();
         ProcessH processH = new ProcessH();
         ProcessE processE = new ProcessE();

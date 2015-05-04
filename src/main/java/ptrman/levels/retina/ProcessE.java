@@ -1,11 +1,14 @@
 package ptrman.levels.retina;
 
+import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.misc.Assert;
 
 import java.util.List;
+
+import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 /**
  * finds line intersections
@@ -23,9 +26,7 @@ public class ProcessE {
                 if( innerI == outerI ) {
                     continue;
                 }
-                
-                Vector2d<Integer> intersectionPosition;
-                Vector2d<Float> intersectionPositionAsFloat;
+
                 RetinaPrimitive lowLinePrimitive;
                 RetinaPrimitive highLinePrimitive;
                 
@@ -34,30 +35,28 @@ public class ProcessE {
                 
                 lowLinePrimitive = lineDetectors.get(outerI);
                 highLinePrimitive = lineDetectors.get(innerI);
-                
-                intersectionPosition = intersectLineDetectors(lowLinePrimitive.line, highLinePrimitive.line);
+
+                ArrayRealVector intersectionPosition = intersectLineDetectors(lowLinePrimitive.line, highLinePrimitive.line);
                 
                 if( intersectionPosition == null ) {
                     continue;
                 }
                 
-                if( !isPointInsideImage(intersectionPosition, image) ) {
+                if( !image.inBounds(arrayRealVectorToInteger(intersectionPosition)) ) {
                     continue;
                 }
                 
                 // examine neighborhood of intersection position
-                if( !isNeightborhoodPixelSet(intersectionPosition, image) ) {
+                if( !isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPosition), image) ) {
                     continue;
                 }
-                
-                intersectionPositionAsFloat = Vector2d.ConverterHelper.convertIntVectorToFloat(intersectionPosition);
-                
+
                 // create entry and register stuff ...
                 // TODO< register it on the line itself? >
                 Intersection createdIntersection = new Intersection();
                 createdIntersection.intersectionPosition = intersectionPosition;
-                createdIntersection.partners[0] = new Intersection.IntersectionPartner(lowLinePrimitive, lowLinePrimitive.line.getIntersectionEndpoint(intersectionPositionAsFloat));
-                createdIntersection.partners[1] = new Intersection.IntersectionPartner(highLinePrimitive, highLinePrimitive.line.getIntersectionEndpoint(intersectionPositionAsFloat));
+                createdIntersection.partners[0] = new Intersection.IntersectionPartner(lowLinePrimitive, lowLinePrimitive.line.getIntersectionEndpoint(intersectionPosition));
+                createdIntersection.partners[1] = new Intersection.IntersectionPartner(highLinePrimitive, highLinePrimitive.line.getIntersectionEndpoint(intersectionPosition));
                 
                 lowLinePrimitive.line.intersections.add(createdIntersection);
                 highLinePrimitive.line.intersections.add(createdIntersection);
@@ -65,22 +64,12 @@ public class ProcessE {
         }
     }
     
-    private static Vector2d<Integer> intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB) {
-        Vector2d<Float> intersectionFloat;
-        
-        intersectionFloat = SingleLineDetector.intersectLineDetectors(lineA, lineB);
-        if( intersectionFloat == null ) {
-            return null;
-        }
-        
-        return new Vector2d<>(Math.round(intersectionFloat.x), Math.round(intersectionFloat.y));
+    private static ArrayRealVector intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB) {
+        ArrayRealVector intersectionPosition = SingleLineDetector.intersectLineDetectors(lineA, lineB);
+        return intersectionPosition;
     }
     
-    // public because its used in processG
-    public static boolean isPointInsideImage(Vector2d<Integer> position, IMap2d<Boolean> image) {
-        return position.x >= 0 && position.x < image.getWidth() && position.y >= 0 && position.y < image.getLength();
-    }
-    
+    // TODO< move into some helper function or integrate it into the spartial scheme or something >
     // public because its used in processG    
     public static boolean isNeightborhoodPixelSet(Vector2d<Integer> position, IMap2d<Boolean> image) {
         Vector2d<Integer> min, max;

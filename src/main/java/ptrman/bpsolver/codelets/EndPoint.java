@@ -1,6 +1,6 @@
 package ptrman.bpsolver.codelets;
 
-import ptrman.Datastructures.Vector2d;
+import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.FargGeneral.network.Link;
 import ptrman.bpsolver.BpSolver;
 import ptrman.bpsolver.HelperFunctions;
@@ -13,16 +13,13 @@ import ptrman.misc.Assert;
  * calculates endpoints of a line segment or a curve
  * must be called only once!
  */
-public class EndPoint extends SolverCodelet
-{
-    public EndPoint(BpSolver bpSolver)
-    {
+public class EndPoint extends SolverCodelet {
+    public EndPoint(BpSolver bpSolver) {
         super(bpSolver);
     }
 
     @Override
-    public void initialize()
-    {
+    public void initialize() {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -36,46 +33,32 @@ public class EndPoint extends SolverCodelet
     }
 
     @Override
-    public RunResult run()
-    {
-        PlatonicPrimitiveInstanceNode startNodeAsPlatonicPrimitiveInstanceNode;
-        Vector2d<Float> endPoints[];
-        int endpointI;
-        
+    public RunResult run() {
         Assert.Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "must be platonic instance node");
-        startNodeAsPlatonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode)startNode;
+        final PlatonicPrimitiveInstanceNode startNodeAsPlatonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode)startNode;
         
-        endPoints = calculateEndpointsOfPlatonicPrimitiveInstanceNode(startNodeAsPlatonicPrimitiveInstanceNode);
+        final ArrayRealVector[] endPoints = calculateEndpointsOfPlatonicPrimitiveInstanceNode(startNodeAsPlatonicPrimitiveInstanceNode);
         
-        for( endpointI = 0; endpointI < 2; endpointI++ )
-        {
-            Link linkToEndpoint;
-            
-            PlatonicPrimitiveInstanceNode createdEndpointInstanceNode = HelperFunctions.createVectorAttributeNode(endPoints[endpointI], getNetworkHandles().endpointPlatonicPrimitiveNode, bpSolver);
-            linkToEndpoint = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdEndpointInstanceNode);
+        for( int endpointI = 0; endpointI < 2; endpointI++ ) {
+            final PlatonicPrimitiveInstanceNode createdEndpointInstanceNode = HelperFunctions.createVectorAttributeNode(endPoints[endpointI], getNetworkHandles().endpointPlatonicPrimitiveNode, bpSolver);
+            final Link linkToEndpoint = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdEndpointInstanceNode);
             startNode.outgoingLinks.add(linkToEndpoint);
         }
         
         return new RunResult(false);
     }
 
-    private Vector2d<Float>[] calculateEndpointsOfPlatonicPrimitiveInstanceNode(PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode)
-    {
-        Vector2d<Float>[] resultPoints;
+    private ArrayRealVector[] calculateEndpointsOfPlatonicPrimitiveInstanceNode(final PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode) {
+        ArrayRealVector[] resultPoints = new ArrayRealVector[2];
         
-        resultPoints = new Vector2d[2];
-        
-        if( platonicPrimitiveInstanceNode.primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) )
-        {
+        if( platonicPrimitiveInstanceNode.primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) ) {
             resultPoints[0] = platonicPrimitiveInstanceNode.p1;
             resultPoints[1] = platonicPrimitiveInstanceNode.p2;
         }
-        else if( false /* TODO curve */ )
-        {
+        else if( false /* TODO curve */ ) {
             // TODO
         }
-        else
-        {
+        else {
             Assert.Assert(false, "unreachable");
         }
         

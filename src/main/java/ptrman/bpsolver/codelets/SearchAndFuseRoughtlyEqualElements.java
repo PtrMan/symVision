@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-import static ptrman.math.Math.weightFloats;
+import static ptrman.math.Math.weightDoubles;
 
 /**
  *
@@ -45,8 +45,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         
         // choose two random nodes
         
-        if( startNode.outgoingLinks.size() < 2 )
-        {
+        if( startNode.outgoingLinks.size() < 2 ) {
             return new RunResult(true);
         }
         // else here
@@ -59,8 +58,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         commonChildnodesOfNodes = getCommonFeatureNodesOfNodes(nodeA, nodeB);
         
         // if the two nodes don't have at least one common type which is Measurable we are done here
-        if( commonChildnodesOfNodes.keySet().size() == 0 )
-        {
+        if( commonChildnodesOfNodes.keySet().size() == 0 ) {
             return new RunResult(true);
         }
         // else here
@@ -77,8 +75,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         Tuple4<FeatureNode, Integer, FeatureNode, Integer> chosenTuple = commonChildnodesOfNodes.get(chosenKeyForCommonChildnodes);
         
         boolean measurementsAreRoughtlyEqual = areMeasurementsRoughtlyEqual(chosenTuple.e0, chosenTuple.e2);
-        if( !measurementsAreRoughtlyEqual )
-        {
+        if( !measurementsAreRoughtlyEqual ) {
             return new RunResult(true);
         }
         // else here
@@ -105,39 +102,32 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
      *         the indices 0 and 2 are the subnodes which are the features
      *         the key is the (common) type of the feature, by default points at the featureTypeNode of both nodes
      */
-    private HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> getCommonFeatureNodesOfNodes(Node nodeA, Node nodeB)
-    {
+    private HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> getCommonFeatureNodesOfNodes(Node nodeA, Node nodeB) {
         HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> resultMap;
         int linkIndexA, linkIndexB;
         
         resultMap = new HashMap<>();
         
-        if( nodeA.type != nodeB.type)
-        {
+        if( nodeA.type != nodeB.type) {
             return resultMap;
         }
-        if( nodeA.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() )
-        {
+        if( nodeA.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
             return resultMap;
         }
         // else here
         
-        for( linkIndexA = 0; linkIndexA < nodeA.outgoingLinks.size(); linkIndexA++ )
-        {
-            for( linkIndexB = 0; linkIndexB < nodeB.outgoingLinks.size(); linkIndexB++ )
-            {
+        for( linkIndexA = 0; linkIndexA < nodeA.outgoingLinks.size(); linkIndexA++ ) {
+            for( linkIndexB = 0; linkIndexB < nodeB.outgoingLinks.size(); linkIndexB++ ) {
                 Node iterationChildNodeOfNodeA, iterationChildNodeOfNodeB;
                 FeatureNode iterationChildNodeOfNodeAAsFeatureNode, iterationChildNodeOfNodeBAsFeatureNode;
                 
                 iterationChildNodeOfNodeA = nodeA.outgoingLinks.get(linkIndexA).target;
                 iterationChildNodeOfNodeB = nodeB.outgoingLinks.get(linkIndexB).target;
                 
-                if( iterationChildNodeOfNodeA.type != iterationChildNodeOfNodeB.type )
-                {
+                if( iterationChildNodeOfNodeA.type != iterationChildNodeOfNodeB.type ) {
                     continue;
                 }
-                if( !isFeatureNode(iterationChildNodeOfNodeA) )
-                {
+                if( !isFeatureNode(iterationChildNodeOfNodeA) ) {
                     continue;
                 }
                 // else here
@@ -145,16 +135,14 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
                 iterationChildNodeOfNodeAAsFeatureNode = (FeatureNode)iterationChildNodeOfNodeA;
                 iterationChildNodeOfNodeBAsFeatureNode = (FeatureNode)iterationChildNodeOfNodeB;
                 
-                if( iterationChildNodeOfNodeAAsFeatureNode.featureTypeNode.equals(iterationChildNodeOfNodeBAsFeatureNode.featureTypeNode) )
-                {
+                if( iterationChildNodeOfNodeAAsFeatureNode.featureTypeNode.equals(iterationChildNodeOfNodeBAsFeatureNode.featureTypeNode) ) {
                     continue;
                 }
                 // else here
                 
                 // the nodes can't be equal because this is nonsensical
                 // CONTEXT< equal nodes can't be connected indirectly >
-                if( iterationChildNodeOfNodeA.equals(iterationChildNodeOfNodeB) )
-                {
+                if( iterationChildNodeOfNodeA.equals(iterationChildNodeOfNodeB) ) {
                     continue;
                 }
                 // else here
@@ -166,13 +154,11 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         return resultMap;
     }
     
-    private boolean isFeatureNode(Node node)
-    {
+    private boolean isFeatureNode(Node node) {
         return node.type == NodeTypes.EnumType.FEATURENODE.ordinal();
     }
     
-    private boolean areMeasurementsRoughtlyEqual(Node nodeA, Node nodeB)
-    {
+    private boolean areMeasurementsRoughtlyEqual(Node nodeA, Node nodeB) {
         FeatureNode nodeAAsFeatureNode, nodeBAsFeatureNode;
         
         Assert.Assert(nodeA.type == NodeTypes.EnumType.FEATURENODE.ordinal(), "");
@@ -183,34 +169,27 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         
         Assert.Assert(nodeAAsFeatureNode.featureTypeNode.equals(nodeBAsFeatureNode), "types are not the same");
         
-        if( nodeAAsFeatureNode.featureTypeNode.equals(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode) )
-        {
+        if( nodeAAsFeatureNode.featureTypeNode.equals(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode) ) {
             return areLengthsRoughtlyEqual(nodeAAsFeatureNode, nodeBAsFeatureNode);
         }
-        else
-        {
+        else {
             throw new RuntimeException("Internal Error!");
         }
     }
     
-    private boolean areLengthsRoughtlyEqual(FeatureNode nodeA, FeatureNode nodeB)
-    {
-        float lengthMin, lengthMax;
-        float ratio;
-        
+    private boolean areLengthsRoughtlyEqual(FeatureNode nodeA, FeatureNode nodeB) {
         Assert.Assert(nodeA.featureTypeNode.equals(nodeA), "types are not the same");
         Assert.Assert(nodeA.featureTypeNode.equals(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode), "not a LINESEGMENTLENGTH feature node!");
         
-        lengthMin = Math.min(nodeA.getValueAsFloat(), nodeB.getValueAsFloat());
-        lengthMax = Math.max(nodeA.getValueAsFloat(), nodeB.getValueAsFloat());
+        double lengthMin = Math.min(nodeA.getValueAsFloat(), nodeB.getValueAsFloat());
+        double lengthMax = Math.max(nodeA.getValueAsFloat(), nodeB.getValueAsFloat());
         
-        ratio = lengthMin/lengthMax;
+        double ratio = lengthMin/lengthMax;
         
         return ratio > HardParameters.RELATIVELINELENGTHTOBECONSIDEREDEQUAL;
     }
     
-    private void relinkGraph(Node parentNode, Node nodeA, Node nodeB, Tuple4<FeatureNode, Integer, FeatureNode, Integer> relinkInfoTuple)
-    {
+    private void relinkGraph(Node parentNode, Node nodeA, Node nodeB, Tuple4<FeatureNode, Integer, FeatureNode, Integer> relinkInfoTuple) {
         int linkIndexOfNodeA, linkIndexOfNodeB;
         Node combinedNode;
 
@@ -223,36 +202,27 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         nodeB.outgoingLinks.set(linkIndexOfNodeB, getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));
     }
     
-    private FeatureNode combineFeatureNodes(FeatureNode nodeA, FeatureNode nodeB)
-    {
-        float valueA, valueB;
-        int weightAsIntA, weightAsIntB;
-        float weightedValue;
-        int weightSum;
-        
+    private FeatureNode combineFeatureNodes(FeatureNode nodeA, FeatureNode nodeB) {
         Assert.Assert(nodeA.featureTypeNode.equals(nodeB.featureTypeNode), "assert failed");
         
-        if( nodeA.featureTypeNode.equals(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode) )
-        {
-            valueA = nodeA.getValueAsFloat();
-            weightAsIntA = nodeA.getWeight();
-            valueB = nodeA.getValueAsFloat();
-            weightAsIntB = nodeA.getWeight();
+        if( nodeA.featureTypeNode.equals(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode) ) {
+            final double valueA = nodeA.getValueAsFloat();
+            final int weightAsIntA = nodeA.getWeight();
+            final double valueB = nodeA.getValueAsFloat();
+            final int weightAsIntB = nodeA.getWeight();
             
-            weightedValue = weightFloat(valueA, weightAsIntA, valueB, weightAsIntB);
-            weightSum = weightAsIntA + weightAsIntB;
+            final double weightedValue = weightDouble(valueA, weightAsIntA, valueB, weightAsIntB);
+            final int weightSum = weightAsIntA + weightAsIntB;
             
             return FeatureNode.createFloatNode(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode, weightedValue, weightSum, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode));
         }
-        else
-        {
+        else {
             throw new RuntimeException("Internal Error!");
         }
     }
     
-    private static float weightFloat(float valueA, int weightAAsInt, float valueB, int weightBAsInt)
-    {
-        return weightFloats(valueA, (float)weightAAsInt, valueB, (float)weightBAsInt);
+    private static double weightDouble(final double valueA, final int weightAAsInt, final double valueB, final int weightBAsInt) {
+        return weightDoubles(valueA, (double) weightAAsInt, valueB, (double) weightBAsInt);
     }
     
     private Random random;

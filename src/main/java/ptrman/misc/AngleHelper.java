@@ -1,7 +1,6 @@
 package ptrman.misc;
 
-import ptrman.Datastructures.Vector2d;
-import static ptrman.Datastructures.Vector2d.FloatHelper.dot;
+import org.apache.commons.math3.linear.ArrayRealVector;
 
 /**
  *
@@ -9,13 +8,11 @@ import static ptrman.Datastructures.Vector2d.FloatHelper.dot;
  */
 public class AngleHelper
 {
-    public static float getMinimalAngleInDegreeBetweenNormalizedVectors(Vector2d<Float> a, Vector2d<Float> b)
+    public static double getMinimalAngleInDegreeBetweenNormalizedVectors(ArrayRealVector a, ArrayRealVector b)
     {
-        float dotResult, angleInRad, angleInDegree;
-        
-        dotResult = dot(a, b);
-        angleInRad = (float)Math.acos(dotResult);
-        angleInDegree = angleInRad * (360.0f/(2.0f*(float)Math.PI));
+        double dotResult = a.dotProduct(b);
+        double angleInRad = Math.acos(dotResult);
+        double angleInDegree = angleInRad * (360.0f/(2.0f*(float)Math.PI));
         
         if( angleInDegree > 90.0f )
         {

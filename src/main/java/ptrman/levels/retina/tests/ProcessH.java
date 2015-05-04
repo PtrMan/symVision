@@ -1,10 +1,11 @@
 package ptrman.levels.retina.tests;
 
-import ptrman.Datastructures.Vector2d;
+import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.levels.retina.SingleLineDetector;
-import java.util.ArrayList;
 import ptrman.misc.Assert;
+
+import java.util.ArrayList;
 
 /**
  *
@@ -29,8 +30,8 @@ public class ProcessH
         ptrman.levels.retina.ProcessH processH = new ptrman.levels.retina.ProcessH();
         
         detectors = new ArrayList<>();
-        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new Vector2d<>(7.0f, 5.0f+2.0f*7.0f), new Vector2d<>(15.0f, 5.0f+2.0f*15.0f))));
-        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new Vector2d<>(5.0f, 5.0f+2.0f*5.0f+2.0f), new Vector2d<>(10.0f, 5.0f+2.0f*10.0f+2.0f))));
+        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{7.0f, 5.0f+2.0f*7.0f}), new ArrayRealVector(new double[]{15.0f, 5.0f+2.0f*15.0f}))));
+        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f+2.0f}), new ArrayRealVector(new double[]{10.0f, 5.0f+2.0f*10.0f+2.0f}))));
         
         
         processH.process(detectors);
@@ -48,8 +49,8 @@ public class ProcessH
         ptrman.levels.retina.ProcessH processH = new ptrman.levels.retina.ProcessH();
         
         detectors = new ArrayList<>();
-        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new Vector2d<>(5.0f, 5.0f+2.0f*5.0f), new Vector2d<>(15.0f, 5.0f+2.0f*15.0f))));
-        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new Vector2d<>(5.0f, 5.0f+2.0f*5.0f+2.0f), new Vector2d<>(10.0f, 5.0f+2.0f*10.0f+2.0f))));
+        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f}), new ArrayRealVector(new double[]{15.0f, 5.0f+2.0f*15.0f}))));
+        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f+2.0f}), new ArrayRealVector(new double[]{10.0f, 5.0f+2.0f*10.0f+2.0f}))));
         
         
         processH.process(detectors);

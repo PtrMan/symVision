@@ -1,6 +1,6 @@
 package ptrman.levels.retina;
 
-import ptrman.Datastructures.Vector2d;
+import org.apache.commons.math3.linear.ArrayRealVector;
 
 public class Intersection {
     public static class IntersectionPartner {
@@ -31,5 +31,5 @@ public class Intersection {
     
     public IntersectionPartner[] partners = new IntersectionPartner[2];
     
-    public Vector2d<Integer> intersectionPosition;
+    public ArrayRealVector intersectionPosition;
 }

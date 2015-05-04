@@ -1,6 +1,6 @@
 package ptrman.Gui;
 
-import ptrman.Datastructures.Vector2d;
+import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
 import ptrman.bpsolver.NetworkHandles;
@@ -10,7 +10,7 @@ import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.levels.retina.*;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -28,13 +28,10 @@ public class DebugDrawingHelper {
         graphics.setColor(Color.LIGHT_GRAY);
 
         for( SingleLineDetector iterationDetector : lineParsing.lineParsing ) {
-            Vector2d<Float> aProjectedFloat;
-            Vector2d<Float> bProjectedFloat;
+            ArrayRealVector aProjectedFloat = iterationDetector.a;
+            ArrayRealVector bProjectedFloat = iterationDetector.b;
 
-            aProjectedFloat = iterationDetector.aFloat;
-            bProjectedFloat = iterationDetector.bFloat;
-
-            graphics.drawLine(Math.round(aProjectedFloat.x), Math.round(aProjectedFloat.y), Math.round(bProjectedFloat.x), Math.round(bProjectedFloat.y));
+            graphics.drawLine((int)aProjectedFloat.getDataRef()[0], (int)aProjectedFloat.getDataRef()[1], (int)bProjectedFloat.getDataRef()[0], (int)bProjectedFloat.getDataRef()[1]);
         }
     }
 
@@ -56,11 +53,9 @@ public class DebugDrawingHelper {
                     continue;
                 }
                 // here if barycenter
-                float barycenterX, barycenterY;
-                int barycenterXAsInt, barycenterYAsInt;
 
-                barycenterX = 0.0f;
-                barycenterY = 0.0f;
+                double barycenterX = 0.0f;
+                double barycenterY = 0.0f;
 
                 for( Link iterationLink2 : platonicPrimitiveInstance.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
                     FeatureNode featureNode;
@@ -79,8 +74,8 @@ public class DebugDrawingHelper {
                     }
                 }
 
-                barycenterXAsInt = Math.round(barycenterX);
-                barycenterYAsInt = Math.round(barycenterY);
+                int barycenterXAsInt = Math.round((float)barycenterX);
+                int barycenterYAsInt = Math.round((float)barycenterY);
 
                 // draw
 
@@ -133,16 +128,16 @@ public class DebugDrawingHelper {
             boolean showAltitude = false;
 
             if( showAltitude ) {
-                float altitudeAsGreen;
+                double altitudeAsGreen;
 
                 if( !iterationSample.isAltitudeValid()) {
-                    altitudeAsGreen = 0.5f;
+                    altitudeAsGreen = 0.5;
                 }
                 else {
-                    altitudeAsGreen = 0.5f + (1.0f - 0.5f) * java.lang.Math.min(1.0f, iterationSample.altitude / 10.0f);
+                    altitudeAsGreen = 0.5 + (1.0 - 0.5) * java.lang.Math.min(1.0, iterationSample.altitude / 10.0);
                 }
 
-                graphics.setColor(new Color(0.0f, altitudeAsGreen, 0.0f));
+                graphics.setColor(new Color(0.0f, (float)altitudeAsGreen, 0.0f));
             }
             else {
                 // show if it is a endosceleton point or not
@@ -156,7 +151,7 @@ public class DebugDrawingHelper {
             }
 
 
-            graphics.drawLine(iterationSample.position.x, iterationSample.position.y, iterationSample.position.x, iterationSample.position.y);
+            graphics.drawLine((int)iterationSample.position.getDataRef()[0], (int)iterationSample.position.getDataRef()[1], (int)iterationSample.position.getDataRef()[0], (int)iterationSample.position.getDataRef()[1]);
         }
     }
 
