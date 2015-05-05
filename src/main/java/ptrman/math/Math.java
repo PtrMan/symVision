@@ -55,4 +55,15 @@ public class Math {
     {
         return java.lang.Math.min(1.0f, java.lang.Math.max(value, 0.0f));
     }
+
+    public static int modNegativeWraparound(final int value, final int max) {
+        if( value >= 0 ) {
+            return value % max;
+        }
+        else {
+            final int positiveValue = -value;
+            final int positiveValueMod = positiveValue % max;
+            return (max - positiveValueMod) % max;
+        }
+    }
 }
