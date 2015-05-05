@@ -50,10 +50,10 @@ public class ProcessC {
             
             
             if( noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(sortedArray, outerSample) ) {
-                outerSample.type = ProcessA.Sample.EnumType.EXOSCELETON;
+                outerSample.type = ProcessA.Sample.EnumType.ENDOSCELETON;
             }
             else {
-                outerSample.type = ProcessA.Sample.EnumType.ENDOSCELETON;
+                outerSample.type = ProcessA.Sample.EnumType.EXOSCELETON;
             }
         }
     }
@@ -118,7 +118,7 @@ public class ProcessC {
 
             System.out.println("i = " + (""+i));
 
-            if( neightborArray[i].sample.altitude < compareSample.altitude ) {
+            if( neightborArray[i].sample.altitude > compareSample.altitude ) {
                 numberOfNeightborsWithAltitudeStrictlyGreaterThan++;
 
                 System.out.println("numberOfNeightborsWithAltitudeStrictlyGreaterThan " + (""+numberOfNeightborsWithAltitudeStrictlyGreaterThan));
