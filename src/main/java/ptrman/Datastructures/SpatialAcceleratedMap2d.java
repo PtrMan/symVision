@@ -1,6 +1,7 @@
 package ptrman.Datastructures;
 
 import ptrman.Algorithms.Bresenham;
+import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,9 @@ public class SpatialAcceleratedMap2d {
 
     // size of map must be .x % gridsize = 0 and .y % gridsize = 0
     public SpatialAcceleratedMap2d(IMap2d<Boolean> map, final int gridsize) {
+        Assert.Assert((map.getWidth() % gridsize) == 0, "width of map is not divisable by gridsize");
+        Assert.Assert((map.getLength() % gridsize) == 0, "height of map is not divisable by gridsize");
+
         this.map = map;
         this.gridsize = gridsize;
         this.gridBoundary = new Vector2d<>(map.getWidth() / gridsize, map.getLength() / gridsize);
@@ -33,20 +37,28 @@ public class SpatialAcceleratedMap2d {
         gridCellStateMap = new Map2d<>(map.getWidth() / gridsize, map.getLength() / gridsize);
     }
 
+    public Vector2d<Integer> getGridPositionOfPosition(final Vector2d<Integer> position) {
+        return new Vector2d<>(position.x / gridsize, position.y / gridsize);
+    }
+
+    public List<Vector2d<Integer>> getGridLocationsOfGridRadius(final Vector2d<Integer> gridPosition, final int gridRadius) {
+        Drawer drawer = new Drawer();
+
+        Bresenham.rasterCircle(gridPosition, gridRadius, drawer);
+
+        drawer.positions.removeIf(position2 -> !isGridLocationInBound(position2));
+        return drawer.positions;
+    }
+
     public List<List<Vector2d<Integer>>> getGridLocationsNearPositionInWideningRadius(final Vector2d<Integer> position, final float radius) {
-        final Vector2d<Integer> centerGridLocation = new Vector2d<>(position.x / gridsize, position.y / gridsize);
+        final Vector2d<Integer> centerGridLocation = getGridPositionOfPosition(position);
 
         List<List<Vector2d<Integer>>> result = new ArrayList<>();
 
         final int radiusInBlocks = 2 + (int)radius / gridsize;
 
         for( int radiusI = 0; radiusI < radiusInBlocks; radiusI++ ) {
-            Drawer drawer = new Drawer();
-
-            Bresenham.rasterCircle(centerGridLocation, radiusI, drawer);
-
-            drawer.positions.removeIf(position2 -> !isGridLocationInBound(position2));
-            result.add(drawer.positions);
+            result.add(getGridLocationsOfGridRadius(centerGridLocation, radiusI));
         }
 
         return result;
@@ -59,7 +71,7 @@ public class SpatialAcceleratedMap2d {
             for( int x = 0; x < gridBoundary.x; x++ ) {
                 int numberOfPixelsSetInCell = countPixelsOfGridCell(x, y);
 
-                if( numberOfPixelsPerCell == numberOfPixelsPerCell ) {
+                if( numberOfPixelsPerCell == numberOfPixelsSetInCell ) {
                     gridCellStateMap.setAt(x, y, EnumGridCellState.FULLYSET);
                 }
                 else if( numberOfPixelsPerCell == 0 ) {
@@ -70,6 +82,21 @@ public class SpatialAcceleratedMap2d {
                 }
             }
         }
+    }
+
+    public boolean canValueBeFoundInCell(final Vector2d<Integer> cellPosition, final boolean value) {
+        final EnumGridCellState gridCellStateAtPosition = gridCellStateMap.readAt(cellPosition.x, cellPosition.y);
+
+        if( value ) {
+            return gridCellStateAtPosition != EnumGridCellState.CLEAR;
+        }
+        else {
+            return gridCellStateAtPosition != EnumGridCellState.FULLYSET;
+        }
+    }
+
+    public int getGridsize() {
+        return gridsize;
     }
 
     private int countPixelsOfGridCell(final int cellX, final int cellY) {
