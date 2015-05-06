@@ -56,6 +56,10 @@ public class Math {
         return java.lang.Math.min(1.0f, java.lang.Math.max(value, 0.0f));
     }
 
+    public static int clampInt(final int value, final int min, final int max) {
+        return java.lang.Math.min(max, java.lang.Math.max(value, min));
+    }
+
     public static int modNegativeWraparound(final int value, final int max) {
         if( value >= 0 ) {
             return value % max;
