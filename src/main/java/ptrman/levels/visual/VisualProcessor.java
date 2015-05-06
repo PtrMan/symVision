@@ -46,6 +46,24 @@ public class VisualProcessor
         }
     }
 
+    public static class FunctionMapperFunction implements Map2dMapper.IMap2dMapper<Float, Float> {
+        public interface IFunction {
+            float calculate(float value);
+        }
+
+        @Override
+        public Float calculate(Float value) {
+            return function.calculate(value);
+        }
+
+        public FunctionMapperFunction(IFunction function) {
+            this.function = function;
+        }
+
+        private final IFunction function;
+
+    }
+
     public static class ProcessingChain
     {
         public enum EnumMapType {
