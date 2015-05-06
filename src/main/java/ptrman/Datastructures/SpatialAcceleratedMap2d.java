@@ -38,7 +38,7 @@ public class SpatialAcceleratedMap2d {
 
         List<List<Vector2d<Integer>>> result = new ArrayList<>();
 
-        final int radiusInBlocks = 1 + (int)radius / gridsize;
+        final int radiusInBlocks = 2 + (int)radius / gridsize;
 
         for( int radiusI = 0; radiusI < radiusInBlocks; radiusI++ ) {
             Drawer drawer = new Drawer();
