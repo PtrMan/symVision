@@ -26,8 +26,8 @@ import java.io.IOException;
  */
 public class TestClustering {
 
-    final static int RETINA_WIDTH = 100;
-    final static int RETINA_HEIGHT = 100;
+    final static int RETINA_WIDTH = 120;
+    final static int RETINA_HEIGHT = 120;
 
     static File currentFile = null;
     static BufferedImage currentFileImage = null;
