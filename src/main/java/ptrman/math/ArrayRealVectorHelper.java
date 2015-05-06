@@ -7,6 +7,10 @@ import ptrman.Datastructures.Vector2d;
  *
  */
 public class ArrayRealVectorHelper {
+    public static ArrayRealVector integerToArrayRealVector(final Vector2d<Integer> vector) {
+        return new ArrayRealVector(new double[]{vector.x, vector.y});
+    }
+
     public static class Dimensions2 {
         public static ArrayRealVector getTangent(final ArrayRealVector vector) {
             final double x = vector.getDataRef()[0];
