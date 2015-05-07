@@ -45,10 +45,6 @@ public class DualConvas extends JPanel
             }
             
             g.drawImage(image, 0, 0, image.getWidth(null), image.getHeight(null), null);
-            
-            g.setColor(Color.BLUE);
-            g.drawLine(0, 0, 200, 200);
-            
             g.dispose();
         }
         
