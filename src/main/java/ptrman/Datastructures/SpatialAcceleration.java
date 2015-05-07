@@ -64,7 +64,7 @@ public class SpatialAcceleration<Type> {
         int centerX, centerY;
 
         centerX = (int)(point.getDataRef()[0] / gridelementSizeX);
-        centerY = (int)(point.getDataRef()[0] / gridelementSizeY);
+        centerY = (int)(point.getDataRef()[1] / gridelementSizeY);
 
         return new Vector2d<>(centerX, centerY);
     }
