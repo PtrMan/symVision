@@ -1,5 +1,9 @@
 package ptrman.math;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
 public class Math {
     public static float weightFloats(final float valueA, final float weightA, final float valueB, final float weightB) {
         return (valueA*weightA + valueB*weightB)/(weightA + weightB);
@@ -69,5 +73,25 @@ public class Math {
             final int positiveValueMod = positiveValue % max;
             return (max - positiveValueMod) % max;
         }
+    }
+
+    public static List<Integer> getRandomElements(final int max, final int numberOfSamples, Random random) {
+        List<Integer> candidates = new ArrayList<>();
+        List<Integer> result = new ArrayList<>();
+
+        for( int i = 0; i < max; i++ ) {
+            candidates.add(i);
+        }
+
+        for( int sampleNumber = 0; sampleNumber < numberOfSamples; sampleNumber++ ) {
+            final int candidate = random.nextInt(candidates.size());
+
+            final int chosenIndex = candidates.get(candidate);
+            candidates.remove(candidate);
+
+            result.add(chosenIndex);
+        }
+
+        return result;
     }
 }
