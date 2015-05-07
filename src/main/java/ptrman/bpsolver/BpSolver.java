@@ -78,7 +78,12 @@ public class BpSolver {
         processB.process(samples, image);
         processC.process(samples);
 
-        List<RetinaPrimitive> lineDetectors = processD.detectLines(samples);
+        processD.setImageSize(getImageSize());
+        processD.set(samples);
+
+        processD.setup();
+        processD.processData();
+        List<RetinaPrimitive> lineDetectors = processD.getResultRetinaPrimitives();
 
         List<Intersection> lineIntersections = new ArrayList<>();
 

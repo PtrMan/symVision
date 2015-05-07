@@ -164,7 +164,7 @@ public class BpSolverTest {
         processB.process(samples, image);
         processC.process(samples);
         
-        List<RetinaPrimitive> lineDetectors = processD.detectLines(samples);
+        List<RetinaPrimitive> lineDetectors = null; // TODO processD.detectLines(samples);
         
         List<Intersection> lineIntersections = new ArrayList<>();
         

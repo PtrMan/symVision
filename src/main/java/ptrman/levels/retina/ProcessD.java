@@ -2,19 +2,20 @@ package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
+import ptrman.Datastructures.IMap2d;
+import ptrman.Datastructures.Map2d;
+import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.Parameters;
 import ptrman.math.ArrayRealVectorHelper;
-import ptrman.math.DistinctUtility;
 import ptrman.misc.Assert;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import static java.util.Collections.sort;
+import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 import static ptrman.math.ArrayRealVectorHelper.getScaled;
+import static ptrman.math.Math.getRandomElements;
 
 // TODO< remove detectors which are removable which have a activation less than <constant> * sumofAllActivations >
 /**
@@ -25,18 +26,24 @@ import static ptrman.math.ArrayRealVectorHelper.getScaled;
  * each line detector either will survive or decay if it doesn't receive enought fitting points
  * 
  */
-public class ProcessD {
-    // just for debugging as a flag, is actually true
-    public final static boolean ENABLELOCKING = false;
+public class ProcessD implements IProcess {
+    private List<RetinaPrimitive> resultRetinaPrimitives;
+    private List<ProcessA.Sample> samples;
 
-    
+    public void set(List<ProcessA.Sample> samples) {
+        this.samples = samples;
+    }
+
+    public List<RetinaPrimitive> getResultRetinaPrimitives() {
+        return resultRetinaPrimitives;
+    }
+
     private static class LineDetectorWithMultiplePoints {
-        public LineDetectorWithMultiplePoints(List<Integer> integratedSampleIndices) {
-            this.integratedSampleIndices = integratedSampleIndices;
-        }
-        
-        
+
+
+        public List<Vector2d<Integer>> cachedIntegratedSampleCellPositions;
         public List<Integer> integratedSampleIndices;
+
         
         public double m, n;
         
@@ -98,6 +105,24 @@ public class ProcessD {
             return samples.get(sampleIndex).position.getDataRef()[0];
         }
     }
+
+    @Override
+    public void setImageSize(final Vector2d<Integer> imageSize) {
+        this.imageSize = imageSize;
+    }
+
+    @Override
+    public void setup() {
+        Assert.Assert((imageSize.x % gridcellSize) == 0, "");
+        Assert.Assert((imageSize.y % gridcellSize) == 0, "");
+
+        accelerationMap = new Map2d<>(imageSize.x / gridcellSize, imageSize.y / gridcellSize);
+    }
+
+    @Override
+    public void processData() {
+        resultRetinaPrimitives = detectLines(samples);
+    }
     
     /**
      * 
@@ -105,54 +130,82 @@ public class ProcessD {
      * 
      * \return only the surviving line segments
      */
-    public List<RetinaPrimitive> detectLines(List<ProcessA.Sample> samples) {
-        final float SAMPLECOUNTLINEDETECTORMULTIPLIER = 3.5f;
-
+    private List<RetinaPrimitive> detectLines(List<ProcessA.Sample> samples) {
         List<LineDetectorWithMultiplePoints> multiplePointsLineDetector = new ArrayList<>();
 
-        List<ProcessA.Sample> workingSamples = filterEndosceletonPoints(samples);
+        final List<ProcessA.Sample> workingSamples = filterEndosceletonPoints(samples);
 
         if( workingSamples.isEmpty() ) {
             return new ArrayList<>();
         }
 
-        for( int counter = 0; counter < Math.round((float)samples.size()*SAMPLECOUNTLINEDETECTORMULTIPLIER); counter++ ) {
-            {
-                int centerPointIndex;
-                RegressionForLineResult regressionResult;
-                
-                // to form a new line detector choose one point at random and chose n points in the neighborhood
-                // this increases the chances that it lies on a (small) line
-                centerPointIndex = random.nextInt(workingSamples.size());
-                
-                List<Integer> chosenPointIndices = new ArrayList<>();
-                chosenPointIndices.add(centerPointIndex);
-                
-                // modifies chosenPointIndices
-                choosePointIndicesInsideRadius(chosenPointIndices.get(0), chosenPointIndices, workingSamples, HardParameters.ProcessD.EARLYCANDIDATECOUNT-1);
-                
-                if( chosenPointIndices.size() < 2 ) {
-                    // ignore potential detectors with less than two points
-                    continue;
-                }
-                
-                
-                // create new line detector
-                LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints(chosenPointIndices);
-                
+        // we store all samples inside the acceleration datastructure
+        int sampleIndex = 0; // NOTE< index in endosceletonPoint / workingSamples >
+        for( final ProcessA.Sample iterationSample : workingSamples ) {
+            putSampleIndexAtPositionIntoAccelerationDatastructure(arrayRealVectorToInteger(iterationSample.position), sampleIndex);
+            sampleIndex++;
+        }
 
-                
-                List<ArrayRealVector> positionsOfSamples = getPositionsOfSamplesOfDetector(createdLineDetector, workingSamples);
-            
-                regressionResult = calcRegressionForPoints(positionsOfSamples);
-                
-                Assert.Assert(createdLineDetector.integratedSampleIndices.size() >= 2, "");
-                // the regression mse is not defined if it are only two points
-                if( createdLineDetector.integratedSampleIndices.size() == 2 ) {
-                    // TODO< calculate m and n for the two point case >
-                    
-                    createdLineDetector.mse = 0.0f;
-                    
+        int numberOfTries = 500;
+
+        // pick out a random cell and pick out a random sample in it and try to build a (small) line out of it
+        for( int tryCounter = 0; tryCounter < numberOfTries; tryCounter++ ) {
+            List<Integer> keys = new ArrayList<>(accelerationMapCellUsed.keySet());
+            final int randomCellPositionIndex = keys.get(random.nextInt(keys.size()));
+            final Vector2d<Integer> randomCellPosition = new Vector2d<Integer>(randomCellPositionIndex % accelerationMap.getWidth(), randomCellPositionIndex / accelerationMap.getWidth());
+
+            // pick out three points at random
+            // TODO< better strategy >
+
+            List<Integer> chosenCandidateSampleIndices = new ArrayList<>();
+
+            {
+                final List<Integer> allCandidateSampleIndices = getAllIndicesOfSamplesOfCellAndNeightborCells(randomCellPosition);
+
+                final List<Integer> allCandidateSampleIndicesChosenIndices = getRandomElements(allCandidateSampleIndices.size(), 3, random);
+
+                for( final int iterationChosenIndex : allCandidateSampleIndicesChosenIndices ) {
+                    final int currentChosenCandidateSampleIndex = allCandidateSampleIndices.get(iterationChosenIndex);
+                    chosenCandidateSampleIndices.add(currentChosenCandidateSampleIndex);
+                }
+            }
+
+
+
+
+
+
+
+            final List<ArrayRealVector> positionsOfSamples = getSamplesByIndices(workingSamples, chosenCandidateSampleIndices);
+
+            final RegressionForLineResult regressionResult = calcRegressionForPoints(positionsOfSamples);
+
+            if( regressionResult.mse > Parameters.getProcessdMaxMse() ) {
+                continue;
+            }
+            // else we are here
+
+            // create new line detector
+            LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints();
+            createdLineDetector.integratedSampleIndices = chosenCandidateSampleIndices;
+            createdLineDetector.cachedIntegratedSampleCellPositions = getUnionOfCellsByPositions(positionsOfSamples);
+
+            Assert.Assert(createdLineDetector.integratedSampleIndices.size() >= 2, "");
+            // the regression mse is not defined if it are only two points
+            if( createdLineDetector.integratedSampleIndices.size() == 2 ) {
+                createdLineDetector.mse = 0.0f;
+
+                createdLineDetector.n = regressionResult.n;
+                createdLineDetector.m = regressionResult.m;
+
+                lockDetectorIfItHasEnoughtActivation(createdLineDetector);
+
+                multiplePointsLineDetector.add(createdLineDetector);
+            }
+            else {
+                if( regressionResult.mse < Parameters.getProcessdMaxMse() ) {
+                    createdLineDetector.mse = regressionResult.mse;
+
                     createdLineDetector.n = regressionResult.n;
                     createdLineDetector.m = regressionResult.m;
 
@@ -160,138 +213,89 @@ public class ProcessD {
 
                     multiplePointsLineDetector.add(createdLineDetector);
                 }
-                else {
-                    if( regressionResult.mse < Parameters.getProcessdMaxMse() ) {
-                        createdLineDetector.mse = regressionResult.mse;
-
-                        createdLineDetector.n = regressionResult.n;
-                        createdLineDetector.m = regressionResult.m;
-
-                        lockDetectorIfItHasEnoughtActivation(createdLineDetector);
-
-                        multiplePointsLineDetector.add(createdLineDetector);
-                    }
-                }
             }
-            
-            // try to include a random sample into the detectors
-            if( false ) {
-                int sampleIndex = random.nextInt(workingSamples.size());
 
-                // try to integrate the current sample into line(s)
-                tryToIntegratePointIntoAllLineDetectors(sampleIndex, multiplePointsLineDetector, workingSamples);
-            }
         }
-        
-        // delete all detectors for which the activation was not enought
-        deleteMultiPointDetectorsWhereActiviationIsInsuficient(multiplePointsLineDetector);
-        
+
+
+
+
+
+
+
+
+
         // split the detectors into one or many lines
         List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector, samples);
         
         return resultSingleDetectors;
     }
-    
-    // TODO< use acceleration datastruction for the points >
-    /**
-     * modifies alreadyIntegratedPointIndices and returns result in it
-     *
-     * \param centerPointIndex
-     * \param alreadyIntegratedPointIndices
-     * \param workingSamples
-     * \param count 
-     */
-    private void choosePointIndicesInsideRadius(int centerPointIndex, List<Integer> alreadyIntegratedPointIndices, List<ProcessA.Sample> workingSamples, int count) {
-        final int MAXTRIES = 20;
 
-        int tryCounter;
-        
-        ArrayRealVector centerPosition = workingSamples.get(centerPointIndex).position;
+    private List<Vector2d<Integer>> getUnionOfCellsByPositions(final List<ArrayRealVector> positions) {
+        Set<Vector2d<Integer>> tempSet = new HashSet<>();
 
-        tryCounter = 0;
-        for( int counter = 0; counter < count; ) {
-            int chosenPointIndex;
-            List<Integer> chosenPointIndexAsList;
-            
-            tryCounter++;
-            
-            chosenPointIndexAsList = DistinctUtility.getDisjuctNumbersTo(random, alreadyIntegratedPointIndices, 1, workingSamples.size());
-            Assert.Assert(chosenPointIndexAsList.size() == 1, "");
-            chosenPointIndex = chosenPointIndexAsList.get(0);
-            
-            // check if it is inside radius
-            ArrayRealVector chosenPointPosition = workingSamples.get(chosenPointIndex).position;
-            
-            if( Helper.isDistanceBetweenPositionsBelow(centerPosition, chosenPointPosition, HardParameters.ProcessD.EARLYCANDIDATEMAXDISTANCE) ) {
-                alreadyIntegratedPointIndices.add(chosenPointIndex);
-                
-                // we have one more point, so increment counter
-                counter++;
-                tryCounter = 0;
-                continue;
-            }
-            
-            if( tryCounter >= MAXTRIES ) {
-                return;
-            }
+        for( final ArrayRealVector iterationPosition : positions ) {
+            final Vector2d<Integer> positionAsInteger = arrayRealVectorToInteger(iterationPosition);
+            final Vector2d<Integer> cellPosition = new Vector2d<>(positionAsInteger.x / gridcellSize, positionAsInteger.y / gridcellSize);
+
+            tempSet.add(cellPosition);
         }
+
+        List<Vector2d<Integer>> resultList = new ArrayList<>();
+        resultList.addAll(tempSet);
+        return resultList;
     }
-    
-    // TODO< belongs into dedicated helper >
-    static private class Helper {
-        private static boolean isDistanceBetweenPositionsBelow(ArrayRealVector a, ArrayRealVector b, double maxDistance) {
-            return a.subtract(b).getNorm() < maxDistance;
-        }
-        
-        private static double getAxis(ArrayRealVector vector, EnumAxis axis) {
-            if( axis == EnumAxis.X ) {
-                return vector.getDataRef()[0];
+
+    private List<Integer> getAllIndicesOfSamplesOfCellAndNeightborCells(final Vector2d<Integer> centerCellPosition) {
+        List<Integer> result = new ArrayList<>();
+
+        for( int y = centerCellPosition.y - 1; y < centerCellPosition.y + 1; y++ ) {
+            for( int x = centerCellPosition.x - 1; x < centerCellPosition.x + 1; x++ ) {
+                if( !accelerationMap.inBounds(new Vector2d<>(x, y)) ) {
+                    continue;
+                }
+
+                final List<Integer> listAtPosition = accelerationMap.readAt(x, y);
+
+                if( listAtPosition != null ) {
+                    result.addAll(listAtPosition);
+                }
             }
-            else {
-                return vector.getDataRef()[1];
-            }
         }
+
+        return result;
     }
-    
-    
-    private static void tryToIntegratePointIntoAllLineDetectors(int sampleIndex, List<LineDetectorWithMultiplePoints> multiplePointsLineDetector, List<ProcessA.Sample> workingSamples) {
-        for( LineDetectorWithMultiplePoints iteratorDetector : multiplePointsLineDetector ) {
-            ProcessA.Sample currentSample = workingSamples.get(sampleIndex);
 
-            if( iteratorDetector.doesContainSampleIndex(sampleIndex) ) {
-                continue;
-            }
-            // else we are here
-
-            List<ArrayRealVector> positionsOfSamples = getPositionsOfSamplesOfDetector(iteratorDetector, workingSamples);
-            positionsOfSamples.add(currentSample.position);
-
-            RegressionForLineResult regressionResult = calcRegressionForPoints(positionsOfSamples);
-            
-            if( regressionResult.mse < Parameters.getProcessdMaxMse() ) {
-                iteratorDetector.mse = regressionResult.mse;
-
-                iteratorDetector.integratedSampleIndices.add(sampleIndex);
-
-                iteratorDetector.n = regressionResult.n;
-                iteratorDetector.m = regressionResult.m;
-
-                lockDetectorIfItHasEnoughtActivation(iteratorDetector);
-            }
-        }
-    }
-    
-    private static List<ArrayRealVector> getPositionsOfSamplesOfDetector(LineDetectorWithMultiplePoints detector, List<ProcessA.Sample> workingSamples) {
+    private static List<ArrayRealVector> getSamplesByIndices(final List<ProcessA.Sample> samples, final List<Integer> indices) {
         List<ArrayRealVector> resultPositions = new ArrayList<>();
-        
-        for( int iterationSampleIndex : detector.integratedSampleIndices ) {
-            ProcessA.Sample currentSample = workingSamples.get(iterationSampleIndex);
-            resultPositions.add(currentSample.position);
+
+        for( final int index : indices ) {
+            resultPositions.add(samples.get(index).position);
         }
-        
+
         return resultPositions;
     }
-    
+
+    private void putSampleIndexAtPositionIntoAccelerationDatastructure(final Vector2d<Integer> position, final int sampleIndex) {
+        final Vector2d<Integer> cellPosition = new Vector2d<>(position.x / gridcellSize, position.y /gridcellSize);
+
+        if( accelerationMap.readAt(cellPosition.x, cellPosition.y) == null ) {
+            Assert.Assert(!accelerationMapCellUsed.containsKey(cellPosition.x + cellPosition.y * accelerationMap.getWidth()), "");
+
+            accelerationMap.setAt(cellPosition.x, cellPosition.y, new ArrayList<>(Arrays.asList(new Integer[]{sampleIndex})));
+            accelerationMapCellUsed.put(cellPosition.x + cellPosition.y * accelerationMap.getWidth(), true);
+        }
+        else {
+            Assert.Assert(accelerationMapCellUsed.containsKey(cellPosition.x + cellPosition.y * accelerationMap.getWidth()), "");
+
+            List<Integer> indices = accelerationMap.readAt(cellPosition.x, cellPosition.y);
+            indices.add(sampleIndex);
+        }
+    }
+
+
+
+
     /**
      * works by counting the "overlapping" pixel coordinates, chooses the axis with the less overlappings
      *  
@@ -464,25 +468,7 @@ public class ProcessD {
         
         return resultSingleLineDetectors;
     }
-    
-    private static void deleteMultiPointDetectorsWhereActiviationIsInsuficient(List<LineDetectorWithMultiplePoints> lineDetectors) {
-        int detectorI;
-        
-        if( !ENABLELOCKING ) {
-            return;
-        }
-        
-        for( detectorI = lineDetectors.size()-1; detectorI >= 0; detectorI-- ) {
-            LineDetectorWithMultiplePoints discardCandidate;
-            
-            discardCandidate = lineDetectors.get(detectorI);
-            
-            if( !discardCandidate.isLocked ) {
-                lineDetectors.remove(detectorI);
-            }
-        }
-    }
-    
+
     private static void lockDetectorIfItHasEnoughtActivation(LineDetectorWithMultiplePoints detector) {
         detector.isLocked |= detector.getActivation() > Parameters.getProcessdLockingActivation();
     }
@@ -500,9 +486,25 @@ public class ProcessD {
         
         return filtered;
     }
-    
-    public Random random = new Random();
-    
+
+
+    // TODO< belongs into dedicated helper >
+    static private class Helper {
+        private static boolean isDistanceBetweenPositionsBelow(ArrayRealVector a, ArrayRealVector b, double maxDistance) {
+            return a.subtract(b).getNorm() < maxDistance;
+        }
+
+        private static double getAxis(ArrayRealVector vector, EnumAxis axis) {
+            if( axis == EnumAxis.X ) {
+                return vector.getDataRef()[0];
+            }
+            else {
+                return vector.getDataRef()[1];
+            }
+        }
+    }
+
+
     private static class VectorComperatorByAxis implements Comparator<ArrayRealVector> {
         
         public VectorComperatorByAxis(EnumAxis axis)
@@ -532,4 +534,16 @@ public class ProcessD {
         X,
         Y
     }
+
+    private Vector2d<Integer> imageSize;
+
+    private int gridcellSize = 8;
+
+    private Random random = new Random();
+
+    // each cell contains the incides of the points/samples inside the accelerationMap
+    private IMap2d<List<Integer>> accelerationMap;
+
+    private Map<Integer, Boolean> accelerationMapCellUsed = new HashMap<>();
+
 }
