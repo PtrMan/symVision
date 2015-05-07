@@ -108,22 +108,15 @@ public class ProcessC {
     private static boolean noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(SampleWithDistance[] neightborArray, ProcessA.Sample compareSample) {
         int numberOfNeightborsWithAltitudeStrictlyGreaterThan = 0;
 
-        System.out.println("---");
-
         for( int i = 0; i < neightborArray.length; i++ ) {
             if( !neightborArray[i].used ) {
                 return true;
             }
             // else here
 
-            System.out.println("i = " + (""+i));
-
             if( neightborArray[i].sample.altitude > compareSample.altitude ) {
                 numberOfNeightborsWithAltitudeStrictlyGreaterThan++;
 
-                System.out.println("numberOfNeightborsWithAltitudeStrictlyGreaterThan " + (""+numberOfNeightborsWithAltitudeStrictlyGreaterThan));
-
-                
                 if( numberOfNeightborsWithAltitudeStrictlyGreaterThan > 2 ) {
                     return false;
                 }
