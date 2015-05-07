@@ -152,7 +152,7 @@ public class ProcessD implements IProcess {
         for( int tryCounter = 0; tryCounter < numberOfTries; tryCounter++ ) {
             List<Integer> keys = new ArrayList<>(accelerationMapCellUsed.keySet());
             final int randomCellPositionIndex = keys.get(random.nextInt(keys.size()));
-            final Vector2d<Integer> randomCellPosition = new Vector2d<Integer>(randomCellPositionIndex % accelerationMap.getWidth(), randomCellPositionIndex / accelerationMap.getWidth());
+            final Vector2d<Integer> randomCellPosition = new Vector2d<>(randomCellPositionIndex % accelerationMap.getWidth(), randomCellPositionIndex / accelerationMap.getWidth());
 
             // pick out three points at random
             // TODO< better strategy >
@@ -161,6 +161,10 @@ public class ProcessD implements IProcess {
 
             {
                 final List<Integer> allCandidateSampleIndices = getAllIndicesOfSamplesOfCellAndNeightborCells(randomCellPosition);
+
+                if( allCandidateSampleIndices.size() < 3 ) {
+                    continue;
+                }
 
                 final List<Integer> allCandidateSampleIndicesChosenIndices = getRandomElements(allCandidateSampleIndices.size(), 3, random);
 
@@ -198,8 +202,6 @@ public class ProcessD implements IProcess {
                 createdLineDetector.n = regressionResult.n;
                 createdLineDetector.m = regressionResult.m;
 
-                lockDetectorIfItHasEnoughtActivation(createdLineDetector);
-
                 multiplePointsLineDetector.add(createdLineDetector);
             }
             else {
@@ -208,8 +210,6 @@ public class ProcessD implements IProcess {
 
                     createdLineDetector.n = regressionResult.n;
                     createdLineDetector.m = regressionResult.m;
-
-                    lockDetectorIfItHasEnoughtActivation(createdLineDetector);
 
                     multiplePointsLineDetector.add(createdLineDetector);
                 }
@@ -226,7 +226,7 @@ public class ProcessD implements IProcess {
 
 
         // split the detectors into one or many lines
-        List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector, samples);
+        List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector, workingSamples);
         
         return resultSingleDetectors;
     }
@@ -467,10 +467,6 @@ public class ProcessD implements IProcess {
         }
         
         return resultSingleLineDetectors;
-    }
-
-    private static void lockDetectorIfItHasEnoughtActivation(LineDetectorWithMultiplePoints detector) {
-        detector.isLocked |= detector.getActivation() > Parameters.getProcessdLockingActivation();
     }
     
     private static List<ProcessA.Sample> filterEndosceletonPoints(List<ProcessA.Sample> samples) {

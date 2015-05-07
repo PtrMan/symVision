@@ -88,17 +88,14 @@ public class DebugDrawingHelper {
 
 
     public static void drawDetectors(Graphics2D graphics, List<RetinaPrimitive> lineDetectors, List<Intersection> intersections, List<ProcessA.Sample> samples) {
-        /*
+
         for( RetinaPrimitive iterationRetinaPrimitive : lineDetectors ) {
             SingleLineDetector iterationDetector;
 
-            Vector2d<Float> aProjectedFloat;
-            Vector2d<Float> bProjectedFloat;
-
             iterationDetector = iterationRetinaPrimitive.line;
 
-            aProjectedFloat = iterationDetector.aFloat;
-            bProjectedFloat = iterationDetector.bFloat;
+            final ArrayRealVector aProjectedFloat = iterationDetector.a;
+            final ArrayRealVector bProjectedFloat = iterationDetector.b;
 
             if( iterationDetector.resultOfCombination || false ) {
                 graphics.setColor(Color.RED);
@@ -108,13 +105,13 @@ public class DebugDrawingHelper {
             }
 
             graphics.setStroke(new BasicStroke(2));
-            graphics.drawLine(Math.round(aProjectedFloat.x), Math.round(aProjectedFloat.y), Math.round(bProjectedFloat.x), Math.round(bProjectedFloat.y));
+            graphics.drawLine(Math.round((float)aProjectedFloat.getDataRef()[0]), Math.round((float)aProjectedFloat.getDataRef()[1]), Math.round((float) bProjectedFloat.getDataRef()[0]), Math.round((float) bProjectedFloat.getDataRef()[1]));
 
             // for old code
             // TODO< overwork old code so the stroke is set at the beginning >
             graphics.setStroke(new BasicStroke(1));
         }
-        */
+
 
         /*
         for( Intersection iterationIntersection : intersections ) {
