@@ -241,18 +241,8 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
                     createdCrosspointElement.data.position = iterationIntersection.intersectionPosition;
                     createdCrosspointElement.position = iterationIntersection.intersectionPosition;
 
-                    RetinaPrimitive x = iterationIntersection.partners[0].primitive;
-                    Set<RetinaPrimitive> y = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.keySet();
-                    
-                    Object[] array = y.toArray();
-                    
-                    for( int i = 0; i < array.length; i++ ) {
-                        System.out.println(System.identityHashCode(array[i]));
-                    }
-                    
-                    
-                    System.out.println("searched " + System.identityHashCode(iterationIntersection.partners[0].primitive));
-                    
+
+
                     retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.partners[0].primitive);
                     Assert.Assert(retinaObjectWithAssoc != null, "");
                     createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.partners[0].intersectionEndpointType));
