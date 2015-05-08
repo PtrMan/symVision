@@ -1,10 +1,8 @@
 package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
-import ptrman.Datastructures.IMap2d;
-import ptrman.Datastructures.SpatialAcceleratedMap2d;
-import ptrman.Datastructures.Tuple2;
-import ptrman.Datastructures.Vector2d;
+import ptrman.Datastructures.*;
+import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,8 +33,7 @@ public class ProcessB {
         counterCellPositiveCandidates = 0;
         counterCellCandidates = 0;
 
-
-        this.map = map;
+        this.map = convertMapToFastBooleanMap2d(map);
 
         spatialAcceleratedMap2d = new SpatialAcceleratedMap2d(map, GRIDSIZE_FOR_SPATIALACCELERATEDMAP2D);
         spatialAcceleratedMap2d.recalculateGridCellStateMap();
@@ -58,7 +55,20 @@ public class ProcessB {
 
 
     }
-    
+
+    private static FastBooleanMap2d convertMapToFastBooleanMap2d(IMap2d<Boolean> map) {
+        final int roundUpWidth = 64 + map.getWidth() - (map.getWidth() % 64);
+        FastBooleanMap2d fastMap = new FastBooleanMap2d(roundUpWidth, map.getLength());
+
+        for( int y = 0; y < map.getLength(); y++ ) {
+            for( int x = 0; x < map.getLength(); x++ ) {
+                fastMap.setAt(x, y, map.readAt(x, y));
+            }
+        }
+
+        return fastMap;
+    }
+
     // TODO< move into external function >
     // TODO< provide a version which doesn't need a maxradius (we need only that version) >
     /**
@@ -122,12 +132,39 @@ public class ProcessB {
     private List<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCells(final List<Vector2d<Integer>> cellPositions, final boolean value) {
         List<Vector2d<Integer>> result = new ArrayList<>();
 
+        Assert.Assert(!value, "only implemented for value = false");
+
         for( final Vector2d<Integer> iterationCellPosition : cellPositions ) {
-            result.addAll(getPositionsOfCandidatePixelsOfCell(iterationCellPosition, value));
+            result.addAll(getPositionsOfCandidatePixelsOfCellWhereFalse(iterationCellPosition));
         }
 
         return result;
     }
+
+    private List<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCellWhereFalse(final Vector2d<Integer> cellPosition) {
+        List<Vector2d<Integer>> result = new ArrayList<>();
+
+        final int gridsize = spatialAcceleratedMap2d.getGridsize();
+
+        Assert.Assert(gridsize == 8, "only implemented for gridsize = 8");
+
+        final boolean value = false; // value to search for, for easier to change code
+
+        for( int y = cellPosition.y * gridsize; y < (cellPosition.y+1) * gridsize; y++ ) {
+            final int byteValueAt = map.readByteAtInt(cellPosition.x, y);
+
+            if( byteValueAt != 0xff ) {
+                for( int x = cellPosition.x * gridsize; x < (cellPosition.x+1) * gridsize; x++ ) {
+                    if( map.readAt(x, y) == value ) {
+                        result.add(new Vector2d<>(x, y));
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
 
     private List<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCell(final Vector2d<Integer> cellPosition, final boolean value) {
         List<Vector2d<Integer>> result = new ArrayList<>();
@@ -146,5 +183,5 @@ public class ProcessB {
     }
 
     private SpatialAcceleratedMap2d spatialAcceleratedMap2d;
-    private IMap2d<Boolean> map;
+    private FastBooleanMap2d map;
 }
