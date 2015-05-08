@@ -24,10 +24,10 @@ import java.io.IOException;
 /**
  *
  */
-public class TestClustering {
+public class TestVideo {
 
-    final static int RETINA_WIDTH = 120;
-    final static int RETINA_HEIGHT = 120;
+    final static int RETINA_WIDTH = 40*8;
+    final static int RETINA_HEIGHT = 160;
 
     static File currentFile = null;
     static BufferedImage currentFileImage = null;
@@ -44,38 +44,29 @@ public class TestClustering {
             }
             Graphics2D g2 = off_Image.createGraphics();
 
-            if (currentFile == null) {
-                g2.setColor(Color.WHITE);
+            currentFile = new File("/home/r0b3/kdenlive/"+ "output_" + String.format("%05d", 1+frameCounter) + ".jpg");
 
-                g2.drawRect(0, 0, off_Image.getWidth(), off_Image.getHeight());
+            frameCounter++;
+            frameCounter = frameCounter % (2022-1);
 
-                g2.setColor(Color.BLACK);
 
-                g2.drawLine(10, 10, 20, 40);
-
-                g2.drawLine(20, 40, 30, 10);
-
-                ///drawTestTriangle(g2, new Vector2d<>(20.0f, 60.0f), 10.0f, time, (3.0f / (float)Math.sqrt(3)));
-
-                //drawTestTriangle(g2, new Vector2d<>(60.0f, 60.0f), 10.0f, time * 0.114f, 0.5f*(3.0f / (float)Math.sqrt(3)));
-
-            } else {
-                if (currentFileImage == null) {
-                    try {
-                        currentFileImage = ImageIO.read(currentFile);
-                        g2.drawImage(currentFileImage, 0, 0, RETINA_WIDTH, RETINA_HEIGHT, null);
-                        System.out.println("painted: "+ currentFile);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        currentFile = null;
-                    }
-                }
-
+            try {
+                currentFileImage = ImageIO.read(currentFile);
+                g2.drawImage(currentFileImage, 0, 0, RETINA_WIDTH, RETINA_HEIGHT, null);
+                System.out.println("painted: "+ currentFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+                currentFile = null;
             }
+
+
+
 
 
             return off_Image;
         }
+
+        private int frameCounter = 51;
     }
 
     static class ImageFileFilter implements FileFilter {
@@ -116,13 +107,15 @@ public class TestClustering {
             // for now imageDrawer does this
             image = imageDrawer.drawToJavaImage(bpSolver);
 
+            System.out.println("begin processing");
 
-
-            mapColor = TestClustering.translateFromImageToMap(image);
+            mapColor = TestVideo.translateFromImageToMap(image);
 
             processingChain.filterChain(mapColor);
 
             mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement)processingChain.filterChainDag.elements.get(1).content).result;
+
+            System.out.println("begin symVision");
 
             bpSolver.recalculate(mapBoolean);
 
@@ -130,6 +123,8 @@ public class TestClustering {
             {
                 nodeGraph.repopulateAfterNodes(bpSolver.lastFrameObjectNodes, bpSolver.networkHandles);
             }
+
+            System.out.println("end all");
 
             dualCanvas.leftCanvas.setImage(translateFromMapToImage(mapBoolean));
 
@@ -153,8 +148,8 @@ public class TestClustering {
         private final VisualProcessor.ProcessingChain processingChain;
     }
 
-    public TestClustering() {
-        JFrame j = new JFrame("TestClustering");
+    public TestVideo() {
+        JFrame j = new JFrame("TestVideo");
 
 
 
@@ -187,27 +182,13 @@ public class TestClustering {
 
         newDagElement = new Dag.Element(
                 new VisualProcessor.ProcessingChain.ChainElementFloatBoolean(
-                        new VisualProcessor.ProcessingChain.DitheringFilter(),
-                        "dither",
+                        new VisualProcessor.ProcessingChain.ThresholdFilter(0.4f),
+                        "threshold",
                         bpSolver.getImageSize()
                 )
         );
 
         processingChain.filterChainDag.elements.add(newDagElement);
-
-
-
-
-        /*
-        new VisualProcessor.ProcessingChain.ChainElementColorFloat(
-                        new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(
-                                new ColorRgb(1.0f, 1.0f, 1.0f)),
-                                "convertRgbToGrayscale",
-                                bpSolver.getImageSize()
-                        )
-                )
-         */
-
 
 
         GraphWindow graphWindow = new GraphWindow();
@@ -219,10 +200,9 @@ public class TestClustering {
 
         DualConvas dualCanvas = new DualConvas();
 
-
-        Timer timer = new Timer(1000, new TimerActionListener(bpSolver, new InputDrawer(), introspectControlPanel, graphWindow.getNodeGraph(), dualCanvas, processingChain));
-        timer.setInitialDelay(0);
-        timer.start();
+        TimerActionListener actionListener = new TimerActionListener(bpSolver, new InputDrawer(), introspectControlPanel, graphWindow.getNodeGraph(), dualCanvas, processingChain);
+        //timer.setInitialDelay(0);
+        //timer.start();
 
         Container panel = j.getContentPane();
 
@@ -261,10 +241,14 @@ public class TestClustering {
         j.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         j.setVisible(true);
 
+        for(;;) {
+            actionListener.actionPerformed(null);
+        }
+
     }
 
     public static void main(String[] args) {
-        new TestClustering();
+        new TestVideo();
     }
 
 
