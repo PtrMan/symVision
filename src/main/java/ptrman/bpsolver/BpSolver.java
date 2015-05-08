@@ -69,7 +69,17 @@ public class BpSolver {
 
 
         processB.process(samples, image);
-        processC.process(samples);
+
+
+        processC.set(null, 8 /* gridsize */);
+        processC.setImageSize(getImageSize());
+        processC.setup();
+
+        processC.set(samples, 8 /* gridsize */);
+        processC.recalculate();
+
+        processC.processData();
+
 
         processD.setImageSize(getImageSize());
         processD.set(samples);

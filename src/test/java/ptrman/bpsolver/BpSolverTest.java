@@ -162,7 +162,9 @@ public class BpSolverTest {
         
         
         processB.process(samples, image);
-        processC.process(samples);
+
+
+        //processC.process(samples); TODO
         
         List<RetinaPrimitive> lineDetectors = null; // TODO processD.detectLines(samples);
         

@@ -1,15 +1,26 @@
 package ptrman.levels.retina;
 
+import ptrman.Datastructures.IMap2d;
+import ptrman.Datastructures.Map2d;
+import ptrman.Datastructures.Vector2d;
+import ptrman.levels.retina.helper.SpatialCircleDrawer;
+import ptrman.misc.Assert;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
 import static java.lang.System.arraycopy;
+import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 /**
  *
  * identifies if a point is a point of the endo or exosceleton
  */
-public class ProcessC {
+public class ProcessC implements IProcess {
+
+
+
     private static class SampleWithDistance {
         public SampleWithDistance(ProcessA.Sample sample, double distance) {
             this.sample = sample;
@@ -29,25 +40,92 @@ public class ProcessC {
     public ProcessC(Queue<ProcessA.Sample> queueToProcessF) {
         this.queueToProcessF = queueToProcessF;
     }
-    
-    public void process(List<ProcessA.Sample> samples) {
+
+    // TODO< split parameters into two methods somehow >
+    public void set(List<ProcessA.Sample> samples, final int gridsize) {
+        this.samples = samples;
+        this.gridsize = gridsize;
+    }
+
+    public void recalculate() {
+        // clean acceleration map
+        for( int y = 0; y < accelerationMap.getLength(); y++ ) {
+            for( int x = 0; x < accelerationMap.getWidth(); x++ ) {
+                accelerationMap.setAt(x, y, new ArrayList<>());
+            }
+        }
+
+        // fill
+        for( final ProcessA.Sample iterationSample : samples ) {
+            final Vector2d<Integer> sampleIntegerPosition = getCellPositionOfPosition(arrayRealVectorToInteger(iterationSample.position));
+            List<ProcessA.Sample> samples = accelerationMap.readAt(sampleIntegerPosition.x, sampleIntegerPosition.y);
+            samples.add(iterationSample);
+        }
+    }
+
+    private Vector2d<Integer> getCellPositionOfPosition(final Vector2d<Integer> integerPosition) {
+        return new Vector2d<>(integerPosition.x / gridsize, integerPosition.y / gridsize);
+    }
+
+    @Override
+    public void setImageSize(Vector2d<Integer> imageSize) {
+        this.imageSize = imageSize;
+    }
+
+    @Override
+    public void setup() {
+        Assert.Assert(imageSize != null, "imagesize is null");
+        Assert.Assert(gridsize != 0, "gridsize must be nonzero");
+
+        Assert.Assert((imageSize.x % gridsize) == 0, "imagesize.x must be divisable by gridsize");
+        Assert.Assert((imageSize.y % gridsize) == 0, "imagesize.y must be divisable by gridsize");
+
+        accelerationMap = new Map2d<>(imageSize.x / gridsize, imageSize.y / gridsize);
+    }
+
+    @Override
+    public void processData() {
         for( int outerI = 0; outerI < samples.size(); outerI++ ) {
             SampleWithDistance[] sortedArray = createSortedArray();
 
             ProcessA.Sample outerSample = samples.get(outerI);
-            
-            for( int innerI = 0; innerI < samples.size(); innerI++ ) {
-                if( outerI == innerI ) {
-                    continue;
+
+            int numberOfConsideredSamples = 0;
+
+            int maxRadius = (int)java.lang.Math.sqrt(imageSize.x*imageSize.y);
+
+            for( int currentRadius = 0; currentRadius < maxRadius; currentRadius++ ) {
+                if( numberOfConsideredSamples >= 8 ) {
+                    maxRadius = Math.min(currentRadius + 2, maxRadius);
                 }
 
-                ProcessA.Sample innerSample = samples.get(innerI);
-                
-                double distance = calculateDistanceBetweenSamples(outerSample, innerSample);
+                List<Vector2d<Integer>> cellPositionsToScan;
 
-                putSampleWithDistanceIntoSortedArray(new SampleWithDistance(innerSample, distance), sortedArray);
+                if( currentRadius == 0 ) {
+                    cellPositionsToScan = new ArrayList<>();
+                    cellPositionsToScan.add(getCellPositionOfPosition(arrayRealVectorToInteger(outerSample.position)));
+                }
+                else {
+                    cellPositionsToScan = SpatialCircleDrawer.getPositionsOfCellsOfCircle(getCellPositionOfPosition(arrayRealVectorToInteger(outerSample.position)), currentRadius, new Vector2d<>(accelerationMap.getWidth(), accelerationMap.getLength()));
+                }
+
+                int debug = 0;
+
+                for( final Vector2d<Integer> currentCellPosition : cellPositionsToScan ) {
+                    final List<ProcessA.Sample> samplesOfCurrentCell = accelerationMap.readAt(currentCellPosition.x, currentCellPosition.y);
+
+                    for( final ProcessA.Sample iterationSample : samplesOfCurrentCell ) {
+                        // we don't want to calculate it for the same sample
+                        if( iterationSample.equals(outerSample) ) {
+                            continue;
+                        }
+
+                        final double distance = calculateDistanceBetweenSamples(outerSample, iterationSample);
+
+                        putSampleWithDistanceIntoSortedArray(new SampleWithDistance(iterationSample, distance), sortedArray);
+                    }
+                }
             }
-            
             
             if( noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(sortedArray, outerSample) ) {
                 outerSample.type = ProcessA.Sample.EnumType.ENDOSCELETON;
@@ -127,4 +205,10 @@ public class ProcessC {
     }
 
     private final Queue<ProcessA.Sample> queueToProcessF;
+
+    private IMap2d<List<ProcessA.Sample>> accelerationMap;
+
+    private int gridsize;
+    private Vector2d<Integer> imageSize;
+    private List<ProcessA.Sample> samples;
 }
