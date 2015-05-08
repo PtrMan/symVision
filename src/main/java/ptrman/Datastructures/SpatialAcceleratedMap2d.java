@@ -1,6 +1,6 @@
 package ptrman.Datastructures;
 
-import ptrman.Algorithms.Bresenham;
+import ptrman.levels.retina.helper.SpatialCircleDrawer;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
@@ -10,14 +10,7 @@ import java.util.List;
  * Acceleration for quicker common operations on Map2d<Boolean>
  */
 public class SpatialAcceleratedMap2d {
-    static final private class Drawer implements Bresenham.IDrawer {
-        public List<Vector2d<Integer>> positions = new ArrayList<>();
 
-        @Override
-        public void set(Vector2d<Integer> position) {
-            positions.add(position);
-        }
-    }
 
     private enum EnumGridCellState {
         FULLYSET,
@@ -42,12 +35,7 @@ public class SpatialAcceleratedMap2d {
     }
 
     public List<Vector2d<Integer>> getGridLocationsOfGridRadius(final Vector2d<Integer> gridPosition, final int gridRadius) {
-        Drawer drawer = new Drawer();
-
-        Bresenham.rasterCircle(gridPosition, gridRadius, drawer);
-
-        drawer.positions.removeIf(position2 -> !isGridLocationInBound(position2));
-        return drawer.positions;
+        return SpatialCircleDrawer.getPositionsOfCellsOfCircle(gridPosition, gridRadius, gridBoundary);
     }
 
     public List<List<Vector2d<Integer>>> getGridLocationsNearPositionInWideningRadius(final Vector2d<Integer> position, final float radius) {
@@ -111,10 +99,6 @@ public class SpatialAcceleratedMap2d {
         }
 
         return numberOfPixels;
-    }
-
-    private boolean isGridLocationInBound(final Vector2d<Integer> gridPosition) {
-        return gridPosition.x >= 0 && gridPosition.x < gridBoundary.x && gridPosition.y >= 0 && gridPosition.y < gridBoundary.y;
     }
 
     // TODO< move outside >
