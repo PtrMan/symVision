@@ -122,6 +122,7 @@ public class ProcessC implements IProcess {
 
                         final double distance = calculateDistanceBetweenSamples(outerSample, iterationSample);
 
+                        numberOfConsideredSamples++;
                         putSampleWithDistanceIntoSortedArray(new SampleWithDistance(iterationSample, distance), sortedArray);
                     }
                 }
