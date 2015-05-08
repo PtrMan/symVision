@@ -23,22 +23,16 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class BpSolver {
-
-
-
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         Parameters.init();
         
         BpSolver solver = new BpSolver();
     }
     
-    public BpSolver()
-    {
+    public BpSolver() {
     }
 
-    public void setup()
-    {
+    public void setup() {
         initializeNetwork();
         setupLtmFactoryDefault();
         initializePlatonicPrimitiveDatabase();
@@ -50,10 +44,9 @@ public class BpSolver {
     }
 
 
-    public void recalculate(IMap2d<Boolean> image)
-    {
-        final boolean enableProcessH = true;
-        final boolean enableProcessE = true;
+    public void recalculate(IMap2d<Boolean> image) {
+        final boolean enableProcessH = false;
+        final boolean enableProcessE = false;
         final boolean enableProcessM = true;
 
         final int NUMBEROFCYCLES = 500;
@@ -89,15 +82,13 @@ public class BpSolver {
 
 
 
-        if( enableProcessH )
-        {
+        if( enableProcessH ) {
             processH.process(lineDetectors);
         }
 
 
 
-        if( enableProcessE )
-        {
+        if( enableProcessE ) {
             processE.process(lineDetectors, image);
 
             lineIntersections = getAllLineIntersections(lineDetectors);
@@ -105,8 +96,7 @@ public class BpSolver {
 
         List<ProcessM.LineParsing> lineParsings = new ArrayList<>();
 
-        if( enableProcessM )
-        {
+        if( enableProcessM ) {
             processM.process(lineDetectors);
 
             lineParsings = processM.getLineParsings();
@@ -124,22 +114,19 @@ public class BpSolver {
 
 
 
-        if( true )
-        {
+        if( false ) {
             FeaturePatternMatching featurePatternMatching;
 
             featurePatternMatching = new FeaturePatternMatching();
 
-            for( Node iterationNode : objectNodes )
-            {
+            for( Node iterationNode : objectNodes ) {
                 Node bestPatternNode;
                 float bestPatternSimilarity;
 
                 bestPatternNode = null;
                 bestPatternSimilarity = 0.0f;
 
-                for( Node patternNode : patternRootNodes )
-                {
+                for( Node patternNode : patternRootNodes ) {
                     List<FeaturePatternMatching.MatchingPathElement> matchingPathElements;
                     float matchingDistanceValue;
                     float matchingSimilarityValue;
@@ -148,20 +135,17 @@ public class BpSolver {
                     matchingDistanceValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
                     matchingSimilarityValue = FeaturePatternMatching.Converter.distanceToSimilarity(matchingDistanceValue);
 
-                    if( matchingSimilarityValue > Parameters.getPatternMatchingMinSimilarity() && matchingSimilarityValue > bestPatternSimilarity )
-                    {
+                    if( matchingSimilarityValue > Parameters.getPatternMatchingMinSimilarity() && matchingSimilarityValue > bestPatternSimilarity ) {
                         bestPatternNode = patternNode;
                         bestPatternSimilarity = matchingSimilarityValue;
                     }
                 }
 
-                if( bestPatternNode != null )
-                {
+                if( bestPatternNode != null ) {
                     // TODO< incorperate new pattern into old >
                     int debugPoint = 0;
                 }
-                else
-                {
+                else {
                     patternRootNodes.add(iterationNode);
                 }
             }
@@ -177,8 +161,7 @@ public class BpSolver {
      * 
      * stores all factory preset nodes in the ltm (standard node types, linked attributes, etc)
      */
-    public void setupLtmFactoryDefault()
-    {
+    public void setupLtmFactoryDefault() {
         ptrman.FargGeneral.network.Link link;
         
         
@@ -274,13 +257,11 @@ public class BpSolver {
         networkHandles.anglePointPositionPlatonicPrimitiveNode.outgoingLinks.add(link);
     }
     
-    private void initializeNetwork()
-    {
+    private void initializeNetwork() {
         network.linkCreator = new LinkCreator();
     }
     
-    private void initializeCodeletLtmLookup()
-    {
+    private void initializeCodeletLtmLookup() {
         CodeletLtmLookup.RegisterEntry createdRegistryEntry;
         SolverCodelet createdCodelet;
         
@@ -321,8 +302,7 @@ public class BpSolver {
         
     }
 
-    private void initializePlatonicPrimitiveDatabase()
-    {
+    private void initializePlatonicPrimitiveDatabase() {
         platonicPrimitiveDatabase.calculatorsForMaxValueOfPlatonicPrimitiveNode.put(networkHandles.xCoordinatePlatonicPrimitiveNode, new PlatonicPrimitiveDatabase.ConstantValueMaxValueCalculator(getImageSizeAsFloat().x));
         platonicPrimitiveDatabase.calculatorsForMaxValueOfPlatonicPrimitiveNode.put(networkHandles.yCoordinatePlatonicPrimitiveNode, new PlatonicPrimitiveDatabase.ConstantValueMaxValueCalculator(getImageSizeAsFloat().y));
         platonicPrimitiveDatabase.calculatorsForMaxValueOfPlatonicPrimitiveNode.put(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode, new PlatonicPrimitiveDatabase.ConstantValueMaxValueCalculator((float)Math.sqrt(getImageSizeAsFloat().x*getImageSizeAsFloat().x + getImageSizeAsFloat().y*getImageSizeAsFloat().y)));
@@ -336,16 +316,13 @@ public class BpSolver {
 
 
     // TODO< refactor out >
-    private static List<Intersection> getAllLineIntersections(List<RetinaPrimitive> lineDetectors)
-    {
+    private static List<Intersection> getAllLineIntersections(List<RetinaPrimitive> lineDetectors) {
         List<Intersection> uniqueIntersections;
 
         uniqueIntersections = new ArrayList<>();
 
-        for( RetinaPrimitive currentPrimitive : lineDetectors )
-        {
-            if( currentPrimitive.type != RetinaPrimitive.EnumType.LINESEGMENT )
-            {
+        for( RetinaPrimitive currentPrimitive : lineDetectors ) {
+            if( currentPrimitive.type != RetinaPrimitive.EnumType.LINESEGMENT ) {
                 continue;
             }
 
@@ -356,25 +333,20 @@ public class BpSolver {
     }
 
     // modifies uniqueIntersections
-    private static void findAndAddUniqueIntersections(List<Intersection> uniqueIntersections, List<Intersection> intersections)
-    {
-        for( Intersection currentOuterIntersection : intersections )
-        {
+    private static void findAndAddUniqueIntersections(List<Intersection> uniqueIntersections, List<Intersection> intersections) {
+        for( Intersection currentOuterIntersection : intersections ) {
             boolean found;
 
             found = false;
 
-            for( Intersection currentUnqiueIntersection : uniqueIntersections )
-            {
-                if( currentUnqiueIntersection.equals(currentOuterIntersection) )
-                {
+            for( Intersection currentUnqiueIntersection : uniqueIntersections ) {
+                if( currentUnqiueIntersection.equals(currentOuterIntersection) ) {
                     found = true;
                     break;
                 }
             }
 
-            if( !found )
-            {
+            if( !found ) {
                 uniqueIntersections.add(currentOuterIntersection);
             }
         }
