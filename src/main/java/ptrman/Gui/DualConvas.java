@@ -14,11 +14,11 @@ public class DualConvas extends JPanel
         setLayout(new GridLayout(1,2));
         
         leftCanvas=new GCanvas();
-        leftCanvas.setSize(new Dimension(200, 200));
+        leftCanvas.setSize(new Dimension(300, 200));
         add(leftCanvas);
         
         rightCanvas = new GCanvas();
-        rightCanvas.setSize(new Dimension(200, 200));
+        rightCanvas.setSize(new Dimension(300, 200));
         add(rightCanvas);
         
         
