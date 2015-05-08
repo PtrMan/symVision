@@ -18,6 +18,9 @@ import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
  * calculates the altitude
  */
 public class ProcessB {
+    private int counterCellPositiveCandidates;
+    private int counterCellCandidates;
+
     /**
      * 
      * we use the whole image, in phaeaco he worked with the incomplete image witht the guiding of processA, this is not implemented that way 
@@ -28,6 +31,10 @@ public class ProcessB {
         final int MAXRADIUS = (int)Math.sqrt(100.0*100.0);
 
         final int GRIDSIZE_FOR_SPATIALACCELERATEDMAP2D = 8;
+
+        counterCellPositiveCandidates = 0;
+        counterCellCandidates = 0;
+
 
         this.map = map;
 
@@ -46,7 +53,10 @@ public class ProcessB {
             
             iterationSample.altitude = nearestResult.e1;
         }
-        
+
+        System.out.println("cell acceleration (positive cases): " + Float.toString(((float)counterCellPositiveCandidates / (float)counterCellCandidates) * 100.0f) + "%" );
+
+
     }
     
     // TODO< move into external function >
@@ -79,8 +89,12 @@ public class ProcessB {
                 gridCellsToScan = spatialAcceleratedMap2d.getGridLocationsOfGridRadius(gridCenterPosition, currentGridRadius);
             }
 
+            counterCellCandidates += gridCellsToScan.size();
+
             // use acceleration map and filter out the gridcells we don't need to scan
             gridCellsToScan.removeIf(cellPosition -> !spatialAcceleratedMap2d.canValueBeFoundInCell(cellPosition, value));
+
+            counterCellPositiveCandidates += gridCellsToScan.size();
 
             final List<Vector2d<Integer>> pixelPositionsToCheck = getPositionsOfCandidatePixelsOfCells(gridCellsToScan, value);
 
