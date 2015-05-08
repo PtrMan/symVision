@@ -76,7 +76,7 @@ public class ProcessB {
         int radiusToScan = gridMaxSearchRadius;
 
         Vector2d<Integer> nearestPixelCandidate = null;
-        double nearestPixelCandidateDistance = Double.MAX_VALUE;
+        double nearestPixelCandidateDistanceSquared = Double.MAX_VALUE;
 
         for( int currentGridRadius = 0; currentGridRadius < radiusToScan; currentGridRadius++ ) {
             final List<Vector2d<Integer>> gridCellsToScan;
@@ -108,15 +108,15 @@ public class ProcessB {
             for( final Vector2d<Integer> iterationPixelPosition : pixelPositionsToCheck ) {
                 final ArrayRealVector iterationPixelPositionReal = ptrman.math.ArrayRealVectorHelper.integerToArrayRealVector(iterationPixelPosition);
 
-                final double currentDistance = positionReal.getDistance(iterationPixelPositionReal);
-                if( currentDistance < nearestPixelCandidateDistance ) {
-                    nearestPixelCandidateDistance = currentDistance;
+                final double currentDistanceSquared = positionReal.dotProduct(iterationPixelPositionReal);
+                if( currentDistanceSquared < nearestPixelCandidateDistanceSquared ) {
+                    nearestPixelCandidateDistanceSquared = currentDistanceSquared;
                     nearestPixelCandidate = iterationPixelPosition;
                 }
             }
         }
 
-        return new Tuple2<>(nearestPixelCandidate, nearestPixelCandidateDistance);
+        return new Tuple2<>(nearestPixelCandidate, java.lang.Math.sqrt(nearestPixelCandidateDistanceSquared));
     }
 
     private List<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCells(final List<Vector2d<Integer>> cellPositions, final boolean value) {
