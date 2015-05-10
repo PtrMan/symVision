@@ -19,6 +19,7 @@ public class ProcessB {
     private int counterCellPositiveCandidates;
     private int counterCellCandidates;
 
+
     /**
      * 
      * we use the whole image, in phaeaco he worked with the incomplete image witht the guiding of processA, this is not implemented that way 
@@ -61,7 +62,7 @@ public class ProcessB {
         FastBooleanMap2d fastMap = new FastBooleanMap2d(roundUpWidth, map.getLength());
 
         for( int y = 0; y < map.getLength(); y++ ) {
-            for( int x = 0; x < map.getLength(); x++ ) {
+            for( int x = 0; x < map.getWidth(); x++ ) {
                 fastMap.setAt(x, y, map.readAt(x, y));
             }
         }
@@ -118,7 +119,8 @@ public class ProcessB {
             for( final Vector2d<Integer> iterationPixelPosition : pixelPositionsToCheck ) {
                 final ArrayRealVector iterationPixelPositionReal = ptrman.math.ArrayRealVectorHelper.integerToArrayRealVector(iterationPixelPosition);
 
-                final double currentDistanceSquared = positionReal.dotProduct(iterationPixelPositionReal);
+                final ArrayRealVector diff = positionReal.subtract(iterationPixelPositionReal);
+                final double currentDistanceSquared = diff.dotProduct(diff);
                 if( currentDistanceSquared < nearestPixelCandidateDistanceSquared ) {
                     nearestPixelCandidateDistanceSquared = currentDistanceSquared;
                     nearestPixelCandidate = iterationPixelPosition;
@@ -151,7 +153,7 @@ public class ProcessB {
         final boolean value = false; // value to search for, for easier to change code
 
         for( int y = cellPosition.y * gridsize; y < (cellPosition.y+1) * gridsize; y++ ) {
-            final int byteValueAt = map.readByteAtInt(cellPosition.x, y);
+            final int byteValueAt = map.readByteAtInt(cellPosition.x * gridsize, y);
 
             if( byteValueAt != 0xff ) {
                 for( int x = cellPosition.x * gridsize; x < (cellPosition.x+1) * gridsize; x++ ) {

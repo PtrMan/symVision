@@ -64,7 +64,8 @@ public class BpSolver {
         ProcessE processE = new ProcessE();
         ProcessM processM = new ProcessM();
 
-        processA.setWorkingImage(image);
+        // copy because processA changes the image
+        processA.setWorkingImage(image.copy());
         List<ProcessA.Sample> samples = processA.sampleImage();
 
 

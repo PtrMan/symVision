@@ -19,21 +19,25 @@ public class FastBooleanMap2d implements IMap2d<Boolean> {
 
     @Override
     public Boolean readAt(int x, int y) {
+        Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
+
         final long nativeValueAtPosition = readLongAtInt(x, y);
 
-        return (nativeValueAtPosition & (1 << (x % 64))) != 0;
+        return (nativeValueAtPosition & (1L << (x % 64))) == (1L << (x % 64));
     }
 
     @Override
     public void setAt(int x, int y, Boolean value) {
+        Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
+
         final int indexX = x / 64;
 
-        final long mask = 1 << (x % 64);
+        final long mask = 1L << (x % 64);
         if( value ) {
             array[indexX + y * widthDivBy64] |= mask;
         }
         else {
-            array[indexX + y * widthDivBy64] &= (mask ^ 0XffffffffffffffffL);
+            array[indexX + y * widthDivBy64] &= (~mask);
         }
     }
 
@@ -58,13 +62,26 @@ public class FastBooleanMap2d implements IMap2d<Boolean> {
     }
 
     public int readByteAtInt(final int x, final int y) {
+        Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
+
         final long longAt = readLongAtInt(x, y);
 
-        return (int)((longAt >> (x / 8)) & 0xff);
+        return (int)((longAt >>> ((x / 8) % (64/8))) & 0xff);
     }
 
     public long readLongAtInt(final int x, final int y) {
+        Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
+
         final int indexX = x / 64;
+
+        /*
+        System.out.flush();
+        System.out.println("FastBooleanMap2d index");
+        System.out.flush();
+        System.out.println(indexX + y * widthDivBy64);
+        System.out.flush();
+        */
+
         return array[indexX + y * widthDivBy64];
     }
 
