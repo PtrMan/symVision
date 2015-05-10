@@ -251,8 +251,6 @@ public class ProcessD implements IProcess {
             maxDistance = java.lang.Math.max(maxDistance, currentDistance);
         }
 
-        System.out.println(maxDistance);
-
         return maxDistance;
     }
 
