@@ -49,4 +49,12 @@ public class SpatialListMap2d<Type> {
 
     private IMap2d<List<Type>> map;
     private final int gridsize;
+
+    public void setAt(final int x, final int y, final List<Type> data) {
+        map.setAt(x, y, data);
+    }
+
+    public boolean inBounds(final Vector2d<Integer> position) {
+        return map.inBounds(position);
+    }
 }

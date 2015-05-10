@@ -2,11 +2,10 @@ package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
-import ptrman.Datastructures.IMap2d;
-import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.Parameters;
+import ptrman.levels.retina.helper.SpatialListMap2d;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
@@ -120,7 +119,7 @@ public class ProcessD implements IProcess {
         Assert.Assert((imageSize.x % gridcellSize) == 0, "");
         Assert.Assert((imageSize.y % gridcellSize) == 0, "");
 
-        accelerationMap = new Map2d<>(imageSize.x / gridcellSize, imageSize.y / gridcellSize);
+        accelerationMap = new SpatialListMap2d<>(imageSize, gridcellSize);
     }
 
     @Override
@@ -150,7 +149,7 @@ public class ProcessD implements IProcess {
             sampleIndex++;
         }
 
-        int numberOfTries = 500000;
+        int numberOfTries = 500;
 
         // pick out a random cell and pick out a random sample in it and try to build a (small) line out of it
         for( int tryCounter = 0; tryCounter < numberOfTries; tryCounter++ ) {
@@ -251,6 +250,8 @@ public class ProcessD implements IProcess {
             final double currentDistance = iterationPosition.getDistance(comparePosition);
             maxDistance = java.lang.Math.max(maxDistance, currentDistance);
         }
+
+        System.out.println(maxDistance);
 
         return maxDistance;
     }
@@ -562,7 +563,7 @@ public class ProcessD implements IProcess {
     private Random random = new Random();
 
     // each cell contains the incides of the points/samples inside the accelerationMap
-    private IMap2d<List<Integer>> accelerationMap;
+    private SpatialListMap2d<Integer> accelerationMap;
 
     private Map<Integer, Boolean> accelerationMapCellUsed = new HashMap<>();
 
