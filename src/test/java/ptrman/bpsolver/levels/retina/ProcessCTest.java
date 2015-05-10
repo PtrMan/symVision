@@ -1,4 +1,4 @@
-package ptrman.bpsolver;
+package ptrman.bpsolver.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.junit.Test;
