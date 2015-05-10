@@ -3,47 +3,55 @@ package ptrman.Algorithms;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 
-public class FloodFill<Type>
+import java.util.ArrayDeque;
+import java.util.Queue;
+
+public class FloodFill
 {
     public interface IPixelSetListener
     {
         void seted(Vector2d<Integer> position);
     }
     
-    public void fill(IMap2d<Type> map, Vector2d<Integer> position, Vector2d<Integer> mapSize, Type targetColor, Type replacementColor, IPixelSetListener pixelSetListener)
+    public static <Type> void fill(IMap2d<Type> map, Vector2d<Integer> centerPosition, final Type targetColor, final Type replacementColor, IPixelSetListener pixelSetListener)
     {
-        if( targetColor.equals(replacementColor) )
-        {
-            return;
+        Queue<Vector2d<Integer>> remainingPositions = new ArrayDeque<>();
+        remainingPositions.add(centerPosition);
+
+        for(;;) {
+            if( remainingPositions.isEmpty() ) {
+                break;
+            }
+
+            final Vector2d<Integer> currentPosition = remainingPositions.poll();
+
+            if( targetColor.equals(replacementColor) )
+            {
+                return;
+            }
+
+            if( !(map.readAt(currentPosition.x, currentPosition.y).equals(targetColor)) )
+            {
+                return;
+            }
+
+            map.setAt(currentPosition.x, currentPosition.y, replacementColor);
+
+            pixelSetListener.seted(currentPosition);
+
+            fillRangeChecked(map, new Vector2d<>(currentPosition.x+1, currentPosition.y), remainingPositions);
+            fillRangeChecked(map, new Vector2d<>(currentPosition.x-1, currentPosition.y), remainingPositions);
+            fillRangeChecked(map, new Vector2d<>(currentPosition.x, currentPosition.y+1), remainingPositions);
+            fillRangeChecked(map, new Vector2d<>(currentPosition.x, currentPosition.y-1), remainingPositions);
         }
-        
-        if( !(map.readAt(position.x, position.y).equals(targetColor)) )
-        {
-            return;
-        }
-        
-        map.setAt(position.x, position.y, replacementColor);
-        
-        pixelSetListener.seted(position);
-        
-        fillRangeChecked(map, new Vector2d<>(position.x+1, position.y), mapSize, targetColor, replacementColor, pixelSetListener);
-        fillRangeChecked(map, new Vector2d<>(position.x-1, position.y), mapSize, targetColor, replacementColor, pixelSetListener);
-        fillRangeChecked(map, new Vector2d<>(position.x, position.y+1), mapSize, targetColor, replacementColor, pixelSetListener);
-        fillRangeChecked(map, new Vector2d<>(position.x, position.y-1), mapSize, targetColor, replacementColor, pixelSetListener);
     }
 
-    private void fillRangeChecked(IMap2d<Type> map, Vector2d<Integer> position, Vector2d<Integer> mapSize, Type targetColor, Type replacementColor, IPixelSetListener pixelSetListener)
+    private static <Type> void fillRangeChecked(final IMap2d<Type> map, final Vector2d<Integer> position, Queue<Vector2d<Integer>> remainingPositions)
     {
-        if( position.x < 0 || position.x >= mapSize.x )
-        {
+        if( !map.inBounds(position) ) {
             return;
         }
-        
-        if( position.y < 0 || position.y >= mapSize.y )
-        {
-            return;
-        }
-        
-        fill(map, position, mapSize, targetColor, replacementColor, pixelSetListener);
+
+        remainingPositions.add(position);
     }
 }

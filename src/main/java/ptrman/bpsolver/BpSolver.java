@@ -64,6 +64,14 @@ public class BpSolver {
         ProcessE processE = new ProcessE();
         ProcessM processM = new ProcessM();
 
+        ProcessZFacade processZFacade = new ProcessZFacade();
+
+        final int processzNumberOfPixelsToMagnifyThreshold = 8;
+
+
+        processZFacade.setup(getImageSize(), processzNumberOfPixelsToMagnifyThreshold);
+        processZFacade.process(image); // image doesn't need to be copied
+
         // copy because processA changes the image
         processA.setWorkingImage(image.copy());
         List<ProcessA.Sample> samples = processA.sampleImage();
