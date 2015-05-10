@@ -13,8 +13,7 @@ import ptrman.misc.Assert;
 import java.util.*;
 
 import static java.util.Collections.sort;
-import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
-import static ptrman.math.ArrayRealVectorHelper.getScaled;
+import static ptrman.math.ArrayRealVectorHelper.*;
 import static ptrman.math.Math.getRandomElements;
 
 // TODO< remove detectors which are removable which have a activation less than <constant> * sumofAllActivations >
@@ -29,6 +28,11 @@ import static ptrman.math.Math.getRandomElements;
 public class ProcessD implements IProcess {
     private List<RetinaPrimitive> resultRetinaPrimitives;
     private List<ProcessA.Sample> samples;
+    private double maximalDistanceOfPositions;
+
+    public void preSetupSet(double maximalDistanceOfPositions) {
+        this.maximalDistanceOfPositions = maximalDistanceOfPositions;
+    }
 
     public void set(List<ProcessA.Sample> samples) {
         this.samples = samples;
@@ -146,7 +150,7 @@ public class ProcessD implements IProcess {
             sampleIndex++;
         }
 
-        int numberOfTries = 500;
+        int numberOfTries = 500000;
 
         // pick out a random cell and pick out a random sample in it and try to build a (small) line out of it
         for( int tryCounter = 0; tryCounter < numberOfTries; tryCounter++ ) {
@@ -181,6 +185,15 @@ public class ProcessD implements IProcess {
 
 
             final List<ArrayRealVector> positionsOfSamples = getSamplesByIndices(workingSamples, chosenCandidateSampleIndices);
+
+            final ArrayRealVector averageOfPositionsOfSamples = getAverage(positionsOfSamples);
+            final double currentMaximalDistanceOfPositions = getMaximalDistanceOfPositionsTo(positionsOfSamples, averageOfPositionsOfSamples);
+
+            if( currentMaximalDistanceOfPositions > maximalDistanceOfPositions ) {
+                // one point is too far away from the average position, so this line is not formed
+                continue;
+            }
+            // else we are here
 
             final RegressionForLineResult regressionResult = calcRegressionForPoints(positionsOfSamples);
 
@@ -229,6 +242,17 @@ public class ProcessD implements IProcess {
         List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector, workingSamples);
         
         return resultSingleDetectors;
+    }
+
+    private static double getMaximalDistanceOfPositionsTo(final List<ArrayRealVector> positions, final ArrayRealVector comparePosition) {
+        double maxDistance = 0.0;
+
+        for( final ArrayRealVector iterationPosition : positions) {
+            final double currentDistance = iterationPosition.getDistance(comparePosition);
+            maxDistance = java.lang.Math.max(maxDistance, currentDistance);
+        }
+
+        return maxDistance;
     }
 
     private List<Vector2d<Integer>> getUnionOfCellsByPositions(final List<ArrayRealVector> positions) {

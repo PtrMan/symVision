@@ -85,6 +85,7 @@ public class BpSolver {
         processD.setImageSize(getImageSize());
         processD.set(samples);
 
+        processD.preSetupSet(6.0f/*maximalDistanceOfPositions*/);
         processD.setup();
         processD.processData();
         List<RetinaPrimitive> lineDetectors = processD.getResultRetinaPrimitives();

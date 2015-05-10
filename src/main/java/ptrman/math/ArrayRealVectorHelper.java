@@ -3,6 +3,8 @@ package ptrman.math;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.Vector2d;
 
+import java.util.List;
+
 /**
  *
  */
@@ -44,5 +46,21 @@ public class ArrayRealVectorHelper {
 
     public static Vector2d<Integer> arrayRealVectorToInteger(ArrayRealVector vector) {
         return new Vector2d<>((int)(vector.getDataRef()[0]), (int)(vector.getDataRef()[1]));
+    }
+
+    public static ArrayRealVector getAverage(final List<ArrayRealVector> elements) {
+        ArrayRealVector result;
+
+        result = new ArrayRealVector(elements.get(0).getDimension());
+
+        for( final ArrayRealVector currentElement : elements ) {
+            result.add(currentElement);
+        }
+
+        for( int i = 0; i < elements.get(0).getDimension(); i++ ) {
+            result.getDataRef()[i] /= (double)elements.size();
+        }
+
+        return result;
     }
 }
