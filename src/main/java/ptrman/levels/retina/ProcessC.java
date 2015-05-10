@@ -41,9 +41,8 @@ public class ProcessC implements IProcess {
     }
 
     // TODO< split parameters into two methods somehow >
-    public void set(List<ProcessA.Sample> samples, final int gridsize) {
+    public void set(List<ProcessA.Sample> samples) {
         this.samples = samples;
-        this.gridsize = gridsize;
     }
 
     public void recalculate() {
@@ -59,6 +58,9 @@ public class ProcessC implements IProcess {
     }
 
 
+    public void preSetupSet(final int gridsize) {
+        this.gridsize = gridsize;
+    }
 
     @Override
     public void setImageSize(Vector2d<Integer> imageSize) {
