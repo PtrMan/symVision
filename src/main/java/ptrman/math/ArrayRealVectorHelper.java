@@ -49,12 +49,10 @@ public class ArrayRealVectorHelper {
     }
 
     public static ArrayRealVector getAverage(final List<ArrayRealVector> elements) {
-        ArrayRealVector result;
-
-        result = new ArrayRealVector(elements.get(0).getDimension());
+        ArrayRealVector result = new ArrayRealVector(elements.get(0).getDimension());
 
         for( final ArrayRealVector currentElement : elements ) {
-            result.add(currentElement);
+            result = result.add(currentElement);
         }
 
         for( int i = 0; i < elements.get(0).getDimension(); i++ ) {
