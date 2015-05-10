@@ -1,9 +1,8 @@
 package ptrman.levels.retina;
 
-import ptrman.Datastructures.IMap2d;
-import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.helper.SpatialCircleDrawer;
+import ptrman.levels.retina.helper.SpatialListMap2d;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
@@ -49,23 +48,17 @@ public class ProcessC implements IProcess {
 
     public void recalculate() {
         // clean acceleration map
-        for( int y = 0; y < accelerationMap.getLength(); y++ ) {
-            for( int x = 0; x < accelerationMap.getWidth(); x++ ) {
-                accelerationMap.setAt(x, y, new ArrayList<>());
-            }
-        }
+        accelerationMap.clean();
 
         // fill
         for( final ProcessA.Sample iterationSample : samples ) {
-            final Vector2d<Integer> sampleIntegerPosition = getCellPositionOfPosition(arrayRealVectorToInteger(iterationSample.position));
+            final Vector2d<Integer> sampleIntegerPosition = accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(iterationSample.position));
             List<ProcessA.Sample> samples = accelerationMap.readAt(sampleIntegerPosition.x, sampleIntegerPosition.y);
             samples.add(iterationSample);
         }
     }
 
-    private Vector2d<Integer> getCellPositionOfPosition(final Vector2d<Integer> integerPosition) {
-        return new Vector2d<>(integerPosition.x / gridsize, integerPosition.y / gridsize);
-    }
+
 
     @Override
     public void setImageSize(Vector2d<Integer> imageSize) {
@@ -75,12 +68,8 @@ public class ProcessC implements IProcess {
     @Override
     public void setup() {
         Assert.Assert(imageSize != null, "imagesize is null");
-        Assert.Assert(gridsize != 0, "gridsize must be nonzero");
 
-        Assert.Assert((imageSize.x % gridsize) == 0, "imagesize.x must be divisable by gridsize");
-        Assert.Assert((imageSize.y % gridsize) == 0, "imagesize.y must be divisable by gridsize");
-
-        accelerationMap = new Map2d<>(imageSize.x / gridsize, imageSize.y / gridsize);
+        accelerationMap = new SpatialListMap2d<>(imageSize, gridsize);
     }
 
     @Override
@@ -103,10 +92,10 @@ public class ProcessC implements IProcess {
 
                 if( currentRadius == 0 ) {
                     cellPositionsToScan = new ArrayList<>();
-                    cellPositionsToScan.add(getCellPositionOfPosition(arrayRealVectorToInteger(outerSample.position)));
+                    cellPositionsToScan.add(accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(outerSample.position)));
                 }
                 else {
-                    cellPositionsToScan = SpatialCircleDrawer.getPositionsOfCellsOfCircle(getCellPositionOfPosition(arrayRealVectorToInteger(outerSample.position)), currentRadius, new Vector2d<>(accelerationMap.getWidth(), accelerationMap.getLength()));
+                    cellPositionsToScan = SpatialCircleDrawer.getPositionsOfCellsOfCircle(accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(outerSample.position)), currentRadius, new Vector2d<>(accelerationMap.getWidth(), accelerationMap.getLength()));
                 }
 
                 int debug = 0;
@@ -207,7 +196,7 @@ public class ProcessC implements IProcess {
 
     private final Queue<ProcessA.Sample> queueToProcessF;
 
-    private IMap2d<List<ProcessA.Sample>> accelerationMap;
+    private SpatialListMap2d<ProcessA.Sample> accelerationMap;
 
     private int gridsize;
     private Vector2d<Integer> imageSize;
