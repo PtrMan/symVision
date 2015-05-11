@@ -24,6 +24,11 @@ public class HardParameters
         public final static float EARLYCANDIDATEMAXDISTANCE = 4.0f; // maximal distance for the early candidates of a line inside a radius of a "center point"
         public final static int EARLYCANDIDATECOUNT = 5;
     }
+
+    public static class ProcessC {
+        public final static double FILLEDREGIONALTITUDETHRESHOLD = 4.0f; // after which altitude is a endosceleton sample from a filled region
+        public final static float FILLEDREGIONCANDIDATEPROPABILITY = 0.8f;
+    }
     
     public static class ProcessE
     {

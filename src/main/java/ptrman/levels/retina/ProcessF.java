@@ -13,32 +13,42 @@ import java.util.Queue;
  *
  * * works only on rasterized input
  */
-public class ProcessF {
-    private static class Ray {
-        public Ray(ArrayRealVector position, ArrayRealVector direction) {
-            this.position = position;
-            this.direction = direction;
-        }
+public class ProcessF implements IProcess {
 
-        public void advance() {
-            position.add(direction);
-        }
-
-        public ArrayRealVector position;
-        public ArrayRealVector direction;
-        public boolean isActive = true;
+    @Override
+    public void setImageSize(Vector2d<Integer> imageSize) {
     }
 
-
-    public ProcessF(Queue<ProcessA.Sample> inputSampleQueue, IMap2d<Boolean> map) {
+    public void preSetup(Queue<ProcessA.Sample> inputSampleQueue, Queue<ProcessA.Sample> outputSampleQueue) {
         this.inputSampleQueue = inputSampleQueue;
-        this.map = map;
+        this.outputSampleQueue = outputSampleQueue;
     }
 
-    public void loop() {
-        ProcessA.Sample currentSample = inputSampleQueue.poll();
-        ArrayRealVector[] borderPositions = processSample(currentSample);
-        // TODO
+    @Override
+    public void setup() {
+
+    }
+
+    @Override
+    public void processData() {
+        for(;;) {
+            if( inputSampleQueue.isEmpty() ) {
+                break;
+            }
+
+            final ProcessA.Sample currentSample = inputSampleQueue.poll();
+            final ArrayRealVector[] borderPositions = processSample(currentSample);
+
+            List<ProcessA.Sample> borderSamples = createSamplesWithPositions(borderPositions);
+
+            for( final ProcessA.Sample iterationSample : borderSamples ) {
+                outputSampleQueue.add(iterationSample);
+            }
+        }
+    }
+
+    public void set(IMap2d<Boolean> map) {
+        this.map = map;
     }
 
     private ArrayRealVector[] processSample(ProcessA.Sample sample) {
@@ -120,8 +130,25 @@ public class ProcessF {
         return result;
     }
 
+    private static class Ray {
+        public Ray(ArrayRealVector position, ArrayRealVector direction) {
+            this.position = position;
+            this.direction = direction;
+        }
+
+        public void advance() {
+            position = position.add(direction);
+        }
+
+        public ArrayRealVector position;
+        public ArrayRealVector direction;
+        public boolean isActive = true;
+    }
+
+
     private Queue<ProcessA.Sample> inputSampleQueue;
-    private final IMap2d<Boolean> map;
+    private Queue<ProcessA.Sample> outputSampleQueue;
+    private IMap2d<Boolean> map;
 
     private static final int COUNTOFRAYDIRECTIONS = 16;
     private static final ArrayRealVector[] RAYDIRECTIONS = calculateRayDirections(COUNTOFRAYDIRECTIONS);

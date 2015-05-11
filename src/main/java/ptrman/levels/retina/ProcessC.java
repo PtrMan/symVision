@@ -1,6 +1,7 @@
 package ptrman.levels.retina;
 
 import ptrman.Datastructures.Vector2d;
+import ptrman.bpsolver.HardParameters;
 import ptrman.levels.retina.helper.SpatialCircleDrawer;
 import ptrman.levels.retina.helper.SpatialListMap2d;
 import ptrman.misc.Assert;
@@ -8,6 +9,7 @@ import ptrman.misc.Assert;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.Random;
 
 import static java.lang.System.arraycopy;
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
@@ -121,10 +123,18 @@ public class ProcessC implements IProcess {
             
             if( noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(sortedArray, outerSample) ) {
                 outerSample.type = ProcessA.Sample.EnumType.ENDOSCELETON;
+
+                if( outerSample.altitude >= HardParameters.ProcessC.FILLEDREGIONALTITUDETHRESHOLD ) {
+                    if( random.nextFloat() < HardParameters.ProcessC.FILLEDREGIONCANDIDATEPROPABILITY ) {
+                        queueToProcessF.add(outerSample);
+                    }
+                }
             }
             else {
                 outerSample.type = ProcessA.Sample.EnumType.EXOSCELETON;
             }
+
+
         }
     }
     
@@ -203,4 +213,6 @@ public class ProcessC implements IProcess {
     private int gridsize;
     private Vector2d<Integer> imageSize;
     private List<ProcessA.Sample> samples;
+
+    private Random random = new Random();
 }

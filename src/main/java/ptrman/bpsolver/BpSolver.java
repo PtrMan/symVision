@@ -56,10 +56,12 @@ public class BpSolver {
         ProcessA processA = new ProcessA();
         ProcessB processB = new ProcessB();
         ProcessC processC = new ProcessC(queueToProcessF);
-        ProcessD processD = new ProcessD();
+        ProcessD endosceletonProcessD = new ProcessD();
+        ProcessD exosceletonProcessD = new ProcessD();
         ProcessH processH = new ProcessH();
         ProcessE processE = new ProcessE();
         ProcessM processM = new ProcessM();
+        ProcessF processF = new ProcessF();
 
         ProcessZFacade processZFacade = new ProcessZFacade();
 
@@ -81,7 +83,7 @@ public class BpSolver {
         Queue<ProcessA.Sample> sampleQueueFromProcessC = new ArrayDeque<>();
         Queue<ProcessA.Sample> sampleQueueForEndosceleton = new ArrayDeque<>();
 
-
+        Queue<ProcessA.Sample> processFOutputSampleQueue = new ArrayDeque<>();
 
         processB.process(samples, image);
 
@@ -107,21 +109,37 @@ public class BpSolver {
 
 
 
-        for( ProcessA.Sample currentSample : samples ) {
-            sampleQueueFromProcessC.add(currentSample);
-        }
+        processF.setImageSize(getImageSize());
+        processF.preSetup(queueToProcessF, processFOutputSampleQueue);
+        processF.setup();
 
-        endosceletonSampleFilter.processData();
+        processF.set(image);
+        processF.processData();
+
+        System.out.println("processFOutputSampleQueue size " + Integer.toString(processFOutputSampleQueue.size()));
 
 
 
-        processD.setImageSize(getImageSize());
-        processD.set(sampleQueueForEndosceleton);
+        endosceletonProcessD.setImageSize(getImageSize());
+        endosceletonProcessD.set(sampleQueueForEndosceleton);
 
-        processD.preSetupSet(6.0f/*maximalDistanceOfPositions*/);
-        processD.setup();
-        processD.processData();
-        List<RetinaPrimitive> lineDetectors = processD.getResultRetinaPrimitives();
+        endosceletonProcessD.preSetupSet(6.0f/*maximalDistanceOfPositions*/);
+        endosceletonProcessD.setup();
+        endosceletonProcessD.processData();
+        List<RetinaPrimitive> lineDetectors = endosceletonProcessD.getResultRetinaPrimitives();
+
+
+
+
+        exosceletonProcessD.setImageSize(getImageSize());
+        exosceletonProcessD.set(processFOutputSampleQueue);
+
+        exosceletonProcessD.preSetupSet(6.0f/*maximalDistanceOfPositions*/);
+        exosceletonProcessD.setup();
+        exosceletonProcessD.processData();
+
+
+
 
         List<Intersection> lineIntersections = new ArrayList<>();
 
