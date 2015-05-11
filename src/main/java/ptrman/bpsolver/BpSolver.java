@@ -16,10 +16,7 @@ import ptrman.bpsolver.nodes.PlatonicPrimitiveNode;
 import ptrman.bpsolver.pattern.FeaturePatternMatching;
 import ptrman.levels.retina.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class BpSolver {
@@ -79,7 +76,22 @@ public class BpSolver {
         List<ProcessA.Sample> samples = processA.sampleImage();
 
 
+        ProcessSampleFilter endosceletonSampleFilter = new ProcessSampleFilter(ProcessA.Sample.EnumType.ENDOSCELETON);
+
+        Queue<ProcessA.Sample> sampleQueueFromProcessC = new ArrayDeque<>();
+        Queue<ProcessA.Sample> sampleQueueForEndosceleton = new ArrayDeque<>();
+
+
+
         processB.process(samples, image);
+
+
+
+
+        endosceletonSampleFilter.preSetupSet(sampleQueueFromProcessC, sampleQueueForEndosceleton);
+        endosceletonSampleFilter.setup();
+
+
 
 
         processC.setImageSize(getImageSize());
@@ -90,11 +102,21 @@ public class BpSolver {
         processC.set(samples);
         processC.recalculate();
 
+
         processC.processData();
 
 
+
+        for( ProcessA.Sample currentSample : samples ) {
+            sampleQueueFromProcessC.add(currentSample);
+        }
+
+        endosceletonSampleFilter.processData();
+
+
+
         processD.setImageSize(getImageSize());
-        processD.set(samples);
+        processD.set(sampleQueueForEndosceleton);
 
         processD.preSetupSet(6.0f/*maximalDistanceOfPositions*/);
         processD.setup();

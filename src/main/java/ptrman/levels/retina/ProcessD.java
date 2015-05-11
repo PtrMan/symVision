@@ -25,16 +25,13 @@ import static ptrman.math.Math.getRandomElements;
  * 
  */
 public class ProcessD implements IProcess {
-    private List<RetinaPrimitive> resultRetinaPrimitives;
-    private List<ProcessA.Sample> samples;
-    private double maximalDistanceOfPositions;
 
     public void preSetupSet(double maximalDistanceOfPositions) {
         this.maximalDistanceOfPositions = maximalDistanceOfPositions;
     }
 
-    public void set(List<ProcessA.Sample> samples) {
-        this.samples = samples;
+    public void set(Queue<ProcessA.Sample> inputSampleQueue) {
+        this.inputSampleQueue = inputSampleQueue;
     }
 
     public List<RetinaPrimitive> getResultRetinaPrimitives() {
@@ -124,7 +121,17 @@ public class ProcessD implements IProcess {
 
     @Override
     public void processData() {
-        resultRetinaPrimitives = detectLines(samples);
+        // take samples from queue and put into array
+        List<ProcessA.Sample> samplesAsList = new ArrayList<>();
+
+        final int inputSampleQueueSize = inputSampleQueue.size();
+
+        for( int i = 0; i < inputSampleQueueSize; i++ ) {
+            samplesAsList.add(inputSampleQueue.poll());
+        }
+
+
+        resultRetinaPrimitives = detectLines(samplesAsList);
     }
     
     /**
@@ -136,7 +143,7 @@ public class ProcessD implements IProcess {
     private List<RetinaPrimitive> detectLines(List<ProcessA.Sample> samples) {
         List<LineDetectorWithMultiplePoints> multiplePointsLineDetector = new ArrayList<>();
 
-        final List<ProcessA.Sample> workingSamples = filterEndosceletonPoints(samples);
+        final List<ProcessA.Sample> workingSamples = samples;
 
         if( workingSamples.isEmpty() ) {
             return new ArrayList<>();
@@ -565,4 +572,9 @@ public class ProcessD implements IProcess {
 
     private Map<Integer, Boolean> accelerationMapCellUsed = new HashMap<>();
 
+    private List<RetinaPrimitive> resultRetinaPrimitives;
+
+    private double maximalDistanceOfPositions;
+
+    private Queue<ProcessA.Sample> inputSampleQueue;
 }
