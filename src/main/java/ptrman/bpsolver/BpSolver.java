@@ -68,8 +68,10 @@ public class BpSolver {
 
         final int processzNumberOfPixelsToMagnifyThreshold = 8;
 
+        final int processZGridsize = 8;
 
-        processZFacade.setup(getImageSize(), processzNumberOfPixelsToMagnifyThreshold);
+        processZFacade.preSetupSet(processZGridsize, processzNumberOfPixelsToMagnifyThreshold);
+        processZFacade.setup(getImageSize());
         processZFacade.process(image); // image doesn't need to be copied
 
         // copy because processA changes the image

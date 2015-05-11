@@ -1,13 +1,13 @@
 package ptrman.levels.retina;
 
 import ptrman.Algorithms.FloodFill;
+import ptrman.Datastructures.HashableVector2dInteger;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
+import ptrman.misc.Assert;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
 /**
  *
@@ -24,7 +24,6 @@ public class ProcessZFacade {
 
         @Override
         public void seted(Vector2d<Integer> position) {
-            processZFacade.unprocessedPixels.remove(position.x + position.y * processZFacade.imageSize.x);
             setPixelPositions.add(position);
         }
 
@@ -33,9 +32,29 @@ public class ProcessZFacade {
         public List<Vector2d<Integer>> setPixelPositions = new ArrayList<>();
     }
 
-    public void setup(Vector2d<Integer> imageSize, int numberOfPixelsManificationThreshold) {
-        this.imageSize = imageSize;
+    public void preSetupSet(final int accelerationGridsize, int numberOfPixelsManificationThreshold) {
+        this.accelerationGridsize = accelerationGridsize;
         this.numberOfPixelsMagnificationThreshold = numberOfPixelsManificationThreshold;
+    }
+
+    public void setup(Vector2d<Integer> imageSize) {
+        this.imageSize = imageSize;
+
+        unprocessedPixelsMap = new Map2d<>(imageSize.x, imageSize.y);
+        for( int y = 0; y < unprocessedPixelsMap.getLength(); y++ ) {
+            for( int x = 0; x < unprocessedPixelsMap.getWidth(); x++ ) {
+                unprocessedPixelsMap.setAt(x, y, false);
+            }
+        }
+
+        Assert.Assert(accelerationGridsize != 0, "gridsize must be nonzero");
+
+        unprocessedPixelsCellCount = new Map2d<>(imageSize.x / accelerationGridsize, imageSize.y / accelerationGridsize);
+        for( int y = 0; y < unprocessedPixelsCellCount.getLength(); y++ ) {
+            for( int x = 0; x < unprocessedPixelsCellCount.getWidth(); x++ ) {
+                unprocessedPixelsCellCount.setAt(x, y, 0);
+            }
+        }
 
         processZ.setImageSize(imageSize);
     }
@@ -53,7 +72,7 @@ public class ProcessZFacade {
 
         copiedInput = input.copy();
 
-        storePixelsIntoHashmap(input);
+        storePixelsIntoAccelerationDatastructuresFromMap(input);
 
         notMagnifiedOutput = new Map2d<>(imageSize.x, imageSize.y);
         toMagnify = createBlankBooleanMap(imageSize);
@@ -76,54 +95,101 @@ public class ProcessZFacade {
         return result;
     }
 
-    private void storePixelsIntoHashmap(final IMap2d<Boolean> input) {
-        for( int iy = 0; iy < input.getLength(); iy++ ) {
-            for( int ix = 0; ix < input.getWidth(); ix++ ) {
-                if( input.readAt(ix, iy) ) {
-                    unprocessedPixels.put(ix + iy * imageSize.x, Boolean.TRUE);
-                }
-            }
-        }
-    }
-
     private void takeRandomPixelFromHashmapUntilNoCandidatesAndFillAndDecide(IMap2d<Boolean> input) {
         PixelChangeListener pixelChangeListener;
 
         pixelChangeListener = new PixelChangeListener(this);
 
         for(;;) {
-            Integer[] setOfUnprocessedPixelsAsArray;
-            int pixelAdress;
-            int x, y;
-
-            if( unprocessedPixels.isEmpty() ) {
+            if( notCompletlyProcessedCells.isEmpty() ) {
                 break;
             }
 
-            setOfUnprocessedPixelsAsArray = unprocessedPixels.keySet().toArray(new Integer[0]);
-            pixelAdress = setOfUnprocessedPixelsAsArray[0];
-            x = pixelAdress % imageSize.x;
-            y = pixelAdress / imageSize.x;
+            HashableVector2dInteger[] arrayOfNotCompletlyProcessedCells = notCompletlyProcessedCells.keySet().toArray(new HashableVector2dInteger[0]);
+            Vector2d<Integer> notCompletlyProcessedCellPosition = (Vector2d<Integer>)arrayOfNotCompletlyProcessedCells[random.nextInt(arrayOfNotCompletlyProcessedCells.length)];
+            Vector2d<Integer> randomPixelFromNotCompletlyProcessCell = getRandomPixelPositionOfCell(notCompletlyProcessedCellPosition);
 
-            FloodFill.fill(input, new Vector2d<>(x, y), Boolean.TRUE, Boolean.FALSE, pixelChangeListener);
+            FloodFill.fill(input, randomPixelFromNotCompletlyProcessCell, Boolean.TRUE, Boolean.FALSE, pixelChangeListener);
 
             // TODO< decide with a propability if the filled patch should be magnified or not >
             if( pixelChangeListener.setPixelPositions.size() < numberOfPixelsMagnificationThreshold) {
-                drawPixelsIntoMap(pixelChangeListener.setPixelPositions, toMagnify);
+                drawPixelsIntoMap(pixelChangeListener.setPixelPositions, toMagnify, true);
             }
             else {
-                drawPixelsIntoMap(pixelChangeListener.setPixelPositions, notMagnifiedOutput);
+                drawPixelsIntoMap(pixelChangeListener.setPixelPositions, notMagnifiedOutput, true);
             }
+
+            removePixelsFromAccelerationDatastructures(pixelChangeListener.setPixelPositions);
 
             pixelChangeListener.setPixelPositions.clear();
 
         }
     }
 
-    private void drawPixelsIntoMap(List<Vector2d<Integer>> pixels, IMap2d<Boolean> map) {
-        for( Vector2d<Integer> iterationPosition : pixels ) {
-            map.setAt(iterationPosition.x, iterationPosition.y, true);
+    private Vector2d<Integer> getRandomPixelPositionOfCell(final Vector2d<Integer> cellPosition) {
+        List<Vector2d<Integer>> candidateList = new ArrayList<>();
+
+        for( int y = cellPosition.y * accelerationGridsize; y < (cellPosition.y+1) * accelerationGridsize; y++ ) {
+            for( int x = cellPosition.x * accelerationGridsize; x < (cellPosition.x+1) * accelerationGridsize; x++ ) {
+                if( unprocessedPixelsMap.readAt(x, y) ) {
+                    candidateList.add(new Vector2d<>(x, y));
+                }
+            }
         }
+
+        final int candidateIndex = random.nextInt(candidateList.size());
+        return candidateList.get(candidateIndex);
+    }
+
+    private void drawPixelsIntoMap(final List<Vector2d<Integer>> pixels, IMap2d<Boolean> map, final boolean value) {
+        for( Vector2d<Integer> iterationPosition : pixels ) {
+            map.setAt(iterationPosition.x, iterationPosition.y, value);
+        }
+    }
+
+    private void storePixelsIntoAccelerationDatastructuresFromMap(final IMap2d<Boolean> input) {
+        for( int iy = 0; iy < input.getLength(); iy++ ) {
+            for( int ix = 0; ix < input.getWidth(); ix++ ) {
+                if( input.readAt(ix, iy) ) {
+                    unprocessedPixelsMap.setAt(ix, iy, true);
+
+                    final Vector2d<Integer> cellPositionOfPixel = pixelPositionToCellPosition(new Vector2d<>(ix, iy));
+                    unprocessedPixelsCellCount.setAt(cellPositionOfPixel.x, cellPositionOfPixel.y, unprocessedPixelsCellCount.readAt(cellPositionOfPixel.x, cellPositionOfPixel.y) + 1);
+                }
+            }
+        }
+
+        // setup the hashmap
+        for( int y = 0; y < unprocessedPixelsCellCount.getLength(); y++ ) {
+            for( int x = 0; x < unprocessedPixelsCellCount.getWidth(); x++ ) {
+                final int cellCountForCell = unprocessedPixelsCellCount.readAt(x, y);
+
+                if( cellCountForCell > 0 ) {
+                    notCompletlyProcessedCells.put(HashableVector2dInteger.fromVector2dInteger(new Vector2d<>(x, y)), null);
+                }
+            }
+        }
+    }
+
+    private void removePixelsFromAccelerationDatastructures(final List<Vector2d<Integer>> pixels) {
+        drawPixelsIntoMap(pixels, unprocessedPixelsMap, false);
+
+        for( final Vector2d<Integer> iterationPixel : pixels ) {
+            final Vector2d<Integer> cellPositionOfPixel = pixelPositionToCellPosition(iterationPixel);
+
+            int numberOfSetPixelsInUnprocessedPixelsMapCell = unprocessedPixelsCellCount.readAt(cellPositionOfPixel.x, cellPositionOfPixel.y);
+            Assert.Assert(numberOfSetPixelsInUnprocessedPixelsMapCell > 0, "");
+            numberOfSetPixelsInUnprocessedPixelsMapCell--;
+            unprocessedPixelsCellCount.setAt(cellPositionOfPixel.x, cellPositionOfPixel.y, numberOfSetPixelsInUnprocessedPixelsMapCell);
+
+            if( numberOfSetPixelsInUnprocessedPixelsMapCell == 0 ) {
+                notCompletlyProcessedCells.remove(HashableVector2dInteger.fromVector2dInteger(cellPositionOfPixel));
+            }
+        }
+    }
+
+    private Vector2d<Integer> pixelPositionToCellPosition(final Vector2d<Integer> pixelPosition) {
+        return new Vector2d<>(pixelPosition.x / accelerationGridsize, pixelPosition.y / accelerationGridsize);
     }
 
     private void magnify() {
@@ -135,8 +201,15 @@ public class ProcessZFacade {
     private Vector2d<Integer> imageSize;
     private int numberOfPixelsMagnificationThreshold;
 
+    // each cell contains the count of unprocessedPixels in that cell
+    private IMap2d<Integer> unprocessedPixelsCellCount;
+    // map which contains all pixels which are not processed
+    private IMap2d<Boolean> unprocessedPixelsMap;
+    // map which stores the adresses of the cells in unprocessedPixelsCellCount which are non-zero
+    private Map<HashableVector2dInteger, Boolean> notCompletlyProcessedCells = new HashMap<>();
 
-    private HashMap<Integer, Boolean> unprocessedPixels = new HashMap<>();
+    private int accelerationGridsize;
+
 
     private IMap2d<Boolean> notMagnifiedOutput;
     private IMap2d<Boolean> magnifiedOutput;
@@ -144,4 +217,6 @@ public class ProcessZFacade {
     private IMap2d<Boolean> toMagnify;
 
     private ProcessZ processZ = new ProcessZ();
+
+    private Random random = new Random();
 }
