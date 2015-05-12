@@ -75,7 +75,7 @@ public class BpSolver {
 
         // copy because processA changes the image
         processA.setWorkingImage(image.copy());
-        List<ProcessA.Sample> samples = processA.sampleImage();
+        List<ProcessA.Sample> endosceletonSamples = processA.sampleImage();
 
 
         ProcessSampleFilter endosceletonSampleFilter = new ProcessSampleFilter(ProcessA.Sample.EnumType.ENDOSCELETON);
@@ -84,8 +84,9 @@ public class BpSolver {
         Queue<ProcessA.Sample> sampleQueueForEndosceleton = new ArrayDeque<>();
 
         Queue<ProcessA.Sample> processFOutputSampleQueue = new ArrayDeque<>();
+        Queue<ProcessA.Sample> toExosceletonProcessDSampleQueue = new ArrayDeque<>();
 
-        processB.process(samples, image);
+        processB.process(endosceletonSamples, image);
 
 
 
@@ -101,7 +102,7 @@ public class BpSolver {
         processC.setup();
 
 
-        processC.set(samples);
+        processC.set(endosceletonSamples);
         processC.recalculate();
 
 
@@ -130,9 +131,21 @@ public class BpSolver {
 
 
 
+        // take out the samples from a queue, put it into a list and a output queue
+        // TODO< put this into a own process >
+
+        List<ProcessA.Sample> exosceletonSamples = new ArrayList<>();
+        int remainingSize = processFOutputSampleQueue.size();
+        for( int i = 0; i < remainingSize; i++ ) {
+            final ProcessA.Sample currentSample = processFOutputSampleQueue.poll();
+            exosceletonSamples.add(currentSample);
+            toExosceletonProcessDSampleQueue.add(currentSample);
+        }
+
+
 
         exosceletonProcessD.setImageSize(getImageSize());
-        exosceletonProcessD.set(processFOutputSampleQueue);
+        exosceletonProcessD.set(toExosceletonProcessDSampleQueue);
 
         exosceletonProcessD.preSetupSet(6.0f/*maximalDistanceOfPositions*/);
         exosceletonProcessD.setup();
@@ -216,7 +229,8 @@ public class BpSolver {
 
         lastFrameObjectNodes = objectNodes;
         lastFrameRetinaPrimitives = lineDetectors; // for now only the line detectors TODO
-        lastFrameSamples = samples;
+        lastFrameEndosceletonSamples = endosceletonSamples;
+        lastFrameExosceletonSamples = exosceletonSamples;
         lastFrameIntersections = lineIntersections; // TODO< other intersections too >
     }
     
@@ -453,6 +467,7 @@ public class BpSolver {
     
     public List<Node> lastFrameObjectNodes;
     public List<RetinaPrimitive> lastFrameRetinaPrimitives;
-    public List<ProcessA.Sample> lastFrameSamples;
+    public List<ProcessA.Sample> lastFrameEndosceletonSamples;
+    public List<ProcessA.Sample> lastFrameExosceletonSamples;
     public List<Intersection> lastFrameIntersections;
 }

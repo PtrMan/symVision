@@ -20,6 +20,9 @@ import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -135,7 +138,10 @@ public class TestVideo {
             Graphics2D graphics = (Graphics2D)detectorImage.getGraphics();
 
             // TODO create graphics and draw it to a created image and put the image into the canvas
-            DebugDrawingHelper.drawDetectors(graphics, bpSolver.lastFrameRetinaPrimitives, bpSolver.lastFrameIntersections, bpSolver.lastFrameSamples);
+            List<DebugDrawingHelper.DrawingEntity> drawingEntities = new ArrayList<>();
+            drawingEntities.add(new DebugDrawingHelper.SampleDrawingEntity(1, false));
+
+            DebugDrawingHelper.drawDetectors(graphics, bpSolver.lastFrameRetinaPrimitives, bpSolver.lastFrameIntersections, new ArrayList<>(Arrays.asList(bpSolver.lastFrameEndosceletonSamples, bpSolver.lastFrameExosceletonSamples)), drawingEntities);
 
             dualCanvas.rightCanvas.setImage(detectorImage);
         }

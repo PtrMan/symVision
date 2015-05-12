@@ -140,7 +140,8 @@ public class TestClustering {
             Graphics2D graphics = (Graphics2D)detectorImage.getGraphics();
 
             // TODO create graphics and draw it to a created image and put the image into the canvas
-            DebugDrawingHelper.drawDetectors(graphics, bpSolver.lastFrameRetinaPrimitives, bpSolver.lastFrameIntersections, bpSolver.lastFrameSamples);
+            // TODO< drawing like in TestVideo >
+            //DebugDrawingHelper.drawDetectors(graphics, bpSolver.lastFrameRetinaPrimitives, bpSolver.lastFrameIntersections, bpSolver.lastFrameEndosceletonSamples);
 
             dualCanvas.rightCanvas.setImage(detectorImage);
         }

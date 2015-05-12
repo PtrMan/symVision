@@ -17,6 +17,73 @@ import java.util.List;
  *
  */
 public class DebugDrawingHelper {
+    public abstract static class DrawingEntity {
+        public enum EnumDrawType {
+            SAMPLES
+        }
+
+        public DrawingEntity(final int dataSourceIndex, final EnumDrawType drawType) {
+            this.dataSourceIndex = dataSourceIndex;
+            this.drawType = drawType;
+        }
+
+        public int getDataSourceIndex() {
+            return dataSourceIndex;
+        }
+
+        public EnumDrawType getDrawType() {
+            return drawType;
+        }
+
+        public abstract void drawSamples(Graphics2D graphics, final List<ProcessA.Sample> samples);
+
+
+        private final EnumDrawType drawType;
+        private final int dataSourceIndex;
+    }
+
+    public static final class SampleDrawingEntity extends DrawingEntity {
+
+        public SampleDrawingEntity(final int dataSourceIndex, final boolean showAltitude) {
+            super(dataSourceIndex, EnumDrawType.SAMPLES);
+
+            this.showAltitude = showAltitude;
+        }
+
+        @Override
+        public void drawSamples(Graphics2D graphics, final List<ProcessA.Sample> samples) {
+            for( ProcessA.Sample iterationSample : samples ) {
+                if( showAltitude ) {
+                    double altitudeAsGreen;
+
+                    if( !iterationSample.isAltitudeValid()) {
+                        altitudeAsGreen = 0.5;
+                    }
+                    else {
+                        altitudeAsGreen = 0.5 + (1.0 - 0.5) * java.lang.Math.min(1.0, iterationSample.altitude / 10.0);
+                    }
+
+                    graphics.setColor(new Color(0.0f, (float)altitudeAsGreen, 0.0f));
+                }
+                else {
+                    // show if it is a endosceleton point or not
+
+                    if( iterationSample.type == ProcessA.Sample.EnumType.ENDOSCELETON ) {
+                        graphics.setColor(Color.GREEN);
+                    }
+                    else {
+                        graphics.setColor(Color.RED);
+                    }
+                }
+
+
+                graphics.drawLine((int)iterationSample.position.getDataRef()[0], (int)iterationSample.position.getDataRef()[1], (int)iterationSample.position.getDataRef()[0], (int)iterationSample.position.getDataRef()[1]);
+            }
+        }
+
+        private final boolean showAltitude;
+
+    }
 
     public static void drawLineParsings(Graphics2D graphics, ArrayList<ProcessM.LineParsing> lineParsings) {
         for( ProcessM.LineParsing iterationLineParsing : lineParsings ) {
@@ -87,7 +154,7 @@ public class DebugDrawingHelper {
     }
 
 
-    public static void drawDetectors(Graphics2D graphics, List<RetinaPrimitive> lineDetectors, List<Intersection> intersections, List<ProcessA.Sample> samples) {
+    public static void drawDetectors(Graphics2D graphics, List<RetinaPrimitive> lineDetectors, List<Intersection> intersections, List<List<ProcessA.Sample>> samplesArray, List<DrawingEntity> drawingEntities) {
 
         for( RetinaPrimitive iterationRetinaPrimitive : lineDetectors ) {
             SingleLineDetector iterationDetector;
@@ -121,41 +188,11 @@ public class DebugDrawingHelper {
         }
         */
 
-        for( ProcessA.Sample iterationSample : samples ) {
-            boolean showAltitude = false;
-
-            if( showAltitude ) {
-                double altitudeAsGreen;
-
-                if( !iterationSample.isAltitudeValid()) {
-                    altitudeAsGreen = 0.5;
-                }
-                else {
-                    altitudeAsGreen = 0.5 + (1.0 - 0.5) * java.lang.Math.min(1.0, iterationSample.altitude / 10.0);
-                }
-
-                graphics.setColor(new Color(0.0f, (float)altitudeAsGreen, 0.0f));
+        for( DrawingEntity iterationDrawingEntity : drawingEntities ) {
+            switch( iterationDrawingEntity.getDrawType() ) {
+                case SAMPLES:
+                iterationDrawingEntity.drawSamples(graphics, samplesArray.get(iterationDrawingEntity.getDataSourceIndex()));
             }
-            else {
-                // show if it is a endosceleton point or not
-
-                if( iterationSample.type == ProcessA.Sample.EnumType.ENDOSCELETON ) {
-                    graphics.setColor(Color.GREEN);
-                }
-                else {
-                    graphics.setColor(Color.RED);
-                }
-            }
-
-
-            graphics.drawLine((int)iterationSample.position.getDataRef()[0], (int)iterationSample.position.getDataRef()[1], (int)iterationSample.position.getDataRef()[0], (int)iterationSample.position.getDataRef()[1]);
         }
-    }
-
-    public static void drawRetinaPrimitives(Graphics2D graphics,  List<RetinaPrimitive> retinaPrimitives, List<Intersection> intersections, List<ProcessA.Sample> samples) {
-
-        // TODO< sort out between lines, dots, circles and splines >
-
-        drawDetectors(graphics, retinaPrimitives, intersections, samples);
     }
 }
