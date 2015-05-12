@@ -56,6 +56,8 @@ public class ProcessZFacade {
             }
         }
 
+        notMagnifiedOutputObjectIds = new Map2d<>(imageSize.x, imageSize.y);
+
         processZ.setImageSize(imageSize);
     }
 
@@ -67,8 +69,15 @@ public class ProcessZFacade {
         return magnifiedOutput;
     }
 
+    public IMap2d<Integer> getNotMagnifiedOutputObjectIds() {
+        return notMagnifiedOutputObjectIds;
+    }
+
     public void process(IMap2d<Boolean> input) {
         IMap2d<Boolean> copiedInput;
+
+        idCounter = 0;
+        resetIdMaps();
 
         copiedInput = input.copy();
 
@@ -82,6 +91,11 @@ public class ProcessZFacade {
 
         magnify();
     }
+
+    private void resetIdMaps() {
+        setMapToValue(notMagnifiedOutputObjectIds, 0);
+    }
+
 
     private static IMap2d<Boolean> createBlankBooleanMap(Vector2d<Integer> imageSize) {
         IMap2d<Boolean> result = new Map2d<>(imageSize.x, imageSize.y);
@@ -113,11 +127,15 @@ public class ProcessZFacade {
 
             // TODO< decide with a propability if the filled patch should be magnified or not >
             if( pixelChangeListener.setPixelPositions.size() < numberOfPixelsMagnificationThreshold) {
-                drawPixelsIntoMap(pixelChangeListener.setPixelPositions, toMagnify, true);
+                drawValuesIntoMap(pixelChangeListener.setPixelPositions, toMagnify, true);
+                //drawValuesIntoMap(pixelChangeListener.setPixelPositions, toMagnifiedOutputObjectIds, idCounter);
             }
             else {
-                drawPixelsIntoMap(pixelChangeListener.setPixelPositions, notMagnifiedOutput, true);
+                drawValuesIntoMap(pixelChangeListener.setPixelPositions, notMagnifiedOutput, true);
+                drawValuesIntoMap(pixelChangeListener.setPixelPositions, notMagnifiedOutputObjectIds, idCounter);
             }
+
+            idCounter++;
 
             removePixelsFromAccelerationDatastructures(pixelChangeListener.setPixelPositions);
 
@@ -141,9 +159,17 @@ public class ProcessZFacade {
         return candidateList.get(candidateIndex);
     }
 
-    private void drawPixelsIntoMap(final List<Vector2d<Integer>> pixels, IMap2d<Boolean> map, final boolean value) {
-        for( Vector2d<Integer> iterationPosition : pixels ) {
+    private static<Type> void drawValuesIntoMap(final List<Vector2d<Integer>> positions, IMap2d<Type> map, final Type value) {
+        for( Vector2d<Integer> iterationPosition : positions ) {
             map.setAt(iterationPosition.x, iterationPosition.y, value);
+        }
+    }
+
+    private static<Type> void setMapToValue(IMap2d<Type> map, final Type value) {
+        for( int y = 0; y < map.getLength(); y++ ) {
+            for( int x = 0; x < map.getWidth(); x++ ) {
+                map.setAt(x, y, value);
+            }
         }
     }
 
@@ -172,7 +198,7 @@ public class ProcessZFacade {
     }
 
     private void removePixelsFromAccelerationDatastructures(final List<Vector2d<Integer>> pixels) {
-        drawPixelsIntoMap(pixels, unprocessedPixelsMap, false);
+        drawValuesIntoMap(pixels, unprocessedPixelsMap, false);
 
         for( final Vector2d<Integer> iterationPixel : pixels ) {
             final Vector2d<Integer> cellPositionOfPixel = pixelPositionToCellPosition(iterationPixel);
@@ -213,6 +239,9 @@ public class ProcessZFacade {
 
     private IMap2d<Boolean> notMagnifiedOutput;
     private IMap2d<Boolean> magnifiedOutput;
+
+    private IMap2d<Integer> notMagnifiedOutputObjectIds;
+    private int idCounter;
 
     private IMap2d<Boolean> toMagnify;
 
