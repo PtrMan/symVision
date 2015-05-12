@@ -60,11 +60,17 @@ public class ProcessBTest {
 
         ProcessA processA = new ProcessA();
 
+        IMap2d<Integer> dummyObjectIdMap = new Map2d<>(mapBoolean.getWidth(), mapBoolean.getLength());
+        for( int y = 0; y < dummyObjectIdMap.getLength(); y++ ) {
+            for( int x = 0; x < dummyObjectIdMap.getWidth(); x++ ) {
+                dummyObjectIdMap.setAt(x, y, 0);
+            }
+        }
 
         // NOTE< we need to sample twice beause the samples will be modified >
-        processA.setWorkingImage(mapBoolean.copy());
+        processA.set(mapBoolean.copy(), dummyObjectIdMap);
         List<ProcessA.Sample> samplesTest = processA.sampleImage();
-        processA.setWorkingImage(mapBoolean.copy());
+        processA.set(mapBoolean.copy(), dummyObjectIdMap);
         List<ProcessA.Sample> samplesReference = processA.sampleImage();
 
 

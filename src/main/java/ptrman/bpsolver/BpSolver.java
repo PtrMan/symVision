@@ -75,7 +75,7 @@ public class BpSolver {
 
         // copy because processA changes the image
         processA.setImageSize(getImageSize());
-        processA.setWorkingImage(image.copy());
+        processA.set(image.copy(), processZFacade.getNotMagnifiedOutputObjectIds());
         List<ProcessA.Sample> endosceletonSamples = processA.sampleImage();
 
 

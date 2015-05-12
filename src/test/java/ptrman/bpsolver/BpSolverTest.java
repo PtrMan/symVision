@@ -1,5 +1,6 @@
 package ptrman.bpsolver;
 
+import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.FargGeneral.network.Link;
@@ -156,8 +157,15 @@ public class BpSolverTest {
         ProcessH processH = new ProcessH();
         ProcessE processE = new ProcessE();
         ProcessM processM = new ProcessM();
-        
-        processA.setWorkingImage(image);
+
+        IMap2d<Integer> dummyObjectIdMap = new Map2d<>(image.getWidth(), image.getLength());
+        for( int y = 0; y < dummyObjectIdMap.getLength(); y++ ) {
+            for( int x = 0; x < dummyObjectIdMap.getWidth(); x++ ) {
+                dummyObjectIdMap.setAt(x, y, 0);
+            }
+        }
+
+        processA.set(image, dummyObjectIdMap);
         List<ProcessA.Sample> samples = processA.sampleImage();
         
         

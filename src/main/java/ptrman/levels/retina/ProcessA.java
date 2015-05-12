@@ -44,15 +44,21 @@ public class ProcessA implements IProcess {
         public boolean isAltitudeValid() {
             return altitude != Double.NaN;
         }
+
+        public boolean isObjectIdValid() {
+            return objectId != -1;
+        }
         
         public ArrayRealVector position;
         public double altitude = Double.NaN;
         public EnumType type;
+        public int objectId = -1;
     }
     
     
-    public void setWorkingImage(IMap2d<Boolean> image) {
+    public void set(IMap2d<Boolean> image, IMap2d<Integer> idMap) {
         workingImage = image.copy();
+        this.idMap = idMap;
     }
 
     /**
@@ -78,7 +84,8 @@ public class ProcessA implements IProcess {
                                 hitCount++;
                                 workingImage.setAt(x, y, false);
 
-                                addSampleToList(resultSamples, x, y);
+                                final int objectId = idMap.readAt(x, y);
+                                addSampleToList(resultSamples, x, y, objectId);
                             }
                         }
                     }
@@ -96,7 +103,8 @@ public class ProcessA implements IProcess {
                                 hitCount++;
                                 workingImage.setAt(x, y, false);
 
-                                addSampleToList(resultSamples, x, y);
+                                final int objectId = idMap.readAt(x, y);
+                                addSampleToList(resultSamples, x, y, objectId);
                             }
                         }
                     }
@@ -107,8 +115,11 @@ public class ProcessA implements IProcess {
         return resultSamples;
     }
     
-    private static void addSampleToList(List<Sample> samples, int x, int y) {
-        samples.add(new Sample(new ArrayRealVector(new double[]{(double)x, (double)y})));
+    private static void addSampleToList(List<Sample> samples, final int x, final int y, final int objectId) {
+        Sample addSample = new Sample(new ArrayRealVector(new double[]{(double)x, (double)y}));
+        addSample.objectId = objectId;
+
+        samples.add(addSample);
     }
 
     private static boolean sampleMaskAtPosition(Vector2d<Integer> position, boolean[] mask4by4) {
@@ -121,6 +132,7 @@ public class ProcessA implements IProcess {
     }
 
     private IMap2d<Boolean> workingImage;
+    private IMap2d<Integer> idMap;
 
     private static final boolean[] MaskDetail0 =
             {
