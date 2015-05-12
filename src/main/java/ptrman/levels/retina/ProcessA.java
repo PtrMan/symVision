@@ -3,6 +3,7 @@ package ptrman.levels.retina;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
+import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,24 @@ import java.util.List;
  *
  * samples from the input image and puts the set pixels into a queue (is for now just a list)
  */
-public class ProcessA {
+public class ProcessA implements IProcess {
+    @Override
+    public void setImageSize(Vector2d<Integer> imageSize) {
+        Assert.Assert((imageSize.x % 4) == 0, "imageSize.x must be divisable by 4");
+        Assert.Assert((imageSize.y % 4) == 0, "imageSize.y must be divisable by 4");
+    }
+
+    @Override
+    public void setup() {
+
+    }
+
+
+    @Override
+    public void processData() {
+        // TODO< refactor code so it uses this new interface >
+    }
+
     public static class Sample {
         public enum EnumType {
             ENDOSCELETON,
@@ -46,24 +64,41 @@ public class ProcessA {
      */
     public List<Sample> sampleImage() {
         List<Sample> resultSamples;
-        int hitCount;
-        int sampleCount;
 
         resultSamples = new ArrayList<>();
-        
-        hitCount = 0;
-        sampleCount = 0;
 
-        for( int y = 0; y < workingImage.getLength(); y++ ) {
-            for( int x = 0; x < workingImage.getWidth(); x++ ) {
-                sampleCount++;
+        for( int blockY = 0; blockY < workingImage.getLength()/4; blockY++ ) {
+            for( int blockX = 0; blockX < workingImage.getWidth()/4; blockX++ ) {
+                int hitCount = 0;
 
-                if( sampleMaskAtPosition(new Vector2d<>(x, y), MaskDetail0) ) {
-                    if( workingImage.readAt(x, y) ) {
-                        hitCount++;
-                        workingImage.setAt(x, y, false);
+                for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
+                    for (int x = blockX; x < (blockX+1)*4; x++) {
+                        if( sampleMaskAtPosition(new Vector2d<>(x, y), MaskDetail0) ) {
+                            if( workingImage.readAt(x, y) ) {
+                                hitCount++;
+                                workingImage.setAt(x, y, false);
 
-                        addSampleToList(resultSamples, x, y);
+                                addSampleToList(resultSamples, x, y);
+                            }
+                        }
+                    }
+                }
+
+                if( hitCount == 8 ) {
+                    continue;
+                }
+
+                // sample it a second time for nearly all of the missing pixels
+                for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
+                    for (int x = blockX; x < (blockX+1)*4; x++) {
+                        if( sampleMaskAtPosition(new Vector2d<>(x, y), MaskDetail1) ) {
+                            if( workingImage.readAt(x, y) ) {
+                                hitCount++;
+                                workingImage.setAt(x, y, false);
+
+                                addSampleToList(resultSamples, x, y);
+                            }
+                        }
                     }
                 }
             }
