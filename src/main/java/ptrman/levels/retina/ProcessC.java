@@ -60,8 +60,9 @@ public class ProcessC implements IProcess {
     }
 
 
-    public void preSetupSet(final int gridsize) {
+    public void preSetupSet(final int gridsize, Queue<ProcessA.Sample> resultSamplesQueue) {
         this.gridsize = gridsize;
+        this.resultSamplesQueue = resultSamplesQueue;
     }
 
     @Override
@@ -134,7 +135,7 @@ public class ProcessC implements IProcess {
                 outerSample.type = ProcessA.Sample.EnumType.EXOSCELETON;
             }
 
-
+            resultSamplesQueue.add(outerSample);
         }
     }
     
@@ -207,6 +208,8 @@ public class ProcessC implements IProcess {
     }
 
     private final Queue<ProcessA.Sample> queueToProcessF;
+    private Queue<ProcessA.Sample> resultSamplesQueue;
+
 
     private SpatialListMap2d<ProcessA.Sample> accelerationMap;
 

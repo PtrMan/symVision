@@ -190,7 +190,15 @@ public class ProcessD implements IProcess {
 
 
 
-            final List<ArrayRealVector> positionsOfSamples = getSamplesByIndices(workingSamples, chosenCandidateSampleIndices);
+            final List<ProcessA.Sample> selectedSamples = getSamplesByIndices(workingSamples, chosenCandidateSampleIndices);
+
+            // check if object ids are the same
+            final boolean objectIdsOfSamplesTheSame = areObjectIdsTheSameOfSamples(selectedSamples);
+            if( !objectIdsOfSamplesTheSame ) {
+                continue;
+            }
+
+            final List<ArrayRealVector> positionsOfSamples = getPositionsOfSamples(selectedSamples);
 
             final ArrayRealVector averageOfPositionsOfSamples = getAverage(positionsOfSamples);
             final double currentMaximalDistanceOfPositions = getMaximalDistanceOfPositionsTo(positionsOfSamples, averageOfPositionsOfSamples);
@@ -250,6 +258,32 @@ public class ProcessD implements IProcess {
         return resultSingleDetectors;
     }
 
+    private static boolean areObjectIdsTheSameOfSamples(final List<ProcessA.Sample> samples) {
+        Assert.Assert(samples.get(0).isObjectIdValid(), "");
+
+        final int objectId = samples.get(0).objectId;
+
+        for( final ProcessA.Sample iterationSamples : samples ) {
+            Assert.Assert(iterationSamples.isObjectIdValid(), "");
+
+            if( iterationSamples.objectId != objectId ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private static List<ArrayRealVector> getPositionsOfSamples(final List<ProcessA.Sample> samples) {
+        List<ArrayRealVector> resultPositions = new ArrayList<>();
+
+        for( final ProcessA.Sample iterationSample : samples ) {
+            resultPositions.add(iterationSample.position);
+        }
+
+        return resultPositions;
+    }
+
     private static double getMaximalDistanceOfPositionsTo(final List<ArrayRealVector> positions, final ArrayRealVector comparePosition) {
         double maxDistance = 0.0;
 
@@ -296,11 +330,11 @@ public class ProcessD implements IProcess {
         return result;
     }
 
-    private static List<ArrayRealVector> getSamplesByIndices(final List<ProcessA.Sample> samples, final List<Integer> indices) {
-        List<ArrayRealVector> resultPositions = new ArrayList<>();
+    private static List<ProcessA.Sample> getSamplesByIndices(final List<ProcessA.Sample> samples, final List<Integer> indices) {
+        List<ProcessA.Sample> resultPositions = new ArrayList<>();
 
         for( final int index : indices ) {
-            resultPositions.add(samples.get(index).position);
+            resultPositions.add(samples.get(index));
         }
 
         return resultPositions;

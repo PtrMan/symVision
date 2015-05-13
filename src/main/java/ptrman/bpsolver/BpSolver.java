@@ -99,7 +99,7 @@ public class BpSolver {
 
 
         processC.setImageSize(getImageSize());
-        processC.preSetupSet(8 /*gridsize*/);
+        processC.preSetupSet(8 /*gridsize*/, sampleQueueFromProcessC);
         processC.setup();
 
 
@@ -108,6 +108,9 @@ public class BpSolver {
 
 
         processC.processData();
+
+
+        endosceletonSampleFilter.processData();
 
 
 
@@ -130,7 +133,7 @@ public class BpSolver {
         endosceletonProcessD.processData();
         List<RetinaPrimitive> lineDetectors = endosceletonProcessD.getResultRetinaPrimitives();
 
-
+        System.out.println("endosceleton lineDetectors size " + Integer.toString(lineDetectors.size()));
 
         // take out the samples from a queue, put it into a list and a output queue
         // TODO< put this into a own process >
