@@ -4,7 +4,7 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 
 import java.util.ArrayDeque;
-import java.util.Queue;
+import java.util.Deque;
 
 public class FloodFill
 {
@@ -15,8 +15,8 @@ public class FloodFill
     
     public static <Type> void fill(IMap2d<Type> map, Vector2d<Integer> centerPosition, final Type targetColor, final Type replacementColor, final boolean cross, IPixelSetListener pixelSetListener)
     {
-        Queue<Vector2d<Integer>> remainingPositions = new ArrayDeque<>();
-        remainingPositions.add(centerPosition);
+        Deque<Vector2d<Integer>> remainingPositions = new ArrayDeque<>();
+        remainingPositions.push(centerPosition);
 
         for(;;) {
             if( remainingPositions.isEmpty() ) {
@@ -27,12 +27,12 @@ public class FloodFill
 
             if( targetColor.equals(replacementColor) )
             {
-                return;
+                continue;
             }
 
             if( !(map.readAt(currentPosition.x, currentPosition.y).equals(targetColor)) )
             {
-                return;
+                continue;
             }
 
             map.setAt(currentPosition.x, currentPosition.y, replacementColor);
@@ -53,12 +53,12 @@ public class FloodFill
         }
     }
 
-    private static <Type> void fillRangeChecked(final IMap2d<Type> map, final Vector2d<Integer> position, Queue<Vector2d<Integer>> remainingPositions)
+    private static <Type> void fillRangeChecked(final IMap2d<Type> map, final Vector2d<Integer> position, Deque<Vector2d<Integer>> remainingPositions)
     {
         if( !map.inBounds(position) ) {
             return;
         }
 
-        remainingPositions.add(position);
+        remainingPositions.push(position);
     }
 }

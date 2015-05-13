@@ -12,6 +12,7 @@ import ptrman.levels.visual.VisualProcessor;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -20,6 +21,7 @@ import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.util.*;
 
 /**
  *
@@ -45,15 +47,13 @@ public class TestClustering {
             Graphics2D g2 = off_Image.createGraphics();
 
             if (currentFile == null) {
-                g2.setColor(Color.WHITE);
+                g2.setColor(Color.BLACK);
 
                 g2.drawRect(0, 0, off_Image.getWidth(), off_Image.getHeight());
 
-                g2.setColor(Color.BLACK);
+                g2.setColor(Color.WHITE);
 
-                g2.drawLine(10, 10, 20, 40);
-
-                g2.drawLine(20, 40, 30, 10);
+                g2.drawRect(2, 2, 2, 2);
 
                 ///drawTestTriangle(g2, new Vector2d<>(20.0f, 60.0f), 10.0f, time, (3.0f / (float)Math.sqrt(3)));
 
@@ -140,8 +140,10 @@ public class TestClustering {
             Graphics2D graphics = (Graphics2D)detectorImage.getGraphics();
 
             // TODO create graphics and draw it to a created image and put the image into the canvas
-            // TODO< drawing like in TestVideo >
-            //DebugDrawingHelper.drawDetectors(graphics, bpSolver.lastFrameRetinaPrimitives, bpSolver.lastFrameIntersections, bpSolver.lastFrameEndosceletonSamples);
+            java.util.List<DebugDrawingHelper.DrawingEntity> drawingEntities = new ArrayList<>();
+            drawingEntities.add(new DebugDrawingHelper.SampleDrawingEntity(1, false));
+
+            DebugDrawingHelper.drawDetectors(graphics, bpSolver.lastFrameRetinaPrimitives, bpSolver.lastFrameIntersections, new ArrayList<>(Arrays.asList(bpSolver.lastFrameEndosceletonSamples, bpSolver.lastFrameExosceletonSamples)), drawingEntities);
 
             dualCanvas.rightCanvas.setImage(detectorImage);
         }
