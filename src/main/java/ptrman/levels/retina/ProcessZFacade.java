@@ -123,7 +123,7 @@ public class ProcessZFacade {
             Vector2d<Integer> notCompletlyProcessedCellPosition = (Vector2d<Integer>)arrayOfNotCompletlyProcessedCells[random.nextInt(arrayOfNotCompletlyProcessedCells.length)];
             Vector2d<Integer> randomPixelFromNotCompletlyProcessCell = getRandomPixelPositionOfCell(notCompletlyProcessedCellPosition);
 
-            FloodFill.fill(input, randomPixelFromNotCompletlyProcessCell, Boolean.TRUE, Boolean.FALSE, pixelChangeListener);
+            FloodFill.fill(input, randomPixelFromNotCompletlyProcessCell, Boolean.TRUE, Boolean.FALSE, true, pixelChangeListener);
 
             // TODO< decide with a propability if the filled patch should be magnified or not >
             if( pixelChangeListener.setPixelPositions.size() < numberOfPixelsMagnificationThreshold) {

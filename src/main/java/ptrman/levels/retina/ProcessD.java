@@ -192,6 +192,11 @@ public class ProcessD implements IProcess {
 
             final List<ProcessA.Sample> selectedSamples = getSamplesByIndices(workingSamples, chosenCandidateSampleIndices);
 
+            final boolean doAllSamplesHaveId = doAllSamplesHaveObjectId(selectedSamples);
+            if( !doAllSamplesHaveId ) {
+                continue;
+            }
+
             // check if object ids are the same
             final boolean objectIdsOfSamplesTheSame = areObjectIdsTheSameOfSamples(selectedSamples);
             if( !objectIdsOfSamplesTheSame ) {
@@ -256,6 +261,16 @@ public class ProcessD implements IProcess {
         List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector, workingSamples);
         
         return resultSingleDetectors;
+    }
+
+    private static boolean doAllSamplesHaveObjectId(final List<ProcessA.Sample> samples) {
+        for( final ProcessA.Sample iterationSamples : samples ) {
+            if( !iterationSamples.isObjectIdValid() ) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private static boolean areObjectIdsTheSameOfSamples(final List<ProcessA.Sample> samples) {

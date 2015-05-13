@@ -13,7 +13,7 @@ public class FloodFill
         void seted(Vector2d<Integer> position);
     }
     
-    public static <Type> void fill(IMap2d<Type> map, Vector2d<Integer> centerPosition, final Type targetColor, final Type replacementColor, IPixelSetListener pixelSetListener)
+    public static <Type> void fill(IMap2d<Type> map, Vector2d<Integer> centerPosition, final Type targetColor, final Type replacementColor, final boolean cross, IPixelSetListener pixelSetListener)
     {
         Queue<Vector2d<Integer>> remainingPositions = new ArrayDeque<>();
         remainingPositions.add(centerPosition);
@@ -43,6 +43,13 @@ public class FloodFill
             fillRangeChecked(map, new Vector2d<>(currentPosition.x-1, currentPosition.y), remainingPositions);
             fillRangeChecked(map, new Vector2d<>(currentPosition.x, currentPosition.y+1), remainingPositions);
             fillRangeChecked(map, new Vector2d<>(currentPosition.x, currentPosition.y-1), remainingPositions);
+
+            if( cross ) {
+                fillRangeChecked(map, new Vector2d<>(currentPosition.x+1, currentPosition.y+1), remainingPositions);
+                fillRangeChecked(map, new Vector2d<>(currentPosition.x-1, currentPosition.y+1), remainingPositions);
+                fillRangeChecked(map, new Vector2d<>(currentPosition.x+1, currentPosition.y-1), remainingPositions);
+                fillRangeChecked(map, new Vector2d<>(currentPosition.x-1, currentPosition.y-1), remainingPositions);
+            }
         }
     }
 
