@@ -7,7 +7,7 @@ import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Network;
 import ptrman.FargGeneral.network.Node;
 import ptrman.bpsolver.RetinaToWorkspaceTranslator.ITranslatorStrategy;
-import ptrman.bpsolver.RetinaToWorkspaceTranslator.NearIntersectionStrategy;
+import ptrman.bpsolver.RetinaToWorkspaceTranslator.IdStrategy;
 import ptrman.bpsolver.codelets.BaryCenter;
 import ptrman.bpsolver.codelets.LineSegmentLength;
 import ptrman.bpsolver.codelets.LineSegmentSlope;
@@ -186,7 +186,7 @@ public class BpSolver {
 
         ITranslatorStrategy retinaToWorkspaceTranslatorStrategy;
 
-        retinaToWorkspaceTranslatorStrategy = new NearIntersectionStrategy();
+        retinaToWorkspaceTranslatorStrategy = new IdStrategy();
 
         List<Node> objectNodes = retinaToWorkspaceTranslatorStrategy.createObjectsFromRetinaPrimitives(lineDetectors, this);
 
