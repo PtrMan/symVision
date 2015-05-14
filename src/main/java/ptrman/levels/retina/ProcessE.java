@@ -16,25 +16,37 @@ import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
  */
 public class ProcessE {
     // TODO< sort out only the line detectors or make sure only linedetectors get in, remove asserts if its made sure >
+
     public void process(List<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
+        FindIntersectionOfLineDetectorsWithDifferentObjectIds(lineDetectors, image);
+    }
+
+    public void FindIntersectionOfLineDetectorsWithDifferentObjectIds(List<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
         // we examine ALL possible intersections of all lines
         // this is only possible if we have the whole image at an instance
         // we assume here that this is the case
 
         for( int outerI = 0; outerI < lineDetectors.size(); outerI++ ) {
+
+            RetinaPrimitive lowLinePrimitive = lineDetectors.get(outerI);
+            Assert.Assert(lowLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
+
             for( int innerI = 0; innerI < lineDetectors.size(); innerI++ ) {
                 if( innerI == outerI ) {
                     continue;
                 }
 
-                RetinaPrimitive lowLinePrimitive;
                 RetinaPrimitive highLinePrimitive;
                 
                 Assert.Assert(lineDetectors.get(outerI).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
                 Assert.Assert(lineDetectors.get(innerI).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
                 
-                lowLinePrimitive = lineDetectors.get(outerI);
                 highLinePrimitive = lineDetectors.get(innerI);
+                Assert.Assert(highLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
+
+                if( lowLinePrimitive.objectId != highLinePrimitive.objectId ) {
+                    continue;
+                }
 
                 ArrayRealVector intersectionPosition = intersectLineDetectors(lowLinePrimitive.line, highLinePrimitive.line);
                 

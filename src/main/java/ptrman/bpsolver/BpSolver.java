@@ -43,7 +43,7 @@ public class BpSolver {
 
     public void recalculate(IMap2d<Boolean> image) {
         final boolean enableProcessH = false;
-        final boolean enableProcessE = false;
+        final boolean enableProcessE = true;
         final boolean enableProcessM = false;
 
         final int NUMBEROFCYCLES = 500;
