@@ -42,7 +42,13 @@ public class RetinaPrimitive {
     public SingleLineDetector line;
     public ProcessG.Curve curve;
     public boolean marked = false; // used in algorithms for marking of the RetinaPrimitive for various algorithms
-    
+
+    public int objectId = -1;
+
+    public boolean hasValidObjectId() {
+        return objectId != -1;
+    }
+
     private RetinaPrimitive() {
     }
     

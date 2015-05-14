@@ -50,6 +50,8 @@ public class ProcessD implements IProcess {
         public double mse = 0.0f;
         
         public boolean isLocked = false; // has the detector received enought activation so it stays?
+
+        public int commonObjectId = -1;
         
         public boolean doesContainSampleIndex(int index)
         {
@@ -58,6 +60,10 @@ public class ProcessD implements IProcess {
         
         public double getActivation() {
             return integratedSampleIndices.size() + (Parameters.getProcessdMaxMse() - mse)*Parameters.getProcessdLockingActivationScale();
+        }
+
+        public boolean isCommonObjectIdValid() {
+            return commonObjectId != -1;
         }
         
         public ArrayRealVector projectPointOntoLine(ArrayRealVector point) {
@@ -225,6 +231,9 @@ public class ProcessD implements IProcess {
             LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints();
             createdLineDetector.integratedSampleIndices = chosenCandidateSampleIndices;
             createdLineDetector.cachedIntegratedSampleCellPositions = getUnionOfCellsByPositions(positionsOfSamples);
+
+            Assert.Assert(areObjectIdsTheSameOfSamples(selectedSamples), "");
+            createdLineDetector.commonObjectId = selectedSamples.get(0).objectId;
 
             Assert.Assert(createdLineDetector.integratedSampleIndices.size() >= 2, "");
             // the regression mse is not defined if it are only two points
@@ -486,7 +495,7 @@ public class ProcessD implements IProcess {
             
             sort(samplePositions, new VectorComperatorByAxis(EnumAxis.Y));
             
-            return clusterPointsFromLinedetectorToLinedetectors(samplePositions, EnumAxis.Y);
+            return clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, samplePositions, EnumAxis.Y);
         }
         else {
             List<ArrayRealVector> projectedPointPositions = new ArrayList<>();
@@ -503,12 +512,12 @@ public class ProcessD implements IProcess {
 
             sort(projectedPointPositions, new VectorComperatorByAxis(EnumAxis.X));
 
-            return clusterPointsFromLinedetectorToLinedetectors(projectedPointPositions, EnumAxis.X);
+            return clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, projectedPointPositions, EnumAxis.X);
         }
     }
     
     
-    private static List<RetinaPrimitive> clusterPointsFromLinedetectorToLinedetectors(List<ArrayRealVector> pointPositions, EnumAxis axis) {
+    private static List<RetinaPrimitive> clusterPointsFromLinedetectorToLinedetectors(final int objectId, final List<ArrayRealVector> pointPositions, final EnumAxis axis) {
         List<RetinaPrimitive> resultSingleLineDetectors = new ArrayList<>();
 
         boolean nextIsNewLineStart = true;
@@ -532,7 +541,9 @@ public class ProcessD implements IProcess {
             }
             else {
                 // form a new line
-                resultSingleLineDetectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, iterationPoint)));
+                RetinaPrimitive newPrimitive = RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, iterationPoint));
+                newPrimitive.objectId = objectId;
+                resultSingleLineDetectors.add(newPrimitive);
 
                 nextIsNewLineStart = true;
             }
@@ -542,7 +553,9 @@ public class ProcessD implements IProcess {
         ArrayRealVector lastPoint = pointPositions.get(pointPositions.size()-1);
 
         if( !nextIsNewLineStart && Helper.getAxis(lastPoint, axis) - lastAxisPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE ) {
-            resultSingleLineDetectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, lastPoint)));
+            RetinaPrimitive newPrimitive = RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, lastPoint));
+            newPrimitive.objectId = objectId;
+            resultSingleLineDetectors.add(newPrimitive);
         }
         
         return resultSingleLineDetectors;
