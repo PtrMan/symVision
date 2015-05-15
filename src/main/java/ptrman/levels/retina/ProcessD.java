@@ -1,6 +1,7 @@
 package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
@@ -40,8 +41,7 @@ public class ProcessD implements IProcess {
 
     private static class LineDetectorWithMultiplePoints {
 
-
-        public List<Vector2d<Integer>> cachedIntegratedSampleCellPositions;
+        public List<ArrayRealVector> cachedSamplePositions;
         public List<Integer> integratedSampleIndices;
 
         
@@ -110,6 +110,18 @@ public class ProcessD implements IProcess {
             int sampleIndex = integratedSampleIndices.get(0);
             return samples.get(sampleIndex).position.getDataRef()[0];
         }
+
+        public double getLength() {
+            List<ArrayRealVector> sortedSamplePositions = getSortedSamplePositions(this);
+
+            Assert.Assert(sortedSamplePositions.size() >= 2, "samples size must be equal or greater than two");
+
+            // it doesn't care if the line is singuar or not, the distance is always the length
+            final ArrayRealVector lastSamplePosition = sortedSamplePositions.get(sortedSamplePositions.size()-1);
+            final ArrayRealVector firstSamplePosition = sortedSamplePositions.get(0);
+
+            return lastSamplePosition.subtract(firstSamplePosition).getNorm();
+        }
     }
 
     @Override
@@ -165,98 +177,149 @@ public class ProcessD implements IProcess {
         // TODO< add constant >
         int numberOfTries = (int)( samples.size() * 3.5f );
 
-        // pick out a random cell and pick out a random sample in it and try to build a (small) line out of it
-        for( int tryCounter = 0; tryCounter < numberOfTries; tryCounter++ ) {
-            List<Integer> keys = new ArrayList<>(accelerationMapCellUsed.keySet());
-            final int randomCellPositionIndex = keys.get(random.nextInt(keys.size()));
-            final Vector2d<Integer> randomCellPosition = new Vector2d<>(randomCellPositionIndex % accelerationMap.getWidth(), randomCellPositionIndex / accelerationMap.getWidth());
+        // TODO< imagesize >
+        double maxLength = Math.sqrt(100.0f*100.0f + 80.0f*80.0f);
 
-            // pick out three points at random
-            // TODO< better strategy >
+        final int numberOfMaximalLengthCycles = 5;
 
-            List<Integer> chosenCandidateSampleIndices = new ArrayList<>();
+        for( int lengthCycle = 0; lengthCycle < numberOfMaximalLengthCycles; lengthCycle++ ) {
+            // pick out a random cell and pick out a random sample in it and try to build a (small) line out of it
+            for( int tryCounter = 0; tryCounter < numberOfTries; tryCounter++ ) {
+                List<Integer> keys = new ArrayList<>(accelerationMapCellUsed.keySet());
+                final int randomCellPositionIndex = keys.get(random.nextInt(keys.size()));
+                final Vector2d<Integer> randomCellPosition = new Vector2d<>(randomCellPositionIndex % accelerationMap.getWidth(), randomCellPositionIndex / accelerationMap.getWidth());
 
-            {
-                final List<Integer> allCandidateSampleIndices = getAllIndicesOfSamplesOfCellAndNeightborCells(randomCellPosition);
+                // pick out three points at random
+                // TODO< better strategy >
 
-                if( allCandidateSampleIndices.size() < 3 ) {
+                List<Integer> chosenCandidateSampleIndices = new ArrayList<>();
+
+                {
+                    final List<Integer> allCandidateSampleIndices = getAllIndicesOfSamplesOfCellAndNeightborCells(randomCellPosition);
+
+                    if( allCandidateSampleIndices.size() < 3 ) {
+                        continue;
+                    }
+
+                    final List<Integer> allCandidateSampleIndicesChosenIndices = getRandomElements(allCandidateSampleIndices.size(), 3, random);
+
+                    for( final int iterationChosenIndex : allCandidateSampleIndicesChosenIndices ) {
+                        final int currentChosenCandidateSampleIndex = allCandidateSampleIndices.get(iterationChosenIndex);
+                        chosenCandidateSampleIndices.add(currentChosenCandidateSampleIndex);
+                    }
+                }
+
+
+
+
+
+
+
+                final List<ProcessA.Sample> selectedSamples = getSamplesByIndices(workingSamples, chosenCandidateSampleIndices);
+
+                final boolean doAllSamplesHaveId = doAllSamplesHaveObjectId(selectedSamples);
+                if( !doAllSamplesHaveId ) {
                     continue;
                 }
 
-                final List<Integer> allCandidateSampleIndicesChosenIndices = getRandomElements(allCandidateSampleIndices.size(), 3, random);
-
-                for( final int iterationChosenIndex : allCandidateSampleIndicesChosenIndices ) {
-                    final int currentChosenCandidateSampleIndex = allCandidateSampleIndices.get(iterationChosenIndex);
-                    chosenCandidateSampleIndices.add(currentChosenCandidateSampleIndex);
+                // check if object ids are the same
+                final boolean objectIdsOfSamplesTheSame = areObjectIdsTheSameOfSamples(selectedSamples);
+                if( !objectIdsOfSamplesTheSame ) {
+                    continue;
                 }
-            }
+
+                final List<ArrayRealVector> positionsOfSamples = getPositionsOfSamples(selectedSamples);
+
+                final ArrayRealVector averageOfPositionsOfSamples = getAverage(positionsOfSamples);
+                final double currentMaximalDistanceOfPositions = getMaximalDistanceOfPositionsTo(positionsOfSamples, averageOfPositionsOfSamples);
+
+                if( currentMaximalDistanceOfPositions > Math.min(maximalDistanceOfPositions, maxLength*0.5f) ) {
+                    // one point is too far away from the average position, so this line is not formed
+                    continue;
+                }
+                // else we are here
+
+                final RegressionForLineResult regressionResult = calcRegressionForPoints(positionsOfSamples);
+
+                if( regressionResult.mse > Parameters.getProcessdMaxMse() ) {
+                    continue;
+                }
+                // else we are here
+
+
+                // create new line detector
+                LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints();
+                createdLineDetector.integratedSampleIndices = chosenCandidateSampleIndices;
+                createdLineDetector.cachedSamplePositions = positionsOfSamples;
 
 
 
+                Assert.Assert(areObjectIdsTheSameOfSamples(selectedSamples), "");
+                createdLineDetector.commonObjectId = selectedSamples.get(0).objectId;
 
+                Assert.Assert(createdLineDetector.integratedSampleIndices.size() >= 2, "");
+                // the regression mse is not defined if it are only two points
 
+                boolean addCreatedLineDetector = false;
 
-
-            final List<ProcessA.Sample> selectedSamples = getSamplesByIndices(workingSamples, chosenCandidateSampleIndices);
-
-            final boolean doAllSamplesHaveId = doAllSamplesHaveObjectId(selectedSamples);
-            if( !doAllSamplesHaveId ) {
-                continue;
-            }
-
-            // check if object ids are the same
-            final boolean objectIdsOfSamplesTheSame = areObjectIdsTheSameOfSamples(selectedSamples);
-            if( !objectIdsOfSamplesTheSame ) {
-                continue;
-            }
-
-            final List<ArrayRealVector> positionsOfSamples = getPositionsOfSamples(selectedSamples);
-
-            final ArrayRealVector averageOfPositionsOfSamples = getAverage(positionsOfSamples);
-            final double currentMaximalDistanceOfPositions = getMaximalDistanceOfPositionsTo(positionsOfSamples, averageOfPositionsOfSamples);
-
-            if( currentMaximalDistanceOfPositions > maximalDistanceOfPositions ) {
-                // one point is too far away from the average position, so this line is not formed
-                continue;
-            }
-            // else we are here
-
-            final RegressionForLineResult regressionResult = calcRegressionForPoints(positionsOfSamples);
-
-            if( regressionResult.mse > Parameters.getProcessdMaxMse() ) {
-                continue;
-            }
-            // else we are here
-
-            // create new line detector
-            LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints();
-            createdLineDetector.integratedSampleIndices = chosenCandidateSampleIndices;
-            createdLineDetector.cachedIntegratedSampleCellPositions = getUnionOfCellsByPositions(positionsOfSamples);
-
-            Assert.Assert(areObjectIdsTheSameOfSamples(selectedSamples), "");
-            createdLineDetector.commonObjectId = selectedSamples.get(0).objectId;
-
-            Assert.Assert(createdLineDetector.integratedSampleIndices.size() >= 2, "");
-            // the regression mse is not defined if it are only two points
-            if( createdLineDetector.integratedSampleIndices.size() == 2 ) {
-                createdLineDetector.mse = 0.0f;
-
-                createdLineDetector.n = regressionResult.n;
-                createdLineDetector.m = regressionResult.m;
-
-                multiplePointsLineDetector.add(createdLineDetector);
-            }
-            else {
-                if( regressionResult.mse < Parameters.getProcessdMaxMse() ) {
-                    createdLineDetector.mse = regressionResult.mse;
+                if( createdLineDetector.integratedSampleIndices.size() == 2 ) {
+                    createdLineDetector.mse = 0.0f;
 
                     createdLineDetector.n = regressionResult.n;
                     createdLineDetector.m = regressionResult.m;
 
+                    addCreatedLineDetector = true;
+                }
+                else {
+                    if( regressionResult.mse < Parameters.getProcessdMaxMse() ) {
+                        createdLineDetector.mse = regressionResult.mse;
+
+                        createdLineDetector.n = regressionResult.n;
+                        createdLineDetector.m = regressionResult.m;
+
+                        addCreatedLineDetector = true;
+                    }
+                }
+
+
+                if( createdLineDetector.getLength() > maxLength ) {
+                    continue;
+                }
+                // else we are here
+
+                if( addCreatedLineDetector ) {
                     multiplePointsLineDetector.add(createdLineDetector);
                 }
             }
 
+
+            // compile statistics
+            SummaryStatistics lineLengthStatistics = new SummaryStatistics();
+
+            for( LineDetectorWithMultiplePoints currentLineDetectorWithMultipleLines : multiplePointsLineDetector ) {
+                double length = currentLineDetectorWithMultipleLines.getLength();
+                lineLengthStatistics.addValue(length);
+            }
+
+
+
+            final double currentLineLengthMean = lineLengthStatistics.getMean();
+            final double newMaxLength = currentLineLengthMean * 0.9f; // TODO< constant >
+            
+            System.out.println("length mean " + Double.toString(currentLineLengthMean));
+
+            maxLength = Math.min(maxLength, newMaxLength);
+            final double finalizedMaxLength = maxLength;
+
+            final List<LineDetectorWithMultiplePoints> oldLines = copyLineDetectors(multiplePointsLineDetector);
+
+            // throw out
+            multiplePointsLineDetector.removeIf(candidate -> candidate.getLength() > finalizedMaxLength);
+
+            if( multiplePointsLineDetector.size() == 0 ) {
+                multiplePointsLineDetector = oldLines;
+                break;
+            }
         }
 
 
@@ -264,13 +327,20 @@ public class ProcessD implements IProcess {
 
 
 
-
-
-
         // split the detectors into one or many lines
-        List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector, workingSamples);
+        List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector);
         
         return resultSingleDetectors;
+    }
+
+    private static List<LineDetectorWithMultiplePoints> copyLineDetectors(final List<LineDetectorWithMultiplePoints> lineDetectors) {
+        List<LineDetectorWithMultiplePoints> result = new ArrayList<>();
+
+        for( final LineDetectorWithMultiplePoints iterationLineDetector : lineDetectors ) {
+            result.add(iterationLineDetector);
+        }
+
+        return result;
     }
 
     private static boolean doAllSamplesHaveObjectId(final List<ProcessA.Sample> samples) {
@@ -472,48 +542,50 @@ public class ProcessD implements IProcess {
         return max;
     }
     
-    private static List<RetinaPrimitive> splitDetectorsIntoLines(List<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints, List<ProcessA.Sample> samples) {
+    private static List<RetinaPrimitive> splitDetectorsIntoLines(List<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints) {
         List<RetinaPrimitive> result;
         
         result = new ArrayList<>();
         
         for( LineDetectorWithMultiplePoints iterationDetector : lineDetectorsWithMultiplePoints ) {
-            result.addAll(splitDetectorIntoLines(iterationDetector, samples));
+            result.addAll(splitDetectorIntoLines(iterationDetector));
         }
         
         return result;
     }
-    
-    private static List<RetinaPrimitive> splitDetectorIntoLines(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints, List<ProcessA.Sample> samples) {
-        if( lineDetectorWithMultiplePoints.isYAxisSingularity() ) {
-            // handle the special case where its all on one x coordinate
 
-            List<ArrayRealVector> samplePositions = new ArrayList<>();
-            
-            for( int iterationSampleIndex : lineDetectorWithMultiplePoints.integratedSampleIndices ) {
-                samplePositions.add(samples.get(iterationSampleIndex).position);
+    private static List<ArrayRealVector> getSortedSamplePositions(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints) {
+        List<ArrayRealVector> samplePositions = new ArrayList<>();
+
+        if( lineDetectorWithMultiplePoints.isYAxisSingularity() ) {
+            for( ArrayRealVector iterationSamplePosition : lineDetectorWithMultiplePoints.cachedSamplePositions ) {
+                samplePositions.add(iterationSamplePosition);
             }
-            
+
             sort(samplePositions, new VectorComperatorByAxis(EnumAxis.Y));
-            
-            return clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, samplePositions, EnumAxis.Y);
         }
         else {
-            List<ArrayRealVector> projectedPointPositions = new ArrayList<>();
-            
-            // first sort all points after the x position
-            // and then "cluster" the lines after the distance between succeeding points
-            
             // project
-            for( int iterationSampleIndex : lineDetectorWithMultiplePoints.integratedSampleIndices ) {
-                ArrayRealVector projectedSamplePosition = lineDetectorWithMultiplePoints.projectPointOntoLine(samples.get(iterationSampleIndex).position);
+            for( ArrayRealVector iterationSamplePosition : lineDetectorWithMultiplePoints.cachedSamplePositions ) {
+                ArrayRealVector projectedSamplePosition = lineDetectorWithMultiplePoints.projectPointOntoLine(iterationSamplePosition);
 
-                projectedPointPositions.add(projectedSamplePosition);
+                samplePositions.add(projectedSamplePosition);
             }
 
-            sort(projectedPointPositions, new VectorComperatorByAxis(EnumAxis.X));
+            sort(samplePositions, new VectorComperatorByAxis(EnumAxis.X));
+        }
 
-            return clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, projectedPointPositions, EnumAxis.X);
+        return samplePositions;
+    }
+    
+    private static List<RetinaPrimitive> splitDetectorIntoLines(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints) {
+        List<ArrayRealVector> sortedSamplePositions = getSortedSamplePositions(lineDetectorWithMultiplePoints);
+
+        if( lineDetectorWithMultiplePoints.isYAxisSingularity() ) {
+            return clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, sortedSamplePositions, EnumAxis.Y);
+        }
+        else {
+            return clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, sortedSamplePositions, EnumAxis.X);
         }
     }
     
