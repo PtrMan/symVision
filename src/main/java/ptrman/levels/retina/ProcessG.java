@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static ptrman.bpsolver.Helper.isNeightborhoodPixelSet;
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 import static ptrman.math.ArrayRealVectorHelper.normalize;
 
@@ -250,7 +251,7 @@ public class ProcessG {
                 
                 if(
                     image.inBounds(arrayRealVectorToInteger(intersectionPositionBegin)) &&
-                    ProcessE.isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPositionBegin), image)
+                    isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPositionBegin), image)
                 ) {
                     Intersection createdIntersection;
 
@@ -264,7 +265,7 @@ public class ProcessG {
                 
                 if(
                         image.inBounds(arrayRealVectorToInteger(intersectionPositionEnd)) &&
-                                ProcessE.isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPositionEnd), image)
+                                isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPositionEnd), image)
                 ) {
                     Intersection createdIntersection;
 

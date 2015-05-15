@@ -162,6 +162,7 @@ public class ProcessD implements IProcess {
             sampleIndex++;
         }
 
+        // TODO< add constant >
         int numberOfTries = (int)( samples.size() * 3.5f );
 
         // pick out a random cell and pick out a random sample in it and try to build a (small) line out of it

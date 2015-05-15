@@ -2,12 +2,13 @@ package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.IMap2d;
-import ptrman.Datastructures.Vector2d;
-import ptrman.bpsolver.HardParameters;
 import ptrman.misc.Assert;
 
 import java.util.List;
+import java.util.Map;
 
+import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimitives;
+import static ptrman.bpsolver.Helper.isNeightborhoodPixelSet;
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 /**
@@ -18,14 +19,19 @@ public class ProcessE {
     // TODO< sort out only the line detectors or make sure only linedetectors get in, remove asserts if its made sure >
 
     public void process(List<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
-        FindIntersectionOfLineDetectorsWithDifferentObjectIds(lineDetectors, image);
-    }
-
-    public void FindIntersectionOfLineDetectorsWithDifferentObjectIds(List<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
         // we examine ALL possible intersections of all lines
         // this is only possible if we have the whole image at an instance
         // we assume here that this is the case
 
+        Map<Integer, List<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(lineDetectors);
+
+        // detect line intersections only per object
+        for( List<RetinaPrimitive> primitivesOfObject : objectIdToRetinaPrimitivesMap.values() ) {
+            FindIntersectionOfLineDetectorsWithDifferentObjectIds(primitivesOfObject, image);
+        }
+    }
+
+    private static void FindIntersectionOfLineDetectorsWithDifferentObjectIds(List<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
         for( int outerI = 0; outerI < lineDetectors.size(); outerI++ ) {
 
             RetinaPrimitive lowLinePrimitive = lineDetectors.get(outerI);
@@ -79,26 +85,5 @@ public class ProcessE {
     private static ArrayRealVector intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB) {
         ArrayRealVector intersectionPosition = SingleLineDetector.intersectLineDetectors(lineA, lineB);
         return intersectionPosition;
-    }
-    
-    // TODO< move into some helper function or integrate it into the spartial scheme or something >
-    // public because its used in processG    
-    public static boolean isNeightborhoodPixelSet(Vector2d<Integer> position, IMap2d<Boolean> image) {
-        Vector2d<Integer> min, max;
-        
-        final int SEARCHRADIUS = HardParameters.ProcessE.NEIGHTBORHOODSEARCHRADIUS;
-        
-        min = new Vector2d<>(Math.max(0, position.x - SEARCHRADIUS), Math.max(0, position.y - SEARCHRADIUS));
-        max = new Vector2d<>(Math.min(image.getWidth()-1, position.x + SEARCHRADIUS), Math.min(image.getLength()-1, position.y + SEARCHRADIUS));
-        
-        for( int iy = min.y; iy <= max.y; iy++ ) {
-            for( int ix = min.x; ix <= max.x; ix++ ) {
-                if( image.readAt(ix, iy) ) {
-                    return true;
-                }
-            }
-        }
-        
-        return false;
     }
 }

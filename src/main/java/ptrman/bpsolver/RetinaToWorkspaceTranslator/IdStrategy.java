@@ -5,12 +5,12 @@ import ptrman.FargGeneral.network.Node;
 import ptrman.bpsolver.BpSolver;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.levels.retina.RetinaPrimitive;
-import ptrman.misc.Assert;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimitives;
 
 /**
  * Translator which uses the id's of the RetinaPrimitives
@@ -19,23 +19,7 @@ import java.util.Map;
 public class IdStrategy extends AbstractTranslatorStrategy {
     @Override
     public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, BpSolver bpSolver) {
-        Map<Integer, List<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = new HashMap<>();
-
-        for( final RetinaPrimitive iterationPrimitive : primitives ) {
-            Assert.Assert(iterationPrimitive.hasValidObjectId(), "RetinaPrimitive has no valid objectId");
-
-            List<RetinaPrimitive> primitivesOfObject;
-            if( objectIdToRetinaPrimitivesMap.containsKey(iterationPrimitive.objectId) ) {
-                primitivesOfObject = objectIdToRetinaPrimitivesMap.get(iterationPrimitive.objectId);
-            }
-            else {
-                primitivesOfObject = new ArrayList<>();
-                objectIdToRetinaPrimitivesMap.put(iterationPrimitive.objectId, primitivesOfObject);
-            }
-
-            primitivesOfObject.add(iterationPrimitive);
-        }
-
+        Map<Integer, List<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(primitives);
         return createNodesFromMap(objectIdToRetinaPrimitivesMap, bpSolver);
     }
 
