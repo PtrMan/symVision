@@ -183,8 +183,7 @@ public class ProcessD implements IProcess {
             sampleIndex++;
         }
 
-        // TODO< add constant >
-        int numberOfTries = (int)( samples.size() * 6.5f );
+        int numberOfTries = (int)( samples.size() * HardParameters.ProcessD.SAMPLES_NUMBER_OF_TRIES_MULTIPLIER);
 
         // TODO< imagesize >
         double maxLength = Math.sqrt(100.0f*100.0f + 80.0f*80.0f);
@@ -315,14 +314,18 @@ public class ProcessD implements IProcess {
 
 
             final double currentLineLengthMean = lineLengthStatistics.getMean();
-            final double newMaxLength = currentLineLengthMean * 0.9f; // TODO< constant >
-            
+            final double newMaxLength = currentLineLengthMean * HardParameters.ProcessD.LENGTH_MEAN_MULTIPLIER;
+
             System.out.println("length mean " + Double.toString(currentLineLengthMean));
 
             maxLength = Math.min(maxLength, newMaxLength);
             final double finalizedMaxLength = maxLength;
 
             lineDetectorsRecords.push(new LineDetectors(copyLineDetectors(multiplePointsLineDetector)));
+
+            if( currentLineLengthMean < HardParameters.ProcessD.MINIMAL_LINESEGMENTLENGTH ) {
+                break;
+            }
 
             // throw out
             multiplePointsLineDetector.removeIf(candidate -> candidate.getLength() > finalizedMaxLength);
@@ -337,9 +340,7 @@ public class ProcessD implements IProcess {
         multiplePointsLineDetector.clear();
 
         // add last n records
-        final int LAST_RECORDS_FROM_LINECANDIDATES_STACK = 2;
-
-        for( int lastNRecordsI = 0; lastNRecordsI < LAST_RECORDS_FROM_LINECANDIDATES_STACK; lastNRecordsI++ ) {
+        for( int lastNRecordsI = 0; lastNRecordsI < HardParameters.ProcessD.LAST_RECORDS_FROM_LINECANDIDATES_STACK; lastNRecordsI++ ) {
             if( lineDetectorsRecords.isEmpty() ) {
                 break;
             }
