@@ -142,7 +142,8 @@ public class ProcessD implements IProcess {
         Assert.Assert((imageSize.x % gridcellSize) == 0, "");
         Assert.Assert((imageSize.y % gridcellSize) == 0, "");
 
-        accelerationMap = new SpatialListMap2d<>(imageSize, gridcellSize);
+        // small size hack because else the map is accessed out of range
+        accelerationMap = new SpatialListMap2d<>(new Vector2d<>(imageSize.x + gridcellSize, imageSize.y + gridcellSize), gridcellSize);
     }
 
     @Override
