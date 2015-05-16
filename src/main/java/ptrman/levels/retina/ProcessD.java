@@ -124,6 +124,14 @@ public class ProcessD implements IProcess {
         }
     }
 
+    private static class LineDetectors {
+        public LineDetectors(List<LineDetectorWithMultiplePoints> lineDetectors) {
+            this.lineDetectors = lineDetectors;
+        }
+
+        public List<LineDetectorWithMultiplePoints> lineDetectors;
+    }
+
     @Override
     public void setImageSize(final Vector2d<Integer> imageSize) {
         this.imageSize = imageSize;
@@ -175,12 +183,14 @@ public class ProcessD implements IProcess {
         }
 
         // TODO< add constant >
-        int numberOfTries = (int)( samples.size() * 3.5f );
+        int numberOfTries = (int)( samples.size() * 6.5f );
 
         // TODO< imagesize >
         double maxLength = Math.sqrt(100.0f*100.0f + 80.0f*80.0f);
 
         final int numberOfMaximalLengthCycles = 5;
+
+        Deque<LineDetectors> lineDetectorsRecords = new ArrayDeque<>();
 
         for( int lengthCycle = 0; lengthCycle < numberOfMaximalLengthCycles; lengthCycle++ ) {
             // pick out a random cell and pick out a random sample in it and try to build a (small) line out of it
@@ -311,17 +321,30 @@ public class ProcessD implements IProcess {
             maxLength = Math.min(maxLength, newMaxLength);
             final double finalizedMaxLength = maxLength;
 
-            final List<LineDetectorWithMultiplePoints> oldLines = copyLineDetectors(multiplePointsLineDetector);
+            lineDetectorsRecords.push(new LineDetectors(copyLineDetectors(multiplePointsLineDetector)));
 
             // throw out
             multiplePointsLineDetector.removeIf(candidate -> candidate.getLength() > finalizedMaxLength);
 
             if( multiplePointsLineDetector.size() == 0 ) {
-                multiplePointsLineDetector = oldLines;
                 break;
             }
         }
 
+
+
+        multiplePointsLineDetector.clear();
+
+        // add last n records
+        final int LAST_RECORDS_FROM_LINECANDIDATES_STACK = 2;
+
+        for( int lastNRecordsI = 0; lastNRecordsI < LAST_RECORDS_FROM_LINECANDIDATES_STACK; lastNRecordsI++ ) {
+            if( lineDetectorsRecords.isEmpty() ) {
+                break;
+            }
+
+            multiplePointsLineDetector.addAll(lineDetectorsRecords.pop().lineDetectors);
+        }
 
 
 
