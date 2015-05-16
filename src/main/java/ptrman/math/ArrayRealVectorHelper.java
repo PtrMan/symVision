@@ -9,6 +9,11 @@ import java.util.List;
  *
  */
 public class ArrayRealVectorHelper {
+    public enum EnumRoundMode {
+        DOWN,
+        NEAREST
+    }
+
     public static ArrayRealVector integerToArrayRealVector(final Vector2d<Integer> vector) {
         return new ArrayRealVector(new double[]{vector.x, vector.y});
     }
@@ -44,8 +49,14 @@ public class ArrayRealVectorHelper {
         return result;
     }
 
-    public static Vector2d<Integer> arrayRealVectorToInteger(ArrayRealVector vector) {
-        return new Vector2d<>((int)(vector.getDataRef()[0]), (int)(vector.getDataRef()[1]));
+    public static Vector2d<Integer> arrayRealVectorToInteger(ArrayRealVector vector, EnumRoundMode roundMode) {
+        if( roundMode == EnumRoundMode.NEAREST ) {
+            return new Vector2d<>((int)(vector.getDataRef()[0]), (int)(vector.getDataRef()[1]));
+        }
+        else {
+            return new Vector2d<>((int)java.lang.Math.floor(vector.getDataRef()[0]), (int)java.lang.Math.floor(vector.getDataRef()[1]));
+        }
+
     }
 
     public static ArrayRealVector getAverage(final List<ArrayRealVector> elements) {

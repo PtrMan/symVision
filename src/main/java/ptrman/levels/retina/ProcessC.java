@@ -4,6 +4,7 @@ import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.levels.retina.helper.SpatialCircleDrawer;
 import ptrman.levels.retina.helper.SpatialListMap2d;
+import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
@@ -53,7 +54,7 @@ public class ProcessC implements IProcess {
 
         // fill
         for( final ProcessA.Sample iterationSample : samples ) {
-            final Vector2d<Integer> sampleIntegerPosition = accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(iterationSample.position));
+            final Vector2d<Integer> sampleIntegerPosition = accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN));
             List<ProcessA.Sample> samples = accelerationMap.readAt(sampleIntegerPosition.x, sampleIntegerPosition.y);
             samples.add(iterationSample);
         }
@@ -97,10 +98,10 @@ public class ProcessC implements IProcess {
 
                 if( currentRadius == 0 ) {
                     cellPositionsToScan = new ArrayList<>();
-                    cellPositionsToScan.add(accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(outerSample.position)));
+                    cellPositionsToScan.add(accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(outerSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN)));
                 }
                 else {
-                    cellPositionsToScan = SpatialCircleDrawer.getPositionsOfCellsOfCircle(accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(outerSample.position)), currentRadius, new Vector2d<>(accelerationMap.getWidth(), accelerationMap.getLength()));
+                    cellPositionsToScan = SpatialCircleDrawer.getPositionsOfCellsOfCircle(accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(outerSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN)), currentRadius, new Vector2d<>(accelerationMap.getWidth(), accelerationMap.getLength()));
                 }
 
                 int debug = 0;

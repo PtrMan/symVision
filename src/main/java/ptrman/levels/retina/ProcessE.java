@@ -2,6 +2,7 @@ package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.IMap2d;
+import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
 import java.util.List;
@@ -60,12 +61,12 @@ public class ProcessE {
                     continue;
                 }
                 
-                if( !image.inBounds(arrayRealVectorToInteger(intersectionPosition)) ) {
+                if( !image.inBounds(arrayRealVectorToInteger(intersectionPosition, ArrayRealVectorHelper.EnumRoundMode.DOWN)) ) {
                     continue;
                 }
                 
                 // examine neighborhood of intersection position
-                if( !isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPosition), image) ) {
+                if( !isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPosition, ArrayRealVectorHelper.EnumRoundMode.DOWN), image) ) {
                     continue;
                 }
 

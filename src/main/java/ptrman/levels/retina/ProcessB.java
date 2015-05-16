@@ -2,6 +2,7 @@ package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.*;
+import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ public class ProcessB {
         for( ProcessA.Sample iterationSample : samples ) {
             Tuple2<Vector2d<Integer>, Double> nearestResult;
             
-            nearestResult = findNearestPositionWhereMapIs(false, arrayRealVectorToInteger(iterationSample.position), map, MAXRADIUS);
+            nearestResult = findNearestPositionWhereMapIs(false, arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN), map, MAXRADIUS);
             if( nearestResult == null ) {
                 iterationSample.altitude = ((MAXRADIUS+1)*2)*((MAXRADIUS+1)*2);
                 continue;

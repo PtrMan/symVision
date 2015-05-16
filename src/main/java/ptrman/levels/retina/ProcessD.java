@@ -178,7 +178,7 @@ public class ProcessD implements IProcess {
         // we store all samples inside the acceleration datastructure
         int sampleIndex = 0; // NOTE< index in endosceletonPoint / workingSamples >
         for( final ProcessA.Sample iterationSample : workingSamples ) {
-            putSampleIndexAtPositionIntoAccelerationDatastructure(arrayRealVectorToInteger(iterationSample.position), sampleIndex);
+            putSampleIndexAtPositionIntoAccelerationDatastructure(arrayRealVectorToInteger(iterationSample.position, EnumRoundMode.DOWN), sampleIndex);
             sampleIndex++;
         }
 
@@ -417,7 +417,7 @@ public class ProcessD implements IProcess {
         Set<Vector2d<Integer>> tempSet = new HashSet<>();
 
         for( final ArrayRealVector iterationPosition : positions ) {
-            final Vector2d<Integer> positionAsInteger = arrayRealVectorToInteger(iterationPosition);
+            final Vector2d<Integer> positionAsInteger = arrayRealVectorToInteger(iterationPosition, EnumRoundMode.DOWN);
             final Vector2d<Integer> cellPosition = new Vector2d<>(positionAsInteger.x / gridcellSize, positionAsInteger.y / gridcellSize);
 
             tempSet.add(cellPosition);

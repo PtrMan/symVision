@@ -7,6 +7,7 @@ import ptrman.levels.retina.ProcessA;
 import ptrman.levels.retina.ProcessB;
 import ptrman.levels.visual.ColorRgb;
 import ptrman.levels.visual.VisualProcessor;
+import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
 import java.awt.*;
@@ -111,7 +112,7 @@ public class ProcessBTest {
             for( ProcessA.Sample iterationSample : samples ) {
                 Tuple2<Vector2d<Integer>, Double> nearestResult;
 
-                nearestResult = findNearestPositionWhereMapIs(false, arrayRealVectorToInteger(iterationSample.position), image, MAXRADIUS);
+                nearestResult = findNearestPositionWhereMapIs(false, arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN), image, MAXRADIUS);
                 if( nearestResult == null ) {
                     iterationSample.altitude = ((MAXRADIUS+1)*2)*((MAXRADIUS+1)*2);
                     continue;

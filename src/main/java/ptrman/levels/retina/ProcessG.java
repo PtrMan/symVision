@@ -3,6 +3,7 @@ package ptrman.levels.retina;
 import org.apache.commons.math3.linear.*;
 import ptrman.Datastructures.Map2d;
 import ptrman.bpsolver.HardParameters;
+import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
@@ -250,8 +251,8 @@ public class ProcessG {
                 // examine the intersection positions for inside the image and the neightborhood
                 
                 if(
-                    image.inBounds(arrayRealVectorToInteger(intersectionPositionBegin)) &&
-                    isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPositionBegin), image)
+                    image.inBounds(arrayRealVectorToInteger(intersectionPositionBegin, ArrayRealVectorHelper.EnumRoundMode.DOWN)) &&
+                    isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPositionBegin, ArrayRealVectorHelper.EnumRoundMode.DOWN), image)
                 ) {
                     Intersection createdIntersection;
 
@@ -264,8 +265,8 @@ public class ProcessG {
                 }
                 
                 if(
-                        image.inBounds(arrayRealVectorToInteger(intersectionPositionEnd)) &&
-                                isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPositionEnd), image)
+                        image.inBounds(arrayRealVectorToInteger(intersectionPositionEnd, ArrayRealVectorHelper.EnumRoundMode.DOWN)) &&
+                                isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPositionEnd, ArrayRealVectorHelper.EnumRoundMode.DOWN), image)
                 ) {
                     Intersection createdIntersection;
 
