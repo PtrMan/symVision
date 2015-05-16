@@ -48,4 +48,35 @@ public class Bresenham {
             drawer.setAllDirections(position.x, position.y, x, y);
         }
     }
+
+    public static void rasterLine(final Vector2d<Integer> a, final Vector2d<Integer> b, IDrawer drawer) {
+        int dx = java.lang.Math.abs(b.x-a.x);
+        int dy = java.lang.Math.abs(b.y-a.y);
+
+        int sx = a.x > b.x ? 1 : -1;
+        int sy = a.y > b.y ? 1 : -1;
+
+        int err = dx+dy;
+
+        int x = a.x;
+        int y = a.y;
+
+        for(;;) {
+            drawer.set(new Vector2d<>(x, y));
+
+            if( x == b.x && y == b.y ) {
+                break;
+            }
+
+            int e2 = 2*err;
+
+            if( e2 > dy ) {
+                err += dy; x += sx;
+            }
+
+            if( e2 < dx ) {
+                err += dx; y += sy;
+            }
+        }
+    }
 }
