@@ -46,6 +46,8 @@ public class BpSolver {
         final boolean enableProcessE = true;
         final boolean enableProcessM = false;
 
+        final boolean debugLineIntersections = false;
+
         final int NUMBEROFCYCLES = 500;
 
         // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
@@ -171,7 +173,9 @@ public class BpSolver {
         if( enableProcessE ) {
             processE.process(lineDetectors, image);
 
-            lineIntersections = getAllLineIntersections(lineDetectors);
+            if( debugLineIntersections ) {
+                lineIntersections = getAllLineIntersections(lineDetectors);
+            }
         }
 
         List<ProcessM.LineParsing> lineParsings = new ArrayList<>();
