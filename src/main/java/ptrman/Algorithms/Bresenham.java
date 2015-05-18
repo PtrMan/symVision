@@ -11,16 +11,6 @@ import ptrman.Datastructures.Vector2d;
 public class Bresenham {
     public interface IDrawer {
         void set(final Vector2d<Integer> position);
-
-        /**
-         *
-         * .set(new Vector2d<>(position.x + x, position.y + y));
-         * .set(new Vector2d<>(position.x - x, position.y + y));
-         * .set(new Vector2d<>(position.x + x, position.y - y));
-         * .set(new Vector2d<>(position.x - x, position.y - y));
-         *
-         */
-        void setAllDirections(final int centerX, final int centerY, final int x, final int y);
     }
 
     public static void rasterCircle(final Vector2d<Integer> position, final int radius, IDrawer drawer) {
@@ -45,7 +35,10 @@ public class Bresenham {
             ddF_x += 2;
             f += ddF_x + 1;
 
-            drawer.setAllDirections(position.x, position.y, x, y);
+            drawer.set(new Vector2d<>(position.x + x, position.y + y));
+            drawer.set(new Vector2d<>(position.x - x, position.y + y));
+            drawer.set(new Vector2d<>(position.x + x, position.y - y));
+            drawer.set(new Vector2d<>(position.x - x, position.y - y));
         }
     }
 

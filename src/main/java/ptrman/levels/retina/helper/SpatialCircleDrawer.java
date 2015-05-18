@@ -17,16 +17,6 @@ public final class SpatialCircleDrawer {
         public void set(Vector2d<Integer> position) {
             positions.add(position);
         }
-
-        @Override
-        public void setAllDirections(int centerX, int centerY, int x, int y) {
-            positions.add(new Vector2d<>(centerX + x, centerY + y));
-            positions.add(new Vector2d<>(centerX + x, centerY - y));
-            positions.add(new Vector2d<>(centerX - x, centerY + y));
-            positions.add(new Vector2d<>(centerX - x, centerY - y));
-        }
-
-
     }
 
     public static List<Vector2d<Integer>> getPositionsOfCellsOfCircle(final Vector2d<Integer> center, final int radius, final Vector2d<Integer> boundary) {
