@@ -9,7 +9,7 @@ import java.util.List;
 /**
  * Used to draw circles in spatial datastructures
  */
-public final class SpatialCircleDrawer {
+public final class SpatialDrawer {
     static final private class Drawer implements Bresenham.IDrawer {
         public List<Vector2d<Integer>> positions = new ArrayList<>();
 
@@ -19,7 +19,7 @@ public final class SpatialCircleDrawer {
         }
     }
 
-    public static List<Vector2d<Integer>> getPositionsOfCellsOfCircle(final Vector2d<Integer> center, final int radius, final Vector2d<Integer> boundary) {
+    public static List<Vector2d<Integer>> getPositionsOfCellsOfCircleBound(final Vector2d<Integer> center, final int radius, final Vector2d<Integer> boundary) {
         Drawer drawer = new Drawer();
 
         Bresenham.rasterCircle(center, radius, drawer);
