@@ -1,6 +1,6 @@
 package ptrman.Datastructures;
 
-import ptrman.levels.retina.helper.SpatialCircleDrawer;
+import ptrman.levels.retina.helper.SpatialDrawer;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ public class SpatialAcceleratedMap2d {
     }
 
     public List<Vector2d<Integer>> getGridLocationsOfGridRadius(final Vector2d<Integer> gridPosition, final int gridRadius) {
-        return SpatialCircleDrawer.getPositionsOfCellsOfCircle(gridPosition, gridRadius, gridBoundary);
+        return SpatialDrawer.getPositionsOfCellsOfCircleBound(gridPosition, gridRadius, gridBoundary);
     }
 
     public List<List<Vector2d<Integer>>> getGridLocationsNearPositionInWideningRadius(final Vector2d<Integer> position, final float radius) {

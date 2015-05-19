@@ -66,6 +66,13 @@ public final class SpatialDrawer {
         */
     }
 
+    public static List<Vector2d<Integer>> getPositionsOfCellsOfLineUnbound(final Vector2d<Integer> a, final Vector2d<Integer> b) {
+        Drawer drawer = new Drawer();
+
+        Bresenham.rasterLine(a, b, drawer);
+        return drawer.positions;
+    }
+
     private static boolean isGridLocationInBound(final Vector2d<Integer> position, final Vector2d<Integer> boundary) {
         return position.x >= 0 && position.x < boundary.x && position.y >= 0 && position.y < boundary.y;
     }

@@ -43,11 +43,54 @@ public class Bresenham {
     }
 
     public static void rasterLine(final Vector2d<Integer> a, final Vector2d<Integer> b, IDrawer drawer) {
-        int dx = java.lang.Math.abs(b.x-a.x);
-        int dy = java.lang.Math.abs(b.y-a.y);
+        // special cases
+        if( a.y == b.y ) {
+            final int x1, x2;
 
-        int sx = a.x > b.x ? 1 : -1;
-        int sy = a.y > b.y ? 1 : -1;
+            if( a.x > b.x ) {
+                x1 = b.x;
+                x2 = a.x;
+            }
+            else {
+                x1 = a.x;
+                x2 = b.x;
+            }
+
+            for( int x = x1; x <= x2; x++ ) {
+                drawer.set(new Vector2d<>(x, a.y));
+            }
+
+            return;
+        }
+
+        if( a.x == b.x ) {
+            final int y1, y2;
+
+            if( a.y > b.y ) {
+                y1 = b.y;
+                y2 = a.y;
+            }
+            else {
+                y1 = a.y;
+                y2 = b.y;
+            }
+
+            for( int y = y1; y <= y2; y++ ) {
+                drawer.set(new Vector2d<>(a.x, y));
+            }
+
+            return;
+        }
+
+        rasterLineBresenham(a, b, drawer);
+    }
+
+    private static void rasterLineBresenham(final Vector2d<Integer> a, final Vector2d<Integer> b, IDrawer drawer) {
+        final int dx = java.lang.Math.abs(b.x - a.x);
+        final int dy = -java.lang.Math.abs(b.y - a.y);
+
+        final int sx = signumWithoutZero(b.x - a.x);
+        final int sy = signumWithoutZero(b.y - a.y);
 
         int err = dx+dy;
 
@@ -70,6 +113,18 @@ public class Bresenham {
             if( e2 < dx ) {
                 err += dx; y += sy;
             }
+        }
+    }
+
+    private static int signumWithoutZero(final int value) {
+        //if( value == 0 ) {
+        //    return 0;
+        //}
+        if( value > 0 ) {
+            return  1;
+        }
+        else {
+            return -1;
         }
     }
 }
