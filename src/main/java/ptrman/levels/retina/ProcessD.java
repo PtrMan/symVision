@@ -14,6 +14,8 @@ import ptrman.misc.Assert;
 import java.util.*;
 
 import static java.util.Collections.sort;
+import static ptrman.Datastructures.Vector2d.IntegerHelper.add;
+import static ptrman.Datastructures.Vector2d.IntegerHelper.sub;
 import static ptrman.math.ArrayRealVectorHelper.*;
 import static ptrman.math.Math.getRandomElements;
 
@@ -234,31 +236,29 @@ public class ProcessD implements IProcess {
                     final int possibleNeightborAccelerationCellIndex = random.nextInt(possibleNeightborAccelerationCellsWithSamples.size());
                     final Vector2d<Integer> chosenAccelerationStructureNeightborCellPosition = possibleNeightborAccelerationCellsWithSamples.get(possibleNeightborAccelerationCellIndex);
 
+                    final Vector2d<Integer> cellDelta = sub(chosenAccelerationStructureNeightborCellPosition, spatialAccelerationCenterPosition);
+                    final Vector2d<Integer> minusCellDelta = new Vector2d<>(-cellDelta.x, -cellDelta.y);
+                    final Vector2d<Integer> otherCellPosition = add(spatialAccelerationCenterPosition, minusCellDelta);
+
                     final ArrayRealVector absoluteRandomPositionInChosenNeightborCell = calcAbsolutePositionInAccelerationCell(chosenAccelerationStructureNeightborCellPosition);
                     final ArrayRealVector absoluteCenterPosition = getAbsolutePositionOfLeftTopCornerOfAccelerationCell(spatialAccelerationCenterPosition).add(new ArrayRealVector(new double[]{0.5 * (double) gridcellSize, 0.5 * (double) gridcellSize}));
 
                     final ArrayRealVector absoluteDiff = absoluteRandomPositionInChosenNeightborCell.subtract(absoluteCenterPosition);
                     spatialAccelerationLineDirection = normalize(absoluteDiff);
 
-                    // TODO< improve line drawing code to draw the line in both directions >
-
                     // * draw line in acceleration structure
 
-                    final List<Vector2d<Integer>> accelerationCandidateCells = SpatialDrawer.getPositionsOfCellsOfLineUnbound(spatialAccelerationCenterPosition, chosenAccelerationStructureNeightborCellPosition);
+                    final List<Vector2d<Integer>> accelerationCandidateCells = SpatialDrawer.getPositionsOfCellsOfLineUnbound(otherCellPosition, chosenAccelerationStructureNeightborCellPosition);
 
                     // * filter out valid candidates
                     accelerationCandidateCells.removeIf(cellPosition -> cellPosition == null);
 
-                    // TODO< >
-
-                    // * select random points from the validAccelerationCandidateCells
+                    // * select random points from the validAccelerationCandidateCells (happens outside)
+                    // * fitting (happens outside)
 
                     // TODO< other strategy, select two samples and find all points whcih are not too far away from the line >
 
                     allCandidateSampleIndices = getAllSampleIndicesOfCells(accelerationCandidateCells);
-
-
-                    // * fitting (happens outside)
                 }
 
 
@@ -455,7 +455,7 @@ public class ProcessD implements IProcess {
 
         for( int y = miny; y < maxy; y++ ) {
             for( int x = minx; x < maxx; x++ ) {
-                if( accelerationMap.readAt(x, y) != null ) {
+                if( centerCellPosition.x != x && centerCellPosition.y != y &&    accelerationMap.readAt(x, y) != null ) {
                     resultCellPositions.add(new Vector2d<>(x, y));
                 }
             }
