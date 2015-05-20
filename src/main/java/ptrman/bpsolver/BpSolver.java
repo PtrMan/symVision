@@ -19,6 +19,8 @@ import ptrman.levels.retina.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
+import static ptrman.levels.retina.helper.QueueHelper.getAllElementsFromQueueAsList;
+
 public class BpSolver {
     public static void main(String[] args) {
         Parameters.init();
@@ -42,7 +44,7 @@ public class BpSolver {
 
 
     public void recalculate(IMap2d<Boolean> image) {
-        final boolean enableProcessH = false;
+        final boolean enableProcessH = true;
         final boolean enableProcessE = true;
         final boolean enableProcessM = false;
 
@@ -60,7 +62,8 @@ public class BpSolver {
         ProcessC processC = new ProcessC(queueToProcessF);
         ProcessD endosceletonProcessD = new ProcessD();
         ProcessD exosceletonProcessD = new ProcessD();
-        ProcessH processH = new ProcessH();
+        ProcessH endosceletonProcessH = new ProcessH();
+        ProcessH exosceletonProcessH = new ProcessH();
         ProcessE processE = new ProcessE();
         ProcessM processM = new ProcessM();
         ProcessF processF = new ProcessF();
@@ -88,6 +91,19 @@ public class BpSolver {
 
         Queue<ProcessA.Sample> processFOutputSampleQueue = new ArrayDeque<>();
         Queue<ProcessA.Sample> toExosceletonProcessDSampleQueue = new ArrayDeque<>();
+
+        Queue<RetinaPrimitive> queueLineDetectorEndosceletonFromProcessD = new ArrayDeque<>(); // new naming style
+        Queue<RetinaPrimitive> queueLineDetectorExosceletonFromProcessD = new ArrayDeque<>(); // new naming style
+
+        Queue<RetinaPrimitive> queueLineDetectorEndosceletonFromProcessH = new ArrayDeque<>(); // new naming style
+        Queue<RetinaPrimitive> queueLineDetectorExosceletonFromProcessH = new ArrayDeque<>(); // new naming style
+
+        endosceletonProcessH.set(queueLineDetectorEndosceletonFromProcessD, queueLineDetectorEndosceletonFromProcessH);
+        endosceletonProcessH.setup();
+
+        exosceletonProcessH.set(queueLineDetectorExosceletonFromProcessD, queueLineDetectorExosceletonFromProcessH);
+        exosceletonProcessH.setup();
+
 
         processB.process(endosceletonSamples, image);
 
@@ -128,14 +144,14 @@ public class BpSolver {
 
 
         endosceletonProcessD.setImageSize(getImageSize());
-        endosceletonProcessD.set(sampleQueueForEndosceleton);
+        endosceletonProcessD.set(sampleQueueForEndosceleton, queueLineDetectorEndosceletonFromProcessD);
 
         endosceletonProcessD.preSetupSet(6.0f/*maximalDistanceOfPositions*/);
         endosceletonProcessD.setup();
         endosceletonProcessD.processData();
-        List<RetinaPrimitive> lineDetectors = endosceletonProcessD.getResultRetinaPrimitives();
+        //List<RetinaPrimitive> lineDetectors = endosceletonProcessD.getResultRetinaPrimitives();
 
-        System.out.println("endosceleton lineDetectors size " + Integer.toString(lineDetectors.size()));
+
 
         // take out the samples from a queue, put it into a list and a output queue
         // TODO< put this into a own process >
@@ -151,7 +167,7 @@ public class BpSolver {
 
 
         exosceletonProcessD.setImageSize(getImageSize());
-        exosceletonProcessD.set(toExosceletonProcessDSampleQueue);
+        exosceletonProcessD.set(toExosceletonProcessDSampleQueue, queueLineDetectorExosceletonFromProcessD);
 
         exosceletonProcessD.preSetupSet(6.0f/*maximalDistanceOfPositions*/);
         exosceletonProcessD.setup();
@@ -165,10 +181,12 @@ public class BpSolver {
 
 
         if( enableProcessH ) {
-            processH.process(lineDetectors);
+            endosceletonProcessH.processData();
+            exosceletonProcessH.processData();
         }
 
 
+        /*
 
         if( enableProcessE ) {
             processE.process(lineDetectors, image);
@@ -186,13 +204,17 @@ public class BpSolver {
             lineParsings = processM.getLineParsings();
         }
 
+        */
 
 
-        ITranslatorStrategy retinaToWorkspaceTranslatorStrategy;
+        List<RetinaPrimitive> lineDetectorsEndosceletonAfterProcessH = getAllElementsFromQueueAsList(queueLineDetectorEndosceletonFromProcessH);
 
-        retinaToWorkspaceTranslatorStrategy = new IdStrategy();
+        System.out.println("lineDetectorsEndosceletonAfterProcessH size " + Integer.toString(lineDetectorsEndosceletonAfterProcessH.size()));
 
-        List<Node> objectNodes = retinaToWorkspaceTranslatorStrategy.createObjectsFromRetinaPrimitives(lineDetectors, this);
+
+        ITranslatorStrategy retinaToWorkspaceTranslatorStrategy = new IdStrategy();
+
+        List<Node> objectNodes = retinaToWorkspaceTranslatorStrategy.createObjectsFromRetinaPrimitives(lineDetectorsEndosceletonAfterProcessH, this);
 
         cycle(NUMBEROFCYCLES);
 
@@ -236,7 +258,8 @@ public class BpSolver {
         }
 
         lastFrameObjectNodes = objectNodes;
-        lastFrameRetinaPrimitives = lineDetectors; // for now only the line detectors TODO
+        lastFrameRetinaPrimitives = lineDetectorsEndosceletonAfterProcessH; // for now only the line detectors TODO
+                                                                            // for now only from processH for the endosceleton
         lastFrameEndosceletonSamples = endosceletonSamples;
         lastFrameExosceletonSamples = exosceletonSamples;
         lastFrameIntersections = lineIntersections; // TODO< other intersections too >

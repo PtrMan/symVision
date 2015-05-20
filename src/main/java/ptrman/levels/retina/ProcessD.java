@@ -16,6 +16,7 @@ import java.util.*;
 import static java.util.Collections.sort;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.add;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.sub;
+import static ptrman.levels.retina.helper.QueueHelper.transferAllElementsFromListToQueue;
 import static ptrman.math.ArrayRealVectorHelper.*;
 import static ptrman.math.Math.getRandomElements;
 
@@ -29,17 +30,13 @@ import static ptrman.math.Math.getRandomElements;
  * 
  */
 public class ProcessD implements IProcess {
-
     public void preSetupSet(double maximalDistanceOfPositions) {
         this.maximalDistanceOfPositions = maximalDistanceOfPositions;
     }
 
-    public void set(Queue<ProcessA.Sample> inputSampleQueue) {
+    public void set(Queue<ProcessA.Sample> inputSampleQueue, Queue<RetinaPrimitive> outputLineDetectorQueue) {
         this.inputSampleQueue = inputSampleQueue;
-    }
-
-    public List<RetinaPrimitive> getResultRetinaPrimitives() {
-        return resultRetinaPrimitives;
+        this.outputLineDetectorQueue = outputLineDetectorQueue;
     }
 
     private static class LineDetectorWithMultiplePoints {
@@ -166,7 +163,9 @@ public class ProcessD implements IProcess {
         }
 
 
-        resultRetinaPrimitives = detectLines(samplesAsList);
+        final List<RetinaPrimitive> resultRetinaPrimitives = detectLines(samplesAsList);
+
+        transferAllElementsFromListToQueue(resultRetinaPrimitives, outputLineDetectorQueue);
     }
     
     /**
@@ -838,9 +837,8 @@ public class ProcessD implements IProcess {
 
     private Map<Integer, Boolean> accelerationMapCellUsed = new HashMap<>();
 
-    private List<RetinaPrimitive> resultRetinaPrimitives;
-
     private double maximalDistanceOfPositions;
 
     private Queue<ProcessA.Sample> inputSampleQueue;
+    private Queue<RetinaPrimitive> outputLineDetectorQueue;
 }

@@ -1,16 +1,17 @@
 package ptrman.bpsolver;
 
+import org.junit.Test;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
-import ptrman.levels.retina.*;
 import ptrman.bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
 import ptrman.bpsolver.nodes.AttributeNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import org.junit.Test;
+import ptrman.levels.retina.*;
+import ptrman.misc.Assert;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -177,10 +178,10 @@ public class BpSolverTest {
         List<RetinaPrimitive> lineDetectors = null; // TODO processD.detectLines(samples);
         
         List<Intersection> lineIntersections = new ArrayList<>();
-        
-        
-        
-        processH.process(lineDetectors);
+
+
+        Assert.Assert(false, "TODO modernize");
+        //processH.process(lineDetectors);
         
         
         

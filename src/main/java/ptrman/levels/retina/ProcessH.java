@@ -1,17 +1,58 @@
 package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
+import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.misc.Assert;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+
+import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimitives;
+import static ptrman.levels.retina.helper.QueueHelper.getAllElementsFromQueueAsList;
 
 /**
  * tries to combine linedetectors
- * 
+ *
+ * combines detectors only of the same objectId
  */
-public class ProcessH {
-    public void process(List<RetinaPrimitive> workingDetectors) {
+public class ProcessH implements IProcess {
+    public void set(Queue<RetinaPrimitive> inputQueue, Queue<RetinaPrimitive> resultQueue) {
+        this.inputQueue = inputQueue;
+        this.resultQueue = resultQueue;
+    }
+
+    @Override
+    public void setImageSize(Vector2d<Integer> imageSize) {
+    }
+
+    @Override
+    public void setup() {
+    }
+
+    @Override
+    public void processData() {
+        List<RetinaPrimitive> allInputDetectors = getAllElementsFromQueueAsList(inputQueue);
+
+        List<RetinaPrimitive> allResultDetectors = new ArrayList<>();
+
+        Map<Integer, List<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(allInputDetectors);
+
+        for( final Map.Entry<Integer, List<RetinaPrimitive>> iterationEntry : objectIdToRetinaPrimitivesMap.entrySet() ) {
+            combineOfObjectId(iterationEntry.getValue(), iterationEntry.getKey());
+
+            allResultDetectors.addAll(iterationEntry.getValue());
+        }
+
+        // transfer the detectors into the result
+        for( final RetinaPrimitive iterationPrimitive : allResultDetectors ) {
+            resultQueue.add(iterationPrimitive);
+        }
+    }
+
+    public void combineOfObjectId(List<RetinaPrimitive> workingDetectors, final int objectId) {
         // called low and high because the index low is always lower than high
         int iteratorLow, iteratorHigh;
         
@@ -46,7 +87,9 @@ public class ProcessH {
                         workingDetectors.remove(iteratorHigh);
                         workingDetectors.remove(iteratorLow);
 
-                        workingDetectors.add(RetinaPrimitive.makeLine(fusedLineDetector));
+                        RetinaPrimitive newLine = RetinaPrimitive.makeLine(fusedLineDetector);
+                        newLine.objectId = objectId;
+                        workingDetectors.add(newLine);
 
                         // we need to repeat the search because we changed the array
                         terminate = false;
@@ -62,7 +105,9 @@ public class ProcessH {
                         workingDetectors.remove(iteratorHigh);
                         workingDetectors.remove(iteratorLow);
 
-                        workingDetectors.add(RetinaPrimitive.makeLine(fusedLineDetector));
+                        RetinaPrimitive newLine = RetinaPrimitive.makeLine(fusedLineDetector);
+                        newLine.objectId = objectId;
+                        workingDetectors.add(newLine);
 
                         // we need to repeat the search because we changed the array
                         terminate = false;
@@ -238,4 +283,9 @@ public class ProcessH {
         
         return distanceBetweenProjectedAndPoint < HardParameters.ProcessH.MAXDISTANCEFORCANDIDATEPOINT;
     }
+
+    private Queue<RetinaPrimitive> inputQueue;
+    private Queue<RetinaPrimitive> resultQueue;
+
+
 }
