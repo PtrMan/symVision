@@ -206,7 +206,6 @@ public class BpSolver {
 
         */
 
-
         List<RetinaPrimitive> lineDetectorsEndosceletonAfterProcessH = getAllElementsFromQueueAsList(queueLineDetectorEndosceletonFromProcessH);
 
         System.out.println("lineDetectorsEndosceletonAfterProcessH size " + Integer.toString(lineDetectorsEndosceletonAfterProcessH.size()));
@@ -259,7 +258,7 @@ public class BpSolver {
 
         lastFrameObjectNodes = objectNodes;
         lastFrameRetinaPrimitives = lineDetectorsEndosceletonAfterProcessH; // for now only the line detectors TODO
-                                                                            // for now only from processH for the endosceleton
+                                                                            // for now only that whats written here
         lastFrameEndosceletonSamples = endosceletonSamples;
         lastFrameExosceletonSamples = exosceletonSamples;
         lastFrameIntersections = lineIntersections; // TODO< other intersections too >

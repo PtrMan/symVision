@@ -11,7 +11,7 @@ public class QueueHelper {
         List<Type> result = new ArrayList<>();
 
         for( int i = 0; i < size; i++ ) {
-            result.add(queue.peek());
+            result.add(queue.poll());
         }
 
         return result;

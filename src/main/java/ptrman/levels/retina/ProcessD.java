@@ -16,6 +16,7 @@ import java.util.*;
 import static java.util.Collections.sort;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.add;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.sub;
+import static ptrman.levels.retina.helper.QueueHelper.getAllElementsFromQueueAsList;
 import static ptrman.levels.retina.helper.QueueHelper.transferAllElementsFromListToQueue;
 import static ptrman.math.ArrayRealVectorHelper.*;
 import static ptrman.math.Math.getRandomElements;
@@ -154,14 +155,7 @@ public class ProcessD implements IProcess {
     @Override
     public void processData() {
         // take samples from queue and put into array
-        List<ProcessA.Sample> samplesAsList = new ArrayList<>();
-
-        final int inputSampleQueueSize = inputSampleQueue.size();
-
-        for( int i = 0; i < inputSampleQueueSize; i++ ) {
-            samplesAsList.add(inputSampleQueue.poll());
-        }
-
+        List<ProcessA.Sample> samplesAsList = getAllElementsFromQueueAsList(inputSampleQueue);
 
         final List<RetinaPrimitive> resultRetinaPrimitives = detectLines(samplesAsList);
 
@@ -211,7 +205,7 @@ public class ProcessD implements IProcess {
 
                 // strategy for getting a "protoline"
 
-                final int ACCELERATIONSTRUCUTRE_LINE_CANDIDATES_RADIUS = 2;
+                final int ACCELERATIONSTRUCUTRE_LINE_CANDIDATES_RADIUS = 1;
 
                 // variables for LineDetectorWithMultiplePoints
                 final ArrayRealVector spatialAccelerationLineDirection;

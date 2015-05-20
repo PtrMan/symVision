@@ -27,7 +27,7 @@ public class HardParameters
         public final static double MINIMAL_LINESEGMENTLENGTH = 5.0;
         public static final double LENGTH_MEAN_MULTIPLIER = 0.9;
         public static final int LAST_RECORDS_FROM_LINECANDIDATES_STACK = 2;
-        public static final double SAMPLES_NUMBER_OF_TRIES_MULTIPLIER = 2.5;
+        public static final double SAMPLES_NUMBER_OF_TRIES_MULTIPLIER = 5.5;
     }
 
     public static class ProcessC {
