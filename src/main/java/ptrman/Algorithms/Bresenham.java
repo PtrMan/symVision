@@ -10,7 +10,7 @@ import ptrman.Datastructures.Vector2d;
  */
 public class Bresenham {
     public interface IDrawer {
-        void set(final Vector2d<Integer> position);
+        void set(final Vector2d<Integer> position, final Vector2d<Integer> direction);
     }
 
     public static void rasterCircle(final Vector2d<Integer> position, final int radius, IDrawer drawer) {
@@ -20,10 +20,10 @@ public class Bresenham {
         int x = 0;
         int y = radius;
 
-        drawer.set(new Vector2d<>(position.x, position.y + radius));
-        drawer.set(new Vector2d<>(position.x, position.y - radius));
-        drawer.set(new Vector2d<>(position.x + radius, position.y));
-        drawer.set(new Vector2d<>(position.x - radius, position.y));
+        drawer.set(new Vector2d<>(position.x, position.y + radius), new Vector2d<>(0, 1));
+        drawer.set(new Vector2d<>(position.x, position.y - radius), new Vector2d<>(0, -1));
+        drawer.set(new Vector2d<>(position.x + radius, position.y), new Vector2d<>(1, 0));
+        drawer.set(new Vector2d<>(position.x - radius, position.y), new Vector2d<>(-1, 0));
 
         while(x < y) {
             if(f >= 0) {
@@ -35,10 +35,14 @@ public class Bresenham {
             ddF_x += 2;
             f += ddF_x + 1;
 
-            drawer.set(new Vector2d<>(position.x + x, position.y + y));
-            drawer.set(new Vector2d<>(position.x - x, position.y + y));
-            drawer.set(new Vector2d<>(position.x + x, position.y - y));
-            drawer.set(new Vector2d<>(position.x - x, position.y - y));
+            drawer.set(new Vector2d<>(position.x + x, position.y + y), new Vector2d<>(0, 1)); // ok
+            drawer.set(new Vector2d<>(position.x - x, position.y + y), new Vector2d<>(0, 1));
+            drawer.set(new Vector2d<>(position.x + x, position.y - y), new Vector2d<>(0, -1));
+            drawer.set(new Vector2d<>(position.x - x, position.y - y), new Vector2d<>(0, -1));
+            drawer.set(new Vector2d<>(position.x + y, position.y + x), new Vector2d<>(1, 0));
+            drawer.set(new Vector2d<>(position.x - y, position.y + x), new Vector2d<>(-1, 0));
+            drawer.set(new Vector2d<>(position.x + y, position.y - x), new Vector2d<>(1, 0));
+            drawer.set(new Vector2d<>(position.x - y, position.y - x), new Vector2d<>(-1, 0));
         }
     }
 
@@ -57,7 +61,7 @@ public class Bresenham {
             }
 
             for( int x = x1; x <= x2; x++ ) {
-                drawer.set(new Vector2d<>(x, a.y));
+                drawer.set(new Vector2d<>(x, a.y), null);
             }
 
             return;
@@ -76,7 +80,7 @@ public class Bresenham {
             }
 
             for( int y = y1; y <= y2; y++ ) {
-                drawer.set(new Vector2d<>(a.x, y));
+                drawer.set(new Vector2d<>(a.x, y), null);
             }
 
             return;
@@ -98,7 +102,7 @@ public class Bresenham {
         int y = a.y;
 
         for(;;) {
-            drawer.set(new Vector2d<>(x, y));
+            drawer.set(new Vector2d<>(x, y), null);
 
             if( x == b.x && y == b.y ) {
                 break;

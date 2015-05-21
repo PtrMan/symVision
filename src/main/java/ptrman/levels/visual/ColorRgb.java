@@ -33,9 +33,9 @@ public class ColorRgb
         return new ColorRgb(r * other.r, g * other.g, b * other.b);
     }
 
-    public float distanceSquared(ColorRgb other)
+    public double distanceSquared(ColorRgb other)
     {
-        return ptrman.math.Math.squaredDistance(new float[]{r, g, b});
+        return ptrman.math.Math.squaredDistance(new double[]{r, g, b});
     }
 
 }

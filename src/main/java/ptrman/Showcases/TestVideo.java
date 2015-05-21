@@ -139,9 +139,9 @@ public class TestVideo {
 
             // TODO create graphics and draw it to a created image and put the image into the canvas
             List<DebugDrawingHelper.DrawingEntity> drawingEntities = new ArrayList<>();
-            drawingEntities.add(new DebugDrawingHelper.SampleDrawingEntity(1, false));
+            drawingEntities.add(new DebugDrawingHelper.SampleDrawingEntity(1, false, 40.0));
 
-            DebugDrawingHelper.drawDetectors(graphics, bpSolver.lastFrameRetinaPrimitives, bpSolver.lastFrameIntersections, new ArrayList<>(Arrays.asList(bpSolver.lastFrameEndosceletonSamples, bpSolver.lastFrameExosceletonSamples)), drawingEntities);
+            DebugDrawingHelper.drawDetectors(graphics, new ArrayList<>(Arrays.asList(bpSolver.lastFrameRetinaPrimitives)), bpSolver.lastFrameIntersections, new ArrayList<>(Arrays.asList(bpSolver.lastFrameEndosceletonSamples, bpSolver.lastFrameExosceletonSamples)), drawingEntities);
 
             dualCanvas.rightCanvas.setImage(detectorImage);
         }

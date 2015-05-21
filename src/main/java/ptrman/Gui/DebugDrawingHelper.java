@@ -8,6 +8,7 @@ import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.levels.retina.*;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -19,7 +20,8 @@ import java.util.List;
 public class DebugDrawingHelper {
     public abstract static class DrawingEntity {
         public enum EnumDrawType {
-            SAMPLES
+            SAMPLES,
+            RETINA_PRIMITIVE
         }
 
         public DrawingEntity(final int dataSourceIndex, final EnumDrawType drawType) {
@@ -36,18 +38,18 @@ public class DebugDrawingHelper {
         }
 
         public abstract void drawSamples(Graphics2D graphics, final List<ProcessA.Sample> samples);
-
+        public abstract void drawRetinaPrimitives(Graphics2D graphics2D, final List<RetinaPrimitive> primitives);
 
         private final EnumDrawType drawType;
         private final int dataSourceIndex;
     }
 
     public static final class SampleDrawingEntity extends DrawingEntity {
-
-        public SampleDrawingEntity(final int dataSourceIndex, final boolean showAltitude) {
+        public SampleDrawingEntity(final int dataSourceIndex, final boolean showAltitude, final double maxAltitude) {
             super(dataSourceIndex, EnumDrawType.SAMPLES);
 
             this.showAltitude = showAltitude;
+            this.maxAltitude = maxAltitude;
         }
 
         @Override
@@ -60,7 +62,7 @@ public class DebugDrawingHelper {
                         altitudeAsGreen = 0.5;
                     }
                     else {
-                        altitudeAsGreen = 0.5 + (1.0 - 0.5) * java.lang.Math.min(1.0, iterationSample.altitude / 10.0);
+                        altitudeAsGreen = 0.5 + (1.0 - 0.5) * java.lang.Math.min(1.0, iterationSample.altitude / maxAltitude);
                     }
 
                     graphics.setColor(new Color(0.0f, (float)altitudeAsGreen, 0.0f));
@@ -81,8 +83,51 @@ public class DebugDrawingHelper {
             }
         }
 
-        private final boolean showAltitude;
+        @Override
+        public void drawRetinaPrimitives(Graphics2D graphics2D, List<RetinaPrimitive> primitives) {
+            throw new NotImplementedException();
+        }
 
+        private final boolean showAltitude;
+        private final double maxAltitude;
+
+    }
+
+    public static final class RetinaPrimitiveDrawingEntity extends DrawingEntity {
+        public RetinaPrimitiveDrawingEntity(final int dataSourceIndex) {
+            super(dataSourceIndex, EnumDrawType.RETINA_PRIMITIVE);
+        }
+
+        @Override
+        public void drawSamples(Graphics2D graphics, List<ProcessA.Sample> samples) {
+            throw new NotImplementedException();
+        }
+
+        @Override
+        public void drawRetinaPrimitives(Graphics2D graphics2D, List<RetinaPrimitive> primitives) {
+            for( RetinaPrimitive iterationRetinaPrimitive : primitives ) {
+                SingleLineDetector iterationDetector;
+
+                iterationDetector = iterationRetinaPrimitive.line;
+
+                final ArrayRealVector aProjectedFloat = iterationDetector.a;
+                final ArrayRealVector bProjectedFloat = iterationDetector.b;
+
+                if( iterationDetector.resultOfCombination || false ) {
+                    graphics2D.setColor(Color.RED);
+                }
+                else {
+                    graphics2D.setColor(Color.BLUE);
+                }
+
+                graphics2D.setStroke(new BasicStroke(2));
+                graphics2D.drawLine(Math.round((float)aProjectedFloat.getDataRef()[0]), Math.round((float)aProjectedFloat.getDataRef()[1]), Math.round((float) bProjectedFloat.getDataRef()[0]), Math.round((float) bProjectedFloat.getDataRef()[1]));
+
+                // for old code
+                // TODO< overwork old code so the stroke is set at the beginning >
+                graphics2D.setStroke(new BasicStroke(1));
+            }
+        }
     }
 
     public static void drawLineParsings(Graphics2D graphics, ArrayList<ProcessM.LineParsing> lineParsings) {
@@ -154,32 +199,7 @@ public class DebugDrawingHelper {
     }
 
 
-    public static void drawDetectors(Graphics2D graphics, List<RetinaPrimitive> lineDetectors, List<Intersection> intersections, List<List<ProcessA.Sample>> samplesArray, List<DrawingEntity> drawingEntities) {
-
-        for( RetinaPrimitive iterationRetinaPrimitive : lineDetectors ) {
-            SingleLineDetector iterationDetector;
-
-            iterationDetector = iterationRetinaPrimitive.line;
-
-            final ArrayRealVector aProjectedFloat = iterationDetector.a;
-            final ArrayRealVector bProjectedFloat = iterationDetector.b;
-
-            if( iterationDetector.resultOfCombination || false ) {
-                graphics.setColor(Color.RED);
-            }
-            else {
-                graphics.setColor(Color.BLUE);
-            }
-
-            graphics.setStroke(new BasicStroke(2));
-            graphics.drawLine(Math.round((float)aProjectedFloat.getDataRef()[0]), Math.round((float)aProjectedFloat.getDataRef()[1]), Math.round((float) bProjectedFloat.getDataRef()[0]), Math.round((float) bProjectedFloat.getDataRef()[1]));
-
-            // for old code
-            // TODO< overwork old code so the stroke is set at the beginning >
-            graphics.setStroke(new BasicStroke(1));
-        }
-
-
+    public static void drawDetectors(Graphics2D graphics, List<List<RetinaPrimitive>> retinaPrimitivesArray, List<Intersection> intersections, List<List<ProcessA.Sample>> samplesArray, List<DrawingEntity> drawingEntities) {
         /*
         for( Intersection iterationIntersection : intersections ) {
             graphics.setColor(Color.BLUE);
@@ -192,6 +212,11 @@ public class DebugDrawingHelper {
             switch( iterationDrawingEntity.getDrawType() ) {
                 case SAMPLES:
                 iterationDrawingEntity.drawSamples(graphics, samplesArray.get(iterationDrawingEntity.getDataSourceIndex()));
+                    break;
+
+                case RETINA_PRIMITIVE:
+                iterationDrawingEntity.drawRetinaPrimitives(graphics, retinaPrimitivesArray.get(iterationDrawingEntity.getDataSourceIndex()));
+                    break;
             }
         }
     }

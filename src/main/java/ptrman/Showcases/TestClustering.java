@@ -53,7 +53,9 @@ public class TestClustering {
 
                 g2.setColor(Color.WHITE);
 
-                g2.drawRect(2, 2, 2, 2);
+                //g2.drawRect(2, 2, 100, 100);
+                g2.fillRect(2, 2, 100, 100);
+
 
                 ///drawTestTriangle(g2, new Vector2d<>(20.0f, 60.0f), 10.0f, time, (3.0f / (float)Math.sqrt(3)));
 
@@ -141,9 +143,9 @@ public class TestClustering {
 
             // TODO create graphics and draw it to a created image and put the image into the canvas
             java.util.List<DebugDrawingHelper.DrawingEntity> drawingEntities = new ArrayList<>();
-            drawingEntities.add(new DebugDrawingHelper.SampleDrawingEntity(1, false));
+            drawingEntities.add(new DebugDrawingHelper.SampleDrawingEntity(2, true, 40.0));
 
-            DebugDrawingHelper.drawDetectors(graphics, bpSolver.lastFrameRetinaPrimitives, bpSolver.lastFrameIntersections, new ArrayList<>(Arrays.asList(bpSolver.lastFrameEndosceletonSamples, bpSolver.lastFrameExosceletonSamples)), drawingEntities);
+            DebugDrawingHelper.drawDetectors(graphics, new ArrayList<>(Arrays.asList(bpSolver.lastFrameRetinaPrimitives)), bpSolver.lastFrameIntersections, new ArrayList<>(Arrays.asList(bpSolver.lastFrameEndosceletonSamples, bpSolver.lastFrameExosceletonSamples, bpSolver.lastFrameSamplesWithAltitude)), drawingEntities);
 
             dualCanvas.rightCanvas.setImage(detectorImage);
         }

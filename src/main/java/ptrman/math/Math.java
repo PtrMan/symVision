@@ -13,15 +13,15 @@ public class Math {
         return (valueA*weightA + valueB*weightB)/(weightA + weightB);
     }
     
-    public static float power2(float x)
+    public static double power2(double x)
     {
         return x*x;
     }
 
     // SUPERCOMPILATION candidate
-    public static float squaredDistance(float[] data)
+    public static double squaredDistance(double[] data)
     {
-        float result;
+        double result;
         int i;
 
         // we play supercompiler
@@ -31,7 +31,7 @@ public class Math {
             return power2(data[0]) + power2(data[1]);
         }
 
-        result = 0.0f;
+        result = 0.0;
 
         for( i = 0; i < data.length; i++ )
         {

@@ -10,25 +10,42 @@ import java.util.Arrays;
 import java.util.List;
 
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
+import static ptrman.math.Math.squaredDistance;
 
 
 /**
  *
  * calculates the altitude
  */
-public class ProcessB {
+public class ProcessB implements IProcess {
     private int counterCellPositiveCandidates;
     private int counterCellCandidates;
 
 
+
+    @Override
+    public void setImageSize(Vector2d<Integer> imageSize) {
+        this.imageSize = imageSize;
+    }
+
+    @Override
+    public void setup() {
+
+    }
+
+    @Override
+    public void processData() {
+
+    }
+
     /**
      * 
-     * we use the whole image, in phaeaco he worked with the incomplete image witht the guiding of processA, this is not implemented that way 
+     * we use the whole image, in phaeaco he worked with the incomplete image with the guiding of processA, this is not implemented that way
      */
     public void process(List<ProcessA.Sample> samples, IMap2d<Boolean> map) {
         Vector2d<Integer> foundPosition;
         
-        final int MAXRADIUS = (int)Math.sqrt(100.0*100.0);
+        final int MAXRADIUS = (int)Math.sqrt(squaredDistance(new double[]{(double)imageSize.x, (double)imageSize.y}));
 
         final int GRIDSIZE_FOR_SPATIALACCELERATEDMAP2D = 8;
 
@@ -78,6 +95,17 @@ public class ProcessB {
      * \return null if no point could be found in the radius 
      */
     private Tuple2<Vector2d<Integer>, Double> findNearestPositionWhereMapIs(boolean value, Vector2d<Integer> position, IMap2d<Boolean> image, int radius) {
+        if( position.x > 80 && position.x < 90 && position.y > 60 && position.y < 70 ) {
+            int x = 0;
+        }
+
+        Map2d<Boolean> debugMap = new Map2d<>(spatialAcceleratedMap2d.getSize().x, spatialAcceleratedMap2d.getSize().y);
+        for( int y = 0; y < debugMap.getLength(); y++ ) {
+            for( int x = 0; x < debugMap.getWidth(); x++ ) {
+                debugMap.setAt(x, y, false);
+            }
+        }
+
         final ArrayRealVector positionReal = ptrman.math.ArrayRealVectorHelper.integerToArrayRealVector(position);
 
         final Vector2d<Integer> gridCenterPosition = spatialAcceleratedMap2d.getGridPositionOfPosition(position);
@@ -98,21 +126,48 @@ public class ProcessB {
                 gridCellsToScan = new ArrayList<Vector2d<Integer>>(Arrays.asList(new Vector2d[]{gridCenterPosition}));
             }
             else {
-                gridCellsToScan = spatialAcceleratedMap2d.getGridLocationsOfGridRadius(gridCenterPosition, currentGridRadius);
+                gridCellsToScan = spatialAcceleratedMap2d.getGridLocationsWithNegativeDirectionOfGridRadius(gridCenterPosition, currentGridRadius);
             }
 
-            counterCellCandidates += gridCellsToScan.size();
+            /*
+            // debugging
+            System.out.println("---");
+            for( final Vector2d<Integer> iterationGridCellPosition : gridCellsToScan ) {
+                //System.out.println("gridCell position " + Integer.toString(iterationGridCellPosition.x) + " " + Integer.toString(iterationGridCellPosition.y));
+
+                debugMap.setAt(iterationGridCellPosition.x, iterationGridCellPosition.y, true);
+            }
+
+            // debug display map
+            for( int y = 0; y < debugMap.getLength(); y++ ) {
+                for( int x = 0; x < debugMap.getWidth(); x++ ) {
+                    boolean valueRead = debugMap.readAt(x, y);
+
+                    if( valueRead ) {
+                        System.out.print("x");
+                    }
+                    else {
+                        System.out.print(".");
+                    }
+
+                }
+
+                System.out.println();
+            }
+             */
 
             // use acceleration map and filter out the gridcells we don't need to scan
             gridCellsToScan.removeIf(cellPosition -> !spatialAcceleratedMap2d.canValueBeFoundInCell(cellPosition, value));
 
+            // statistics
+            counterCellCandidates += gridCellsToScan.size();
             counterCellPositiveCandidates += gridCellsToScan.size();
 
             final List<Vector2d<Integer>> pixelPositionsToCheck = getPositionsOfCandidatePixelsOfCells(gridCellsToScan, value);
 
             // pixel scan logic
 
-            if( !gridCellsToScan.isEmpty() ) {
+            if( !pixelPositionsToCheck.isEmpty() ) {
                 // do this because we need to scan the next radius too
                 radiusToScan = java.lang.Math.min(radiusToScan, currentGridRadius+1+1);
             }
@@ -129,7 +184,13 @@ public class ProcessB {
             }
         }
 
-        return new Tuple2<>(nearestPixelCandidate, java.lang.Math.sqrt(nearestPixelCandidateDistanceSquared));
+        if( nearestPixelCandidate == null ) {
+            return null;
+        }
+        else {
+            final double nearestPixelCandidateDistance = java.lang.Math.sqrt(nearestPixelCandidateDistanceSquared);
+            return new Tuple2<>(nearestPixelCandidate, nearestPixelCandidateDistance);
+        }
     }
 
     private List<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCells(final List<Vector2d<Integer>> cellPositions, final boolean value) {
@@ -187,4 +248,7 @@ public class ProcessB {
 
     private SpatialAcceleratedMap2d spatialAcceleratedMap2d;
     private FastBooleanMap2d map;
+
+
+    private Vector2d<Integer> imageSize;
 }

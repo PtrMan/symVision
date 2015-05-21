@@ -6,16 +6,30 @@ import ptrman.Datastructures.Vector2d;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ptrman.Datastructures.Vector2d.IntegerHelper.add;
+import static ptrman.Datastructures.Vector2d.IntegerHelper.getScaled;
+
 /**
  * Used to draw circles in spatial datastructures
  */
 public final class SpatialDrawer {
     static final private class Drawer implements Bresenham.IDrawer {
-        public List<Vector2d<Integer>> positions = new ArrayList<>();
+        public class PositionWithDirection {
+            private final Vector2d<Integer> position;
+            private final Vector2d<Integer> direction;
+
+            public PositionWithDirection(final Vector2d<Integer> position, final Vector2d<Integer> direction) {
+                this.position = position;
+                this.direction = direction;
+            }
+        }
+
+        public List<PositionWithDirection> positionWithDirections = new ArrayList<>();
+        public List<Vector2d<Integer>> directions = new ArrayList<>();
 
         @Override
-        public void set(Vector2d<Integer> position) {
-            positions.add(position);
+        public void set(final Vector2d<Integer> position, final Vector2d<Integer> direction) {
+            positionWithDirections.add(new PositionWithDirection(position, direction));
         }
     }
 
@@ -24,53 +38,42 @@ public final class SpatialDrawer {
 
         Bresenham.rasterCircle(center, radius, drawer);
 
-        drawer.positions.removeIf(position2 -> !isGridLocationInBound(position2, boundary));
-        return drawer.positions;
-
-
-        // played SUPERCOMPILATION by hand and inlined the bresenham algorithm
-        /*
-        List<Vector2d<Integer>> positions = new ArrayList<>();
-
-        int f = 1 - radius;
-        int ddF_x = 0;
-        int ddF_y = -2 * radius;
-        int x = 0;
-        int y = radius;
-
-        positions.add(new Vector2d<>(center.x, center.y + radius));
-        positions.add(new Vector2d<>(center.x, center.y - radius));
-        positions.add(new Vector2d<>(center.x + radius, center.y));
-        positions.add(new Vector2d<>(center.x - radius, center.y));
-
-        while(x < y) {
-            if(f >= 0) {
-                y--;
-                ddF_y += 2;
-                f += ddF_y;
-            }
-            x++;
-            ddF_x += 2;
-            f += ddF_x + 1;
-
-            positions.add(new Vector2d<>(center.x + x, center.y + y));
-            positions.add(new Vector2d<>(center.x + x, center.y - y));
-            positions.add(new Vector2d<>(center.x - x, center.y + y));
-            positions.add(new Vector2d<>(center.x - x, center.y - y));
+        List<Vector2d<Integer>> resultPositions = new ArrayList<>();
+        for( final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections ) {
+            resultPositions.add(iterationPositionWithDirection.position);
         }
 
+        resultPositions.removeIf(position -> !isGridLocationInBound(position, boundary));
 
-        positions.removeIf(position2 -> !isGridLocationInBound(position2, boundary));
+        return resultPositions;
+    }
 
-        return positions;
-        */
+    public static List<Vector2d<Integer>> getPositionsOfCellsWithNegativeDirectionOfCircleBound(final Vector2d<Integer> center, final int radius, final Vector2d<Integer> boundary) {
+        Drawer drawer = new Drawer();
+
+        Bresenham.rasterCircle(center, radius, drawer);
+
+        List<Vector2d<Integer>> resultPositions = new ArrayList<>();
+        for( final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections ) {
+            resultPositions.add(iterationPositionWithDirection.position);
+            resultPositions.add(add(iterationPositionWithDirection.position, getScaled(iterationPositionWithDirection.direction, -1)));
+        }
+
+        resultPositions.removeIf(position -> !isGridLocationInBound(position, boundary));
+
+        return resultPositions;
     }
 
     public static List<Vector2d<Integer>> getPositionsOfCellsOfLineUnbound(final Vector2d<Integer> a, final Vector2d<Integer> b) {
         Drawer drawer = new Drawer();
 
         Bresenham.rasterLine(a, b, drawer);
-        return drawer.positions;
+
+        List<Vector2d<Integer>> resultPositions = new ArrayList<>();
+        for( final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections ) {
+            resultPositions.add(iterationPositionWithDirection.position);
+        }
+        return resultPositions;
     }
 
     private static boolean isGridLocationInBound(final Vector2d<Integer> position, final Vector2d<Integer> boundary) {

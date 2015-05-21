@@ -24,7 +24,7 @@ public class Map2dDither {
             IValue add(IValue other);
             IValue sub(IValue other);
             IValue mulScalar(float other);
-            float distanceSquared(IValue other); // sub and distanceSquared
+            double distanceSquared(IValue other); // sub and distanceSquared
         }
 
         private static class ValueFloat implements IValue {
@@ -48,8 +48,8 @@ public class Map2dDither {
             }
 
             @Override
-            public float distanceSquared(IValue other) {
-                return ptrman.math.Math.squaredDistance(new float[]{value - ((ValueFloat)other).value});
+            public double distanceSquared(IValue other) {
+                return ptrman.math.Math.squaredDistance(new double[]{value - ((ValueFloat)other).value});
             }
 
             private float value;

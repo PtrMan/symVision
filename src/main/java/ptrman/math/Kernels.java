@@ -28,8 +28,8 @@ public class Kernels
             double gaussianFactor, scalingFactor;
             final double factor = -1.0/(java.lang.Math.PI*java.lang.Math.pow(sigma, 4.0f));
 
-            gaussianFactor = java.lang.Math.exp(-1.0f*(Math.squaredDistance(new float[]{position.x, position.y})/(2.0*Math.power2(sigma))));
-            scalingFactor = 1.0 - Math.squaredDistance(new float[]{position.x, position.y})/(2.0*Math.power2(sigma));
+            gaussianFactor = java.lang.Math.exp(-1.0f*(Math.squaredDistance(new double[]{position.x, position.y})/(2.0*Math.power2(sigma))));
+            scalingFactor = 1.0 - Math.squaredDistance(new double[]{position.x, position.y})/(2.0*Math.power2(sigma));
 
             return (float)(factor*gaussianFactor*scalingFactor);
         }

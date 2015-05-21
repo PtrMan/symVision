@@ -38,6 +38,10 @@ public class SpatialAcceleratedMap2d {
         return SpatialDrawer.getPositionsOfCellsOfCircleBound(gridPosition, gridRadius, gridBoundary);
     }
 
+    public List<Vector2d<Integer>> getGridLocationsWithNegativeDirectionOfGridRadius(final Vector2d<Integer> gridPosition, final int gridRadius) {
+        return SpatialDrawer.getPositionsOfCellsWithNegativeDirectionOfCircleBound(gridPosition, gridRadius, gridBoundary);
+    }
+
     public List<List<Vector2d<Integer>>> getGridLocationsNearPositionInWideningRadius(final Vector2d<Integer> position, final float radius) {
         final Vector2d<Integer> centerGridLocation = getGridPositionOfPosition(position);
 
@@ -85,6 +89,10 @@ public class SpatialAcceleratedMap2d {
 
     public int getGridsize() {
         return gridsize;
+    }
+
+    public Vector2d<Integer> getSize() {
+        return new Vector2d<>(gridCellStateMap.getWidth(), gridCellStateMap.getLength());
     }
 
     private int countPixelsOfGridCell(final int cellX, final int cellY) {

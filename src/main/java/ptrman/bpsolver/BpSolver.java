@@ -104,8 +104,17 @@ public class BpSolver {
         exosceletonProcessH.set(queueLineDetectorExosceletonFromProcessD, queueLineDetectorExosceletonFromProcessH);
         exosceletonProcessH.setup();
 
+        processB.setImageSize(getImageSize());
 
         processB.process(endosceletonSamples, image);
+
+        List<ProcessA.Sample> samplesWithAltitude = new ArrayList<>();
+
+        for( final ProcessA.Sample iterationSample : endosceletonSamples ) {
+            samplesWithAltitude.add(iterationSample);
+        }
+
+        System.out.println("Samples with altitude size " + Integer.toString(samplesWithAltitude.size()));
 
 
 
@@ -261,6 +270,7 @@ public class BpSolver {
                                                                             // for now only that whats written here
         lastFrameEndosceletonSamples = endosceletonSamples;
         lastFrameExosceletonSamples = exosceletonSamples;
+        lastFrameSamplesWithAltitude = samplesWithAltitude;
         lastFrameIntersections = lineIntersections; // TODO< other intersections too >
     }
     
@@ -499,5 +509,6 @@ public class BpSolver {
     public List<RetinaPrimitive> lastFrameRetinaPrimitives;
     public List<ProcessA.Sample> lastFrameEndosceletonSamples;
     public List<ProcessA.Sample> lastFrameExosceletonSamples;
+    public List<ProcessA.Sample> lastFrameSamplesWithAltitude;
     public List<Intersection> lastFrameIntersections;
 }
