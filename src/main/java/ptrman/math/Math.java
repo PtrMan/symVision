@@ -94,4 +94,28 @@ public class Math {
 
         return result;
     }
+
+    public static int nextPowerOfTwo(final int value) {
+        int workingValue = value;
+
+        int bitsFromLeft;
+        for( bitsFromLeft = 0; bitsFromLeft < 32; bitsFromLeft++ ) {
+            if( (value & (1 << (32-bitsFromLeft))) != 0 ) {
+                break;
+            }
+        }
+
+        int result;
+
+        if( bitsFromLeft == 0 ) {
+            result = 1 << 31;
+
+            return result;
+        }
+        else {
+            result = 1 << (31+1+1-bitsFromLeft);
+
+            return result;
+        }
+    }
 }
