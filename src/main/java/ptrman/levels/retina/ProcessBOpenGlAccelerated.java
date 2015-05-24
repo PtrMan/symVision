@@ -1,8 +1,6 @@
 package ptrman.levels.retina;
 
 import com.jogamp.common.nio.Buffers;
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.Vector2d;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
@@ -11,6 +9,8 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static javax.media.opengl.GL2.*;
+import static ptrman.math.MatrixHelper.convertMatrixToArray;
+import static ptrman.math.MatrixHelper.getIdentityMatrix;
 
 /**
  * OpenGL accelerated ProcessB
@@ -283,27 +283,6 @@ public class ProcessBOpenGlAccelerated implements IProcess {
         gl.glViewport(0, 0, fboImageSize.x, fboImageSize.y);
         checkError(gl);
 
-        /* GL2
-        gl.glMatrixMode(GL_PROJECTION);
-        gl.glLoadIdentity();
-        gl.glOrtho(0.0, (float) fboImageSize.x, 0.0, (float) fboImageSize.y, -1.0, 1.0);
-        gl.glMatrixMode(GL_MODELVIEW);
-        gl.glLoadIdentity();
-
-        gl.glBegin(GL_TRIANGLES);
-
-        gl.glColor3f(0.5f, 2.0f, -0.5f);
-
-        gl.glVertex3f(0.0f, 0.0f, 0.0f);
-        gl.glVertex3f((float) 50, 0.0f, 0.0f);
-        gl.glVertex3f((float) 50, (float) 50, 0.0f);
-
-        gl.glEnd();
-        */
-
-        //gl.glClampColor(GL_CLAMP_FRAGMENT_COLOR, GL_FALSE);
-
-
         defaultProgram.useThis(gl);
         setUniforms(defaultProgram);
 
@@ -342,17 +321,6 @@ public class ProcessBOpenGlAccelerated implements IProcess {
         for( int i = 0; i < remaining; i++ ) {
             dataArray[i] = data.get(i);
         }
-
-        /*
-        while(data.hasRemaining()) {
-            int curr = data.position() / 4;
-            int offset = (curr%fboImageSize.x+(curr))*4;
-            dataArray[offset] = data.get();
-            dataArray[offset+1] = data.get();
-            dataArray[offset+2] = data.get();
-            dataArray[offset+3] = data.get();
-        }
-        */
 
         for( int i = 0; i < dataArray.length / 4; i++ ) {
             System.out.println(Float.toString(dataArray[i * 4 + 0]) + " " + Float.toString(dataArray[i * 4 + 1]) + " " + Float.toString(dataArray[i*4 + 2]) + " " + Float.toString(dataArray[i*4 + 3]));
@@ -509,18 +477,6 @@ public class ProcessBOpenGlAccelerated implements IProcess {
         checkError(gl);
     }
 
-    private float[] convertMatrixToArray(final Array2DRowRealMatrix matrix) {
-        float[] result = new float[16];
-
-        for( int row = 0; row < 4; row++ ) {
-            for( int column = 0; column < 4; column++ ) {
-                result[row*4+column] = (float)matrix.getRow(row)[column];
-            }
-        }
-
-        return new float[0];
-    }
-
     // see https://www.opengl.org/discussion_boards/showthread.php/172280-Constructing-an-orthographic-matrix-for-2D-drawing
     private static float[] getOrtographicMatrix(float xmax, float ymax, float zNear, float zFar) {
         return new float[] {
@@ -531,22 +487,6 @@ public class ProcessBOpenGlAccelerated implements IProcess {
         };
     }
 
-    private static Array2DRowRealMatrix getIdentityMatrix() {
-        Array2DRowRealMatrix result = new Array2DRowRealMatrix(4, 4);
-        for( int i = 0; i < 4; i++ ) {
-            result.getData()[i][i] = 1.0;
-        }
-
-        return result;
-    }
-
-    private static Array2DRowRealMatrix getTranslationMatrix(final ArrayRealVector translation) {
-        Array2DRowRealMatrix result = getIdentityMatrix();
-        result.getData()[3][0] = translation.getDataRef()[0];
-        result.getData()[3][1] = translation.getDataRef()[1];
-        result.getData()[3][2] = translation.getDataRef()[2];
-        return result;
-    }
 
     private Vector2d<Integer> imageSize;
 
