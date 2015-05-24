@@ -68,6 +68,12 @@ public class BpSolver {
         ProcessM processM = new ProcessM();
         ProcessF processF = new ProcessF();
 
+        // for testing
+        ProcessBOpenGlAccelerated processBOpenGlAccelerated = new ProcessBOpenGlAccelerated();
+        processBOpenGlAccelerated.setImageSize(getImageSize());
+        processBOpenGlAccelerated.setup();
+        processBOpenGlAccelerated.processData();
+
         ProcessZFacade processZFacade = new ProcessZFacade();
 
         final int processzNumberOfPixelsToMagnifyThreshold = 8;
@@ -107,6 +113,12 @@ public class BpSolver {
         processB.setImageSize(getImageSize());
 
         processB.process(endosceletonSamples, image);
+
+        try {
+            Thread.sleep(500000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
 
         List<ProcessA.Sample> samplesWithAltitude = new ArrayList<>();
 
