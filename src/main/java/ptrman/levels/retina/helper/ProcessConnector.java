@@ -2,6 +2,8 @@ package ptrman.levels.retina.helper;
 
 import ptrman.misc.Assert;
 
+import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
@@ -16,6 +18,10 @@ public class ProcessConnector<Type> {
         WORKSPACE,
         QUEUE,
         PRIMARY_QUEUE // workspace is used as a "logger", behaves like a queue
+    }
+
+    public static ProcessConnector createWithDefaultQueues(final EnumMode mode) {
+        return new ProcessConnector(new ArrayDeque<>(), new ArrayList<>(), mode);
     }
 
     private ProcessConnector(Queue<Type> queueImplementation, List<Type> workspaceImplementation, EnumMode mode) {
