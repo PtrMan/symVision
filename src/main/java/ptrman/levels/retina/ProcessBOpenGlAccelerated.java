@@ -1,7 +1,12 @@
 package ptrman.levels.retina;
 
 import com.jogamp.common.nio.Buffers;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.ArrayRealVector;
+import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
+import ptrman.levels.retina.helper.ProcessConnector;
+import ptrman.math.ArrayRealVectorHelper;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.media.opengl.*;
@@ -9,15 +14,20 @@ import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
 import static javax.media.opengl.GL2.*;
-import static ptrman.math.MatrixHelper.convertMatrixToArray;
-import static ptrman.math.MatrixHelper.getIdentityMatrix;
+import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
+import static ptrman.math.Math.squaredDistance;
+import static ptrman.math.MatrixHelper.*;
 
 /**
  * OpenGL accelerated ProcessB
  *
  * uses blendingmodes, polygondrawing and quaddrawing and render to texture functionality to accelerate the Process
  */
-public class ProcessBOpenGlAccelerated implements IProcess {
+public class ProcessBOpenGlAccelerated extends AbstractProcessB {
+    private IMap2d<Boolean> inputMap;
+    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
+    private ProcessConnector<ProcessA.Sample> outputSampleConnector;
+
     private static class PolygonBuffer {
         public PolygonBuffer(final int vertexLocation, final int colorLocation) {
             this.vertexLocation = vertexLocation;
@@ -113,18 +123,14 @@ public class ProcessBOpenGlAccelerated implements IProcess {
             checkError(gl);
 
             gl.glGetShaderiv(vertexShader, GL3.GL_COMPILE_STATUS, wasCompiled, 0);
-            if(wasCompiled[0] != 0) {
-                System.out.println("Vertex shader compiled");
-            }
-            else {
+            if(wasCompiled[0] == 0) {
                 int[] logLength = new int[1];
                 gl.glGetShaderiv(vertexShader, GL3.GL_INFO_LOG_LENGTH, logLength, 0);
 
                 byte[] log = new byte[logLength[0]];
                 gl.glGetShaderInfoLog(vertexShader, logLength[0], null, 0, log, 0);
 
-                System.err.println("Error compiling the vertex shader: " + new String(log));
-                System.exit(1);
+                throw new RuntimeException("Error compiling the vertex shader: " + new String(log));
             }
 
             int fragmentShader = gl.glCreateShader(GL3.GL_FRAGMENT_SHADER);
@@ -134,18 +140,14 @@ public class ProcessBOpenGlAccelerated implements IProcess {
             checkError(gl);
 
             gl.glGetShaderiv(fragmentShader, GL3.GL_COMPILE_STATUS, wasCompiled, 0);
-            if(wasCompiled[0] != 0) {
-                System.out.println("fragment shader compiled");
-            }
-            else {
+            if(wasCompiled[0] == 0) {
                 int[] logLength = new int[1];
                 gl.glGetShaderiv(fragmentShader, GL3.GL_INFO_LOG_LENGTH, logLength, 0);
 
                 byte[] log = new byte[logLength[0]];
                 gl.glGetShaderInfoLog(fragmentShader, logLength[0], null, 0, log, 0);
 
-                System.err.println("Error compiling the fragment shader: " + new String(log));
-                System.exit(1);
+                throw new RuntimeException("Error compiling the fragment shader: " + new String(log));
             }
 
             gl.glAttachShader(program, vertexShader);
@@ -175,8 +177,10 @@ public class ProcessBOpenGlAccelerated implements IProcess {
     }
 
     @Override
-    public void setImageSize(Vector2d<Integer> imageSize) {
-        this.imageSize = imageSize;
+    public void set(IMap2d<Boolean> map, ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector) {
+        this.inputMap = map;
+        this.inputSampleConnector = inputSampleConnector;
+        this.outputSampleConnector = outputSampleConnector;
     }
 
     @Override
@@ -215,9 +219,10 @@ public class ProcessBOpenGlAccelerated implements IProcess {
                 "layout(location=0) in vec3 position;\n" +
                 "layout(location=1) in vec3 color;\n" +
                 "out vec3 vColor;\n" +
+                "uniform mat4 viewMatrix;\n" +
                 "void main(void)\n" +
                 "{\n" +
-                "gl_Position = vec4(position, 1.0);\n" +
+                "gl_Position = viewMatrix * vec4(position, 1.0);\n" +
                 "vColor = color;\n" +
                 "}\n";
 
@@ -238,9 +243,9 @@ public class ProcessBOpenGlAccelerated implements IProcess {
 
         final float[] triangleArray = {
                 0, 0, 0.5f,
-                1, 0, 0.5f,
-                0, 1, 0.5f,
-                1, 1, 0.5f,
+                2, 0, 0.5f,
+                0, 2, 0.5f,
+                2, 2, 0.5f,
         };
 
         final float[] colorArray = {
@@ -258,13 +263,16 @@ public class ProcessBOpenGlAccelerated implements IProcess {
 
     }
 
-
+    /**
+     *
+     * we use the whole image, in phaeaco he worked with the incomplete image with the guiding of processA, this is not implemented that way
+     */
     @Override
     public void processData() {
         final Vector2d<Integer> fboImageSize = getFboImageSize();
 
-        final float maxDistance = 10.0f + 500.0f*500.0f;
-        final float backgroundColor = maxDistance*maxDistance;
+        final float maxDistance = (float)squaredDistance(new double[]{imageSize.x, imageSize.y});
+        final float backgroundValue = maxDistance*maxDistance;
 
         gl = (GL3)context.getCurrentGL();
 
@@ -275,7 +283,7 @@ public class ProcessBOpenGlAccelerated implements IProcess {
 
         gl.glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObjectID);
         checkError(gl);
-        gl.glClearColor(maxDistance, 0.0f, 0.0f, 1.0f);
+        gl.glClearColor(backgroundValue, 0.0f, 0.0f, 1.0f);
         checkError(gl);
         gl.glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         checkError(gl);
@@ -284,12 +292,37 @@ public class ProcessBOpenGlAccelerated implements IProcess {
         checkError(gl);
 
         defaultProgram.useThis(gl);
-        setUniforms(defaultProgram);
+
+
 
         gl.glEnable(gl.GL_BLEND);
         gl.glBlendEquationSeparate(gl.GL_MIN, gl.GL_MIN);
 
-        polygonBufferTest.draw(gl);
+
+        /*
+        double translateX = -(1.0);
+        double translateY = -(0.0);
+
+
+        Array2DRowRealMatrix viewMatrix = getIdentityMatrix();
+        viewMatrix = viewMatrix.multiply(getScaleMatrix(new ArrayRealVector(new double[]{.5, 1.0, 1.0})));
+        viewMatrix = viewMatrix.multiply(getTranslationMatrix(new ArrayRealVector(new double[]{translateX, translateY, 0.0f})));
+        */
+
+        for( int y = 0; y < inputMap.getLength(); y++ ) {
+            for( int x = 0; x < inputMap.getWidth(); x++ ) {
+                boolean pixelValue = inputMap.readAt(x, y);
+
+                if( !pixelValue ) {
+                    Array2DRowRealMatrix viewMatrix = getMatrixForBlackPixel(0, 0, fboImageSize.x, maxDistance);
+                    setUniforms(defaultProgram, viewMatrix);
+                    polygonBufferTest.draw(gl);
+                }
+            }
+        }
+
+
+
 
         // TODO< use no program >
 
@@ -314,18 +347,60 @@ public class ProcessBOpenGlAccelerated implements IProcess {
         checkError(gl);
 
         // dump of data
-        float[] dataArray = new float[fboImageSize.x*fboImageSize.y*4];
+        float[] dataArrayRaw = new float[fboImageSize.x*fboImageSize.y*4];
 
         int remaining = data.remaining();
 
         for( int i = 0; i < remaining; i++ ) {
-            dataArray[i] = data.get(i);
+            dataArrayRaw[i] = data.get(i);
         }
 
-        for( int i = 0; i < dataArray.length / 4; i++ ) {
-            System.out.println(Float.toString(dataArray[i * 4 + 0]) + " " + Float.toString(dataArray[i * 4 + 1]) + " " + Float.toString(dataArray[i*4 + 2]) + " " + Float.toString(dataArray[i*4 + 3]));
+        float[] dataArray = new float[fboImageSize.x*fboImageSize.y];
+
+        for( int i = 0; i < dataArray.length; i++ ) {
+            dataArray[i] = dataArrayRaw[i*4];
         }
+
+        /* debug the content of dataArray
+        for( int y = 0; y < fboImageSize.y; y++ ) {
+            for( int x = 0; x < fboImageSize.x; x++ ) {
+                float distanceSquared = dataArray[x + y*fboImageSize.x];
+
+                boolean notSet = distanceSquared >= backgroundValue - 1000000.0f;
+
+                if( notSet ) {
+                    System.out.print(" ");
+                }
+                else {
+                    System.out.print(".");
+                }
+            }
+
+            System.out.println("");
+        }
+        */
+
+        // for each sample we read out the depth and calculate the squareroot of it.
+        // we calculate the squareroot because the values are squared for efficiency reasons
+
+        final int samplesRemaining = inputSampleConnector.getSize();
+
+        for( int sampleI = 0; sampleI < samplesRemaining; sampleI++ ) {
+            final ProcessA.Sample currentSample = inputSampleConnector.poll();
+            final ArrayRealVector currentSamplePosition = currentSample.position;
+            final Vector2d<Integer> currentSamplePositionAsInteger = arrayRealVectorToInteger(currentSamplePosition, ArrayRealVectorHelper.EnumRoundMode.DOWN);
+
+            final float squaredAltitudeOfSample =  dataArray[currentSamplePositionAsInteger.x + currentSamplePositionAsInteger.y * fboImageSize.x];
+            final float altitudeOfSample = (float)java.lang.Math.sqrt(squaredAltitudeOfSample);
+
+            ProcessA.Sample resultSample = currentSample.getClone();
+            resultSample.altitude = altitudeOfSample;
+
+            outputSampleConnector.add(resultSample);
+        }
+
     }
+
 
     // code from https://github.com/demoscenepassivist/SocialCoding/blob/master/code_demos_jogamp/src/framework/base/BaseFrameBufferObjectRendererExecutor.java
     private void initFbo(GL3 gl) {
@@ -387,50 +462,36 @@ public class ProcessBOpenGlAccelerated implements IProcess {
                 //BaseLogging.getInstance().info("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_COMPLETE_EXT");
                 break;
             case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
-                //BaseLogging.getInstance().error("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT");
-                break;
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
-                //BaseLogging.getInstance().error("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT");
-                break;
+                throw new RuntimeException("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT");
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:;
+                throw new RuntimeException("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT");
             case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
-                //BaseLogging.getInstance().error("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT");
-                break;
+                throw new RuntimeException("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT");
             case GL_FRAMEBUFFER_INCOMPLETE_FORMATS:
-                //BaseLogging.getInstance().error("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT");
-                break;
+                throw new RuntimeException("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT");
             case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER:
-                //BaseLogging.getInstance().error("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT");
-                break;
+                throw new RuntimeException("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT");
             case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER:
-                //BaseLogging.getInstance().error("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT");
-                break;
+                throw new RuntimeException("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT");
             case GL_FRAMEBUFFER_UNSUPPORTED:
-                //BaseLogging.getInstance().error("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_UNSUPPORTED_EXT");
-                break;
+                throw new RuntimeException("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_UNSUPPORTED_EXT");
             default:
-                //BaseLogging.getInstance().error("FRAMEBUFFER CHECK RETURNED UNKNOWN RESULT ...");
-                int debugX = 0;
+                throw new RuntimeException("FRAMEBUFFER CHECK RETURNED UNKNOWN RESULT ...");
         }
     }
 
     public void renderToFrameBufferBegin(GL3 inGL) {
         final Vector2d<Integer> fboImageSize = getFboImageSize();
 
-        ///inGL.glPushAttrib(GL_TRANSFORM_BIT | GL_ENABLE_BIT | GL_COLOR_BUFFER_BIT);
-        //bind the framebuffer ...
         inGL.glBindFramebuffer(GL_FRAMEBUFFER, frameBufferObjectID);
         checkError(inGL);
-        ///inGL.glPushAttrib(GL_VIEWPORT_BIT);
         inGL.glViewport(0, 0, fboImageSize.x, fboImageSize.y);
         checkError(gl);
     }
 
     public void renderToFrameBufferEnd(GL3 inGL) {
-        ///inGL.glPopAttrib();
-        //unbind the framebuffer ...
         inGL.glBindFramebuffer(GL_FRAMEBUFFER, 0);
         checkError(inGL);
-        ///inGL.glPopAttrib();
     }
 
     private static void checkError(GL3 gl) {
@@ -454,12 +515,11 @@ public class ProcessBOpenGlAccelerated implements IProcess {
     }
 
     // must be called after glUseProgram
-    private void setUniforms(Program fromProgram) {
+    private void setUniforms(Program fromProgram, final Array2DRowRealMatrix viewMatrixInput) {
         final Vector2d<Integer> fboImageSize = getFboImageSize();
 
-        //FOR TESTING
-        final float[] projectionMatrix = convertMatrixToArray(getIdentityMatrix()); //getOrtographicMatrix(fboImageSize.x, fboImageSize.y, -1.0f, 1.0f);
-        final float[] viewMatrix = convertMatrixToArray(getIdentityMatrix());
+        final float[] projectionMatrix = convertMatrixToArray(getIdentityMatrix());
+        final float[] viewMatrix = convertMatrixToArray(viewMatrixInput);
 
         FloatBuffer projectionMatrixBuffer = Buffers.newDirectFloatBuffer(projectionMatrix);
         projectionMatrixBuffer.rewind();
@@ -477,18 +537,26 @@ public class ProcessBOpenGlAccelerated implements IProcess {
         checkError(gl);
     }
 
-    // see https://www.opengl.org/discussion_boards/showthread.php/172280-Constructing-an-orthographic-matrix-for-2D-drawing
-    private static float[] getOrtographicMatrix(float xmax, float ymax, float zNear, float zFar) {
-        return new float[] {
-                2.0f/xmax, 0.0f, 0.0f, -1.0f,
-                0.0f -2.0f/ymax, 0.0f, 1.0f,
-                0.0f, 0.0f, 2.0f/(zFar-zNear), (zNear+zFar)/(zNear-zFar),
-                0.0f, 0.0f, 0.0f, 1.0f
-        };
+
+    private Array2DRowRealMatrix getMatrixForBlackPixel(int x, int y, int bufferSize, float maxDistance) {
+        final int maxAltitideInteger = (int)maxDistance;
+
+        return getMatrixForPositionAndSize(x-maxAltitideInteger, y-maxAltitideInteger, x+1+maxAltitideInteger, y+1+maxAltitideInteger, bufferSize);
     }
 
+    private static Array2DRowRealMatrix getMatrixForPositionAndSize(final int positionX, final int positionY, final int sizeX, final int sizeY, final int bufferSize) {
+        double translateX = ((double)positionX/(double)bufferSize) * 2.0 - 1.0;
+        double translateY = ((double)positionY/(double)bufferSize) * 2.0 - 1.0;
 
-    private Vector2d<Integer> imageSize;
+        double sizeXd = (double)sizeX / (double)bufferSize;
+        double sizeYd = (double)sizeY / (double)bufferSize;
+
+        Array2DRowRealMatrix viewMatrix = getIdentityMatrix();
+        viewMatrix = viewMatrix.multiply(getScaleMatrix(new ArrayRealVector(new double[]{sizeXd, sizeYd, 1.0})));
+        viewMatrix = viewMatrix.multiply(getTranslationMatrix(new ArrayRealVector(new double[]{translateX, translateY, 0.0f})));
+
+        return viewMatrix;
+    }
 
     private GLContext context;
     private GL3 gl;

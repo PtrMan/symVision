@@ -2,6 +2,7 @@ package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.*;
+import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
@@ -15,34 +16,33 @@ import static ptrman.math.Math.squaredDistance;
 
 /**
  *
- * calculates the altitude
+ * java version of ProcessB
  */
-public class ProcessB implements IProcess {
-    private int counterCellPositiveCandidates;
-    private int counterCellCandidates;
-
+public class ProcessB extends AbstractProcessB {
 
 
     @Override
-    public void setImageSize(Vector2d<Integer> imageSize) {
-        this.imageSize = imageSize;
+    public void set(IMap2d<Boolean> map, ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector) {
+        this.inputMap = map;
+        this.inputSampleConnector = inputSampleConnector;
+        this.outputSampleConnector = outputSampleConnector;
     }
+
+
 
     @Override
     public void setup() {
 
     }
 
-    @Override
-    public void processData() {
-
-    }
-
     /**
-     * 
+     *
      * we use the whole image, in phaeaco he worked with the incomplete image with the guiding of processA, this is not implemented that way
      */
-    public void process(List<ProcessA.Sample> samples, IMap2d<Boolean> map) {
+    @Override
+    public void processData() {
+        List<ProcessA.Sample> samples = inputSampleConnector.getWorkspace();
+
         Vector2d<Integer> foundPosition;
         
         final int MAXRADIUS = (int)Math.sqrt(squaredDistance(new double[]{(double)imageSize.x, (double)imageSize.y}));
@@ -66,13 +66,15 @@ public class ProcessB implements IProcess {
                 continue;
             }
             // else here
-            
-            iterationSample.altitude = nearestResult.e1;
+
+            // create a new sample to the output connector
+            ProcessA.Sample outputSample = iterationSample.getClone();
+            outputSample.altitude =  nearestResult.e1;
+
+            outputSampleConnector.add(outputSample);
         }
 
         System.out.println("cell acceleration (positive cases): " + Float.toString(((float)counterCellPositiveCandidates / (float)counterCellCandidates) * 100.0f) + "%" );
-
-
     }
 
     private static FastBooleanMap2d convertMapToFastBooleanMap2d(IMap2d<Boolean> map) {
@@ -95,9 +97,11 @@ public class ProcessB implements IProcess {
      * \return null if no point could be found in the radius 
      */
     private Tuple2<Vector2d<Integer>, Double> findNearestPositionWhereMapIs(boolean value, Vector2d<Integer> position, IMap2d<Boolean> image, int radius) {
+        /* debug
         if( position.x > 80 && position.x < 90 && position.y > 60 && position.y < 70 ) {
             int x = 0;
         }
+        */
 
         Map2d<Boolean> debugMap = new Map2d<>(spatialAcceleratedMap2d.getSize().x, spatialAcceleratedMap2d.getSize().y);
         for( int y = 0; y < debugMap.getLength(); y++ ) {
@@ -249,6 +253,9 @@ public class ProcessB implements IProcess {
     private SpatialAcceleratedMap2d spatialAcceleratedMap2d;
     private FastBooleanMap2d map;
 
-
-    private Vector2d<Integer> imageSize;
+    private int counterCellPositiveCandidates;
+    private int counterCellCandidates;
+    private IMap2d<Boolean> inputMap;
+    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
+    private ProcessConnector<ProcessA.Sample> outputSampleConnector;
 }

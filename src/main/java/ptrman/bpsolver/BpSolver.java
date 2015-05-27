@@ -3,25 +3,24 @@ package ptrman.bpsolver;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.FargGeneral.Coderack;
-import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Network;
 import ptrman.FargGeneral.network.Node;
-import ptrman.bpsolver.RetinaToWorkspaceTranslator.ITranslatorStrategy;
-import ptrman.bpsolver.RetinaToWorkspaceTranslator.IdStrategy;
 import ptrman.bpsolver.codelets.BaryCenter;
 import ptrman.bpsolver.codelets.LineSegmentLength;
 import ptrman.bpsolver.codelets.LineSegmentSlope;
 import ptrman.bpsolver.ltm.LinkCreator;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveNode;
-import ptrman.bpsolver.pattern.FeaturePatternMatching;
 import ptrman.levels.retina.*;
+import ptrman.levels.retina.helper.ProcessConnector;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-import static ptrman.levels.retina.helper.QueueHelper.getAllElementsFromQueueAsList;
-
 public class BpSolver {
+
+
     public static void main(String[] args) {
         Parameters.init();
         
@@ -36,8 +35,35 @@ public class BpSolver {
         setupLtmFactoryDefault();
         initializePlatonicPrimitiveDatabase();
         initializeCodeletLtmLookup();
+
+        createConnectors();
+        setupProcesses();
     }
-    
+
+    private void createConnectors() {
+        // mode is PRIMARY_QUEUE because the java version of processB uses the workspace, and the opengl version uses the queue
+        connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.PRIMARY_QUEUE);
+
+        connectorSamplesFromProcessB = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+    }
+
+    private void setupProcesses() {
+        processA = new ProcessA();
+        processB = new ProcessBOpenGlAccelerated();
+
+        processA.setImageSize(getImageSize());
+        processA.setup();
+
+        processB.setImageSize(getImageSize());
+        processB.setup();
+
+
+
+
+        // TODO< others >
+
+    }
+
     public void cycle(int cycleCount) {
         coderack.cycle(cycleCount);
     }
@@ -57,8 +83,6 @@ public class BpSolver {
 
         Queue<ProcessA.Sample> queueToProcessF = new ConcurrentLinkedQueue<>();
 
-        ProcessA processA = new ProcessA();
-        ProcessB processB = new ProcessB();
         ProcessC processC = new ProcessC(queueToProcessF);
         ProcessD endosceletonProcessD = new ProcessD();
         ProcessD exosceletonProcessD = new ProcessD();
@@ -68,11 +92,17 @@ public class BpSolver {
         ProcessM processM = new ProcessM();
         ProcessF processF = new ProcessF();
 
-        // for testing
-        ProcessBOpenGlAccelerated processBOpenGlAccelerated = new ProcessBOpenGlAccelerated();
-        processBOpenGlAccelerated.setImageSize(getImageSize());
-        processBOpenGlAccelerated.setup();
-        processBOpenGlAccelerated.processData();
+
+
+
+
+        connectorSamplesFromProcessA.flush();
+        connectorSamplesFromProcessB.flush();
+        // TODO< others >
+
+
+
+
 
         ProcessZFacade processZFacade = new ProcessZFacade();
 
@@ -84,9 +114,22 @@ public class BpSolver {
         processZFacade.setup(getImageSize());
         processZFacade.process(image); // image doesn't need to be copied
 
+        // copy image because processA changes the image
+        processA.set(image.copy(), processZFacade.getNotMagnifiedOutputObjectIds(), connectorSamplesFromProcessA);
+
+        processB.set(image.copy(), connectorSamplesFromProcessA, connectorSamplesFromProcessB);
+
+
+        processA.processData();
+        processB.processData();
+
+        System.out.println("x " + Integer.toString(connectorSamplesFromProcessB.getSize()));
+
+        /*
+
         // copy because processA changes the image
         processA.setImageSize(getImageSize());
-        processA.set(image.copy(), processZFacade.getNotMagnifiedOutputObjectIds());
+        processA.set(image.copy(), processZFacade.getNotMagnifiedOutputObjectIds(), connectorSamplesFromProcessA);
         List<ProcessA.Sample> endosceletonSamples = processA.sampleImage();
 
 
@@ -138,7 +181,7 @@ public class BpSolver {
 
 
         processC.setImageSize(getImageSize());
-        processC.preSetupSet(8 /*gridsize*/, sampleQueueFromProcessC);
+        processC.preSetupSet(8 gridsize, sampleQueueFromProcessC);
         processC.setup();
 
 
@@ -167,7 +210,7 @@ public class BpSolver {
         endosceletonProcessD.setImageSize(getImageSize());
         endosceletonProcessD.set(sampleQueueForEndosceleton, queueLineDetectorEndosceletonFromProcessD);
 
-        endosceletonProcessD.preSetupSet(6.0f/*maximalDistanceOfPositions*/);
+        endosceletonProcessD.preSetupSet(6.0f    #maximalDistanceOfPositions#);
         endosceletonProcessD.setup();
         endosceletonProcessD.processData();
         //List<RetinaPrimitive> lineDetectors = endosceletonProcessD.getResultRetinaPrimitives();
@@ -190,7 +233,7 @@ public class BpSolver {
         exosceletonProcessD.setImageSize(getImageSize());
         exosceletonProcessD.set(toExosceletonProcessDSampleQueue, queueLineDetectorExosceletonFromProcessD);
 
-        exosceletonProcessD.preSetupSet(6.0f/*maximalDistanceOfPositions*/);
+        exosceletonProcessD.preSetupSet(6.0f #maximalDistanceOfPositions#);
         exosceletonProcessD.setup();
         exosceletonProcessD.processData();
 
@@ -207,7 +250,7 @@ public class BpSolver {
         }
 
 
-        /*
+        *###
 
         if( enableProcessE ) {
             processE.process(lineDetectors, image);
@@ -225,7 +268,7 @@ public class BpSolver {
             lineParsings = processM.getLineParsings();
         }
 
-        */
+        *###
 
         List<RetinaPrimitive> lineDetectorsEndosceletonAfterProcessH = getAllElementsFromQueueAsList(queueLineDetectorEndosceletonFromProcessH);
 
@@ -284,6 +327,8 @@ public class BpSolver {
         lastFrameExosceletonSamples = exosceletonSamples;
         lastFrameSamplesWithAltitude = samplesWithAltitude;
         lastFrameIntersections = lineIntersections; // TODO< other intersections too >
+
+        */
     }
     
     /**
@@ -523,4 +568,10 @@ public class BpSolver {
     public List<ProcessA.Sample> lastFrameExosceletonSamples;
     public List<ProcessA.Sample> lastFrameSamplesWithAltitude;
     public List<Intersection> lastFrameIntersections;
+
+    private ProcessA processA;
+    private AbstractProcessB processB;
+
+    private ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA;
+    private ProcessConnector connectorSamplesFromProcessB;
 }
