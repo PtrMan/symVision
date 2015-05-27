@@ -261,6 +261,28 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
         polygonBufferTest = new PolygonBuffer(vertexLocation, colorLocation);
         polygonBufferTest.createGL(gl, triangleArray, colorArray, /* number of primitives*/ 1);
 
+        projectionMatrixBuffer = FloatBuffer.allocate(16);
+        viewMatrixBuffer = FloatBuffer.allocate(16);
+
+        projMatrixLoc = gl.glGetUniformLocation(defaultProgram.getProgram(), "projMatrix");
+        checkError(gl);
+        viewMatrixLoc = gl.glGetUniformLocation(defaultProgram.getProgram(), "viewMatrix");
+        checkError(gl);
+
+
+
+        // set projection matrix only once because it doesn't change!
+        final float[] projectionMatrix = convertMatrixToArray(getIdentityMatrix());
+
+        projectionMatrixBuffer.rewind();
+        projectionMatrixBuffer.put(projectionMatrix);
+        projectionMatrixBuffer.rewind();
+
+        defaultProgram.useThis(gl);
+
+        gl.glUniformMatrix4fv(projMatrixLoc, 1, false, projectionMatrixBuffer);
+        checkError(gl);
+
     }
 
     /**
@@ -521,18 +543,18 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
         final float[] projectionMatrix = convertMatrixToArray(getIdentityMatrix());
         final float[] viewMatrix = convertMatrixToArray(viewMatrixInput);
 
-        FloatBuffer projectionMatrixBuffer = Buffers.newDirectFloatBuffer(projectionMatrix);
         projectionMatrixBuffer.rewind();
-        FloatBuffer viewMatrixBuffer = Buffers.newDirectFloatBuffer(viewMatrix);
+        projectionMatrixBuffer.put(projectionMatrix);
+        projectionMatrixBuffer.rewind();
+
+        viewMatrixBuffer.rewind();
+        viewMatrixBuffer.put(viewMatrix);
         viewMatrixBuffer.rewind();
 
-        final int projMatrixLoc = gl.glGetUniformLocation(fromProgram.getProgram(), "projMatrix");
-        checkError(gl);
-        final int viewMatrixLoc = gl.glGetUniformLocation(fromProgram.getProgram(), "viewMatrix");
-        checkError(gl);
+        // we save the time to set the matrix because its always the same and set in in the setup
+        //gl.glUniformMatrix4fv(projMatrixLoc, 1, false, projectionMatrixBuffer);
+        //checkError(gl);
 
-        gl.glUniformMatrix4fv(projMatrixLoc, 1, false, projectionMatrixBuffer);
-        checkError(gl);
         gl.glUniformMatrix4fv(viewMatrixLoc, 1, false, viewMatrixBuffer);
         checkError(gl);
     }
@@ -564,6 +586,12 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
     private int frameBufferObjectID;
     private int colorTextureID, depthTextureID;
 
-    Program defaultProgram;
-    PolygonBuffer polygonBufferTest;
+    private Program defaultProgram;
+    private PolygonBuffer polygonBufferTest;
+
+    private FloatBuffer projectionMatrixBuffer;
+    private FloatBuffer viewMatrixBuffer;
+
+    private int projMatrixLoc;
+    private int viewMatrixLoc;
 }
