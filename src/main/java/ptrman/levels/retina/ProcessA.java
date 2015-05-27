@@ -31,6 +31,15 @@ public class ProcessA implements IProcess {
     }
 
     public static class Sample {
+        public Sample getClone() {
+            Sample clone = new Sample(position);
+            clone.altitude = this.altitude;
+            clone.type = this.type;
+            clone.objectId = this.objectId;
+
+            return clone;
+        }
+
         public enum EnumType {
             ENDOSCELETON,
             EXOSCELETON
