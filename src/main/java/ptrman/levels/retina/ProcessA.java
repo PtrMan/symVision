@@ -3,10 +3,8 @@ package ptrman.levels.retina;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
+import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.misc.Assert;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  *
@@ -24,10 +22,53 @@ public class ProcessA implements IProcess {
 
     }
 
-
+    /**
+     *
+     * avoids samping the same pixel by setting the sampled positions to false
+     *
+     *
+     *
+     */
     @Override
     public void processData() {
-        // TODO< refactor code so it uses this new interface >
+        for( int blockY = 0; blockY < workingImage.getLength()/4; blockY++ ) {
+            for( int blockX = 0; blockX < workingImage.getWidth()/4; blockX++ ) {
+                int hitCount = 0;
+
+                for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
+                    for (int x = blockX; x < (blockX+1)*4; x++) {
+                        if( sampleMaskAtPosition(new Vector2d<>(x, y), MaskDetail0) ) {
+                            if( workingImage.readAt(x, y) ) {
+                                hitCount++;
+                                workingImage.setAt(x, y, false);
+
+                                final int objectId = idMap.readAt(x, y);
+                                addSampleToOutput(x, y, objectId);
+                            }
+                        }
+                    }
+                }
+
+                if( hitCount == 8 ) {
+                    continue;
+                }
+
+                // sample it a second time for nearly all of the missing pixels
+                for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
+                    for (int x = blockX; x < (blockX+1)*4; x++) {
+                        if( sampleMaskAtPosition(new Vector2d<>(x, y), MaskDetail1) ) {
+                            if( workingImage.readAt(x, y) ) {
+                                hitCount++;
+                                workingImage.setAt(x, y, false);
+
+                                final int objectId = idMap.readAt(x, y);
+                                addSampleToOutput(x, y, objectId);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public static class Sample {
@@ -65,70 +106,18 @@ public class ProcessA implements IProcess {
     }
     
     
-    public void set(IMap2d<Boolean> image, IMap2d<Integer> idMap) {
+    public void set(IMap2d<Boolean> image, IMap2d<Integer> idMap, ProcessConnector<Sample> outputSampleConnector) {
         workingImage = image.copy();
         this.idMap = idMap;
+
+        this.outputSampleConnector = outputSampleConnector;
     }
 
-    /**
-     * 
-     * avoids samping the same pixel by setting the sampled positions to false
-     * 
-     * 
-     *  
-     */
-    public List<Sample> sampleImage() {
-        List<Sample> resultSamples;
-
-        resultSamples = new ArrayList<>();
-
-        for( int blockY = 0; blockY < workingImage.getLength()/4; blockY++ ) {
-            for( int blockX = 0; blockX < workingImage.getWidth()/4; blockX++ ) {
-                int hitCount = 0;
-
-                for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
-                    for (int x = blockX; x < (blockX+1)*4; x++) {
-                        if( sampleMaskAtPosition(new Vector2d<>(x, y), MaskDetail0) ) {
-                            if( workingImage.readAt(x, y) ) {
-                                hitCount++;
-                                workingImage.setAt(x, y, false);
-
-                                final int objectId = idMap.readAt(x, y);
-                                addSampleToList(resultSamples, x, y, objectId);
-                            }
-                        }
-                    }
-                }
-
-                if( hitCount == 8 ) {
-                    continue;
-                }
-
-                // sample it a second time for nearly all of the missing pixels
-                for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
-                    for (int x = blockX; x < (blockX+1)*4; x++) {
-                        if( sampleMaskAtPosition(new Vector2d<>(x, y), MaskDetail1) ) {
-                            if( workingImage.readAt(x, y) ) {
-                                hitCount++;
-                                workingImage.setAt(x, y, false);
-
-                                final int objectId = idMap.readAt(x, y);
-                                addSampleToList(resultSamples, x, y, objectId);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        return resultSamples;
-    }
-    
-    private static void addSampleToList(List<Sample> samples, final int x, final int y, final int objectId) {
+    private void addSampleToOutput(final int x, final int y, final int objectId) {
         Sample addSample = new Sample(new ArrayRealVector(new double[]{(double)x, (double)y}));
         addSample.objectId = objectId;
 
-        samples.add(addSample);
+        outputSampleConnector.add(addSample);
     }
 
     private static boolean sampleMaskAtPosition(Vector2d<Integer> position, boolean[] mask4by4) {
@@ -142,6 +131,7 @@ public class ProcessA implements IProcess {
 
     private IMap2d<Boolean> workingImage;
     private IMap2d<Integer> idMap;
+    private ProcessConnector<Sample> outputSampleConnector;
 
     private static final boolean[] MaskDetail0 =
             {
