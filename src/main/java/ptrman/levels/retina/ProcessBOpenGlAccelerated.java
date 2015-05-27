@@ -23,6 +23,7 @@ import static ptrman.math.MatrixHelper.*;
  *
  * uses blendingmodes, polygondrawing and quaddrawing and render to texture functionality to accelerate the Process
  */
+// TODO< accelerate it with the usage of a accelerated map, so we can draw large patches (typical for blocks of size 8x8), speeds up it order of magnitude >
 public class ProcessBOpenGlAccelerated extends AbstractProcessB {
     private IMap2d<Boolean> inputMap;
     private ProcessConnector<ProcessA.Sample> inputSampleConnector;
