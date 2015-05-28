@@ -246,20 +246,12 @@ public class ProcessD implements IProcess {
                 }
 
 
-                List<Integer> chosenCandidateSampleIndices = new ArrayList<>();
 
                 if( allCandidateSampleIndices.size() < 3 ) {
                     continue;
                 }
 
-                final List<Integer> allCandidateSampleIndicesChosenIndices = getRandomElements(allCandidateSampleIndices.size(), 3, random);
-
-                for (final int iterationChosenIndex : allCandidateSampleIndicesChosenIndices) {
-                    final int currentChosenCandidateSampleIndex = allCandidateSampleIndices.get(iterationChosenIndex);
-                    chosenCandidateSampleIndices.add(currentChosenCandidateSampleIndex);
-                }
-
-
+                List<Integer> chosenCandidateSampleIndices = getRandomElements(allCandidateSampleIndices, 3, random);
 
 
 

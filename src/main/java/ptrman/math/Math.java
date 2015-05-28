@@ -1,8 +1,6 @@
 package ptrman.math;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class Math {
     public static float weightFloats(final float valueA, final float weightA, final float valueB, final float weightB) {
@@ -75,7 +73,8 @@ public class Math {
         }
     }
 
-    public static List<Integer> getRandomElements(final int max, final int numberOfSamples, Random random) {
+    // can be very slow
+    public static List<Integer> getRandomIndices(final int max, final int numberOfSamples, Random random) {
         List<Integer> candidates = new ArrayList<>();
         List<Integer> result = new ArrayList<>();
 
@@ -93,6 +92,24 @@ public class Math {
         }
 
         return result;
+    }
+
+    public static<Type> List<Type> getRandomElements(final List<Type> source, final int numberOfSamples, Random random) {
+        Set<Type> result = new TreeSet<>();
+
+        for( int i = 0; i < numberOfSamples; i++ ) {
+            final int sampleIndex = random.nextInt(source.size());
+            result.add(source.get(sampleIndex));
+        }
+
+        while( result.size() < numberOfSamples ) {
+            final int sampleIndex = random.nextInt(source.size());
+            result.add(source.get(sampleIndex));
+        }
+
+        List<Type> resultList = new ArrayList<>();
+        resultList.addAll(result);
+        return resultList;
     }
 
     public static int nextPowerOfTwo(final int value) {
