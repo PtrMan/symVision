@@ -299,7 +299,7 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
     public void processData() {
         final Vector2d<Integer> fboImageSize = getFboImageSize();
 
-        final float maxDistance = (float)squaredDistance(new double[]{imageSize.x, imageSize.y});
+        final float maxDistance = (float)java.lang.Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y}));
         final float backgroundValue = maxDistance*maxDistance;
 
         gl = (GL3)context.getCurrentGL();
