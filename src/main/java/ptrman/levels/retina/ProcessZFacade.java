@@ -16,18 +16,21 @@ import java.util.*;
  * Too small segments get magnified with ProcessZ
  *
  */
-public class ProcessZFacade {
+public class ProcessZFacade implements IProcess {
+
+
+    public void set(IMap2d<Boolean> image) {
+        this.alreadyCopiedImage = image.copy();
+    }
+
     private class PixelChangeListener implements FloodFill.IPixelSetListener {
-        public PixelChangeListener(ProcessZFacade processZFacade) {
-            this.processZFacade = processZFacade;
+        public PixelChangeListener() {
         }
 
         @Override
         public void seted(Vector2d<Integer> position) {
             setPixelPositions.add(position);
         }
-
-        private ProcessZFacade processZFacade;
 
         public List<Vector2d<Integer>> setPixelPositions = new ArrayList<>();
     }
@@ -37,9 +40,30 @@ public class ProcessZFacade {
         this.numberOfPixelsMagnificationThreshold = numberOfPixelsManificationThreshold;
     }
 
-    public void setup(Vector2d<Integer> imageSize) {
-        this.imageSize = imageSize;
+    public IMap2d<Boolean> getNotMagnifiedOutput() {
+        return notMagnifiedOutput;
+    }
 
+    public IMap2d<Boolean> getMagnifiedOutput() {
+        return magnifiedOutput;
+    }
+
+    public IMap2d<Integer> getNotMagnifiedOutputObjectIds() {
+        return notMagnifiedOutputObjectIds;
+    }
+
+    @Override
+    public void setImageSize(Vector2d<Integer> imageSize) {
+        this.imageSize = imageSize;
+    }
+
+    @Override
+    public void setup() {
+
+    }
+
+    @Override
+    public void preProcessData() {
         unprocessedPixelsMap = new Map2d<>(imageSize.x, imageSize.y);
         for( int y = 0; y < unprocessedPixelsMap.getLength(); y++ ) {
             for( int x = 0; x < unprocessedPixelsMap.getWidth(); x++ ) {
@@ -59,37 +83,29 @@ public class ProcessZFacade {
         notMagnifiedOutputObjectIds = new Map2d<>(imageSize.x, imageSize.y);
 
         processZ.setImageSize(imageSize);
-    }
 
-    public IMap2d<Boolean> getNotMagnifiedOutput() {
-        return notMagnifiedOutput;
-    }
 
-    public IMap2d<Boolean> getMagnifiedOutput() {
-        return magnifiedOutput;
-    }
-
-    public IMap2d<Integer> getNotMagnifiedOutputObjectIds() {
-        return notMagnifiedOutputObjectIds;
-    }
-
-    public void process(IMap2d<Boolean> input) {
-        IMap2d<Boolean> copiedInput;
 
         idCounter = 0;
         resetIdMaps();
+    }
 
-        copiedInput = input.copy();
-
-        storePixelsIntoAccelerationDatastructuresFromMap(input);
+    @Override
+    public void processData() {
+        storePixelsIntoAccelerationDatastructuresFromMap(alreadyCopiedImage);
 
         notMagnifiedOutput = new Map2d<>(imageSize.x, imageSize.y);
         toMagnify = createBlankBooleanMap(imageSize);
         magnifiedOutput = new Map2d<>(imageSize.x*2, imageSize.y*2);
 
-        takeRandomPixelFromHashmapUntilNoCandidatesAndFillAndDecide(copiedInput);
+        takeRandomPixelFromHashmapUntilNoCandidatesAndFillAndDecide(alreadyCopiedImage);
 
         magnify();
+    }
+
+    @Override
+    public void postProcessData() {
+
     }
 
     private void resetIdMaps() {
@@ -112,7 +128,7 @@ public class ProcessZFacade {
     private void takeRandomPixelFromHashmapUntilNoCandidatesAndFillAndDecide(IMap2d<Boolean> input) {
         PixelChangeListener pixelChangeListener;
 
-        pixelChangeListener = new PixelChangeListener(this);
+        pixelChangeListener = new PixelChangeListener();
 
         for(;;) {
             if( notCompletlyProcessedCells.isEmpty() ) {
@@ -248,4 +264,6 @@ public class ProcessZFacade {
     private ProcessZ processZ = new ProcessZ();
 
     private Random random = new Random();
+
+    private IMap2d<Boolean> alreadyCopiedImage;
 }

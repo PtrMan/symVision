@@ -7,6 +7,7 @@ import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.*;
 import ptrman.bpsolver.BpSolver;
 import ptrman.bpsolver.Parameters;
+import ptrman.levels.retina.ProcessA;
 import ptrman.levels.visual.ColorRgb;
 import ptrman.levels.visual.VisualProcessor;
 
@@ -68,7 +69,7 @@ public class TestVideo {
             return off_Image;
         }
 
-        private int frameCounter = 51;
+        private int frameCounter = 80;
     }
 
     static class ImageFileFilter implements FileFilter {
@@ -135,6 +136,39 @@ public class TestVideo {
             detectorImage = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D graphics = (Graphics2D)detectorImage.getGraphics();
+
+
+            // draw whit dots where the object ids are valid
+            /*
+            for( int y = 0; y < bpSolver.notMagnifiedOutputObjectIdsMapDebug.getLength(); y++ ) {
+                for( int x = 0; x < bpSolver.notMagnifiedOutputObjectIdsMapDebug.getWidth(); x++ ) {
+                    final int readObjectId = bpSolver.notMagnifiedOutputObjectIdsMapDebug.readAt(x, y);
+
+                    graphics.setColor(Color.WHITE);
+
+                    if( readObjectId != -1 ) {
+                        graphics.fillRect(x, y, 1, 1);
+                    }
+                }
+            }
+            */
+
+            // draw debguSamples, the color depends on the set objectId
+            for( ProcessA.Sample iterationSample : bpSolver.debugSamples ) {
+                if( iterationSample.isObjectIdValid() ) {
+                    graphics.setColor(Color.GREEN);
+                }
+                else {
+                    graphics.setColor(Color.BLACK);
+                }
+
+                int positionX = (int)iterationSample.position.getDataRef()[0];
+                int positionY = (int)iterationSample.position.getDataRef()[1];
+
+                graphics.fillRect(positionX, positionY, 1, 1);
+            }
+
+
 
             // TODO create graphics and draw it to a created image and put the image into the canvas
             List<DebugDrawingHelper.DrawingEntity> drawingEntities = new ArrayList<>();

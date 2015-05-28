@@ -553,6 +553,10 @@ public class ProcessD implements IProcess {
     private void putSampleIndexAtPositionIntoAccelerationDatastructure(final Vector2d<Integer> position, final int sampleIndex) {
         final Vector2d<Integer> cellPosition = new Vector2d<>(position.x / gridcellSize, position.y /gridcellSize);
 
+        if( accelerationMap == null ) {
+            int debug0 = 0;
+        }
+
         if( accelerationMap.readAt(cellPosition.x, cellPosition.y) == null ) {
             Assert.Assert(!accelerationMapCellUsed.containsKey(cellPosition.x + cellPosition.y * accelerationMap.getWidth()), "");
 

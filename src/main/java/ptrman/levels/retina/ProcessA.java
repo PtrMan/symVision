@@ -48,6 +48,10 @@ public class ProcessA implements IProcess {
                                 workingImage.setAt(x, y, false);
 
                                 final int objectId = idMap.readAt(x, y);
+                                //Assert.Assert(objectId  != -1, "");
+                                if( objectId != -1 ) {
+                                    int d = 0;
+                                }
                                 addSampleToOutput(x, y, objectId);
                             }
                         }
@@ -67,6 +71,11 @@ public class ProcessA implements IProcess {
                                 workingImage.setAt(x, y, false);
 
                                 final int objectId = idMap.readAt(x, y);
+                                //Assert.Assert(objectId  != -1, "");
+                                if( objectId != -1 ) {
+                                    int d = 0;
+                                }
+
                                 addSampleToOutput(x, y, objectId);
                             }
                         }

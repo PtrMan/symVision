@@ -424,6 +424,10 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
             ProcessA.Sample resultSample = currentSample.getClone();
             resultSample.altitude = altitudeOfSample;
 
+            if( resultSample.isObjectIdValid() ) {
+                int debug = 0;
+            }
+
             outputSampleConnector.add(resultSample);
         }
 

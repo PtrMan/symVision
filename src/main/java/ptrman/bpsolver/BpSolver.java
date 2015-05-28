@@ -21,6 +21,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class BpSolver {
 
 
+    public List<ProcessA.Sample> debugSamples;
+
     public static void main(String[] args) {
         Parameters.init();
         
@@ -48,7 +50,7 @@ public class BpSolver {
         connectorSamplesFromProcessB = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
         allConnectors.add(connectorSamplesFromProcessB);
 
-        connectorSamplesFromProcessC = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        connectorSamplesFromProcessC = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.PRIMARY_QUEUE);
         allConnectors.add(connectorSamplesFromProcessC);
         connectorSamplesFromProcessCToProcessF = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.QUEUE);
         allConnectors.add(connectorSamplesFromProcessCToProcessF);
@@ -155,9 +157,17 @@ public class BpSolver {
 
         final int processZGridsize = 8;
 
+        processZFacade.setImageSize(getImageSize());
         processZFacade.preSetupSet(processZGridsize, processzNumberOfPixelsToMagnifyThreshold);
-        processZFacade.setup(getImageSize());
-        processZFacade.process(image); // image doesn't need to be copied
+        processZFacade.setup();
+
+        processZFacade.set(image); // image doesn't need to be copied
+
+        processZFacade.preProcessData();
+        processZFacade.processData();
+        processZFacade.postProcessData();
+
+        notMagnifiedOutputObjectIdsMapDebug = processZFacade.getNotMagnifiedOutputObjectIds();
 
         // copy image because processA changes the image
         processA.set(image.copy(), processZFacade.getNotMagnifiedOutputObjectIds(), connectorSamplesFromProcessA);
@@ -175,29 +185,38 @@ public class BpSolver {
         processC.preProcessData();
         processF.preProcessData();
 
+        endosceletonSampleFilter.preProcessData();
+
         endosceletonProcessD.preProcessData();
-        exosceletonProcessD.preProcessData();
+        //exosceletonProcessD.preProcessData();
 
 
 
         // processData
         processA.processData();
+
+        debugSamples = connectorSamplesFromProcessA.getWorkspace();
+
         processB.processData();
         processC.processData();
+        endosceletonSampleFilter.processData();
+
+
         processF.processData();
 
         endosceletonProcessD.processData();
-        exosceletonProcessD.processData();
+        //exosceletonProcessD.processData();
 
 
         // postProcessData
         processA.postProcessData();
         processB.postProcessData();
         processC.postProcessData();
+        endosceletonSampleFilter.postProcessData();
         processF.postProcessData();
 
         endosceletonProcessD.postProcessData();
-        exosceletonProcessD.postProcessData();
+        //exosceletonProcessD.postProcessData();
 
 
 
@@ -650,6 +669,8 @@ public class BpSolver {
     public List<ProcessA.Sample> lastFrameSamplesWithAltitude;
     public List<Intersection> lastFrameIntersections;
 
+    public IMap2d<Integer> notMagnifiedOutputObjectIdsMapDebug;
+
 
     private ProcessA processA;
     private AbstractProcessB processB;
@@ -670,4 +691,6 @@ public class BpSolver {
     private ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessF;
 
     private List<ProcessConnector> allConnectors = new ArrayList<>();
+
+
 }
