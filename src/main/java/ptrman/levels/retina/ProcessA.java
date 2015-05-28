@@ -22,6 +22,11 @@ public class ProcessA implements IProcess {
 
     }
 
+    @Override
+    public void preProcessData() {
+
+    }
+
     /**
      *
      * avoids samping the same pixel by setting the sampled positions to false
@@ -69,6 +74,11 @@ public class ProcessA implements IProcess {
                 }
             }
         }
+    }
+
+    @Override
+    public void postProcessData() {
+
     }
 
     public static class Sample {

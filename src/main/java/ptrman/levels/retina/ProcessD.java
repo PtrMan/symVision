@@ -6,6 +6,7 @@ import org.apache.commons.math3.stat.regression.SimpleRegression;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.Parameters;
+import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.levels.retina.helper.SpatialDrawer;
 import ptrman.levels.retina.helper.SpatialListMap2d;
 import ptrman.math.ArrayRealVectorHelper;
@@ -16,10 +17,9 @@ import java.util.*;
 import static java.util.Collections.sort;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.add;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.sub;
-import static ptrman.levels.retina.helper.QueueHelper.getAllElementsFromQueueAsList;
-import static ptrman.levels.retina.helper.QueueHelper.transferAllElementsFromListToQueue;
 import static ptrman.math.ArrayRealVectorHelper.*;
 import static ptrman.math.Math.getRandomElements;
+import static ptrman.math.Math.squaredDistance;
 
 // TODO< remove detectors which are removable which have a activation less than <constant> * sumofAllActivations >
 /**
@@ -31,15 +31,6 @@ import static ptrman.math.Math.getRandomElements;
  * 
  */
 public class ProcessD implements IProcess {
-    public void preSetupSet(double maximalDistanceOfPositions) {
-        this.maximalDistanceOfPositions = maximalDistanceOfPositions;
-    }
-
-    public void set(Queue<ProcessA.Sample> inputSampleQueue, Queue<RetinaPrimitive> outputLineDetectorQueue) {
-        this.inputSampleQueue = inputSampleQueue;
-        this.outputLineDetectorQueue = outputLineDetectorQueue;
-    }
-
     private static class LineDetectorWithMultiplePoints {
 
         public List<ArrayRealVector> cachedSamplePositions;
@@ -138,6 +129,16 @@ public class ProcessD implements IProcess {
         public List<LineDetectorWithMultiplePoints> lineDetectors;
     }
 
+    public void preSetupSet(double maximalDistanceOfPositions) {
+        this.maximalDistanceOfPositions = maximalDistanceOfPositions;
+    }
+
+    public void set(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<RetinaPrimitive> outputLineDetectorConnector) {
+        this.inputSampleConnector = inputSampleConnector;
+        this.outputLineDetectorConnector = outputLineDetectorConnector;
+    }
+
+
     @Override
     public void setImageSize(final Vector2d<Integer> imageSize) {
         this.imageSize = imageSize;
@@ -145,36 +146,27 @@ public class ProcessD implements IProcess {
 
     @Override
     public void setup() {
+    }
+
+    @Override
+    public void preProcessData() {
         Assert.Assert((imageSize.x % gridcellSize) == 0, "");
         Assert.Assert((imageSize.y % gridcellSize) == 0, "");
 
         // small size hack because else the map is accessed out of range
-        accelerationMap = new SpatialListMap2d<>(new Vector2d<>(imageSize.x + gridcellSize, imageSize.y + gridcellSize), gridcellSize);
+        accelerationMap = new SpatialListMap2d<>(new Vector2d<>(imageSize.x + gridcellSize, imageSize.y + gridcellSize*2), gridcellSize);
+
+        accelerationMapCellUsed = new HashMap<>();
     }
 
     @Override
     public void processData() {
-        // take samples from queue and put into array
-        List<ProcessA.Sample> samplesAsList = getAllElementsFromQueueAsList(inputSampleQueue);
-
-        final List<RetinaPrimitive> resultRetinaPrimitives = detectLines(samplesAsList);
-
-        transferAllElementsFromListToQueue(resultRetinaPrimitives, outputLineDetectorQueue);
-    }
-    
-    /**
-     * 
-     * \param samples doesn't need to be filtered for endo/exosceleton points, it does it itself
-     * 
-     * \return only the surviving line segments
-     */
-    private List<RetinaPrimitive> detectLines(List<ProcessA.Sample> samples) {
         List<LineDetectorWithMultiplePoints> multiplePointsLineDetector = new ArrayList<>();
 
-        final List<ProcessA.Sample> workingSamples = samples;
+        final List<ProcessA.Sample> workingSamples = inputSampleConnector.getWorkspace();
 
         if( workingSamples.isEmpty() ) {
-            return new ArrayList<>();
+            return;
         }
 
         // we store all samples inside the acceleration datastructure
@@ -184,10 +176,9 @@ public class ProcessD implements IProcess {
             sampleIndex++;
         }
 
-        int numberOfTries = (int)( samples.size() * HardParameters.ProcessD.SAMPLES_NUMBER_OF_TRIES_MULTIPLIER);
+        int numberOfTries = (int)( workingSamples.size() * HardParameters.ProcessD.SAMPLES_NUMBER_OF_TRIES_MULTIPLIER);
 
-        // TODO< imagesize >
-        double maxLength = Math.sqrt(100.0f*100.0f + 80.0f*80.0f);
+        double maxLength = java.lang.Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y}));
 
         final int numberOfMaximalLengthCycles = 5;
 
@@ -402,9 +393,17 @@ public class ProcessD implements IProcess {
 
 
         // split the detectors into one or many lines
-        List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector);
-        
-        return resultSingleDetectors;
+        final List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector);
+
+        for( final RetinaPrimitive iterationPrimitive : resultSingleDetectors ) {
+            outputLineDetectorConnector.add(iterationPrimitive);
+        }
+
+    }
+
+    @Override
+    public void postProcessData() {
+
     }
 
     private List<Integer> getAllSampleIndicesOfCells(final List<Vector2d<Integer>> cellPositions) {
@@ -757,21 +756,6 @@ public class ProcessD implements IProcess {
         
         return resultSingleLineDetectors;
     }
-    
-    private static List<ProcessA.Sample> filterEndosceletonPoints(List<ProcessA.Sample> samples) {
-        List<ProcessA.Sample> filtered;
-        
-        filtered = new ArrayList<>();
-        
-        for( ProcessA.Sample iterationSample : samples ) {
-            if( iterationSample.type == ProcessA.Sample.EnumType.ENDOSCELETON ) {
-                filtered.add(iterationSample);
-            }
-        }
-        
-        return filtered;
-    }
-
 
     // TODO< belongs into dedicated helper >
     static private class Helper {
@@ -829,10 +813,10 @@ public class ProcessD implements IProcess {
     // each cell contains the incides of the points/samples inside the accelerationMap
     private SpatialListMap2d<Integer> accelerationMap;
 
-    private Map<Integer, Boolean> accelerationMapCellUsed = new HashMap<>();
+    private Map<Integer, Boolean> accelerationMapCellUsed;
 
     private double maximalDistanceOfPositions;
 
-    private Queue<ProcessA.Sample> inputSampleQueue;
-    private Queue<RetinaPrimitive> outputLineDetectorQueue;
+    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
+    private ProcessConnector<RetinaPrimitive> outputLineDetectorConnector;
 }

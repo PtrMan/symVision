@@ -33,6 +33,11 @@ public class ProcessH implements IProcess {
     }
 
     @Override
+    public void preProcessData() {
+
+    }
+
+    @Override
     public void processData() {
         List<RetinaPrimitive> allInputDetectors = getAllElementsFromQueueAsList(inputQueue);
 
@@ -50,6 +55,11 @@ public class ProcessH implements IProcess {
         for( final RetinaPrimitive iterationPrimitive : allResultDetectors ) {
             resultQueue.add(iterationPrimitive);
         }
+    }
+
+    @Override
+    public void postProcessData() {
+
     }
 
     public void combineOfObjectId(List<RetinaPrimitive> workingDetectors, final int objectId) {

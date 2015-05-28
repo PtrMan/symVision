@@ -30,6 +30,11 @@ public class ProcessZ implements IProcess {
     }
 
     @Override
+    public void preProcessData() {
+
+    }
+
+    @Override
     public void processData() {
         IMap2d<Float> floatNotMagnified;
         IMap2d<Float> floatMagnified;
@@ -45,6 +50,11 @@ public class ProcessZ implements IProcess {
         floatMagnifiedBlured = GaussianBlur.blur(2, floatMagnified);
         Map2dConverter.floatToBoolean(floatMagnifiedBlured, tempResult, FLOATTOBOOLEANTHRESHOLD);
         magnifiedOutput = Map2dBinary.corode(tempResult);
+    }
+
+    @Override
+    public void postProcessData() {
+
     }
 
     private IMap2d<Boolean> inputMap;

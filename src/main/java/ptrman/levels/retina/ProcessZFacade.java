@@ -127,9 +127,6 @@ public class ProcessZFacade {
 
             // TODO< decide with a propability if the filled patch should be magnified or not >
             if( pixelChangeListener.setPixelPositions.size() < numberOfPixelsMagnificationThreshold) {
-                System.out.println(pixelChangeListener.setPixelPositions.size());
-
-
                 drawValuesIntoMap(pixelChangeListener.setPixelPositions, toMagnify, true);
                 //drawValuesIntoMap(pixelChangeListener.setPixelPositions, toMagnifiedOutputObjectIds, idCounter);
             }

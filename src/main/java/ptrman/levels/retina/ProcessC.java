@@ -2,6 +2,7 @@ package ptrman.levels.retina;
 
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
+import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.levels.retina.helper.SpatialDrawer;
 import ptrman.levels.retina.helper.SpatialListMap2d;
 import ptrman.math.ArrayRealVectorHelper;
@@ -9,7 +10,6 @@ import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Random;
 
 import static java.lang.System.arraycopy;
@@ -20,9 +20,6 @@ import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
  * identifies if a point is a point of the endo or exosceleton
  */
 public class ProcessC implements IProcess {
-
-
-
     private static class SampleWithDistance {
         public SampleWithDistance(ProcessA.Sample sample, double distance) {
             this.sample = sample;
@@ -39,31 +36,23 @@ public class ProcessC implements IProcess {
         public boolean used = false; // used for the sorted array
     }
 
-    public ProcessC(Queue<ProcessA.Sample> queueToProcessF) {
-        this.queueToProcessF = queueToProcessF;
-    }
+    public ProcessC() {
 
-    // TODO< split parameters into two methods somehow >
-    public void set(List<ProcessA.Sample> samples) {
-        this.samples = samples;
-    }
-
-    public void recalculate() {
-        // clean acceleration map
-        accelerationMap.clean();
-
-        // fill
-        for( final ProcessA.Sample iterationSample : samples ) {
-            final Vector2d<Integer> sampleIntegerPosition = accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN));
-            List<ProcessA.Sample> samples = accelerationMap.readAt(sampleIntegerPosition.x, sampleIntegerPosition.y);
-            samples.add(iterationSample);
-        }
     }
 
 
-    public void preSetupSet(final int gridsize, Queue<ProcessA.Sample> resultSamplesQueue) {
+    public void preSetupSet(final int gridsize) {
         this.gridsize = gridsize;
-        this.resultSamplesQueue = resultSamplesQueue;
+    }
+
+    public void set(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> resultSampleConnector, ProcessConnector<ProcessA.Sample> resultSamplesToProcessF) {
+        if( inputSampleConnector.getWorkspace() == null ) {
+            throw new RuntimeException("inputSampleConnector must be a workspace Connector!");
+        }
+
+        this.inputSampleConnector = inputSampleConnector;
+        this.resultSamplesToProcessF = resultSamplesToProcessF;
+        this.resultSampleConnector = resultSampleConnector;
     }
 
     @Override
@@ -79,11 +68,28 @@ public class ProcessC implements IProcess {
     }
 
     @Override
+    public void preProcessData() {
+
+    }
+
+    @Override
     public void processData() {
-        for( int outerI = 0; outerI < samples.size(); outerI++ ) {
+        // clean acceleration map
+        accelerationMap.clean();
+
+        // fill
+        for( final ProcessA.Sample iterationSample : inputSampleConnector.getWorkspace()  ) {
+            final Vector2d<Integer> sampleIntegerPosition = accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN));
+            List<ProcessA.Sample> samplesOfCell = accelerationMap.readAt(sampleIntegerPosition.x, sampleIntegerPosition.y);
+            samplesOfCell.add(iterationSample);
+        }
+
+
+
+        for( int outerI = 0; outerI < inputSampleConnector.getWorkspace().size(); outerI++ ) {
             SampleWithDistance[] sortedArray = createSortedArray();
 
-            ProcessA.Sample outerSample = samples.get(outerI);
+            ProcessA.Sample outerSample = inputSampleConnector.getWorkspace().get(outerI);
 
             int numberOfConsideredSamples = 0;
 
@@ -103,8 +109,6 @@ public class ProcessC implements IProcess {
                 else {
                     cellPositionsToScan = SpatialDrawer.getPositionsOfCellsOfCircleBound(accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(outerSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN)), currentRadius, new Vector2d<>(accelerationMap.getWidth(), accelerationMap.getLength()));
                 }
-
-                int debug = 0;
 
                 for( final Vector2d<Integer> currentCellPosition : cellPositionsToScan ) {
                     final List<ProcessA.Sample> samplesOfCurrentCell = accelerationMap.readAt(currentCellPosition.x, currentCellPosition.y);
@@ -128,7 +132,7 @@ public class ProcessC implements IProcess {
 
                 if( outerSample.altitude >= HardParameters.ProcessC.FILLEDREGIONALTITUDETHRESHOLD ) {
                     if( random.nextFloat() < HardParameters.ProcessC.FILLEDREGIONCANDIDATEPROPABILITY ) {
-                        queueToProcessF.add(outerSample);
+                        resultSamplesToProcessF.add(outerSample);
                     }
                 }
             }
@@ -136,10 +140,15 @@ public class ProcessC implements IProcess {
                 outerSample.type = ProcessA.Sample.EnumType.EXOSCELETON;
             }
 
-            resultSamplesQueue.add(outerSample);
+            resultSampleConnector.add(outerSample);
         }
     }
-    
+
+    @Override
+    public void postProcessData() {
+
+    }
+
     /**
      *
      * \param sortedArray lower values are more left
@@ -208,15 +217,14 @@ public class ProcessC implements IProcess {
         return true;
     }
 
-    private final Queue<ProcessA.Sample> queueToProcessF;
-    private Queue<ProcessA.Sample> resultSamplesQueue;
-
-
     private SpatialListMap2d<ProcessA.Sample> accelerationMap;
 
     private int gridsize;
     private Vector2d<Integer> imageSize;
-    private List<ProcessA.Sample> samples;
 
     private Random random = new Random();
+
+    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
+    private ProcessConnector<ProcessA.Sample> resultSamplesToProcessF;
+    private ProcessConnector<ProcessA.Sample> resultSampleConnector;
 }

@@ -1,8 +1,7 @@
 package ptrman.levels.retina;
 
 import ptrman.Datastructures.Vector2d;
-
-import java.util.Queue;
+import ptrman.levels.retina.helper.ProcessConnector;
 
 /**
  * filters samples by type
@@ -12,9 +11,9 @@ public class ProcessSampleFilter implements IProcess {
         this.filterType = filterType;
     }
 
-    public void preSetupSet(Queue<ProcessA.Sample> inputSampleQueue, Queue<ProcessA.Sample> outputSampleQueue) {
-        this.inputSampleQueue = inputSampleQueue;
-        this.outputSampleQueue = outputSampleQueue;
+    public void preSetupSet(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector) {
+        this.inputSampleConnector = inputSampleConnector;
+        this.outputSampleConnector = outputSampleConnector;
     }
 
     @Override
@@ -26,20 +25,28 @@ public class ProcessSampleFilter implements IProcess {
     }
 
     @Override
-    public void processData() {
-        final int numberOfSamplesInInputQueue = inputSampleQueue.size();
+    public void preProcessData() {
 
-        for( int i = 0; i < numberOfSamplesInInputQueue; i++ ) {
-            final ProcessA.Sample currentSample = inputSampleQueue.poll();
+    }
+
+    @Override
+    public void processData() {
+        while( inputSampleConnector.getSize() > 0 ) {
+            final ProcessA.Sample currentSample = inputSampleConnector.poll();
 
             if( currentSample.type == filterType ) {
-                outputSampleQueue.add(currentSample);
+                outputSampleConnector.add(currentSample);
             }
         }
     }
 
-    private Queue<ProcessA.Sample> inputSampleQueue;
-    private Queue<ProcessA.Sample> outputSampleQueue;
+    @Override
+    public void postProcessData() {
+
+    }
+
+    private ProcessConnector<ProcessA.Sample> outputSampleConnector;
+    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
 
     private ProcessA.Sample.EnumType filterType;
 }

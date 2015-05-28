@@ -35,6 +35,11 @@ public class ProcessB extends AbstractProcessB {
 
     }
 
+    @Override
+    public void preProcessData() {
+
+    }
+
     /**
      *
      * we use the whole image, in phaeaco he worked with the incomplete image with the guiding of processA, this is not implemented that way
@@ -75,6 +80,11 @@ public class ProcessB extends AbstractProcessB {
         }
 
         System.out.println("cell acceleration (positive cases): " + Float.toString(((float)counterCellPositiveCandidates / (float)counterCellCandidates) * 100.0f) + "%" );
+    }
+
+    @Override
+    public void postProcessData() {
+
     }
 
     private static FastBooleanMap2d convertMapToFastBooleanMap2d(IMap2d<Boolean> map) {

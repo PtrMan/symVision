@@ -21,7 +21,6 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -141,7 +140,8 @@ public class TestVideo {
             List<DebugDrawingHelper.DrawingEntity> drawingEntities = new ArrayList<>();
             drawingEntities.add(new DebugDrawingHelper.SampleDrawingEntity(1, false, 40.0));
 
-            DebugDrawingHelper.drawDetectors(graphics, new ArrayList<>(Arrays.asList(bpSolver.lastFrameRetinaPrimitives)), bpSolver.lastFrameIntersections, new ArrayList<>(Arrays.asList(bpSolver.lastFrameEndosceletonSamples, bpSolver.lastFrameExosceletonSamples)), drawingEntities);
+            // no drawing, we just look at the speed
+            //DebugDrawingHelper.drawDetectors(graphics, new ArrayList<>(Arrays.asList(bpSolver.lastFrameRetinaPrimitives)), bpSolver.lastFrameIntersections, new ArrayList<>(Arrays.asList(bpSolver.lastFrameEndosceletonSamples, bpSolver.lastFrameExosceletonSamples)), drawingEntities);
 
             dualCanvas.rightCanvas.setImage(detectorImage);
         }

@@ -3,7 +3,6 @@ package ptrman.bpsolver.levels.retina;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.junit.Test;
 import ptrman.levels.retina.ProcessA;
-import ptrman.levels.retina.ProcessC;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
@@ -58,8 +57,8 @@ public class ProcessCTest {
         createdSample.altitude = (float)Math.sqrt(0.0f);
         samples.add(createdSample);
 
-
-        ProcessC processC = new ProcessC(null);
+        Assert.Assert(false, "TODO< overwork >");
+        //ProcessC processC = new ProcessC(null);
 
         // TODO
         // processC.process(samples);

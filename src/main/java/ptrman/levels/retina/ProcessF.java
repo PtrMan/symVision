@@ -3,10 +3,10 @@ package ptrman.levels.retina;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
+import ptrman.levels.retina.helper.ProcessConnector;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Queue;
 
 /**
  * Sends traces in imagespace for samples which are deeper than a threshold
@@ -14,14 +14,13 @@ import java.util.Queue;
  * * works only on rasterized input
  */
 public class ProcessF implements IProcess {
-
     @Override
     public void setImageSize(Vector2d<Integer> imageSize) {
     }
 
-    public void preSetup(Queue<ProcessA.Sample> inputSampleQueue, Queue<ProcessA.Sample> outputSampleQueue) {
-        this.inputSampleQueue = inputSampleQueue;
-        this.outputSampleQueue = outputSampleQueue;
+    public void preSetup(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector) {
+        this.inputSampleConnector = inputSampleConnector;
+        this.outputSampleConnector = outputSampleConnector;
     }
 
     @Override
@@ -30,21 +29,31 @@ public class ProcessF implements IProcess {
     }
 
     @Override
+    public void preProcessData() {
+
+    }
+
+    @Override
     public void processData() {
         for(;;) {
-            if( inputSampleQueue.isEmpty() ) {
+            if( inputSampleConnector.getSize() == 0 ) {
                 break;
             }
 
-            final ProcessA.Sample currentSample = inputSampleQueue.poll();
+            final ProcessA.Sample currentSample = inputSampleConnector.poll();
             final ArrayRealVector[] borderPositions = processSample(currentSample);
 
             List<ProcessA.Sample> borderSamples = createSamplesWithPositions(borderPositions);
 
             for( final ProcessA.Sample iterationSample : borderSamples ) {
-                outputSampleQueue.add(iterationSample);
+                outputSampleConnector.add(iterationSample);
             }
         }
+    }
+
+    @Override
+    public void postProcessData() {
+
     }
 
     public void set(IMap2d<Boolean> map) {
@@ -146,9 +155,10 @@ public class ProcessF implements IProcess {
     }
 
 
-    private Queue<ProcessA.Sample> inputSampleQueue;
-    private Queue<ProcessA.Sample> outputSampleQueue;
     private IMap2d<Boolean> map;
+
+    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
+    private ProcessConnector<ProcessA.Sample> outputSampleConnector;
 
     private static final int COUNTOFRAYDIRECTIONS = 16;
     private static final ArrayRealVector[] RAYDIRECTIONS = calculateRayDirections(COUNTOFRAYDIRECTIONS);

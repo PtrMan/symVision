@@ -286,6 +286,11 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
 
     }
 
+    @Override
+    public void preProcessData() {
+
+    }
+
     /**
      *
      * we use the whole image, in phaeaco he worked with the incomplete image with the guiding of processA, this is not implemented that way
@@ -421,6 +426,11 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
 
             outputSampleConnector.add(resultSample);
         }
+
+    }
+
+    @Override
+    public void postProcessData() {
 
     }
 

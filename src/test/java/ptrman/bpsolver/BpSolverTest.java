@@ -11,7 +11,7 @@ import ptrman.bpsolver.nodes.AttributeNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.levels.retina.*;
-import ptrman.misc.Assert;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -153,7 +153,7 @@ public class BpSolverTest {
         
         ProcessA processA = new ProcessA();
         ProcessB processB = new ProcessB();
-        ProcessC processC = new ProcessC(null);
+        // ProcessC processC = new ProcessC(null); TODO< overwork >
         ProcessD processD = new ProcessD();
         ProcessH processH = new ProcessH();
         ProcessE processE = new ProcessE();
@@ -165,6 +165,10 @@ public class BpSolverTest {
                 dummyObjectIdMap.setAt(x, y, 0);
             }
         }
+
+        throw new NotImplementedException();
+
+        /*
 
         processA.set(image, dummyObjectIdMap);
         List<ProcessA.Sample> samples = processA.sampleImage();
@@ -208,6 +212,8 @@ public class BpSolverTest {
         bpSolver.cycle(500);
         
         return objectNodes;
+
+        */
     }
     
     // TODO< refactor out >
