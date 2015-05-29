@@ -20,6 +20,7 @@ import static ptrman.Datastructures.Vector2d.IntegerHelper.sub;
 import static ptrman.math.ArrayRealVectorHelper.*;
 import static ptrman.math.Math.getRandomElements;
 import static ptrman.math.Math.squaredDistance;
+import static ptrman.misc.SetUtility.getRandomElementFromSet;
 
 // TODO< remove detectors which are removable which have a activation less than <constant> * sumofAllActivations >
 /**
@@ -187,8 +188,7 @@ public class ProcessD implements IProcess {
         for( int lengthCycle = 0; lengthCycle < numberOfMaximalLengthCycles; lengthCycle++ ) {
             // pick out a random cell and pick out a random sample in it and try to build a (small) line out of it
             for( int tryCounter = 0; tryCounter < numberOfTries; tryCounter++ ) {
-                List<Integer> keys = new ArrayList<>(accelerationMapCellUsed.keySet());
-                final int randomCellPositionIndex = keys.get(random.nextInt(keys.size()));
+                final int randomCellPositionIndex = getRandomElementFromSet(accelerationMapCellUsed.keySet(), random);
                 final Vector2d<Integer> randomCellPosition = new Vector2d<>(randomCellPositionIndex % accelerationMap.getWidth(), randomCellPositionIndex / accelerationMap.getWidth());
 
 
