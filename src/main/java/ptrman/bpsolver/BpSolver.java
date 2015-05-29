@@ -23,6 +23,7 @@ public class BpSolver {
 
     public List<ProcessA.Sample> debugSamples;
 
+
     public static void main(String[] args) {
         Parameters.init();
         
@@ -64,6 +65,9 @@ public class BpSolver {
 
         connectorSamplesFromProcessF = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
         allConnectors.add(connectorSamplesFromProcessF);
+
+        connectorDetectorsEndosceletonFromProcessH = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        allConnectors.add(connectorSamplesFromProcessF);
     }
 
     private void setupProcesses() {
@@ -73,6 +77,7 @@ public class BpSolver {
         endosceletonProcessD = new ProcessD();
         exosceletonProcessD = new ProcessD();
         processF = new ProcessF();
+        processH = new ProcessH();
 
         endosceletonSampleFilter = new ProcessSampleFilter(ProcessA.Sample.EnumType.ENDOSCELETON);
 
@@ -101,6 +106,10 @@ public class BpSolver {
         processF.setImageSize(getImageSize());
         processF.preSetup(connectorSamplesFromProcessCToProcessF, connectorSamplesFromProcessF);
         processF.setup();
+
+        processH.setImageSize(getImageSize());
+        processH.set(connectorDetectorsEndosceletonFromProcessD, connectorDetectorsEndosceletonFromProcessH);
+        processH.setup();
 
 
         // TODO< others >
@@ -190,6 +199,8 @@ public class BpSolver {
         endosceletonProcessD.preProcessData();
         //exosceletonProcessD.preProcessData();
 
+        processH.preProcessData();
+
 
 
         // processData
@@ -207,6 +218,9 @@ public class BpSolver {
         endosceletonProcessD.processData();
         //exosceletonProcessD.processData();
 
+        processH.processData();
+
+
 
         // postProcessData
         processA.postProcessData();
@@ -218,7 +232,7 @@ public class BpSolver {
         endosceletonProcessD.postProcessData();
         //exosceletonProcessD.postProcessData();
 
-
+        processH.postProcessData();
 
 
 
@@ -678,6 +692,7 @@ public class BpSolver {
     private ProcessD endosceletonProcessD;
     private ProcessD exosceletonProcessD;
     private ProcessF processF;
+    private ProcessH processH;
 
     private ProcessSampleFilter endosceletonSampleFilter;
 
@@ -689,6 +704,7 @@ public class BpSolver {
     private ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
     private ProcessConnector<RetinaPrimitive> connectorDetectorsExosceletonFromProcessD;
     private ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessF;
+    private ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessH;
 
     private List<ProcessConnector> allConnectors = new ArrayList<>();
 
