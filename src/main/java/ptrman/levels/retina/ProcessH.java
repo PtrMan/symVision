@@ -3,15 +3,14 @@ package ptrman.levels.retina;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
+import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 
 import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimitives;
-import static ptrman.levels.retina.helper.QueueHelper.getAllElementsFromQueueAsList;
 
 /**
  * tries to combine linedetectors
@@ -19,9 +18,12 @@ import static ptrman.levels.retina.helper.QueueHelper.getAllElementsFromQueueAsL
  * combines detectors only of the same objectId
  */
 public class ProcessH implements IProcess {
-    public void set(Queue<RetinaPrimitive> inputQueue, Queue<RetinaPrimitive> resultQueue) {
-        this.inputQueue = inputQueue;
-        this.resultQueue = resultQueue;
+    private ProcessConnector<RetinaPrimitive> resultPrimitiveConnector;
+    private ProcessConnector<RetinaPrimitive> inputPrimitiveConnection;
+
+    public void set(ProcessConnector<RetinaPrimitive> inputPrimitiveConnection, ProcessConnector<RetinaPrimitive> resultPrimitiveConnector) {
+        this.inputPrimitiveConnection = inputPrimitiveConnection;
+        this.resultPrimitiveConnector = resultPrimitiveConnector;
     }
 
     @Override
@@ -39,7 +41,7 @@ public class ProcessH implements IProcess {
 
     @Override
     public void processData() {
-        List<RetinaPrimitive> allInputDetectors = getAllElementsFromQueueAsList(inputQueue);
+        List<RetinaPrimitive> allInputDetectors = inputPrimitiveConnection.getWorkspace();
 
         List<RetinaPrimitive> allResultDetectors = new ArrayList<>();
 
@@ -53,7 +55,7 @@ public class ProcessH implements IProcess {
 
         // transfer the detectors into the result
         for( final RetinaPrimitive iterationPrimitive : allResultDetectors ) {
-            resultQueue.add(iterationPrimitive);
+            resultPrimitiveConnector.add(iterationPrimitive);
         }
     }
 
@@ -293,9 +295,4 @@ public class ProcessH implements IProcess {
         
         return distanceBetweenProjectedAndPoint < HardParameters.ProcessH.MAXDISTANCEFORCANDIDATEPOINT;
     }
-
-    private Queue<RetinaPrimitive> inputQueue;
-    private Queue<RetinaPrimitive> resultQueue;
-
-
 }
