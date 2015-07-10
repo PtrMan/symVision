@@ -54,15 +54,34 @@
     </dependency>
 
     <dependency>
+      <groupId>org.boofcv</groupId>
+      <artifactId>boofcv</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.boofcv</groupId>
+      <artifactId>feature</artifactId>
+      <version>0.18</version>
+    </dependency>
+
+
+    <dependency>
+      <groupId>com.syncleus.dann</groupId>
+      <artifactId>dann-core</artifactId>
+      <version>2.1</version>
+    </dependency>
+
+
+
+    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <version>4.12</version>
       <scope>test</scope>
     </dependency>
-      <dependency>
-          <groupId>com.google.guava</groupId>
-          <artifactId>guava</artifactId>
-          <version>18.0</version>
-      </dependency>
+    <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+      <version>18.0</version>
+    </dependency>
   </dependencies>
 </project>

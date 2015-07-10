@@ -21,7 +21,8 @@ public class DebugDrawingHelper {
     public abstract static class DrawingEntity {
         public enum EnumDrawType {
             SAMPLES,
-            RETINA_PRIMITIVE
+            RETINA_PRIMITIVE,
+            CUSTOM
         }
 
         public DrawingEntity(final int dataSourceIndex, final EnumDrawType drawType) {
@@ -39,6 +40,7 @@ public class DebugDrawingHelper {
 
         public abstract void drawSamples(Graphics2D graphics, final List<ProcessA.Sample> samples);
         public abstract void drawRetinaPrimitives(Graphics2D graphics2D, final List<RetinaPrimitive> primitives);
+        public abstract void drawCustom(Graphics2D graphics2D);
 
         private final EnumDrawType drawType;
         private final int dataSourceIndex;
@@ -88,6 +90,11 @@ public class DebugDrawingHelper {
             throw new NotImplementedException();
         }
 
+        @Override
+        public void drawCustom(Graphics2D graphics2D) {
+            throw new NotImplementedException();
+        }
+
         private final boolean showAltitude;
         private final double maxAltitude;
 
@@ -127,6 +134,11 @@ public class DebugDrawingHelper {
                 // TODO< overwork old code so the stroke is set at the beginning >
                 graphics2D.setStroke(new BasicStroke(1));
             }
+        }
+
+        @Override
+        public void drawCustom(Graphics2D graphics2D) {
+            throw new NotImplementedException();
         }
     }
 
@@ -212,11 +224,15 @@ public class DebugDrawingHelper {
             switch( iterationDrawingEntity.getDrawType() ) {
                 case SAMPLES:
                 iterationDrawingEntity.drawSamples(graphics, samplesArray.get(iterationDrawingEntity.getDataSourceIndex()));
-                    break;
+                break;
 
                 case RETINA_PRIMITIVE:
                 iterationDrawingEntity.drawRetinaPrimitives(graphics, retinaPrimitivesArray.get(iterationDrawingEntity.getDataSourceIndex()));
-                    break;
+                break;
+
+                case CUSTOM:
+                iterationDrawingEntity.drawCustom(graphics);
+                break;
             }
         }
     }
