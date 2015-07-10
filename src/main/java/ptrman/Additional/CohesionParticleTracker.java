@@ -31,15 +31,23 @@ public class CohesionParticleTracker {
         @Override
         public void remove(CohesionParticleTracker.Particle particle) {
             // remove all incomming/outgoing edges
-            Set<CohesionEdge> edgesOfNode = cohesionParticleTracker.graph.getAdjacentEdges(particle);
-            for( final CohesionEdge iterationEdge : edgesOfNode ) {
+            Set<CohesionEdge> outEdgesOfNode = cohesionParticleTracker.graph.getAdjacentEdges(particle);
+            for( final CohesionEdge iterationEdge : outEdgesOfNode ) {
+                Set<CohesionEdge> edgesToNode = cohesionParticleTracker.graph.getAdjacentEdges(iterationEdge.getDestinationNode());
+
+                for( final CohesionEdge iterationEdgeToNode : edgesToNode  ) {
+                    if( iterationEdgeToNode.getDestinationNode().equals(particle) ) {
+                        cohesionParticleTracker.graph.remove(iterationEdgeToNode);
+                    }
+                }
+
                 cohesionParticleTracker.graph.remove(iterationEdge);
             }
 
-            edgesOfNode = cohesionParticleTracker.graph.getInEdges(particle);
-            for( final CohesionEdge iterationEdge : edgesOfNode ) {
-                cohesionParticleTracker.graph.remove(iterationEdge);
-            }
+            //outEdgesOfNode = cohesionParticleTracker.graph.getInEdges(particle);
+            //for( final CohesionEdge iterationEdge : outEdgesOfNode ) {
+            //    cohesionParticleTracker.graph.remove(iterationEdge);
+            //}
 
             cohesionParticleTracker.graph.remove(particle);
         }
