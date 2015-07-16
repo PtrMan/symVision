@@ -538,7 +538,10 @@ public class ProcessD implements IProcess {
                 final List<Integer> listAtPosition = accelerationMap.readAt(x, y);
 
                 if (listAtPosition != null) {
-                    listAtPosition.forEach(result::add);
+                    listAtPosition.forEach( i -> {
+                        if (i!=null)
+                            result.add(i);
+                    });
                 }
             }
         }

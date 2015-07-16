@@ -1,5 +1,6 @@
 package ptrman.levels.retina;
 
+import com.gs.collections.impl.list.mutable.FastList;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.levels.retina.helper.ProcessConnector;
@@ -8,11 +9,11 @@ import ptrman.levels.retina.helper.SpatialListMap2d;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
-import static java.lang.System.arraycopy;
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 /**
@@ -20,20 +21,41 @@ import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
  * identifies if a point is a point of the endo or exosceleton
  */
 public class ProcessC implements IProcess {
-    private static class SampleWithDistance {
+
+    private SpatialListMap2d<ProcessA.Sample> accelerationMap;
+
+    final int maxSortedSamples = 8;
+
+    private int gridsize;
+    private Vector2d<Integer> imageSize;
+
+    private final Random random = new Random();
+
+    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
+    private ProcessConnector<ProcessA.Sample> resultSamplesToProcessF;
+    private ProcessConnector<ProcessA.Sample> resultSampleConnector;
+    final FastList<SampleWithDistance> sortedSamples = new FastList();
+
+    /** sort order: lowest distance first */
+    private static class SampleWithDistance implements Comparable<SampleWithDistance> {
+
+
         public SampleWithDistance(ProcessA.Sample sample, double distance) {
             this.sample = sample;
             this.distance = distance;
             used = true;
         }
         
-        public SampleWithDistance() {
-        }
-        
-        public ProcessA.Sample sample;
-        public double distance;
-        
+
+        public final ProcessA.Sample sample;
+        public final double distance;
+
         public boolean used = false; // used for the sorted array
+
+        @Override
+        public int compareTo(SampleWithDistance o) {
+            return Double.compare(distance, o.distance);
+        }
     }
 
     public ProcessC() {
@@ -86,7 +108,10 @@ public class ProcessC implements IProcess {
 
 
         for( int outerI = 0; outerI < inputSampleConnector.getWorkspace().size(); outerI++ ) {
-            SampleWithDistance[] sortedArray = createSortedArray();
+
+
+
+            //SampleWithDistance[] sortedArray = createSortedArray();
 
             ProcessA.Sample outerSample = inputSampleConnector.getWorkspace().get(outerI);
 
@@ -102,7 +127,7 @@ public class ProcessC implements IProcess {
                 List<Vector2d<Integer>> cellPositionsToScan;
 
                 if( currentRadius == 0 ) {
-                    cellPositionsToScan = new ArrayList<>();
+                    cellPositionsToScan = new FastList<>();
                     cellPositionsToScan.add(accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(outerSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN)));
                 }
                 else {
@@ -110,7 +135,7 @@ public class ProcessC implements IProcess {
                 }
 
                 for( final Vector2d<Integer> currentCellPosition : cellPositionsToScan ) {
-                    final List<ProcessA.Sample> samplesOfCurrentCell = accelerationMap.readAt(currentCellPosition.x, currentCellPosition.y);
+                    final List<ProcessA.Sample> samplesOfCurrentCell = accelerationMap.readAt(currentCellPosition.xInt(), currentCellPosition.yInt());
                     if (samplesOfCurrentCell!=null) {
 
                         for (final ProcessA.Sample iterationSample : samplesOfCurrentCell) {
@@ -122,13 +147,40 @@ public class ProcessC implements IProcess {
                             final double distance = calculateDistanceBetweenSamples(outerSample, iterationSample);
 
                             numberOfConsideredSamples++;
-                            putSampleWithDistanceIntoSortedArray(new SampleWithDistance(iterationSample, distance), sortedArray);
+
+
+                            SampleWithDistance sd = new SampleWithDistance(iterationSample, distance);
+
+
+                            if (sortedSamples.size() < maxSortedSamples || sd.distance < sortedSamples.getLast().distance) {
+                                /** binary insertion sort: sort order: lowest distance first */
+                                int index = Collections.binarySearch(sortedSamples, sd);
+                                if (index < 0) {
+                                    index = -(index + 1);
+                                    if (index < maxSortedSamples) {
+                                        sortedSamples.add(index, sd);
+                                        while (sortedSamples.size() > maxSortedSamples)
+                                            sortedSamples.remove(sortedSamples.size() - 1);
+                                    }
+                                }
+                            }
+
+                            //sortedSamples.add(sd);
+
+//                            putSampleWithDistanceIntoSortedArray(, sortedArray);
+//                            Arrays.sort(sortedArray, new Comparator<SampleWithDistance>() {
+//                                @Override public int compare(SampleWithDistance a, SampleWithDistance b) {
+//                                    return Double.compare(a.distance, b.distance);
+//                                }
+//                            });
                         }
                     }
                 }
             }
-            
-            if( noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(sortedArray, outerSample) ) {
+
+
+
+            if( noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(sortedSamples, outerSample) ) {
                 outerSample.type = ProcessA.Sample.EnumType.ENDOSCELETON;
 
                 if( outerSample.altitude >= HardParameters.ProcessC.FILLEDREGIONALTITUDETHRESHOLD ) {
@@ -142,6 +194,8 @@ public class ProcessC implements IProcess {
             }
 
             resultSampleConnector.add(outerSample);
+
+            sortedSamples.clear();
         }
     }
 
@@ -150,63 +204,58 @@ public class ProcessC implements IProcess {
 
     }
 
-    /**
-     *
-     * \param sortedArray lower values are more left
-     */
-    private static void putSampleWithDistanceIntoSortedArray(SampleWithDistance newElement, SampleWithDistance[] sortedArray) {
-        for( int i = 0; i < sortedArray.length; i++ ) {
-            if( !sortedArray[i].used ) {
-                // array element is not set, its save to set it to the newElement
-                sortedArray[i] = newElement;
-                sortedArray[i].used = true;
-                
-                return;
-            }
-            
-            if( newElement.distance < sortedArray[i].distance ) {
-                // shift one to the back
-                arraycopy(
-                    sortedArray,
-                    i,
-                    sortedArray,
-                    i+1,
-                    sortedArray.length-1-i
-                );
+//    /**
+//     *
+//     * \param sortedArray lower values are more left
+//     */
+//    private static void putSampleWithDistanceIntoSortedArray(SampleWithDistance newElement, SampleWithDistance[] sortedArray) {
+//
+//
+//        for( int i = 0; i < sortedArray.length; i++ ) {
+//            if( !sortedArray[i].used ) {
+//                // array element is not set, its save to set it to the newElement
+//                sortedArray[i] = newElement;
+//                sortedArray[i].used = true;
+//
+//                return;
+//            }
+//
+//            if( newElement.distance < sortedArray[i].distance ) {
+//                // shift one to the back
+//                arraycopy(
+//                    sortedArray,
+//                    i,
+//                    sortedArray,
+//                    i+1,
+//                    sortedArray.length-1-i
+//                );
+//
+//                // add
+//                sortedArray[i] = newElement;
+//                sortedArray[i].used = true;
+//
+//                return;
+//            }
+//        }
+//
+//
+//    }
 
-                // add
-                sortedArray[i] = newElement;
-                sortedArray[i].used = true;
-                
-                return;
-            }
-        }
-    }
-    
-    private static SampleWithDistance[] createSortedArray() {
-        SampleWithDistance[] result = new SampleWithDistance[8];
-        
-        for( int i = 0; i < result.length; i++ ) {
-            result[i] = new SampleWithDistance();
-        }
-        
-        return result;
-    }
     
     private static double calculateDistanceBetweenSamples(ProcessA.Sample a, ProcessA.Sample b) {
         return a.position.getDistance(b.position);
     }
     
-    private static boolean noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(SampleWithDistance[] neightborArray, ProcessA.Sample compareSample) {
+    private static boolean noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(Collection<SampleWithDistance> neightborArray, ProcessA.Sample compareSample) {
         int numberOfNeightborsWithAltitudeStrictlyGreaterThan = 0;
 
-        for( int i = 0; i < neightborArray.length; i++ ) {
-            if( !neightborArray[i].used ) {
+        for (SampleWithDistance s : neightborArray) {
+            if( !s.used ) {
                 return true;
             }
             // else here
 
-            if( neightborArray[i].sample.altitude > compareSample.altitude ) {
+            if( s.sample.altitude > compareSample.altitude ) {
                 numberOfNeightborsWithAltitudeStrictlyGreaterThan++;
 
                 if( numberOfNeightborsWithAltitudeStrictlyGreaterThan > 2 ) {
@@ -218,14 +267,5 @@ public class ProcessC implements IProcess {
         return true;
     }
 
-    private SpatialListMap2d<ProcessA.Sample> accelerationMap;
 
-    private int gridsize;
-    private Vector2d<Integer> imageSize;
-
-    private Random random = new Random();
-
-    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
-    private ProcessConnector<ProcessA.Sample> resultSamplesToProcessF;
-    private ProcessConnector<ProcessA.Sample> resultSampleConnector;
 }

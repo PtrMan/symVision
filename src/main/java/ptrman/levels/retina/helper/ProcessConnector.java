@@ -81,8 +81,8 @@ public class ProcessConnector<Type> {
         }
     }
 
-    private EnumMode mode;
+    public final EnumMode mode;
 
-    private Queue<Type> queue;
-    private List<Type> workspace;
+    public final Queue<Type> queue;
+    public final List<Type> workspace;
 }
