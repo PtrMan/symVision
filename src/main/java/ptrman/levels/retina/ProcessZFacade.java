@@ -17,7 +17,24 @@ import java.util.*;
  *
  */
 public class ProcessZFacade implements IProcess {
+    public static class Rect {
+        public static Rect createFromSinglePoint(final Vector2d<Integer> position) {
+            return new Rect(position, position);
+        }
 
+        public Rect(final Vector2d<Integer> min, final Vector2d<Integer> max) {
+            this.min = min;
+            this.max = max;
+        }
+
+        public void addPosition(final Vector2d<Integer> position) {
+            min = Vector2d.IntegerHelper.min(position, min);
+            max = Vector2d.IntegerHelper.max(position, max);
+        }
+
+        public Vector2d<Integer> min;
+        public Vector2d<Integer> max;
+    }
 
     public void set(IMap2d<Boolean> image) {
         this.alreadyCopiedImage = image.copy();
@@ -130,6 +147,8 @@ public class ProcessZFacade implements IProcess {
 
         pixelChangeListener = new PixelChangeListener();
 
+        rects.clear();
+
         for(;;) {
             if( notCompletlyProcessedCells.isEmpty() ) {
                 break;
@@ -154,10 +173,21 @@ public class ProcessZFacade implements IProcess {
             idCounter++;
 
             removePixelsFromAccelerationDatastructures(pixelChangeListener.setPixelPositions);
+            rects.add(getRectForPixelPositions(pixelChangeListener.setPixelPositions));
 
             pixelChangeListener.setPixelPositions.clear();
 
         }
+    }
+
+    private Rect getRectForPixelPositions(final List<Vector2d<Integer>> setPixelPositions) {
+        Rect rect = Rect.createFromSinglePoint(setPixelPositions.get(0));
+
+        for( Vector2d<Integer> iterationPosition : setPixelPositions ) {
+            rect.addPosition(iterationPosition);
+        }
+
+        return rect;
     }
 
     private Vector2d<Integer> getRandomPixelPositionOfCell(final Vector2d<Integer> cellPosition) {
@@ -266,4 +296,7 @@ public class ProcessZFacade implements IProcess {
     private Random random = new Random();
 
     private IMap2d<Boolean> alreadyCopiedImage;
+
+    // stores all rectangles of the filled regions
+    public List<Rect> rects = new ArrayList<>();
 }
