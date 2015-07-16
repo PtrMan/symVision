@@ -1,31 +1,31 @@
 package ptrman.bpsolver;
 
+import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.misc.Assert;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
  *
  */
 public class Helper {
-    public static Map<Integer, List<RetinaPrimitive>> createMapByObjectIdsFromListOfRetinaPrimitives(List<RetinaPrimitive> primitives) {
-        Map<Integer, List<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = new HashMap<>();
+    public static IntObjectHashMap<Deque<RetinaPrimitive>> createMapByObjectIdsFromListOfRetinaPrimitives(List<RetinaPrimitive> primitives) {
+
+        IntObjectHashMap<Deque<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = new IntObjectHashMap<>(primitives.size());
 
         for( final RetinaPrimitive iterationPrimitive : primitives ) {
+
             Assert.Assert(iterationPrimitive.hasValidObjectId(), "RetinaPrimitive has no valid objectId");
 
-            List<RetinaPrimitive> primitivesOfObject;
-            if( objectIdToRetinaPrimitivesMap.containsKey(iterationPrimitive.objectId) ) {
-                primitivesOfObject = objectIdToRetinaPrimitivesMap.get(iterationPrimitive.objectId);
-            }
-            else {
-                primitivesOfObject = new ArrayList<>();
+            Deque<RetinaPrimitive> primitivesOfObject =
+                objectIdToRetinaPrimitivesMap.get(iterationPrimitive.objectId);
+
+            if( primitivesOfObject == null) {
+                primitivesOfObject = new ConcurrentLinkedDeque<>();
                 objectIdToRetinaPrimitivesMap.put(iterationPrimitive.objectId, primitivesOfObject);
             }
 

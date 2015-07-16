@@ -9,7 +9,7 @@ import java.util.List;
 import static ptrman.math.ArrayRealVectorHelper.Dimensions2.getTangent;
 import static ptrman.math.ArrayRealVectorHelper.getScaled;
 import static ptrman.math.ArrayRealVectorHelper.normalize;
-import static ptrman.math.Math.modNegativeWraparound;
+import static ptrman.math.Maths.modNegativeWraparound;
 
 /**
  * Algorithm as described in the foundalis dissertation at

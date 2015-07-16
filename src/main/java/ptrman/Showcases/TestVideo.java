@@ -30,7 +30,7 @@ public class TestVideo extends AnimatedShowcase {
             }
             Graphics2D g2 = off_Image.createGraphics();
 
-            currentFile = new File("/home/r0b3/kdenlive/"+ "output_" + String.format("%05d", 1+frameCounter) + ".jpg");
+            currentFile = new File("/tmp/"+ "output_" + String.format("%05d", 1+frameCounter) + ".jpg");
 
             frameCounter++;
             frameCounter = frameCounter % (2022-1);

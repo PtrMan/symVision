@@ -19,7 +19,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.FileFilter;
-import java.util.*;
 
 /**
  *
@@ -41,6 +40,8 @@ public class AnimatedShowcase {
     }
 
     public static class NormalModeRefreshAction extends RefreshAction {
+        private BufferedImage detectorImage;
+
         public void preSetupSet(BpSolver bpSolver, IImageDrawer imageDrawer,  IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas) {
             this.bpSolver = bpSolver;
             this.imageDrawer = imageDrawer;
@@ -77,7 +78,7 @@ public class AnimatedShowcase {
             processingChain.filterChainDag.elements.add(newDagElement);
         }
 
-        public void process() {
+        public synchronized void process() {
             BufferedImage image;
             IMap2d<Boolean> mapBoolean;
             IMap2d<ColorRgb> mapColor;
@@ -104,9 +105,11 @@ public class AnimatedShowcase {
 
             System.out.println("end all");
 
-            resultLeftCanvasImage = translateFromMapToImage(mapBoolean);
+            resultLeftCanvasImage = translateFromMapToImage(mapBoolean, resultLeftCanvasImage);
 
-            BufferedImage detectorImage = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
+
+            if (detectorImage == null || detectorImage.getWidth()!=bpSolver.getImageSize().x || detectorImage.getHeight()!=bpSolver.getImageSize().y)
+                detectorImage = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D detectorImageGraphics = (Graphics2D) detectorImage.getGraphics();
 
@@ -128,26 +131,22 @@ public class AnimatedShowcase {
 
             // draw debugSamples, the color depends on the set objectId
             for (ProcessA.Sample iterationSample : bpSolver.debugSamples) {
-                if (iterationSample.isObjectIdValid()) {
-                    detectorImageGraphics.setColor(Color.GREEN);
-                } else {
-                    detectorImageGraphics.setColor(Color.BLACK);
-                }
-
-                int positionX = (int) iterationSample.position.getDataRef()[0];
-                int positionY = (int) iterationSample.position.getDataRef()[1];
-
-                detectorImageGraphics.fillRect(positionX, positionY, 1, 1);
+                iterationSample.debugPlot(detectorImageGraphics);
             }
 
 
-            // TODO create graphics and draw it to a created image and put the image into the canvas
-            java.util.List<DebugDrawingHelper.DrawingEntity> drawingEntities = new ArrayList<>();
-            drawingEntities.add(new DebugDrawingHelper.SampleDrawingEntity(1, false, 40.0));
-
+//            // TODO create graphics and draw it to a created image and put the image into the canvas
+//            java.util.List<DebugDrawingHelper.DrawingEntity> drawingEntities = new ArrayList<>();
+//            drawingEntities.add(new DebugDrawingHelper.SampleDrawingEntity(1, false, 40.0));
+//
             // no drawing, we just look at the speed
-            //DebugDrawingHelper.drawDetectors(graphics, new ArrayList<>(Arrays.asList(bpSolver.lastFrameRetinaPrimitives)), bpSolver.lastFrameIntersections, new ArrayList<>(Arrays.asList(bpSolver.lastFrameEndosceletonSamples, bpSolver.lastFrameExosceletonSamples)), drawingEntities);
-
+//            DebugDrawingHelper.drawDetectors(detectorImageGraphics,
+//                    bpSolver.lastFrameRetinaPrimitives,
+//                    bpSolver.lastFrameIntersections,
+//                    bpSolver.lastFrameEndosceletonSamples,
+//                    //bpSolver.lastFrameExosceletonSamples);
+//                    drawingEntities);
+//
             resultRightCanvasImage = detectorImage;
         }
 
@@ -283,11 +282,11 @@ public class AnimatedShowcase {
         return convertedToMap;
     }
 
-    private static BufferedImage translateFromMapToImage(IMap2d<Boolean> map) {
-        BufferedImage result;
+    private static BufferedImage translateFromMapToImage(IMap2d<Boolean> map, BufferedImage result) {
         int x, y;
 
-        result = new BufferedImage(map.getWidth(), map.getLength(), BufferedImage.TYPE_INT_ARGB);
+        if (result == null || result.getWidth()!=map.getWidth() || result.getHeight() != map.getLength())
+            result = new BufferedImage(map.getWidth(), map.getLength(), BufferedImage.TYPE_INT_ARGB);
 
         for( y = 0; y < map.getLength(); y++ ) {
             for( x = 0; x < map.getWidth(); x++ ) {

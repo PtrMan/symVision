@@ -1,14 +1,16 @@
 package ptrman.levels.retina;
 
+import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.misc.Assert;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimitives;
 
@@ -18,6 +20,8 @@ import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimiti
  * combines detectors only of the same objectId
  */
 public class ProcessH implements IProcess {
+    final int maxFusionsPerCycle = 16;
+
     private ProcessConnector<RetinaPrimitive> resultPrimitiveConnector;
     private ProcessConnector<RetinaPrimitive> inputPrimitiveConnection;
 
@@ -43,20 +47,15 @@ public class ProcessH implements IProcess {
     public void processData() {
         List<RetinaPrimitive> allInputDetectors = inputPrimitiveConnection.getWorkspace();
 
-        List<RetinaPrimitive> allResultDetectors = new ArrayList<>();
+        IntObjectHashMap<Deque<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(allInputDetectors);
 
-        Map<Integer, List<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(allInputDetectors);
+        objectIdToRetinaPrimitivesMap.forEachKeyValue( (k, v) -> {
+            combineOfObjectId(v, k, maxFusionsPerCycle);
 
-        for( final Map.Entry<Integer, List<RetinaPrimitive>> iterationEntry : objectIdToRetinaPrimitivesMap.entrySet() ) {
-            combineOfObjectId(iterationEntry.getValue(), iterationEntry.getKey());
+            // transfer the detectors into the result
+            resultPrimitiveConnector.addAll(v);
+        });
 
-            allResultDetectors.addAll(iterationEntry.getValue());
-        }
-
-        // transfer the detectors into the result
-        for( final RetinaPrimitive iterationPrimitive : allResultDetectors ) {
-            resultPrimitiveConnector.add(iterationPrimitive);
-        }
     }
 
     @Override
@@ -64,76 +63,113 @@ public class ProcessH implements IProcess {
 
     }
 
-    public void combineOfObjectId(List<RetinaPrimitive> workingDetectors, final int objectId) {
+    public void combineOfObjectId(Deque<RetinaPrimitive> workingDetectors, final int objectId, int iterations) {
         // called low and high because the index low is always lower than high
-        int iteratorLow, iteratorHigh;
+
         
         // TODO< this algorithm is simple, it is possible to optimize this >
         // TODO< a possible solution is to flag "deleted" elements in the input array and store the fused Detectors in a second array
         //       then after one iteration these two arrays get merged (without deleted elements), this repeats as long as elements are fused
         //     >
-        for(;;) {
-            boolean terminate;
+        //for(;;) {
+            //boolean terminate;
             
-            terminate = true;
-            
-            repeatSearch:
-            for( iteratorLow = 0; iteratorLow < workingDetectors.size(); iteratorLow++ ) {
-                for( iteratorHigh = iteratorLow+1; iteratorHigh < workingDetectors.size(); iteratorHigh++ ) {
-                    SingleLineDetector detectorLow;
-                    SingleLineDetector detectorHigh;
-                    
-                    Assert.Assert(workingDetectors.get(iteratorLow).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
-                    Assert.Assert(workingDetectors.get(iteratorHigh).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
-                    
-                    detectorLow = workingDetectors.get(iteratorLow).line;
-                    detectorHigh = workingDetectors.get(iteratorHigh).line;
-                    
+            //terminate = true;
+
+
+
+
+
+            //System.out.println("H: START detectors=" + workingDetectors.size());
+
+            Iterator<RetinaPrimitive> a = workingDetectors.iterator();
+
+            while (a.hasNext()) {
+                SingleLineDetector detectorLow = a.next().line;
+
+                //Assert.Assert(workingDetectors.get(iteratorLow).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
+
+                Iterator<RetinaPrimitive> b = workingDetectors.descendingIterator();
+                while (b.hasNext()) {
+                    SingleLineDetector detectorHigh = b.next().line;
+
+                    //Assert.Assert(workingDetectors.get(iteratorHigh).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
+
+                    if (detectorHigh.serial <= detectorLow.serial) {
+                        //exclude reverse order permutations (triangular matrix)
+                        break;
+                    }
+
+
+
+                    boolean fused = false;
+
                     if( canDetectorsBeFusedOverlap(detectorLow, detectorHigh) ) {
                         SingleLineDetector fusedLineDetector;
 
-                        // fuse
                         fusedLineDetector = fuseLineDetectorsOverlap(detectorLow, detectorHigh);
 
-                        // NOTE< order is important >
-                        workingDetectors.remove(iteratorHigh);
-                        workingDetectors.remove(iteratorLow);
+                        addNewLine(workingDetectors, objectId, fusedLineDetector);
 
-                        RetinaPrimitive newLine = RetinaPrimitive.makeLine(fusedLineDetector);
-                        newLine.objectId = objectId;
-                        workingDetectors.add(newLine);
 
-                        // we need to repeat the search because we changed the array
-                        terminate = false;
-                        break repeatSearch;
+                        fused = true;
                     }
                     else if( canDetectorsBeFusedInside(detectorLow, detectorHigh) ) {
                         SingleLineDetector fusedLineDetector;
 
-                        // fuse
                         fusedLineDetector = fuseLineDetectorsInside(detectorLow, detectorHigh);
 
-                        // NOTE< order is important >
-                        workingDetectors.remove(iteratorHigh);
-                        workingDetectors.remove(iteratorLow);
+                        addNewLine(workingDetectors, objectId, fusedLineDetector);
 
-                        RetinaPrimitive newLine = RetinaPrimitive.makeLine(fusedLineDetector);
-                        newLine.objectId = objectId;
-                        workingDetectors.add(newLine);
+                        fused = true;
+                    }
 
-                        // we need to repeat the search because we changed the array
-                        terminate = false;
-                        break repeatSearch;
+                    if (fused) {
+                        iterations--;
+
+                        b.remove();
+                        a.remove();
+
+
+                        if (iterations == 0)
+                            return;
+                        else
+                            break;
+
+
                     }
                 }
             }
+
+
+
+//            for( iteratorLow = 0; iteratorLow < workingDetectors.size(); iteratorLow++ ) {
+//                for( iteratorHigh = iteratorLow+1; iteratorHigh < workingDetectors.size(); iteratorHigh++ ) {
+//                    SingleLineDetector detectorLow;
+//                    SingleLineDetector detectorHigh;
+//
+//                    Assert.Assert(workingDetectors.get(iteratorLow).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
+//                    Assert.Assert(workingDetectors.get(iteratorHigh).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
+//
+//                    detectorLow = workingDetectors.get(iteratorLow).line;
+//                    detectorHigh = workingDetectors.get(iteratorHigh).line;
+//
+//                }
+//            }
             
-            if( terminate ) {
-                break;
-            }
-        }
+//            if( terminate ) {
+//                break;
+//            }
+        //}
     }
-    
+
+    private void addNewLine(Collection<RetinaPrimitive> workingDetectors, int objectId, SingleLineDetector fusedLineDetector) {
+
+        RetinaPrimitive newLine = RetinaPrimitive.makeLine(fusedLineDetector);
+        newLine.objectId = objectId;
+        workingDetectors.add(newLine);
+    }
+
     // overlap case
     private static boolean canDetectorsBeFusedOverlap(SingleLineDetector detectorA, SingleLineDetector detectorB) {
         // TODO< vertical special case >
@@ -204,14 +240,14 @@ public class ProcessH implements IProcess {
         // we need to sort them after the x of the begin, so ABegin.x is always the lowest
         // TODO BUG FIXME< the variables after the switching are not used >
         if( projectedBBegin.getDataRef()[0] < projectedABegin.getDataRef()[0] ) {
-            ArrayRealVector tempBegin, tempEnd;
+            ArrayRealVector /*tempBegin, */tempEnd;
             
-            tempBegin = projectedABegin;
+            //tempBegin = projectedABegin;
             projectedABegin = projectedBBegin;
-            projectedBBegin = tempBegin;
+            //projectedBBegin = tempBegin;
             
             tempEnd = projectedAEnd;
-            projectedAEnd = projectedBEnd;
+            //projectedAEnd = projectedBEnd;
             projectedBEnd = tempEnd;
         }
         
@@ -278,11 +314,13 @@ public class ProcessH implements IProcess {
      *  
      */
     private static boolean vectorXBetween(ArrayRealVector min, ArrayRealVector max, ArrayRealVector value) {
-        return value.getDataRef()[0] > min.getDataRef()[0] && value.getDataRef()[0] < max.getDataRef()[0];
+        final double[] vData = value.getDataRef();
+        return vData[0] > min.getDataRef()[0] && vData[0] < max.getDataRef()[0];
     }
     
     private static boolean vectorXBetweenInclusive(ArrayRealVector min, ArrayRealVector max, ArrayRealVector value) {
-        return value.getDataRef()[0] >= min.getDataRef()[0] && value.getDataRef()[0] <= max.getDataRef()[0];
+        final double[] vData = value.getDataRef();
+        return vData[0] >= min.getDataRef()[0] && vData[0] <= max.getDataRef()[0];
     }
     
     private static boolean isProjectedPointOntoLineBelowDistanceLimit(ArrayRealVector point, SingleLineDetector line) {

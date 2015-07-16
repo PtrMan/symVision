@@ -11,7 +11,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
-import static ptrman.math.Math.squaredDistance;
+import static ptrman.math.Maths.squaredDistance;
 
 
 /**

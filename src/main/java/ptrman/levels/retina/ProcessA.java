@@ -6,6 +6,8 @@ import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.misc.Assert;
 
+import java.awt.*;
+
 /**
  *
  * samples from the input image and puts the set pixels into a queue (is for now just a list)
@@ -100,6 +102,24 @@ public class ProcessA implements IProcess {
             return clone;
         }
 
+        public void debugPlot(Graphics2D detectorImageGraphics) {
+
+            if (isObjectIdValid()) {
+                detectorImageGraphics.setColor(Color.GREEN);
+            } else {
+                detectorImageGraphics.setColor(Color.BLUE);
+            }
+
+            final double[] pos = position.getDataRef();
+            int positionX = (int) pos[0];
+            int positionY = (int) pos[1];
+
+
+            detectorImageGraphics.fillRect(positionX, positionY, 1, 1);
+
+
+        }
+
         public enum EnumType {
             ENDOSCELETON,
             EXOSCELETON
@@ -118,7 +138,7 @@ public class ProcessA implements IProcess {
             return objectId != -1;
         }
         
-        public ArrayRealVector position;
+        public final ArrayRealVector position;
         public double altitude = Double.NaN;
         public EnumType type;
         public int objectId = -1;

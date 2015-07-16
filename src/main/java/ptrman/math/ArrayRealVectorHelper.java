@@ -15,15 +15,17 @@ public class ArrayRealVectorHelper {
     }
 
     public static ArrayRealVector integerToArrayRealVector(final Vector2d<Integer> vector) {
-        return new ArrayRealVector(new double[]{vector.x, vector.y});
+        return new ArrayRealVector(new double[]{vector.x, vector.y}, false);
     }
 
     public static class Dimensions2 {
         public static ArrayRealVector getTangent(final ArrayRealVector vector) {
-            final double x = vector.getDataRef()[0];
-            final double y = vector.getDataRef()[1];
+            final double[] vectorData = vector.getDataRef();
 
-            return new ArrayRealVector(new double[]{-y, x});
+            final double x = vectorData[0];
+            final double y = vectorData[1];
+
+            return new ArrayRealVector(new double[]{-y, x}, false);
         }
     }
 
@@ -32,8 +34,11 @@ public class ArrayRealVectorHelper {
         double length = vector.getNorm();
         double inverseLength = 1.0/length;
 
-        for( int i = 0; i < vector.getDimension(); i++ ) {
-            result.getDataRef()[i] = inverseLength * vector.getDataRef()[i];
+        final double[] resultData = result.getDataRef();
+        final double[] vectorData = vector.getDataRef();
+
+        for( int i = 0; i < vectorData.length; i++ ) {
+            resultData[i] = inverseLength * vectorData[i];
         }
 
         return result;
@@ -42,19 +47,33 @@ public class ArrayRealVectorHelper {
     public static ArrayRealVector getScaled(ArrayRealVector vector, double scale) {
         ArrayRealVector result = new ArrayRealVector(vector.getDimension());
 
+        final double[] resultData = result.getDataRef();
+        final double[] vectorData = vector.getDataRef();
+
+        for( int i = 0; i < vectorData.length; i++ ) {
+            resultData[i] = vectorData[i] * scale;
+        }
+
+        return result;
+    }
+    public static ArrayRealVector getScaled(final ArrayRealVector vector, final double scale, final ArrayRealVector result) {
+        final double[] resultData = result.getDataRef();
+        final double[] vectorData = vector.getDataRef();
+
         for( int i = 0; i < vector.getDimension(); i++ ) {
-            result.getDataRef()[i] = vector.getDataRef()[i] * scale;
+            resultData[i] = vectorData[i] * scale;
         }
 
         return result;
     }
 
     public static Vector2d<Integer> arrayRealVectorToInteger(ArrayRealVector vector, EnumRoundMode roundMode) {
+        final double[] vectorData = vector.getDataRef();
         if( roundMode == EnumRoundMode.NEAREST ) {
-            return new Vector2d<>((int)(vector.getDataRef()[0]), (int)(vector.getDataRef()[1]));
+            return new Vector2d<>((int)(vectorData[0]), (int)(vectorData[1]));
         }
         else {
-            return new Vector2d<>((int)java.lang.Math.floor(vector.getDataRef()[0]), (int)java.lang.Math.floor(vector.getDataRef()[1]));
+            return new Vector2d<>((int)java.lang.Math.floor(vectorData[0]), (int)java.lang.Math.floor(vectorData[1]));
         }
 
     }

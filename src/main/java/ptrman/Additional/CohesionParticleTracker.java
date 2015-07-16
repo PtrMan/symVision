@@ -5,6 +5,7 @@ import com.syncleus.dann.graph.MutableDirectedAdjacencyGraph;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.SpatialAcceleration;
 import ptrman.Datastructures.Vector2d;
+import ptrman.math.Maths;
 
 import java.util.List;
 import java.util.Set;
@@ -184,7 +185,7 @@ public class CohesionParticleTracker {
     private void adaptCohesionForEdge(CohesionEdge iterationEdge, ArrayRealVector sourceParticleVelocity, ArrayRealVector outgoingEdgeParticleVelocity) {
         final double cohesionStrengthDelta = sourceParticleVelocity.getDistance(outgoingEdgeParticleVelocity) * COHESION_VELOCITYDIFFERENCE_MULTIPLIER;
         iterationEdge.strength += (float)cohesionStrengthDelta;
-        iterationEdge.strength = ptrman.math.Math.clamp01(iterationEdge.strength);
+        iterationEdge.strength = Maths.clamp01(iterationEdge.strength);
     }
 
     public MutableDirectedAdjacencyGraph<Particle, CohesionEdge> graph = new MutableDirectedAdjacencyGraph<>();

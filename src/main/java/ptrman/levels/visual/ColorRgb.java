@@ -1,5 +1,7 @@
 package ptrman.levels.visual;
 
+import ptrman.math.Maths;
+
 public class ColorRgb
 {
     public float r;
@@ -35,7 +37,7 @@ public class ColorRgb
 
     public double distanceSquared(ColorRgb other)
     {
-        return ptrman.math.Math.squaredDistance(new double[]{r, g, b});
+        return Maths.squaredDistance(new double[]{r, g, b});
     }
 
 }

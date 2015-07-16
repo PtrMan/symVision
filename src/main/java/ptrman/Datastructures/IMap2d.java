@@ -8,7 +8,9 @@ public interface IMap2d<Type>
     int getWidth();
     int getLength();
 
-    boolean inBounds(Vector2d<Integer> position);
+    default boolean inBounds(Vector2d<Integer> position) {
+        return position.xInt() < getWidth() && position.yInt() < getLength();
+    }
 
-    Map2d<Type> copy();
+    IMap2d<Type> copy();
 }

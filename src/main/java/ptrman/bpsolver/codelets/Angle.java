@@ -10,6 +10,7 @@ import ptrman.bpsolver.nodes.AttributeNode;
 import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
+import ptrman.math.Maths;
 import ptrman.math.TruncatedFisherYades;
 import ptrman.misc.AngleHelper;
 import ptrman.misc.Assert;
@@ -219,7 +220,7 @@ public class Angle extends SolverCodelet {
     private List<Double> calculateAnglesBetweenPartners(final EnumIsKPoint isKpoint, final List<PlatonicPrimitiveInstanceNode> anglePartners, final ArrayRealVector anglePosition) {
         List<Double> angleResult = new ArrayList<>();
         
-        final int numberOfCombinations = ptrman.math.Math.faculty(anglePartners.size());
+        final int numberOfCombinations = Maths.faculty(anglePartners.size());
 
         if( isKpoint == EnumIsKPoint.YES && numberOfCombinations > KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE ) {
             // NOTE PERFORMANCE< the Fisher yades algorithm is maybe too slow, future will tell >

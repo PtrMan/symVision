@@ -1,21 +1,21 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>ptrman</groupId>
-  <artifactId>symvision</artifactId>
-  <version>1.0</version>
-  <packaging>jar</packaging>
+    <groupId>ptrman</groupId>
+    <artifactId>symvision</artifactId>
+    <version>1.0</version>
+    <packaging>jar</packaging>
 
-  <name>symvision</name>
-  <url>http://maven.apache.org</url>
+    <name>symvision</name>
+    <url>http://maven.apache.org</url>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.3</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -24,64 +24,84 @@
             </plugin>
         </plugins>
     </build>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-  </properties>
+    </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-math3</artifactId>
-      <version>3.5</version>
-    </dependency>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-math3</artifactId>
+            <version>3.5</version>
+        </dependency>
 
-    <dependency>
-      <groupId>com.github.monkeysintown</groupId>
-      <artifactId>jgraphx</artifactId>
-      <version>3.1.2.1</version>
-    </dependency>
+        <dependency>
+            <groupId>com.github.monkeysintown</groupId>
+            <artifactId>jgraphx</artifactId>
+            <version>3.1.2.1</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.jogamp.gluegen</groupId>
-      <artifactId>gluegen-rt-main</artifactId>
-      <version>2.1.3</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jogamp.jogl</groupId>
-      <artifactId>jogl-all-main</artifactId>
-      <version>2.1.3</version>
-    </dependency>
+        <dependency>
+            <groupId>org.jogamp.gluegen</groupId>
+            <artifactId>gluegen-rt-main</artifactId>
+            <version>2.0-rc11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jogamp.jogl</groupId>
+            <artifactId>jogl-all-main</artifactId>
+            <version>2.0-rc11</version>
+        </dependency>
 
-    <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>boofcv</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.boofcv</groupId>
-      <artifactId>feature</artifactId>
-      <version>0.18</version>
-    </dependency>
+        <dependency>
+            <groupId>org.boofcv</groupId>
+            <artifactId>feature</artifactId>
+            <version>0.18</version>
+        </dependency>
+        <dependency>
+            <groupId>org.boofcv</groupId>
+            <artifactId>WebcamCapture</artifactId>
+            <version>0.18</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.goldmansachs</groupId>
+            <artifactId>gs-collections</artifactId>
+            <version>6.2.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.syncleus.dann</groupId>
+            <artifactId>dann-core</artifactId>
+            <version>2.1</version>
+        </dependency>
 
 
-    <dependency>
-      <groupId>com.syncleus.dann</groupId>
-      <artifactId>dann-core</artifactId>
-      <version>2.1</version>
-    </dependency>
-
-
-
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>4.12</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.guava</groupId>
-      <artifactId>guava</artifactId>
-      <version>18.0</version>
-    </dependency>
-  </dependencies>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>18.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.sarxos</groupId>
+            <artifactId>webcam-capture</artifactId>
+            <version>0.3.9</version>
+        </dependency>
+        <dependency>
+            <groupId>org.boofcv</groupId>
+            <artifactId>geo</artifactId>
+            <version>0.18</version>
+        </dependency>
+        <dependency>
+            <groupId>org.boofcv</groupId>
+            <artifactId>visualize</artifactId>
+            <version>0.18</version>
+        </dependency>
+    </dependencies>
 </project>

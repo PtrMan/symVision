@@ -3,7 +3,7 @@ package math;
 import org.junit.Test;
 import ptrman.misc.Assert;
 
-import static ptrman.math.Math.modNegativeWraparound;
+import static ptrman.math.Maths.modNegativeWraparound;
 
 /**
  *

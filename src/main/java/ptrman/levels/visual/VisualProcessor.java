@@ -1,9 +1,6 @@
 package ptrman.levels.visual;
 
-import ptrman.Datastructures.Dag;
-import ptrman.Datastructures.IMap2d;
-import ptrman.Datastructures.Map2d;
-import ptrman.Datastructures.Vector2d;
+import ptrman.Datastructures.*;
 import ptrman.meter.event.DurationStartMeter;
 import ptrman.misc.Assert;
 
@@ -152,8 +149,13 @@ public class VisualProcessor
         public abstract static class ApplyChainElement<InputType, ResultType> extends ChainElement {
             public ApplyChainElement(EnumMapType inputType, EnumMapType outputType, String meterName, Vector2d<Integer> imageSize, IFilter<InputType, ResultType> filter) {
                 super(inputType, outputType, meterName);
-                result = new Map2d<>(imageSize.x, imageSize.y);
+                this.result = newResultMap(imageSize.x, imageSize.y);
                 this.filter = filter;
+            }
+
+            /** default, but can be overridden in subclasses */
+            protected IMap2d<ResultType> newResultMap(int w, int h) {
+                return new Map2d<>(w, h);
             }
 
             public void apply() {
@@ -171,11 +173,76 @@ public class VisualProcessor
             public ChainElementFloatFloat(IFilter<Float, Float> filter, String meterName, Vector2d<Integer> imageSize) {
                 super(EnumMapType.FLOAT, EnumMapType.FLOAT, meterName, imageSize, filter);
             }
+
+            @Override
+            protected IMap2d<Float> newResultMap(int w, int h) {
+                return new FloatMap2d(w, h);
+            }
+
+            private class FloatMap2d implements IMap2d<Float> {
+                private final int w;
+                private final int h;
+                public final float data[][];
+
+                public FloatMap2d(int w, int h) {
+                    this.w = w;
+                    this.h = h;
+                    this.data = new float[h][];
+                    for (int i = 0; i < h; i++) data[i] = new float[w];
+                }
+
+                public FloatMap2d(FloatMap2d f) {
+                    throw new RuntimeException("not impl yet");
+                    //this.w = f.w;
+                    //this.h = f.h;
+                    //this.data = f.data; //TODO copy 2d array
+                }
+
+                @Override
+                public Float readAt(int x, int y) {
+                    return get(x, y);
+                }
+
+                public float get(int x, int y) {
+                    return data[y][x];
+                }
+
+                @Override
+                public void setAt(int x, int y, Float value) {
+                    set(x, y, value);
+                }
+
+                public void set(int x, int y, float v) {
+                    data[y][x] = v;
+                }
+
+                @Override
+                public int getWidth() {
+                    return w;
+                }
+
+                @Override
+                public int getLength() {
+                    return h;
+                }
+
+
+
+                @Override
+                public FloatMap2d copy() {
+                    return new FloatMap2d(this);
+                }
+            }
         }
 
         public static class ChainElementFloatBoolean extends ApplyChainElement<Float, Boolean> {
             public ChainElementFloatBoolean(IFilter<Float, Boolean> filter, String meterName, Vector2d<Integer> imageSize) {
                 super(EnumMapType.FLOAT, EnumMapType.BOOLEAN, meterName, imageSize, filter);
+            }
+
+            @Override
+            protected IMap2d<Boolean> newResultMap(int w, int h) {
+                return new FastBooleanMap2d(w, h);
             }
         }
 

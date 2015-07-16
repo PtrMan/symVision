@@ -2,6 +2,7 @@ package ptrman.levels.visual;
 
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
+import ptrman.math.Maths;
 
 /**
  *
@@ -49,7 +50,7 @@ public class Map2dDither {
 
             @Override
             public double distanceSquared(IValue other) {
-                return ptrman.math.Math.squaredDistance(new double[]{value - ((ValueFloat)other).value});
+                return Maths.squaredDistance(new double[]{value - ((ValueFloat) other).value});
             }
 
             private float value;

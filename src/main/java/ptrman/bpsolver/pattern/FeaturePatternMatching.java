@@ -8,6 +8,7 @@ import ptrman.bpsolver.NetworkHandles;
 import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
+import ptrman.math.Maths;
 import ptrman.misc.Assert;
 import org.apache.commons.math3.analysis.UnivariateFunction;
 import org.apache.commons.math3.analysis.integration.BaseAbstractUnivariateIntegrator;
@@ -317,7 +318,7 @@ public class FeaturePatternMatching {
         float z;
         double insideSqrt;
         
-        insideSqrt = SIGMAZERO*SIGMAZERO*f1.getMean() + ptrman.math.Math.power2(f2.getStandardDeviation())/ ptrman.math.Math.power2(f2.numberOfObservations);
+        insideSqrt = SIGMAZERO*SIGMAZERO*f1.getMean() + Maths.power2(f2.getStandardDeviation())/ Maths.power2(f2.numberOfObservations);
         z = (float)(Math.abs(f1.getMean() - f2.getMean())/Math.sqrt(insideSqrt));
         
         return calcNumeriosityD(z);
@@ -327,7 +328,7 @@ public class FeaturePatternMatching {
         float z;
         double insideSqrt;
         
-        insideSqrt = ptrman.math.Math.power2(f1.getStandardDeviation())/f1.numberOfObservations + ptrman.math.Math.power2(f2.getStandardDeviation())/f2.numberOfObservations;
+        insideSqrt = Maths.power2(f1.getStandardDeviation())/f1.numberOfObservations + Maths.power2(f2.getStandardDeviation())/f2.numberOfObservations;
         z = (float)(Math.abs(f1.getMean() - f2.getMean())/Math.sqrt(insideSqrt));
         
         return calcNumeriosityD(z);
@@ -355,12 +356,12 @@ public class FeaturePatternMatching {
         double s2 = f2.getStandardDeviation();
         double n2 = f2.numberOfObservations;
 
-        double nDividend = ptrman.math.Math.power2(s1)/n1 + ptrman.math.Math.power2(s2)/n2;
-        double nDivisorSum1 = ptrman.math.Math.power2((s1*s1)/n1) / (n1 - 1.0f);
-        double nDivisorSum2 = ptrman.math.Math.power2((s2*s2)/n2) / (n2 - 1.0f);
+        double nDividend = Maths.power2(s1)/n1 + Maths.power2(s2)/n2;
+        double nDivisorSum1 = Maths.power2((s1 * s1) / n1) / (n1 - 1.0f);
+        double nDivisorSum2 = Maths.power2((s2 * s2) / n2) / (n2 - 1.0f);
 
         double n = nDividend / (nDivisorSum1 + nDivisorSum2);
-        double t = Math.abs(f1.getMean()-f2.getMean())/Math.sqrt(ptrman.math.Math.power2(s1) / n1 + ptrman.math.Math.power2(s2) / n2);
+        double t = Math.abs(f1.getMean()-f2.getMean())/Math.sqrt(Maths.power2(s1) / n1 + Maths.power2(s2) / n2);
         
         return calcStudentTDistribution(n, t);
     }

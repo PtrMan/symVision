@@ -1,5 +1,6 @@
 package ptrman.bpsolver.RetinaToWorkspaceTranslator;
 
+import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
 import ptrman.bpsolver.BpSolver;
@@ -7,8 +8,8 @@ import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.levels.retina.RetinaPrimitive;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
-import java.util.Map;
 
 import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimitives;
 
@@ -19,17 +20,17 @@ import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimiti
 public class IdStrategy extends AbstractTranslatorStrategy {
     @Override
     public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, BpSolver bpSolver) {
-        Map<Integer, List<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(primitives);
+        IntObjectHashMap<Deque<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(primitives);
         return createNodesFromMap(objectIdToRetinaPrimitivesMap, bpSolver);
     }
 
-    private static List<Node> createNodesFromMap(final Map<Integer, List<RetinaPrimitive>> map, final BpSolver bpSolver) {
+    private static List<Node> createNodesFromMap(final IntObjectHashMap<Deque<RetinaPrimitive>> map, final BpSolver bpSolver) {
         List<Node> resultNodes = new ArrayList<>();
 
-        for( final Map.Entry<Integer, List<RetinaPrimitive>> iterationEntry : map.entrySet() ) {
+        map.forEachKeyValue( (k, v) -> {
             Node objectNode = new PlatonicPrimitiveInstanceNode(bpSolver.networkHandles.objectPlatonicPrimitiveNode);
 
-            for( final RetinaPrimitive iterationRetinaPrimitive : iterationEntry.getValue() ) {
+            for( final RetinaPrimitive iterationRetinaPrimitive : v)  {
                 Node nodeForRetinaPrimitive = createPlatonicInstanceNodeForRetinaObject(iterationRetinaPrimitive, bpSolver.networkHandles);
 
                 // linkage
@@ -41,7 +42,7 @@ public class IdStrategy extends AbstractTranslatorStrategy {
             }
 
             resultNodes.add(objectNode);
-        }
+        });
 
         return resultNodes;
     }

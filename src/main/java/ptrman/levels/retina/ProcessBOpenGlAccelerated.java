@@ -7,6 +7,7 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.ArrayRealVectorHelper;
+import ptrman.math.Maths;
 import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.media.opengl.*;
@@ -15,7 +16,7 @@ import java.nio.IntBuffer;
 
 import static javax.media.opengl.GL2.*;
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
-import static ptrman.math.Math.squaredDistance;
+import static ptrman.math.Maths.squaredDistance;
 import static ptrman.math.MatrixHelper.*;
 
 /**
@@ -302,7 +303,7 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
         final float maxDistance = (float)java.lang.Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y}));
         final float backgroundValue = maxDistance*maxDistance;
 
-        gl = (GL3)context.getCurrentGL();
+        gl = context.getGL().getGL3();
 
         context.makeCurrent();
         renderToFrameBufferBegin(gl);
@@ -546,7 +547,7 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
      */
 
     private Vector2d<Integer> getFboImageSize() {
-        final int nextPowerOfTwo = ptrman.math.Math.nextPowerOfTwo(java.lang.Math.max(imageSize.x, imageSize.y));
+        final int nextPowerOfTwo = Maths.nextPowerOfTwo(java.lang.Math.max(imageSize.x, imageSize.y));
 
         return new Vector2d<>(nextPowerOfTwo, nextPowerOfTwo);
     }

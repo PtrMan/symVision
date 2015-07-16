@@ -1,12 +1,13 @@
 package ptrman.levels.retina;
 
+import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.IMap2d;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
+import java.util.Deque;
 import java.util.List;
-import java.util.Map;
 
 import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimitives;
 import static ptrman.bpsolver.Helper.isNeightborhoodPixelSet;
@@ -24,32 +25,27 @@ public class ProcessE {
         // this is only possible if we have the whole image at an instance
         // we assume here that this is the case
 
-        Map<Integer, List<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(lineDetectors);
+        IntObjectHashMap<Deque<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(lineDetectors);
 
         // detect line intersections only per object
-        for( List<RetinaPrimitive> primitivesOfObject : objectIdToRetinaPrimitivesMap.values() ) {
+        for( Deque<RetinaPrimitive> primitivesOfObject : objectIdToRetinaPrimitivesMap.values() ) {
             FindIntersectionOfLineDetectorsWithDifferentObjectIds(primitivesOfObject, image);
         }
     }
 
-    private static void FindIntersectionOfLineDetectorsWithDifferentObjectIds(List<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
-        for( int outerI = 0; outerI < lineDetectors.size(); outerI++ ) {
-
-            RetinaPrimitive lowLinePrimitive = lineDetectors.get(outerI);
+    private static void FindIntersectionOfLineDetectorsWithDifferentObjectIds(Deque<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
+        for (RetinaPrimitive lowLinePrimitive : lineDetectors) {
             Assert.Assert(lowLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
 
-            for( int innerI = 0; innerI < lineDetectors.size(); innerI++ ) {
-                if( innerI == outerI ) {
+            for (RetinaPrimitive highLinePrimitive : lineDetectors) {
+
+                Assert.Assert(lowLinePrimitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "");
+                Assert.Assert(highLinePrimitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "");
+                Assert.Assert(highLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
+
+                if( highLinePrimitive == lowLinePrimitive ) {
                     continue;
                 }
-
-                RetinaPrimitive highLinePrimitive;
-                
-                Assert.Assert(lineDetectors.get(outerI).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
-                Assert.Assert(lineDetectors.get(innerI).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
-                
-                highLinePrimitive = lineDetectors.get(innerI);
-                Assert.Assert(highLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
 
                 if( lowLinePrimitive.objectId != highLinePrimitive.objectId ) {
                     continue;
@@ -72,11 +68,11 @@ public class ProcessE {
 
                 // create entry and register stuff ...
                 // TODO< register it on the line itself? >
-                Intersection createdIntersection = new Intersection();
-                createdIntersection.intersectionPosition = intersectionPosition;
-                createdIntersection.partners[0] = new Intersection.IntersectionPartner(lowLinePrimitive, lowLinePrimitive.line.getIntersectionEndpoint(intersectionPosition));
-                createdIntersection.partners[1] = new Intersection.IntersectionPartner(highLinePrimitive, highLinePrimitive.line.getIntersectionEndpoint(intersectionPosition));
-                
+                Intersection createdIntersection = new Intersection(intersectionPosition,
+                        new Intersection.IntersectionPartner(lowLinePrimitive, lowLinePrimitive.line.getIntersectionEndpoint(intersectionPosition)),
+                        new Intersection.IntersectionPartner(highLinePrimitive, highLinePrimitive.line.getIntersectionEndpoint(intersectionPosition))
+                        );
+
                 lowLinePrimitive.line.intersections.add(createdIntersection);
                 highLinePrimitive.line.intersections.add(createdIntersection);
             }

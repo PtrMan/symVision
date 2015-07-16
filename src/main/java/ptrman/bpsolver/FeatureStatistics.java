@@ -1,5 +1,7 @@
 package ptrman.bpsolver;
 
+import ptrman.math.Maths;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -55,7 +57,7 @@ public class FeatureStatistics
         
         for( float value : values )
         {
-            runningSum += ptrman.math.Math.power2(value-mean);
+            runningSum += Maths.power2(value - mean);
         }
         
         return 1.0f/runningSum;

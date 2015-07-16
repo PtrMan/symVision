@@ -2,10 +2,9 @@ package ptrman.levels.retina.helper;
 
 import ptrman.misc.Assert;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
+
+import static ptrman.levels.retina.helper.ProcessConnector.EnumMode.*;
 
 /**
  * Connector between two Processes.
@@ -31,28 +30,40 @@ public class ProcessConnector<Type> {
     }
 
     public List<Type> getWorkspace() {
-        Assert.Assert(mode == EnumMode.WORKSPACE || mode == EnumMode.PRIMARY_QUEUE, "");
+        Assert.Assert(mode == WORKSPACE || mode == PRIMARY_QUEUE, "");
         Assert.Assert(workspace != null, "");
         return workspace;
     }
 
+    public void addAll(Collection<Type> elements) {
+        if( mode == WORKSPACE || mode == PRIMARY_QUEUE ) {
+            workspace.addAll(elements);
+        }
+
+        if( mode == QUEUE || mode == PRIMARY_QUEUE ) {
+            queue.addAll(elements);
+        }
+
+    }
+
     public void add(Type element) {
-        if( mode == EnumMode.WORKSPACE || mode == EnumMode.PRIMARY_QUEUE ) {
+
+        if( mode == WORKSPACE || mode == PRIMARY_QUEUE ) {
             workspace.add(element);
         }
 
-        if( mode == EnumMode.QUEUE || mode == EnumMode.PRIMARY_QUEUE ) {
+        if( mode == QUEUE || mode == PRIMARY_QUEUE ) {
             queue.add(element);
         }
     }
 
     public Type poll() {
-        Assert.Assert( mode == EnumMode.QUEUE || mode == EnumMode.PRIMARY_QUEUE, "");
+        Assert.Assert( mode == QUEUE || mode == PRIMARY_QUEUE, "");
         return queue.poll();
     }
 
     public int getSize() {
-        if( mode == EnumMode.WORKSPACE ) {
+        if( mode == WORKSPACE ) {
             return workspace.size();
         }
         else {

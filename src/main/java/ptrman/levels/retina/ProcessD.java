@@ -18,8 +18,8 @@ import static java.util.Collections.sort;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.add;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.sub;
 import static ptrman.math.ArrayRealVectorHelper.*;
-import static ptrman.math.Math.getRandomElements;
-import static ptrman.math.Math.squaredDistance;
+import static ptrman.math.Maths.getRandomElements;
+import static ptrman.math.Maths.squaredDistance;
 import static ptrman.misc.SetUtility.getRandomElementFromSet;
 
 // TODO< remove detectors which are removable which have a activation less than <constant> * sumofAllActivations >

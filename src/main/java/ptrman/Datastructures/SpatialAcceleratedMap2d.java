@@ -1,6 +1,7 @@
 package ptrman.Datastructures;
 
 import ptrman.levels.retina.helper.SpatialDrawer;
+import ptrman.math.Maths;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
@@ -111,8 +112,8 @@ public class SpatialAcceleratedMap2d {
 
     // TODO< move outside >
     private static Vector2d<Integer> clampVector2dInteger(final Vector2d<Integer> position, final Vector2d<Integer> min, final Vector2d<Integer> max) {
-        final int x = ptrman.math.Math.clampInt(position.x, min.x, max.x);
-        final int y = ptrman.math.Math.clampInt(position.y, min.y, max.y);
+        final int x = Maths.clampInt(position.x, min.x, max.x);
+        final int y = Maths.clampInt(position.y, min.y, max.y);
         return new Vector2d<>(x, y);
     }
 

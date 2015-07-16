@@ -2,7 +2,7 @@ package ptrman.math;
 
 import java.util.*;
 
-public class Math {
+public class Maths {
     public static float weightFloats(final float valueA, final float weightA, final float valueB, final float weightB) {
         return (valueA*weightA + valueB*weightB)/(weightA + weightB);
     }
@@ -135,4 +135,13 @@ public class Math {
             return result;
         }
     }
+
+    public static boolean equals(final double a, final double b, final double epsilon) {
+        if (a >= b) {
+            return (a - b <= epsilon);
+        }
+        else //if (b > a) {
+            return (b - a <= epsilon);
+    }
+
 }

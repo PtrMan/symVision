@@ -2,11 +2,14 @@ package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.Vector2d;
+import ptrman.math.ArrayRealVectorHelper;
+import ptrman.math.Maths;
 import ptrman.misc.AngleHelper;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 
@@ -15,15 +18,22 @@ import java.util.List;
  * 
  */
 public class SingleLineDetector {
+    final static AtomicInteger nextSerial = new AtomicInteger(0);
+
+    static final double EPSILON = 0.001;
+    private ArrayRealVector normalizedDirection;
+    public final int serial;
+
     private SingleLineDetector() {
+        this.serial = nextSerial.addAndGet(1);
     }
 
     public static SingleLineDetector createFromIntegerPositions(Vector2d<Integer> a, Vector2d<Integer> b) {
         SingleLineDetector createdDetector;
 
         createdDetector = new SingleLineDetector();
-        createdDetector.a = new ArrayRealVector(new double[]{(double)a.x, (double)a.y});
-        createdDetector.b = new ArrayRealVector(new double[]{(double)b.x, (double)b.y});
+        createdDetector.a = new ArrayRealVector(new double[]{(double)a.x, (double)a.y}, false);
+        createdDetector.b = new ArrayRealVector(new double[]{(double)b.x, (double)b.y}, false);
         createdDetector.fullfillABInvariant();
         //createdDetector.integratedSampleIndices = integratedSampleIndices;
 
@@ -31,6 +41,8 @@ public class SingleLineDetector {
         // bug outruling
         //createdDetector.m = 0.0f; //(b.y-a.y)/(b.x-a.x);
         //createdDetector.n = 0.0f; //a.y - a.y * createdDetector.m;
+
+        createdDetector.update();
 
         return createdDetector;
     }
@@ -49,16 +61,32 @@ public class SingleLineDetector {
         //createdDetector.m = 0.0f; //(b.y-a.y)/(b.x-a.x);
         //createdDetector.n = 0.0f; //a.y - a.y * createdDetector.m;
 
+        createdDetector.update();
+
         return createdDetector;
     }
 
+    protected void update() {
+        //TODO make constant only update when a and b changes
+        normalizedDirection = a.subtract(b);
+
+        //normalizedDirection.unitize();
+        final double norm = normalizedDirection.getNorm();
+        if (norm == 0) {
+            normalizedDirection = new ArrayRealVector(2);
+            //throw new MathArithmeticException(LocalizedFormats.ZERO_NORM);
+        }
+        else {
+            normalizedDirection.mapDivideToSelf(norm);
+        }
+    }
     /**
      * 
      * swaps a and b if necessary to fullfil the invariant
      * 
      */
     private void fullfillABInvariant() {
-        if( a.getDataRef()[0] > b.getDataRef()[0] ) {
+        if( a.getEntry(0) > b.getEntry(0) ) {
             ArrayRealVector temp;
 
             temp = a;
@@ -107,48 +135,57 @@ public class SingleLineDetector {
     }
 
     public ArrayRealVector getNormalizedDirection() {
-        return new ArrayRealVector(a.subtract(b).unitVector());
+        return normalizedDirection;
     }
     
-    public ArrayRealVector projectPointOntoLine(ArrayRealVector point) {
+    public ArrayRealVector projectPointOntoLine(ArrayRealVector point, ArrayRealVector result) {
         if( isYAxisSingularity() ) {
-            return projectPointOntoLineForSignular(point);
+            return projectPointOntoLineForSignular(point, result);
         }
         else {
-            return projectPointOntoLineForNonsignular(point);
+            return projectPointOntoLineForNonsignular(point, result);
         }
     }
     
-    private ArrayRealVector projectPointOntoLineForSignular(ArrayRealVector point) {
-        return new ArrayRealVector(new double[]{ a.getDataRef()[0], point.getDataRef()[1]});
+    protected final ArrayRealVector projectPointOntoLineForSignular(ArrayRealVector point, ArrayRealVector result) {
+        double[] r = result.getDataRef();
+        r[0] = a.getEntry(0);
+        r[1] = point.getEntry(1);
+        return result;
     }
 
-    private ArrayRealVector projectPointOntoLineForNonsignular(ArrayRealVector point) {
+    private ArrayRealVector projectPointOntoLineForNonsignular(ArrayRealVector point, ArrayRealVector result) {
         ArrayRealVector lineDirection = getNormalizedDirection();
         ArrayRealVector diffFromAToPoint = point.subtract(new ArrayRealVector(new double[]{0.0f, getN()}));
         double dotResult = lineDirection.dotProduct(diffFromAToPoint);
 
-        return new ArrayRealVector(new double[]{0.0, getN()}).add(ptrman.math.ArrayRealVectorHelper.getScaled(lineDirection, dotResult));
+
+        ArrayRealVectorHelper.getScaled(lineDirection, dotResult, result);
+        result.addToEntry(1, getN());
+        return result;
     }
     
     public boolean isXOfPointInLine(ArrayRealVector point) {
         Assert.Assert(!isYAxisSingularity(), "is singular!");
-        
-        return point.getDataRef()[0] >= getAProjected().getDataRef()[0] && point.getDataRef()[0] <= getBProjected().getDataRef()[0];
+
+        double[] pointData = point.getDataRef();
+        return pointData[0] >= getAProjected().getEntry(0) && pointData[0] <= getBProjected().getEntry(0);
     }
 
     public double getN() {
         Assert.Assert(!isYAxisSingularity(), "is singular!");
         
         // TODO< m = inf special handling >
-        return a.getDataRef()[1] - a.getDataRef()[0]*getM();
+        double[] aData = a.getDataRef();
+        return aData[1] - aData[0]*getM();
     }
 
     public double getM() {
         Assert.Assert(!isYAxisSingularity(), "is singular!");
 
-        ArrayRealVector diff = b.subtract(a);
-        return diff.getDataRef()[1]/diff.getDataRef()[0];
+        double aData[] = a.getDataRef();
+        double bData[] = b.getDataRef();
+        return (bData[1]-aData[1]) / (bData[0]-aData[0]);
     }
 
     public double getLength() {
@@ -187,14 +224,14 @@ public class SingleLineDetector {
     // returns null if they are parallel
     public static ArrayRealVector intersectLinesMN(double am, double an, double bm, double bn) {
         // parallel check
-        if( am == bm ) {
+        if( Maths.equals(am, bm, EPSILON) ) {
             return null;
         }
         
         double x = (an - bn)/(bm - am);
         double y = an + am * x;
         
-        return new ArrayRealVector(new double[]{x, y});
+        return new ArrayRealVector(new double[]{x, y}, false);
     }
     
     public static ArrayRealVector intersectLineWithMN(SingleLineDetector line, double am, double an) {
@@ -209,52 +246,20 @@ public class SingleLineDetector {
     private static ArrayRealVector intersectSingularLineWithMN(SingleLineDetector line, double am, double an) {
         Assert.Assert(line.isYAxisSingularity(), "must be signularity");
         
-        double y = am*line.getAProjected().getDataRef()[0] + an;
+        double y = am*line.getAProjected().getEntry(0) + an;
         
-        return new ArrayRealVector(new double[]{line.getAProjected().getDataRef()[0], y});
+        return new ArrayRealVector(new double[]{line.getAProjected().getEntry(0), y}, false);
     }
     
     public boolean isYAxisSingularity() {
+        //return Maths.equals(a.getEntry(0), b.getEntry(0), EPSILON);
         return a.getDataRef()[0] == b.getDataRef()[0];
     }
     
     
-    
-    // tests
-    public static void unittestProjectPoint() {
-        SingleLineDetector testLine;
-        ArrayRealVector point;
-        ArrayRealVector projectedPoint;
-        
-        testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{1.0f, 2.0f}), new ArrayRealVector(new double[]{2.0f, 3.0f}));
-        point = new ArrayRealVector(new double[]{2.0f, 1.0f});
-        
-        projectedPoint = testLine.projectPointOntoLine(point);
-        
-        if( projectedPoint.getDataRef()[0] < 1.0f + 0.01f && projectedPoint.getDataRef()[0] > 1.0f - 0.01f && projectedPoint.getDataRef()[1] < 2.0f + 0.01f && projectedPoint.getDataRef()[1] > 2.0f - 0.01f ) {
-            // all fine
-        }
-        else {
-            throw new RuntimeException("Unittest failed (1)");
-        }
-        
-        
-        testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{1.0f, 2.0f}), new ArrayRealVector(new double[]{2.0f, 2.0f}));
-        point = new ArrayRealVector(new double[]{2.0f, 1.0f});
-        
-        projectedPoint = testLine.projectPointOntoLine(point);
-        
-        if( projectedPoint.getDataRef()[0] < 2.0f + 0.01f && projectedPoint.getDataRef()[0] > 2.0f - 0.01f && projectedPoint.getDataRef()[1] < 2.0f + 0.01f && projectedPoint.getDataRef()[1] > 2.0f - 0.01f ) {
-            // all fine
-        }
-        else {
-            throw new RuntimeException("Unittest failed (1)");
-        }
-        
-        testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{0.0f, 1.0f}), new ArrayRealVector(new double[]{1.0f, 0.0f}));
-        point = new ArrayRealVector(new double[]{2.0f, 1.0f});
-        
-        projectedPoint = testLine.projectPointOntoLine(point);
+
+    public ArrayRealVector projectPointOntoLine(ArrayRealVector point) {
+        return projectPointOntoLine(point, new ArrayRealVector(2));
     }
 
     public ArrayRealVector getPositionOfEndpoint(int index) {
@@ -274,14 +279,16 @@ public class SingleLineDetector {
     //    -> compare x value if its before the begin or after the end, or in the middle
     //  * if the line is singularity we have to do the same with the y axis
     public Intersection.IntersectionPartner.EnumIntersectionEndpointType getIntersectionEndpoint(ArrayRealVector point) {
-        ArrayRealVector diff;
-        double distanceBegin, distanceEnd;
+        //ArrayRealVector diff;
+        final double distanceBegin, distanceEnd;
 
-        diff = a.subtract(point);
-        distanceBegin = diff.getNorm();
-
-        diff = b.subtract(point);
-        distanceEnd = diff.getNorm();
+        distanceBegin = a.getDistance(point);
+        distanceEnd = b.getDistance(point);
+//        diff = a.subtract(point);
+//        distanceBegin = diff.getNorm();
+//
+//        diff = b.subtract(point);
+//        distanceEnd = diff.getNorm();
         
         if( distanceBegin < distanceEnd ) {
             return Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN;

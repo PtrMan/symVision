@@ -39,7 +39,7 @@ public class DebugDrawingHelper {
         }
 
         public abstract void drawSamples(Graphics2D graphics, final List<ProcessA.Sample> samples);
-        public abstract void drawRetinaPrimitives(Graphics2D graphics2D, final List<RetinaPrimitive> primitives);
+        public abstract void drawRetinaPrimitives(Graphics2D graphics2D, final RetinaPrimitive... primitives);
         public abstract void drawCustom(Graphics2D graphics2D);
 
         private final EnumDrawType drawType;
@@ -86,7 +86,7 @@ public class DebugDrawingHelper {
         }
 
         @Override
-        public void drawRetinaPrimitives(Graphics2D graphics2D, List<RetinaPrimitive> primitives) {
+        public void drawRetinaPrimitives(Graphics2D graphics2D, RetinaPrimitive[] primitives) {
             throw new NotImplementedException();
         }
 
@@ -111,7 +111,7 @@ public class DebugDrawingHelper {
         }
 
         @Override
-        public void drawRetinaPrimitives(Graphics2D graphics2D, List<RetinaPrimitive> primitives) {
+        public void drawRetinaPrimitives(Graphics2D graphics2D, RetinaPrimitive[] primitives) {
             for( RetinaPrimitive iterationRetinaPrimitive : primitives ) {
                 SingleLineDetector iterationDetector;
 
@@ -211,29 +211,37 @@ public class DebugDrawingHelper {
     }
 
 
-    public static void drawDetectors(Graphics2D graphics, List<List<RetinaPrimitive>> retinaPrimitivesArray, List<Intersection> intersections, List<List<ProcessA.Sample>> samplesArray, List<DrawingEntity> drawingEntities) {
-        /*
+    //TODO use forEach visitors intead of creating lists or concatenating iterators,
+    // just execute one big draw sequence
+    public static void drawDetectors(Graphics2D graphics,
+                                     List<RetinaPrimitive> retinaPrimitivesArray,
+                                     List<Intersection> intersections,
+                                     List<ProcessA.Sample> samplesArray, List<DrawingEntity> drawingEntities) {
+
         for( Intersection iterationIntersection : intersections ) {
             graphics.setColor(Color.BLUE);
 
-            graphics.drawRect(iterationIntersection.intersectionPosition.x-1, iterationIntersection.intersectionPosition.y-1, 3, 3);
+            double[] ip = iterationIntersection.intersectionPosition.getDataRef();
+            graphics.drawRect((int)ip[0]-1, (int)ip[1]-1, 3, 3);
         }
-        */
 
-        for( DrawingEntity iterationDrawingEntity : drawingEntities ) {
-            switch( iterationDrawingEntity.getDrawType() ) {
-                case SAMPLES:
-                iterationDrawingEntity.drawSamples(graphics, samplesArray.get(iterationDrawingEntity.getDataSourceIndex()));
-                break;
 
-                case RETINA_PRIMITIVE:
-                iterationDrawingEntity.drawRetinaPrimitives(graphics, retinaPrimitivesArray.get(iterationDrawingEntity.getDataSourceIndex()));
-                break;
-
-                case CUSTOM:
-                iterationDrawingEntity.drawCustom(graphics);
-                break;
-            }
-        }
+//        for( DrawingEntity iterationDrawingEntity : drawingEntities ) {
+//            switch( iterationDrawingEntity.getDrawType() ) {
+//                case SAMPLES:
+//                iterationDrawingEntity.drawSamples(graphics, samplesArray.get(iterationDrawingEntity.getDataSourceIndex()));
+//                break;
+//
+//                case RETINA_PRIMITIVE:
+//                iterationDrawingEntity.drawRetinaPrimitives(graphics,
+//                        retinaPrimitivesArray[iterationDrawingEntity.getDataSourceIndex()]
+//                    );
+//                break;
+//
+//                case CUSTOM:
+//                iterationDrawingEntity.drawCustom(graphics);
+//                break;
+//            }
+//        }
     }
 }

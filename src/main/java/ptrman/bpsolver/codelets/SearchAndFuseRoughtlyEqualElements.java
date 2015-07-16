@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
-import static ptrman.math.Math.weightDoubles;
+import static ptrman.math.Maths.weightDoubles;
 
 /**
  *

@@ -12,7 +12,6 @@ import ptrman.levels.visual.VisualProcessor;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -21,7 +20,7 @@ import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
 
 /**
  *
@@ -145,7 +144,14 @@ public class TestClustering {
             java.util.List<DebugDrawingHelper.DrawingEntity> drawingEntities = new ArrayList<>();
             drawingEntities.add(new DebugDrawingHelper.SampleDrawingEntity(2, true, 40.0));
 
-            DebugDrawingHelper.drawDetectors(graphics, new ArrayList<>(Arrays.asList(bpSolver.lastFrameRetinaPrimitives)), bpSolver.lastFrameIntersections, new ArrayList<>(Arrays.asList(bpSolver.lastFrameEndosceletonSamples, bpSolver.lastFrameExosceletonSamples, bpSolver.lastFrameSamplesWithAltitude)), drawingEntities);
+//            DebugDrawingHelper.drawDetectors(graphics,
+//                    bpSolver.lastFrameRetinaPrimitives,
+//                    bpSolver.lastFrameIntersections,
+//                    Iterators.concat(
+//                            bpSolver.lastFrameEndosceletonSamples,
+//                            bpSolver.lastFrameExosceletonSamples,
+//                            bpSolver.lastFrameSamplesWithAltitude),
+//                    drawingEntities);
 
             dualCanvas.rightCanvas.setImage(detectorImage);
         }

@@ -1,7 +1,8 @@
 package ptrman.Datastructures;
 
 import ptrman.misc.Assert;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.util.Arrays;
 
 /**
  *
@@ -12,14 +13,20 @@ public class FastBooleanMap2d implements IMap2d<Boolean> {
 
         this.width = width;
         this.length = length;
-        widthDivBy64 = width / 64;
 
-        array = new long[widthDivBy64 * length];
+
+        array = new long[width/64 * length];
+    }
+
+    public FastBooleanMap2d(FastBooleanMap2d f) {
+        this.width = f.width;
+        this.length = f.length;
+        this.array = Arrays.copyOf(f.array, f.array.length);
     }
 
     @Override
-    public Boolean readAt(int x, int y) {
-        Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
+    public Boolean readAt(final int x, final int y) {
+        //Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
 
         final long nativeValueAtPosition = readLongAtInt(x, y);
 
@@ -27,17 +34,20 @@ public class FastBooleanMap2d implements IMap2d<Boolean> {
     }
 
     @Override
-    public void setAt(int x, int y, Boolean value) {
-        Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
+    public void setAt(final int x, final int y, final Boolean value) {
+        //Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
 
         final int indexX = x / 64;
 
         final long mask = 1L << (x % 64);
+
+        final int t = indexX + y * width/64;
+
         if( value ) {
-            array[indexX + y * widthDivBy64] |= mask;
+            array[t] |= mask;
         }
         else {
-            array[indexX + y * widthDivBy64] &= (~mask);
+            array[t] &= (~mask);
         }
     }
 
@@ -53,16 +63,16 @@ public class FastBooleanMap2d implements IMap2d<Boolean> {
 
     @Override
     public boolean inBounds(Vector2d<Integer> position) {
-        return position.x >= 0 && position.x < width && position.y >= 0 && position.y < length;
+        return position.xInt() >= 0 && position.xInt() < width && position.yInt() >= 0 && position.yInt() < length;
     }
 
     @Override
-    public Map2d<Boolean> copy() {
-        throw new NotImplementedException();
+    public FastBooleanMap2d copy() {
+        return new FastBooleanMap2d(this);
     }
 
     public int readByteAtInt(final int x, final int y) {
-        Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
+        //Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
 
         final long longAt = readLongAtInt(x, y);
 
@@ -70,7 +80,7 @@ public class FastBooleanMap2d implements IMap2d<Boolean> {
     }
 
     public long readLongAtInt(final int x, final int y) {
-        Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
+        //Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
 
         final int indexX = x / 64;
 
@@ -82,13 +92,14 @@ public class FastBooleanMap2d implements IMap2d<Boolean> {
         System.out.flush();
         */
 
-        return array[indexX + y * widthDivBy64];
+        return array[indexX + y * width/64];
     }
 
+
     // datastructure for native 64 bit machines
-    private long[] array;
+    private final long[] array;
 
     private final int width;
-    private final int widthDivBy64;
+
     private final int length;
 }

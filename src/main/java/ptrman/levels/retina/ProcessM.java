@@ -106,29 +106,29 @@ public class ProcessM {
                 currentIntersection = remainingIntersections.get(indexOfChosenRemainingIntersections);
                 remainingIntersections.remove(indexOfChosenRemainingIntersections);
                 
-                Assert.Assert(currentIntersection.partners[0].primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "is not line");
-                Assert.Assert(currentIntersection.partners[1].primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "is not line");
+                Assert.Assert(currentIntersection.p0.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "is not line");
+                Assert.Assert(currentIntersection.p1.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "is not line");
                 
                 // check out if the other side was already marked, if so, continue search for a unmarked edge/line
-                if( currentIntersection.partners[0].primitive.line.equals(currentLineDetector) ) {
-                    if( currentIntersection.partners[1].primitive.line.marked ) {
+                if( currentIntersection.p0.primitive.line.equals(currentLineDetector) ) {
+                    if( currentIntersection.p1.primitive.line.marked ) {
                         continue;
                     }
                     // else we are here
                     
-                    currentIntersection.partners[1].primitive.line.marked = true;
-                    resultLineParsing.add(currentIntersection.partners[1].primitive.line);
-                    currentLineDetector = currentIntersection.partners[1].primitive.line;
+                    currentIntersection.p1.primitive.line.marked = true;
+                    resultLineParsing.add(currentIntersection.p1.primitive.line);
+                    currentLineDetector = currentIntersection.p1.primitive.line;
                 }
                 else {
-                    if( currentIntersection.partners[0].primitive.line.marked ) {
+                    if( currentIntersection.p0.primitive.line.marked ) {
                         continue;
                     }
                     // else we are here
                     
-                    currentIntersection.partners[0].primitive.line.marked = true;
-                    resultLineParsing.add(currentIntersection.partners[0].primitive.line);
-                    currentLineDetector = currentIntersection.partners[0].primitive.line;
+                    currentIntersection.p0.primitive.line.marked = true;
+                    resultLineParsing.add(currentIntersection.p0.primitive.line);
+                    currentLineDetector = currentIntersection.p0.primitive.line;
                 }
             }
         }
