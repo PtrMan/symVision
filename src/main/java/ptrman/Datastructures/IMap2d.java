@@ -12,5 +12,7 @@ public interface IMap2d<Type>
         return position.xInt() < getWidth() && position.yInt() < getLength();
     }
 
+    void clear();
+
     IMap2d<Type> copy();
 }

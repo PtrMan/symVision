@@ -1,5 +1,8 @@
 package ptrman.math;
 
+import com.gs.collections.api.list.primitive.IntList;
+import com.gs.collections.impl.set.mutable.primitive.IntHashSet;
+
 import java.util.*;
 
 public class Maths {
@@ -94,21 +97,37 @@ public class Maths {
         return result;
     }
 
-    public static<Type> List<Type> getRandomElements(final List<Type> source, final int numberOfSamples, Random random) {
-        Set<Type> result = new TreeSet<>();
+    public static IntList getRandomElements(final IntList source, final int numberOfSamples, Random random) {
+        if (source.size() <= numberOfSamples)
+            return source;
 
-        for( int i = 0; i < numberOfSamples; i++ ) {
-            final int sampleIndex = random.nextInt(source.size());
-            result.add(source.get(sampleIndex));
-        }
+        IntHashSet result = new IntHashSet();
 
         while( result.size() < numberOfSamples ) {
             final int sampleIndex = random.nextInt(source.size());
             result.add(source.get(sampleIndex));
         }
 
-        List<Type> resultList = new ArrayList<>();
-        resultList.addAll(result);
+        return result.toList();
+    }
+
+    public static<Type> List<Type> getRandomElements(final List<Type> source, final int numberOfSamples, Random random) {
+        if (source.size() <= numberOfSamples)
+            return source;
+
+        Set<Type> result = new TreeSet<>();
+
+//        for( int i = 0; i < numberOfSamples; i++ ) {
+//            final int sampleIndex = random.nextInt(source.size());
+//            result.add(source.get(sampleIndex));
+//        }
+
+        while( result.size() < numberOfSamples ) {
+            final int sampleIndex = random.nextInt(source.size());
+            result.add(source.get(sampleIndex));
+        }
+
+        List<Type> resultList = new ArrayList<>(result);
         return resultList;
     }
 

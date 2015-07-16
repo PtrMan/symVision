@@ -1,5 +1,7 @@
 package ptrman.Datastructures;
 
+import java.util.Arrays;
+
 import static java.lang.System.arraycopy;
 
 /**
@@ -14,10 +16,15 @@ public class Map2d<Type> implements IMap2d<Type>
         this.length = length;
         this.array = (Type[])new Object[width*length];
     }
-    
+
+    @Override
+    public void clear() {
+        Arrays.fill(array, null);
+    }
+
     public Type readAt(int x, int y)
     {
-        if( !inBounds(new Vector2d<>(x, y)) )
+        if( !inBounds(x, y) )
         {
             throw new RuntimeException("access error");
         }
@@ -48,6 +55,10 @@ public class Map2d<Type> implements IMap2d<Type>
     @Override
     public boolean inBounds(Vector2d<Integer> position) {
         return position.x >= 0 && position.x < width && position.y >= 0 && position.y < length;
+    }
+
+    public boolean inBounds(int px, int py) {
+        return px >= 0 && px < width && py >= 0 && py < length;
     }
 
     public Map2d<Type> copy()

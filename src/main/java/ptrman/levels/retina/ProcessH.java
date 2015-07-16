@@ -20,7 +20,8 @@ import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimiti
  * combines detectors only of the same objectId
  */
 public class ProcessH implements IProcess {
-    final int maxFusionsPerCycle = 16;
+
+    final float maxFusionsPerCycle = 0.15f; //adjustable
 
     private ProcessConnector<RetinaPrimitive> resultPrimitiveConnector;
     private ProcessConnector<RetinaPrimitive> inputPrimitiveConnection;
@@ -63,7 +64,7 @@ public class ProcessH implements IProcess {
 
     }
 
-    public void combineOfObjectId(Deque<RetinaPrimitive> workingDetectors, final int objectId, int iterations) {
+    public void combineOfObjectId(Deque<RetinaPrimitive> workingDetectors, final int objectId, float maxFusionPercent) {
         // called low and high because the index low is always lower than high
 
         
@@ -78,6 +79,7 @@ public class ProcessH implements IProcess {
 
 
 
+        int remainingCombinations = (int) Math.ceil( maxFusionPercent * workingDetectors.size() );
 
 
             //System.out.println("H: START detectors=" + workingDetectors.size());
@@ -125,13 +127,13 @@ public class ProcessH implements IProcess {
                     }
 
                     if (fused) {
-                        iterations--;
+                        remainingCombinations--;
 
                         b.remove();
                         a.remove();
 
 
-                        if (iterations == 0)
+                        if (remainingCombinations == 0)
                             return;
                         else
                             break;

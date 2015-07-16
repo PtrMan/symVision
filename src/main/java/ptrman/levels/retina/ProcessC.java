@@ -75,13 +75,12 @@ public class ProcessC implements IProcess {
     @Override
     public void processData() {
         // clean acceleration map
-        accelerationMap.clean();
+        accelerationMap.clear();
 
         // fill
         for( final ProcessA.Sample iterationSample : inputSampleConnector.getWorkspace()  ) {
             final Vector2d<Integer> sampleIntegerPosition = accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN));
-            List<ProcessA.Sample> samplesOfCell = accelerationMap.readAt(sampleIntegerPosition.x, sampleIntegerPosition.y);
-            samplesOfCell.add(iterationSample);
+            List<ProcessA.Sample> samplesOfCell = accelerationMap.addAt(sampleIntegerPosition.x, sampleIntegerPosition.y, iterationSample);
         }
 
 
@@ -112,17 +111,19 @@ public class ProcessC implements IProcess {
 
                 for( final Vector2d<Integer> currentCellPosition : cellPositionsToScan ) {
                     final List<ProcessA.Sample> samplesOfCurrentCell = accelerationMap.readAt(currentCellPosition.x, currentCellPosition.y);
+                    if (samplesOfCurrentCell!=null) {
 
-                    for( final ProcessA.Sample iterationSample : samplesOfCurrentCell ) {
-                        // we don't want to calculate it for the same sample
-                        if( iterationSample.equals(outerSample) ) {
-                            continue;
+                        for (final ProcessA.Sample iterationSample : samplesOfCurrentCell) {
+                            // we don't want to calculate it for the same sample
+                            if (iterationSample.equals(outerSample)) {
+                                continue;
+                            }
+
+                            final double distance = calculateDistanceBetweenSamples(outerSample, iterationSample);
+
+                            numberOfConsideredSamples++;
+                            putSampleWithDistanceIntoSortedArray(new SampleWithDistance(iterationSample, distance), sortedArray);
                         }
-
-                        final double distance = calculateDistanceBetweenSamples(outerSample, iterationSample);
-
-                        numberOfConsideredSamples++;
-                        putSampleWithDistanceIntoSortedArray(new SampleWithDistance(iterationSample, distance), sortedArray);
                     }
                 }
             }

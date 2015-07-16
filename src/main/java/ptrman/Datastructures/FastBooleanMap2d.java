@@ -25,6 +25,11 @@ public class FastBooleanMap2d implements IMap2d<Boolean> {
     }
 
     @Override
+    public void clear() {
+        Arrays.fill(array, 0);
+    }
+
+    @Override
     public Boolean readAt(final int x, final int y) {
         //Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
 

@@ -1,5 +1,6 @@
 package ptrman.Gui.showcase;
 
+import org.apache.commons.math3.stat.descriptive.DescriptiveStatistics;
 import ptrman.Datastructures.Dag;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
@@ -13,8 +14,6 @@ import ptrman.levels.visual.VisualProcessor;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.io.File;
@@ -164,15 +163,25 @@ public class AnimatedShowcase {
      * delegates to the refresh action
      *
      */
-    private static class TimerActionListener implements ActionListener {
-        public TimerActionListener( DualConvas dualCanvas, RefreshAction refreshAction) {
+    private static class FrameTask implements Runnable {
+        DescriptiveStatistics frameTimes = new DescriptiveStatistics(32);
+
+        public FrameTask(DualConvas dualCanvas, RefreshAction refreshAction) {
             this.dualCanvas = dualCanvas;
             this.refreshAction = refreshAction;
         }
 
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void run() {
+            long start = System.currentTimeMillis();
             refreshAction.process();
+            long end = System.currentTimeMillis();
+
+            float frameTime =  ((end - start) / 1000.0f);
+            frameTimes.addValue(frameTime);
+
+            System.out.println("frame: " + frameTime + "s (" + frameTimes.getMean() + " avg, " + frameTimes.getVariance() + " variance)");
+
             dualCanvas.leftCanvas.setImage(refreshAction.resultLeftCanvasImage);
             dualCanvas.rightCanvas.setImage(refreshAction.resultRightCanvasImage);
         }
@@ -212,7 +221,7 @@ public class AnimatedShowcase {
         refreshAction.preSetupSet(bpSolver, inputDrawer, introspectControlPanel, graphWindow.getNodeGraph(), dualCanvas);
         refreshAction.setup();
 
-        TimerActionListener actionListener = new TimerActionListener(dualCanvas, refreshAction);
+        FrameTask frame = new FrameTask(dualCanvas, refreshAction);
         //timer.setInitialDelay(0);
         //timer.start();
 
@@ -249,9 +258,11 @@ public class AnimatedShowcase {
         j.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         j.setVisible(true);
 
-        for(;;) {
-            actionListener.actionPerformed(null);
-        }
+        new Thread(() -> {
+            for(;;) {
+                frame.run();
+            }
+        }).start();
     }
 
 

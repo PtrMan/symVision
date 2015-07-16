@@ -5,6 +5,7 @@ import ptrman.meter.event.DurationStartMeter;
 import ptrman.misc.Assert;
 
 import java.util.ArrayDeque;
+import java.util.Arrays;
 import java.util.Deque;
 
 /**
@@ -197,6 +198,13 @@ public class VisualProcessor
                     //this.h = f.h;
                     //this.data = f.data; //TODO copy 2d array
                 }
+
+                @Override
+                public void clear() {
+                    for (float[] d : data)
+                        Arrays.fill(d, 0);
+                }
+
 
                 @Override
                 public Float readAt(int x, int y) {

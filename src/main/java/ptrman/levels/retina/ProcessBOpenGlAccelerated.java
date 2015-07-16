@@ -187,6 +187,11 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
 
     @Override
     public void setup() {
+
+    }
+
+    /** must be called from same thread that processing will happen in */
+    public void setupContext() {
         GLProfile.initSingleton();
 
         // TODO< change to GL3 when I have learned the api... >
@@ -298,6 +303,11 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
      */
     @Override
     public void processData() {
+
+        if (context == null) {
+            setupContext();
+        }
+
         final Vector2d<Integer> fboImageSize = getFboImageSize();
 
         final float maxDistance = (float)java.lang.Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y}));
@@ -431,6 +441,8 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
 
             outputSampleConnector.add(resultSample);
         }
+
+        context.release();
 
     }
 
