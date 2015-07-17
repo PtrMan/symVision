@@ -5,20 +5,15 @@ import java.awt.*;
 
 public class DualConvas extends JPanel
 {
-    public DualConvas()
-    {
-        super();
+    public DualConvas() {
+        super(new GridLayout(0,1));
 
-        
-
-        setLayout(new GridLayout(1,2));
-        
         leftCanvas=new GCanvas();
-        leftCanvas.setSize(new Dimension(300, 200));
+        //leftCanvas.setSize(new Dimension(300, 200));
         add(leftCanvas);
         
         rightCanvas = new GCanvas();
-        rightCanvas.setSize(new Dimension(300, 200));
+        //rightCanvas.setSize(new Dimension(300, 200));
         add(rightCanvas);
         
         
@@ -33,25 +28,24 @@ public class DualConvas extends JPanel
     
     public class GCanvas extends Canvas
     {
-        public GCanvas()
-        {
+        public GCanvas() {
+            setIgnoreRepaint(true);
         }
         
         public void paint(Graphics g)
         {
-            if( image == null )
-            {
+            if( image == null ) {
                 return;
             }
             
-            g.drawImage(image, 0, 0, image.getWidth(null), image.getHeight(null), null);
-            g.dispose();
+            g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
         }
         
         public void setImage(Image image)
         {
             this.image = image;
-            repaint();
+
+            SwingUtilities.invokeLater(() -> { repaint(); } );
         }
         
         private Image image;

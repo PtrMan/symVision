@@ -86,7 +86,7 @@ public class AnimatedShowcase {
             // for now imageDrawer does this
             image = imageDrawer.drawToJavaImage(bpSolver);
 
-            System.out.println("begin processing");
+            System.out.print("begin processing...");
 
             mapColor = AnimatedShowcase.translateFromImageToMap(image);
 
@@ -102,7 +102,6 @@ public class AnimatedShowcase {
                 nodeGraph.repopulateAfterNodes(bpSolver.lastFrameObjectNodes, bpSolver.networkHandles);
             }
 
-            System.out.println("end all");
 
             resultLeftCanvasImage = translateFromMapToImage(mapBoolean, resultLeftCanvasImage);
 
@@ -110,7 +109,11 @@ public class AnimatedShowcase {
             if (detectorImage == null || detectorImage.getWidth()!=bpSolver.getImageSize().x || detectorImage.getHeight()!=bpSolver.getImageSize().y)
                 detectorImage = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
 
+
             Graphics2D detectorImageGraphics = (Graphics2D) detectorImage.getGraphics();
+
+            detectorImageGraphics.setColor(Color.BLACK);
+            detectorImageGraphics.fillRect(0,0,detectorImage.getWidth(), detectorImage.getHeight());
 
 
             // draw whit dots where the object ids are valid
@@ -229,29 +232,28 @@ public class AnimatedShowcase {
 
 
         panel.setLayout(new BorderLayout());
+        panel.add(dualCanvas, BorderLayout.CENTER);
 
         {
-            GridLayout experimentLayout = new GridLayout(3,1);
 
-            final JPanel compsToExperiment = new JPanel();
-            compsToExperiment.setLayout(experimentLayout);
+            final JPanel controls = new JPanel(new BorderLayout());
+
+            final JPanel compsToExperiment = new JPanel(new GridLayout(2,1));
 
             compsToExperiment.add(introspectControlPanel.getPanel());
-            compsToExperiment.add(dualCanvas);
             compsToExperiment.add(graphWindow.getComponent());
+            compsToExperiment.add(new TuningWindow());
 
-            panel.add(compsToExperiment, BorderLayout.CENTER);
-        }
-
-        panel.add(new TuningWindow(), BorderLayout.SOUTH);
-        {
+            controls.add(compsToExperiment, BorderLayout.CENTER);
 
             Component fc = FileChooser.newComponent(new File("/tmp"), new ImageFileFilter(), true, f -> {
                 currentFileImage = null;
                 currentFile = f;
             });
             fc.setPreferredSize(new Dimension(imageSize.x, imageSize.y));
-            panel.add(fc, BorderLayout.WEST);
+            controls.add(fc, BorderLayout.WEST);
+
+            panel.add(controls, BorderLayout.SOUTH);
         }
 
         j.setSize(1024, 1000);
