@@ -1,5 +1,6 @@
 package ptrman.levels.retina.helper;
 
+import com.gs.collections.impl.list.mutable.FastList;
 import ptrman.Algorithms.Bresenham;
 import ptrman.Datastructures.Vector2d;
 
@@ -14,7 +15,8 @@ import static ptrman.Datastructures.Vector2d.IntegerHelper.getScaled;
  */
 public final class SpatialDrawer {
     static final private class Drawer implements Bresenham.IDrawer {
-        public class PositionWithDirection {
+
+        public static class PositionWithDirection {
             private final Vector2d<Integer> position;
             private final Vector2d<Integer> direction;
 
@@ -24,8 +26,8 @@ public final class SpatialDrawer {
             }
         }
 
-        public List<PositionWithDirection> positionWithDirections = new ArrayList<>();
-        public List<Vector2d<Integer>> directions = new ArrayList<>();
+        public final List<PositionWithDirection> positionWithDirections = new FastList<>();
+        public final List<Vector2d<Integer>> directions = new FastList<>();
 
         @Override
         public void set(final Vector2d<Integer> position, final Vector2d<Integer> direction) {
@@ -38,12 +40,14 @@ public final class SpatialDrawer {
 
         Bresenham.rasterCircle(center, radius, drawer);
 
-        List<Vector2d<Integer>> resultPositions = new ArrayList<>();
-        for( final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections ) {
-            resultPositions.add(iterationPositionWithDirection.position);
+        List<Vector2d<Integer>> resultPositions = new FastList<>(drawer.positionWithDirections.size());
+        for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections) {
+            Vector2d<Integer> position = iterationPositionWithDirection.position;
+            if (isGridLocationInBound(position, boundary))
+                resultPositions.add(position);
         }
 
-        resultPositions.removeIf(position -> !isGridLocationInBound(position, boundary));
+        //resultPositions.removeIf(position -> !isGridLocationInBound(position, boundary));
 
         return resultPositions;
     }
@@ -54,7 +58,7 @@ public final class SpatialDrawer {
         Bresenham.rasterCircle(center, radius, drawer);
 
         List<Vector2d<Integer>> resultPositions = new ArrayList<>();
-        for( final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections ) {
+        for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections) {
             resultPositions.add(iterationPositionWithDirection.position);
             resultPositions.add(add(iterationPositionWithDirection.position, getScaled(iterationPositionWithDirection.direction, -1)));
         }
@@ -70,7 +74,7 @@ public final class SpatialDrawer {
         Bresenham.rasterLine(a, b, drawer);
 
         List<Vector2d<Integer>> resultPositions = new ArrayList<>();
-        for( final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections ) {
+        for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections) {
             resultPositions.add(iterationPositionWithDirection.position);
         }
         return resultPositions;

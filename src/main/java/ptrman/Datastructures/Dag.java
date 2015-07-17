@@ -1,6 +1,8 @@
 package ptrman.Datastructures;
 
-import java.util.ArrayList;
+import com.gs.collections.impl.list.mutable.FastList;
+import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
+
 import java.util.List;
 
 /**
@@ -13,7 +15,7 @@ public class Dag<Type> {
             this.content = content;
         }
 
-        public List<Integer> childIndices = new ArrayList<>();
+        public IntArrayList childIndices = new IntArrayList();
         public ElementType content;
     }
 
@@ -22,5 +24,5 @@ public class Dag<Type> {
         elements.add(element);
     }
 
-    public List<Element<Type>> elements = new ArrayList<>();
+    public List<Element<Type>> elements = new FastList<>();
 }

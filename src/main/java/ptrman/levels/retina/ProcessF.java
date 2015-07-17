@@ -1,11 +1,11 @@
 package ptrman.levels.retina;
 
+import com.gs.collections.impl.list.mutable.FastList;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.helper.ProcessConnector;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,40 +61,53 @@ public class ProcessF implements IProcess {
     }
 
     private ArrayRealVector[] processSample(ProcessA.Sample sample) {
-        List<Ray> activeRays = new ArrayList<>();
-        List<Ray> inativeRays = new ArrayList<>();
+
+        //List<Ray> inativeRays = new ArrayList<>();
         ArrayRealVector[] resultPositions = new ArrayRealVector[COUNTOFRAYDIRECTIONS];
 
+        List<Ray> activeRays = new FastList<>(RAYDIRECTIONS.length);
         for( ArrayRealVector currentRayDirection : RAYDIRECTIONS ) {
             activeRays.add(new Ray(sample.position, currentRayDirection));
         }
 
+        int remaining = activeRays.size();
+
         for(;;) {
-            if( activeRays.isEmpty() ) {
-                break;
-            }
+
 
             for( Ray iterationRay : activeRays ) {
-                iterationRay.advance();
-            }
-
-            for( Ray iterationRay : activeRays ) {
-                if( !readMapAtFloat(iterationRay.position) ) {
-                    iterationRay.isActive = false;
+                if (iterationRay.isActive) {
+                    iterationRay.advance();
                 }
             }
 
+            for( Ray iterationRay : activeRays ) {
+                if (iterationRay.isActive) {
+                    if( !readMapAtFloat(iterationRay.position) ) {
+                        iterationRay.isActive = false;
+                        remaining--;
+                    }
+                }
+            }
+
+            if( remaining == 0 ) //activeRays.isEmpty() ) {
+                break;
+            //}
+
+            /*
             for( Ray iterationRay : activeRays ) {
                 if( !iterationRay.isActive ) {
                     inativeRays.add(iterationRay);
                 }
             }
+            */
 
-            activeRays.removeIf(current -> !current.isActive);
+            //activeRays.removeIf(current -> !current.isActive);
+
         }
 
         for( int i = 0; i < COUNTOFRAYDIRECTIONS; i++ ) {
-            resultPositions[i] = inativeRays.get(i).position;
+            resultPositions[i] = activeRays.get(i).position;
         }
 
         return resultPositions;
@@ -103,10 +116,11 @@ public class ProcessF implements IProcess {
 
     private boolean readMapAtFloat(ArrayRealVector position) {
         // NOTE use default rounding
-        int x = (int)position.getDataRef()[0];
-        int y = (int)position.getDataRef()[1];
+        final double[] dr = position.getDataRef();
+        int x = (int) dr[0];
+        int y = (int) dr[1];
 
-        if( !map.inBounds(new Vector2d<>(x, y)) ) {
+        if( !map.inBounds(x, y) ) {
             return false;
         }
 
@@ -114,7 +128,7 @@ public class ProcessF implements IProcess {
     }
 
     private static List<ProcessA.Sample> createSamplesWithPositions(ArrayRealVector[] positions) {
-        List<ProcessA.Sample> samples = new ArrayList<>();
+        List<ProcessA.Sample> samples = new FastList<>(positions.length);
 
         for( ArrayRealVector position : positions ) {
             samples.add(new ProcessA.Sample(position));
@@ -133,7 +147,7 @@ public class ProcessF implements IProcess {
             double x = java.lang.Math.sin(radiants);
             double y = java.lang.Math.cos(radiants);
 
-            result[currentDivision] = new ArrayRealVector(new double[]{x, y});
+            result[currentDivision] = new ArrayRealVector(new double[]{x, y}, false);
         }
 
         return result;
@@ -147,6 +161,7 @@ public class ProcessF implements IProcess {
 
         public void advance() {
             position = position.add(direction);
+
         }
 
         public ArrayRealVector position;
