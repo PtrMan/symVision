@@ -35,18 +35,17 @@ public class ProcessF implements IProcess {
 
     @Override
     public void processData() {
-        for(;;) {
-            if( inputSampleConnector.getSize() == 0 ) {
-                break;
-            }
+        ArrayRealVector[] borderPositions = borderPositions = new ArrayRealVector[COUNTOFRAYDIRECTIONS];
+        FastList<Ray> activeRays = new FastList<>(RAYDIRECTIONS.length);
+
+        while (inputSampleConnector.getSize() > 0) {
 
             final ProcessA.Sample currentSample = inputSampleConnector.poll();
-            final ArrayRealVector[] borderPositions = processSample(currentSample);
 
-            List<ProcessA.Sample> borderSamples = createSamplesWithPositions(borderPositions);
+            borderPositions = processSample(currentSample, borderPositions, activeRays);
 
-            for( final ProcessA.Sample iterationSample : borderSamples ) {
-                outputSampleConnector.add(iterationSample);
+            for( ArrayRealVector borderPos : borderPositions) {
+                outputSampleConnector.add(new ProcessA.Sample(borderPos));
             }
         }
     }
@@ -60,49 +59,26 @@ public class ProcessF implements IProcess {
         this.map = map;
     }
 
-    private ArrayRealVector[] processSample(ProcessA.Sample sample) {
+    private ArrayRealVector[] processSample(ProcessA.Sample sample, ArrayRealVector[] resultPositions, List<Ray> activeRays) {
 
-        //List<Ray> inativeRays = new ArrayList<>();
-        ArrayRealVector[] resultPositions = new ArrayRealVector[COUNTOFRAYDIRECTIONS];
-
-        List<Ray> activeRays = new FastList<>(RAYDIRECTIONS.length);
+        activeRays.clear();
         for( ArrayRealVector currentRayDirection : RAYDIRECTIONS ) {
             activeRays.add(new Ray(sample.position, currentRayDirection));
         }
 
-        int remaining = activeRays.size();
+        int remaining = COUNTOFRAYDIRECTIONS;
 
-        for(;;) {
-
+        while (remaining > 0) {
 
             for( Ray iterationRay : activeRays ) {
                 if (iterationRay.isActive) {
                     iterationRay.advance();
-                }
-            }
-
-            for( Ray iterationRay : activeRays ) {
-                if (iterationRay.isActive) {
                     if( !readMapAtFloat(iterationRay.position) ) {
                         iterationRay.isActive = false;
                         remaining--;
                     }
                 }
             }
-
-            if( remaining == 0 ) //activeRays.isEmpty() ) {
-                break;
-            //}
-
-            /*
-            for( Ray iterationRay : activeRays ) {
-                if( !iterationRay.isActive ) {
-                    inativeRays.add(iterationRay);
-                }
-            }
-            */
-
-            //activeRays.removeIf(current -> !current.isActive);
 
         }
 
