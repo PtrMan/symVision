@@ -132,7 +132,7 @@ public class ProcessD implements IProcess {
         public List<LineDetectorWithMultiplePoints> lineDetectors;
     }
 
-    public void preSetupSet(double maximalDistanceOfPositions) {
+    public void setMaxDistancePositions(double maximalDistanceOfPositions) {
         this.maximalDistanceOfPositions = maximalDistanceOfPositions;
     }
 
@@ -166,6 +166,10 @@ public class ProcessD implements IProcess {
 
     @Override
     public void processData() {
+        processData(1f);
+    }
+
+    public void processData(float throttle) {
         List<LineDetectorWithMultiplePoints> multiplePointsLineDetector = new ArrayList<>();
 
         final List<ProcessA.Sample> workingSamples = inputSampleConnector.getWorkspace();
@@ -182,7 +186,7 @@ public class ProcessD implements IProcess {
             sampleIndex++;
         }
 
-        int numberOfTries = (int) (workingSamples.size() * HardParameters.ProcessD.SAMPLES_NUMBER_OF_TRIES_MULTIPLIER);
+        int numberOfTries = (int) (workingSamples.size() * HardParameters.ProcessD.SAMPLES_NUMBER_OF_TRIES_MULTIPLIER * throttle);
 
         final double maxLength = java.lang.Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y}));
 

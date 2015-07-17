@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
-import static ptrman.math.Maths.squaredDistance;
 
 
 /**
@@ -50,7 +49,7 @@ public class ProcessB extends AbstractProcessB {
 
         Vector2d<Integer> foundPosition;
         
-        final int MAXRADIUS = (int)Math.sqrt(squaredDistance(new double[]{(double)imageSize.x, (double)imageSize.y}));
+        final int MAXRADIUS = (int)Math.ceil( Math.sqrt( imageSize.x*imageSize.x + imageSize.y*imageSize.y) ); // (int)Math.sqrt(squaredDistance(new double[]{(double)imageSize.x, (double)imageSize.y}));
 
         final int GRIDSIZE_FOR_SPATIALACCELERATEDMAP2D = 8;
 

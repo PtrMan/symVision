@@ -35,7 +35,7 @@ public class ProcessF implements IProcess {
 
     @Override
     public void processData() {
-        ArrayRealVector[] borderPositions = borderPositions = new ArrayRealVector[COUNTOFRAYDIRECTIONS];
+        ArrayRealVector[] borderPositions = new ArrayRealVector[COUNTOFRAYDIRECTIONS];
         FastList<Ray> activeRays = new FastList<>(RAYDIRECTIONS.length);
 
         while (inputSampleConnector.getSize() > 0) {

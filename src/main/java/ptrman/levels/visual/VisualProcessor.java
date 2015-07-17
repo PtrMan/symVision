@@ -97,12 +97,16 @@ public class VisualProcessor
                 this.threshold = threshold;
             }
 
+
+
             @Override
             public void apply(IMap2d<Float> input, IMap2d<Boolean> output) {
                 ThresholdMap2dMapperFunction imageMapper;
                 Map2dMapper.Mapper<Float, Boolean> mapper;
 
                 imageMapper = new ThresholdMap2dMapperFunction(threshold);
+
+
                 mapper = new Map2dMapper.Mapper<>();
 
                 mapper.map(imageMapper, input, output);

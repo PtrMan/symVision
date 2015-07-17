@@ -96,6 +96,11 @@ public class ProcessC implements IProcess {
 
     @Override
     public void processData() {
+        processData(1f);
+    }
+
+    public void processData(float throttle) {
+
         // clean acceleration map
         accelerationMap.clear();
 
@@ -106,6 +111,7 @@ public class ProcessC implements IProcess {
         }
 
 
+        int maxSortedSamples = (int)Math.ceil( this.maxSortedSamples * throttle );
 
         for( int outerI = 0; outerI < inputSampleConnector.getWorkspace().size(); outerI++ ) {
 
@@ -149,10 +155,9 @@ public class ProcessC implements IProcess {
                             numberOfConsideredSamples++;
 
 
-                            SampleWithDistance sd = new SampleWithDistance(iterationSample, distance);
+                            if (sortedSamples.size() < maxSortedSamples || distance < sortedSamples.getLast().distance) {
+                                SampleWithDistance sd = new SampleWithDistance(iterationSample, distance);
 
-
-                            if (sortedSamples.size() < maxSortedSamples || sd.distance < sortedSamples.getLast().distance) {
                                 /** binary insertion sort: sort order: lowest distance first */
                                 int index = Collections.binarySearch(sortedSamples, sd);
                                 if (index < 0) {

@@ -144,10 +144,11 @@ public class NodeGraph
         resultVertexList = new VertexList();
         
         remainingNodes = new ArrayDeque<>();
-        
-        for( Node iterationNode : nodes )
-        {
-            remainingNodes.add(iterationNode);
+
+        if (nodes!=null) {
+            for (Node iterationNode : nodes) {
+                remainingNodes.add(iterationNode);
+            }
         }
         
         for(;;)

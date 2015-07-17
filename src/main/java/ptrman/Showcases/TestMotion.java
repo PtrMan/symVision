@@ -81,7 +81,7 @@ public class TestMotion extends AnimatedShowcase {
         public void setup() {
         }
 
-        public void process() {
+        public void process(float throttle) {
             // TODO< pull image from source >
             // for now imageDrawer does this
             BufferedImage image = imageDrawer.drawToJavaImage(bpSolver);

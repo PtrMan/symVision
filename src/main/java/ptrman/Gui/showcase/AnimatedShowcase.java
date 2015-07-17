@@ -32,7 +32,7 @@ public class AnimatedShowcase {
     public abstract static class RefreshAction {
         public abstract void preSetupSet(BpSolver bpSolver, IImageDrawer imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas);
         public abstract void setup();
-        public abstract void process();
+        public abstract void process(float throttle);
 
         public BufferedImage resultLeftCanvasImage;
         public BufferedImage resultRightCanvasImage;
@@ -40,6 +40,7 @@ public class AnimatedShowcase {
 
     public static class NormalModeRefreshAction extends RefreshAction {
         private BufferedImage detectorImage;
+
 
         public void preSetupSet(BpSolver bpSolver, IImageDrawer imageDrawer,  IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas) {
             this.bpSolver = bpSolver;
@@ -54,7 +55,7 @@ public class AnimatedShowcase {
 
             processingChain = new VisualProcessor.ProcessingChain();
 
-            Dag.Element newDagElement = new Dag.Element(
+            Dag.Element newDagElement = new Dag.Element<>(
                     new VisualProcessor.ProcessingChain.ChainElementColorFloat(
                             new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
                             "convertRgbToGrayscale",
@@ -66,7 +67,7 @@ public class AnimatedShowcase {
             processingChain.filterChainDag.elements.add(newDagElement);
 
 
-            newDagElement = new Dag.Element(
+            newDagElement = new Dag.Element<>(
                     new VisualProcessor.ProcessingChain.ChainElementFloatBoolean(
                             new VisualProcessor.ProcessingChain.ThresholdFilter(0.4f),
                             "threshold",
@@ -77,7 +78,7 @@ public class AnimatedShowcase {
             processingChain.filterChainDag.elements.add(newDagElement);
         }
 
-        public synchronized void process() {
+        public synchronized void process(float throttle) {
             BufferedImage image;
             IMap2d<Boolean> mapBoolean;
             IMap2d<ColorRgb> mapColor;
@@ -86,7 +87,7 @@ public class AnimatedShowcase {
             // for now imageDrawer does this
             image = imageDrawer.drawToJavaImage(bpSolver);
 
-            System.out.print("begin processing...");
+            System.out.print("begin processing @" + ((int)(100f * throttle)) + "%" );
 
             mapColor = AnimatedShowcase.translateFromImageToMap(image);
 
@@ -96,7 +97,7 @@ public class AnimatedShowcase {
 
             System.out.println("begin symVision");
 
-            bpSolver.recalculate(mapBoolean);
+            bpSolver.recalculate(mapBoolean, throttle);
 
             if (introspectControlPanel.getIntrospectionState()) {
                 nodeGraph.repopulateAfterNodes(bpSolver.lastFrameObjectNodes, bpSolver.networkHandles);
@@ -167,6 +168,13 @@ public class AnimatedShowcase {
      *
      */
     private static class FrameTask implements Runnable {
+
+        float throttle = 1f;
+        float throttleMin = 0.15f;
+        float throttleMax = 1f;
+
+        float targetFPS = 5f;
+
         DescriptiveStatistics frameTimes = new DescriptiveStatistics(32);
 
         public FrameTask(DualConvas dualCanvas, RefreshAction refreshAction) {
@@ -177,13 +185,23 @@ public class AnimatedShowcase {
         @Override
         public void run() {
             long start = System.currentTimeMillis();
-            refreshAction.process();
+            refreshAction.process(throttle);
             long end = System.currentTimeMillis();
 
             float frameTime =  ((end - start) / 1000.0f);
             frameTimes.addValue(frameTime);
 
             System.out.println("frame: " + frameTime + "s (" + frameTimes.getMean() + " avg, " + frameTimes.getVariance() + " variance)");
+
+            double meanFPS = frameTimes.getMean();
+            if (meanFPS < targetFPS) {
+                throttle *= 0.95f;
+                if (throttle < throttleMin) throttle = throttleMin;
+            }
+            else if (meanFPS > targetFPS) {
+                throttle *= 1.05f;
+                if (throttle > throttleMax) throttle = throttleMax;
+            }
 
             dualCanvas.leftCanvas.setImage(refreshAction.resultLeftCanvasImage);
             dualCanvas.rightCanvas.setImage(refreshAction.resultRightCanvasImage);

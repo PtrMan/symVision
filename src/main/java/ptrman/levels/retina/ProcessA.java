@@ -1,12 +1,15 @@
 package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.apache.commons.math3.random.MersenneTwister;
+import org.apache.commons.math3.random.RandomAdaptor;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.misc.Assert;
 
 import java.awt.*;
+import java.util.Random;
 
 /**
  *
@@ -38,22 +41,40 @@ public class ProcessA implements IProcess {
      */
     @Override
     public void processData() {
+        processData(1f);
+    }
+
+
+    int cycle = 0;
+
+    Random rng = new RandomAdaptor( new MersenneTwister() );
+
+    public void processData(float throttle) {
+
+        cycle++;
+
+
         for( int blockY = 0; blockY < workingImage.getLength()/4; blockY++ ) {
             for( int blockX = 0; blockX < workingImage.getWidth()/4; blockX++ ) {
                 int hitCount = 0;
 
+                if (throttle < 1f)
+                    if (rng.nextInt(100) < throttle*100)
+                        continue;
+
                 for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
                     for (int x = blockX; x < (blockX+1)*4; x++) {
-                        if( sampleMaskAtPosition(new Vector2d<>(x, y), MaskDetail0) ) {
+                        if( sampleMaskAtPosition(x, y, MaskDetail0) ) {
                             if( workingImage.readAt(x, y) ) {
                                 hitCount++;
                                 workingImage.setAt(x, y, false);
 
                                 final int objectId = idMap.readAt(x, y);
                                 //Assert.Assert(objectId  != -1, "");
-                                if( objectId != -1 ) {
+                                /*if( objectId != -1 ) {
                                     int d = 0;
-                                }
+                                }*/
+
                                 addSampleToOutput(x, y, objectId);
                             }
                         }
@@ -67,16 +88,16 @@ public class ProcessA implements IProcess {
                 // sample it a second time for nearly all of the missing pixels
                 for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
                     for (int x = blockX; x < (blockX+1)*4; x++) {
-                        if( sampleMaskAtPosition(new Vector2d<>(x, y), MaskDetail1) ) {
+                        if( sampleMaskAtPosition(x, y, MaskDetail1) ) {
                             if( workingImage.readAt(x, y) ) {
                                 hitCount++;
                                 workingImage.setAt(x, y, false);
 
                                 final int objectId = idMap.readAt(x, y);
                                 //Assert.Assert(objectId  != -1, "");
-                                if( objectId != -1 ) {
+                                /*if( objectId != -1 ) {
                                     int d = 0;
-                                }
+                                }*/
 
                                 addSampleToOutput(x, y, objectId);
                             }
@@ -114,9 +135,13 @@ public class ProcessA implements IProcess {
             int positionX = (int) pos[0];
             int positionY = (int) pos[1];
 
-
             detectorImageGraphics.fillRect(positionX, positionY, 1, 1);
 
+            if (isAltitudeValid()) {
+                detectorImageGraphics.setColor(Color.RED);
+                final int a = (int)(altitude * 4);
+                detectorImageGraphics.drawOval(positionX-a/2, positionY-a/2, a, a);
+            }
 
         }
 
@@ -124,14 +149,19 @@ public class ProcessA implements IProcess {
             ENDOSCELETON,
             EXOSCELETON
         }
-        
-        public Sample(ArrayRealVector position)
-        {
+
+        public Sample(double x, double y) {
+            this(new ArrayRealVector(new double[] { x, y}, false));
+        }
+        public Sample(float x, float y) {
+            this(new ArrayRealVector(new double[] { x, y}, false));
+        }
+        public Sample(ArrayRealVector position) {
             this.position = position;
         }
         
         public boolean isAltitudeValid() {
-            return altitude != Double.NaN;
+            return Double.isFinite(altitude);
         }
 
         public boolean isObjectIdValid() {
@@ -153,17 +183,17 @@ public class ProcessA implements IProcess {
     }
 
     private void addSampleToOutput(final int x, final int y, final int objectId) {
-        Sample addSample = new Sample(new ArrayRealVector(new double[]{(double)x, (double)y}));
+        Sample addSample = new Sample(x, y);
         addSample.objectId = objectId;
 
         outputSampleConnector.add(addSample);
     }
 
-    private static boolean sampleMaskAtPosition(Vector2d<Integer> position, boolean[] mask4by4) {
+    private static boolean sampleMaskAtPosition(int px, int py, boolean[] mask4by4) {
         int modX, modY;
 
-        modX = position.x % 4;
-        modY = position.y % 4;
+        modX = px % 4;
+        modY = py % 4;
 
         return mask4by4[modX + modY * 4];
     }

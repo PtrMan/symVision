@@ -43,8 +43,13 @@ public class Helper {
         min = new Vector2d<>(Math.max(0, position.x - SEARCHRADIUS), Math.max(0, position.y - SEARCHRADIUS));
         max = new Vector2d<>(Math.min(image.getWidth()-1, position.x + SEARCHRADIUS), Math.min(image.getLength()-1, position.y + SEARCHRADIUS));
 
-        for( int iy = min.y; iy <= max.y; iy++ ) {
-            for( int ix = min.x; ix <= max.x; ix++ ) {
+        final int miny = min.y;
+        final int minx = min.x;
+        final int maxy = max.y;
+        final int maxx = max.x;
+
+        for( int iy = miny; iy <= maxy; iy++ ) {
+            for( int ix = minx; ix <= maxx; ix++ ) {
                 if( image.readAt(ix, iy) ) {
                     return true;
                 }

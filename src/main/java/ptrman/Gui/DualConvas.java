@@ -41,11 +41,11 @@ public class DualConvas extends JPanel
             g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
         }
         
-        public void setImage(Image image)
-        {
-            this.image = image;
-
-            SwingUtilities.invokeLater(() -> { repaint(); } );
+        public void setImage(Image image) {
+            SwingUtilities.invokeLater(() -> {
+                this.image = image;
+                repaint();
+            } );
         }
         
         private Image image;

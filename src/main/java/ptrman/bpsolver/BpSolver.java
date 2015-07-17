@@ -13,10 +13,10 @@ import ptrman.bpsolver.nodes.PlatonicPrimitiveNode;
 import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class BpSolver {
 
@@ -94,13 +94,11 @@ public class BpSolver {
 
         endosceletonProcessD.setImageSize(getImageSize());
         endosceletonProcessD.set(connectorSamplesForEndosceleton, connectorDetectorsEndosceletonFromProcessD);
-        final float processdmaximalDistanceOfPositions = 6.0f;
-        endosceletonProcessD.preSetupSet(processdmaximalDistanceOfPositions);
+
         endosceletonProcessD.setup();
 
         exosceletonProcessD.setImageSize(getImageSize());
         exosceletonProcessD.set(connectorSamplesFromProcessF, connectorDetectorsExosceletonFromProcessD);
-        exosceletonProcessD.preSetupSet(processdmaximalDistanceOfPositions);
         exosceletonProcessD.setup();
 
         processF.setImageSize(getImageSize());
@@ -124,8 +122,12 @@ public class BpSolver {
         coderack.cycle(cycleCount);
     }
 
-
     public void recalculate(IMap2d<Boolean> image) {
+        recalculate(image, 1.0f);
+    }
+
+    /** use throttle < 1.0 to degrade quality */
+    public void recalculate(IMap2d<Boolean> image, float throttle) {
         final boolean enableProcessH = true;
         final boolean enableProcessE = true;
         final boolean enableProcessM = false;
@@ -137,7 +139,7 @@ public class BpSolver {
         // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
         coderack.flush();
 
-        Queue<ProcessA.Sample> queueToProcessF = new ConcurrentLinkedQueue<>();
+        Queue<ProcessA.Sample> queueToProcessF = new ArrayDeque<>();
 
 
         /*
@@ -196,6 +198,9 @@ public class BpSolver {
 
         endosceletonSampleFilter.preProcessData();
 
+        final float processdmaximalDistanceOfPositions = 6.0f;
+        endosceletonProcessD.setMaxDistancePositions(processdmaximalDistanceOfPositions);
+
         endosceletonProcessD.preProcessData();
         //exosceletonProcessD.preProcessData();
 
@@ -204,18 +209,18 @@ public class BpSolver {
 
 
         // processData
-        processA.processData();
+        processA.processData(throttle);
 
         debugSamples = connectorSamplesFromProcessA.getWorkspace();
 
         processB.processData();
-        processC.processData();
+        processC.processData(throttle);
         endosceletonSampleFilter.processData();
 
 
         processF.processData();
 
-        endosceletonProcessD.processData();
+        endosceletonProcessD.processData(throttle);
         //exosceletonProcessD.processData();
 
         processH.processData();

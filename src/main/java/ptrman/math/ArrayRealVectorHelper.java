@@ -82,11 +82,14 @@ public class ArrayRealVectorHelper {
         ArrayRealVector result = new ArrayRealVector(elements.get(0).getDimension());
 
         for( final ArrayRealVector currentElement : elements ) {
-            result = result.add(currentElement);
+            //result = result.add(currentElement);
+            result.combineToSelf(1,1, currentElement);
+
         }
 
+        final double[] d = result.getDataRef();
         for( int i = 0; i < elements.get(0).getDimension(); i++ ) {
-            result.getDataRef()[i] /= (double)elements.size();
+            d[i] /= (double)elements.size();
         }
 
         return result;

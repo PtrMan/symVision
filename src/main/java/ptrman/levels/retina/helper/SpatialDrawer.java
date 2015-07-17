@@ -27,7 +27,7 @@ public final class SpatialDrawer {
         }
 
         public final List<PositionWithDirection> positionWithDirections = new FastList<>();
-        public final List<Vector2d<Integer>> directions = new FastList<>();
+        //public final List<Vector2d<Integer>> directions = new FastList<>();
 
         @Override
         public void set(final Vector2d<Integer> position, final Vector2d<Integer> direction) {
@@ -57,13 +57,18 @@ public final class SpatialDrawer {
 
         Bresenham.rasterCircle(center, radius, drawer);
 
-        List<Vector2d<Integer>> resultPositions = new ArrayList<>();
+        List<Vector2d<Integer>> resultPositions = new FastList<>(drawer.positionWithDirections.size());
         for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections) {
-            resultPositions.add(iterationPositionWithDirection.position);
-            resultPositions.add(add(iterationPositionWithDirection.position, getScaled(iterationPositionWithDirection.direction, -1)));
+
+            final Vector2d<Integer> a = iterationPositionWithDirection.position;
+            if (isGridLocationInBound(a, boundary))
+                resultPositions.add(a);
+
+            final Vector2d<Integer> b = add(a, getScaled(iterationPositionWithDirection.direction, -1));
+            if (isGridLocationInBound(b, boundary))
+                resultPositions.add(b);
         }
 
-        resultPositions.removeIf(position -> !isGridLocationInBound(position, boundary));
 
         return resultPositions;
     }
@@ -73,7 +78,7 @@ public final class SpatialDrawer {
 
         Bresenham.rasterLine(a, b, drawer);
 
-        List<Vector2d<Integer>> resultPositions = new ArrayList<>();
+        List<Vector2d<Integer>> resultPositions = new ArrayList<>(drawer.positionWithDirections.size());
         for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections) {
             resultPositions.add(iterationPositionWithDirection.position);
         }
@@ -81,6 +86,8 @@ public final class SpatialDrawer {
     }
 
     private static boolean isGridLocationInBound(final Vector2d<Integer> position, final Vector2d<Integer> boundary) {
-        return position.x >= 0 && position.x < boundary.x && position.y >= 0 && position.y < boundary.y;
+        final int x = position.xInt();
+        final int y = position.yInt();
+        return x >= 0 && x < boundary.x && y >= 0 && y < boundary.y;
     }
 }
