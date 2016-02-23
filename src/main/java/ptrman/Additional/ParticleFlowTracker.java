@@ -97,6 +97,8 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
     }
 
     private void removeParticlesOutOfImage() {
+        List<ParticleType> particlesToBeRemoved = new ArrayList<>();
+
         for( int particleI = 0; particleI < trackingParticles.size(); particleI++ ) {
             ParticleType iterationTrackingParticle = trackingParticles.get(particleI);
 
@@ -106,10 +108,17 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
                 iterationTrackingParticle.getPosition().getDataRef()[1] < 0.0 ||
                 iterationTrackingParticle.getPosition().getDataRef()[1] > imageSize.y
             ) {
-                trackingParticles.remove(particleI);
-                particleConstructorDestructor.remove(iterationTrackingParticle);
-                particleI--;
+                particlesToBeRemoved.add(iterationTrackingParticle);
+
+                //trackingParticles.remove(particleI);
+                //particleConstructorDestructor.remove(iterationTrackingParticle);
+                //particleI--;
             }
+        }
+
+        for( ParticleType iterationParticle : particlesToBeRemoved ) {
+            particleConstructorDestructor.remove(iterationParticle);
+            trackingParticles.remove(iterationParticle);
         }
     }
 

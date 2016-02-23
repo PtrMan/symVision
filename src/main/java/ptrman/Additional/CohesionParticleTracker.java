@@ -1,6 +1,7 @@
 package ptrman.Additional;
 
 import com.syncleus.dann.graph.AbstractDirectedEdge;
+import com.syncleus.dann.graph.MutableBidirectedGraph;
 import com.syncleus.dann.graph.MutableDirectedAdjacencyGraph;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.SpatialAcceleration;
@@ -32,6 +33,7 @@ public class CohesionParticleTracker {
         @Override
         public void remove(CohesionParticleTracker.Particle particle) {
             // remove all incomming/outgoing edges
+            /*
             Set<CohesionEdge> outEdgesOfNode = cohesionParticleTracker.graph.getAdjacentEdges(particle);
             for( final CohesionEdge iterationEdge : outEdgesOfNode ) {
                 Set<CohesionEdge> edgesToNode = cohesionParticleTracker.graph.getAdjacentEdges(iterationEdge.getDestinationNode());
@@ -44,11 +46,16 @@ public class CohesionParticleTracker {
 
                 cohesionParticleTracker.graph.remove(iterationEdge);
             }
+            */
 
             //outEdgesOfNode = cohesionParticleTracker.graph.getInEdges(particle);
             //for( final CohesionEdge iterationEdge : outEdgesOfNode ) {
             //    cohesionParticleTracker.graph.remove(iterationEdge);
             //}
+
+            if( !cohesionParticleTracker.graph.getNodes().contains(particle) ) {
+                return;
+            }
 
             cohesionParticleTracker.graph.remove(particle);
         }
@@ -188,7 +195,7 @@ public class CohesionParticleTracker {
         iterationEdge.strength = Maths.clamp01(iterationEdge.strength);
     }
 
-    public MutableDirectedAdjacencyGraph<Particle, CohesionEdge> graph = new MutableDirectedAdjacencyGraph<>();
+    public MutableBidirectedGraph<Particle, CohesionEdge> graph = new MutableDirectedAdjacencyGraph<>();
 
     private SpatialAcceleration<Particle> spatialAcceleration;
 

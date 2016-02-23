@@ -2,7 +2,6 @@ package ptrman.Showcases;
 
 import boofcv.core.image.ConvertBufferedImage;
 import boofcv.struct.image.ImageFloat32;
-import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Additional.CohesionParticleTracker;
 import ptrman.Additional.ParticleFlowTracker;
 import ptrman.Datastructures.Vector2d;
@@ -105,6 +104,7 @@ public class TestMotion extends AnimatedShowcase {
 
             testMotion.particleMutex.lock();
 
+            /*
             Graphics2D graphics = (Graphics2D)targetImage.getGraphics();
 
             graphics.setColor(Color.RED);
@@ -136,6 +136,7 @@ public class TestMotion extends AnimatedShowcase {
                 }
 
             }
+            */
 
             testMotion.particleMutex.unlock();
 
