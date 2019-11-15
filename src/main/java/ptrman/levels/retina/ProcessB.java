@@ -56,7 +56,7 @@ public class ProcessB extends AbstractProcessB {
         counterCellPositiveCandidates = 0;
         counterCellCandidates = 0;
 
-        this.map = convertMapToFastBooleanMap2d(map);
+        this.map = convertMapToFastBooleanMap2d(inputMap);
 
         spatialAcceleratedMap2d = new SpatialAcceleratedMap2d(map, GRIDSIZE_FOR_SPATIALACCELERATEDMAP2D);
         spatialAcceleratedMap2d.recalculateGridCellStateMap();

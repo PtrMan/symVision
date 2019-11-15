@@ -72,7 +72,7 @@ public class BpSolver {
 
     private void setupProcesses() {
         processA = new ProcessA();
-        processB = new ProcessBOpenGlAccelerated();
+        processB = new ProcessB();
         processC = new ProcessC();
         endosceletonProcessD = new ProcessD();
         exosceletonProcessD = new ProcessD();
