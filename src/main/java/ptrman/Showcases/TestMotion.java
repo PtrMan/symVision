@@ -43,19 +43,22 @@ public class TestMotion extends AnimatedShowcase {
             Graphics2D g2 = off_Image.createGraphics();
 
             // TODO< change path >
-            currentFile = new File("/media/r0b3/Seagate Expansion Drive/"+ "output_" + String.format("%05d", 1+frameCounter) + ".jpg");
+            currentFile = null;//new File("/media/r0b3/Seagate Expansion Drive/"+ "output_" + String.format("%05d", 1+frameCounter) + ".jpg");
 
             frameCounter++;
             frameCounter = frameCounter % (14140);
 
-            try {
-                currentFileImage = ImageIO.read(currentFile);
-                g2.drawImage(currentFileImage, 0, 0, RETINA_WIDTH, RETINA_HEIGHT, null);
-                System.out.println("painted: "+ currentFile);
-            } catch (IOException e) {
-                e.printStackTrace();
-                currentFile = null;
+            if (currentFile != null) { // HACK< ignore file when we didn't read a image, we can do this because we test with synthetic images anyways >
+                try {
+                    currentFileImage = ImageIO.read(currentFile);
+                    g2.drawImage(currentFileImage, 0, 0, RETINA_WIDTH, RETINA_HEIGHT, null);
+                    System.out.println("painted: "+ currentFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    currentFile = null;
+                }
             }
+
 
             return off_Image;
         }
