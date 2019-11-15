@@ -11,7 +11,8 @@ import ptrman.Datastructures.SpatialAcceleration;
 import ptrman.Datastructures.Vector2d;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.math.RandomUtil;
-import sun.awt.Mutex;
+//import sun.awt.Mutex;
+import java.util.concurrent.Semaphore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +37,7 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
         void remove(final ParticleType particle);
     }
 
-    public ParticleFlowTracker(IParticleConstructorDestructor<ParticleType> particleConstructorDestructor, Vector2d<Integer> imageSize, int imageDownscaleFactor, Mutex particleMutex) {
+    public ParticleFlowTracker(IParticleConstructorDestructor<ParticleType> particleConstructorDestructor, Vector2d<Integer> imageSize, int imageDownscaleFactor, Semaphore particleMutex) {
         this.particleConstructorDestructor = particleConstructorDestructor;
         this.imageDownscaleFactor = imageDownscaleFactor;
         this.imageSize = imageSize;
@@ -85,7 +86,7 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
     }
 
     public void step(ImageFloat32 newCurrent) {
-        particleMutex.lock();
+        //particleMutex.lock();
 
         flip();
         setCurrent(newCurrent);
@@ -93,7 +94,7 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
         removeParticlesOutOfImage();
         reseedTrackingParticles();
 
-        particleMutex.unlock();
+        //particleMutex.unlock();
     }
 
     private void removeParticlesOutOfImage() {
@@ -191,5 +192,5 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
 
     private final IParticleConstructorDestructor<ParticleType> particleConstructorDestructor;
 
-    private Mutex particleMutex;
+    private Semaphore particleMutex;
 }

@@ -1,13 +1,14 @@
 package ptrman.openclContext;
 
-import com.jogamp.opencl.CLCommandQueue;
-import com.jogamp.opencl.CLContext;
-import com.jogamp.opencl.CLDevice;
+//import com.jogamp.opencl.CLCommandQueue;
+//import com.jogamp.opencl.CLContext;
+//import com.jogamp.opencl.CLDevice;
 
 /**
  *
  */
 public class OpenclContext {
+    /*
     private OpenclContext(CLContext clContext, CLCommandQueue queue) {
         this.clContext = clContext;
         this.queue = queue;
@@ -37,4 +38,5 @@ public class OpenclContext {
 
     private CLContext clContext;
     private CLCommandQueue queue;
+    */
 }

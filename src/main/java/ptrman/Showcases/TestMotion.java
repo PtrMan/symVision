@@ -12,7 +12,6 @@ import ptrman.Gui.NodeGraph;
 import ptrman.Gui.showcase.AnimatedShowcase;
 import ptrman.bpsolver.BpSolver;
 import ptrman.levels.visual.VisualProcessor;
-import sun.awt.Mutex;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -21,6 +20,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.IOException;
+import java.util.concurrent.Semaphore;
 
 // TODO
 /**
@@ -102,7 +102,7 @@ public class TestMotion extends AnimatedShowcase {
 
         private void drawParticlesAndConnectionsToImage(BufferedImage targetImage, CohesionParticleTracker cohesionParticleTracker) {
 
-            testMotion.particleMutex.lock();
+            //testMotion.particleMutex.lock();
 
             /*
             Graphics2D graphics = (Graphics2D)targetImage.getGraphics();
@@ -138,7 +138,7 @@ public class TestMotion extends AnimatedShowcase {
             }
             */
 
-            testMotion.particleMutex.unlock();
+            //testMotion.particleMutex.unlock();
 
         }
 
@@ -200,5 +200,5 @@ public class TestMotion extends AnimatedShowcase {
     private ParticleFlowTracker<CohesionParticleTracker.Particle> particleFlowTracker;
     private CohesionParticleTracker cohesionParticleTracker;
 
-    private Mutex particleMutex = new Mutex();
+    private Semaphore particleMutex = new Semaphore(1);
 }

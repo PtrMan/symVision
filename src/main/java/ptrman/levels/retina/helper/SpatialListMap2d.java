@@ -1,7 +1,6 @@
 package ptrman.levels.retina.helper;
 
 import com.gs.collections.impl.list.mutable.FastList;
-import com.sun.istack.internal.Nullable;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
@@ -27,7 +26,7 @@ public class SpatialListMap2d<Type> {
         return new Vector2d<>(integerPosition.x / gridsize, integerPosition.y / gridsize);
     }
 
-    @Nullable
+    // /return can be null
     public List<Type> readAt(final int x, final int y) {
         List<Type> l = map.readAt(x, y);
         return l;

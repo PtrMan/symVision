@@ -136,7 +136,8 @@ public class ProcessB extends AbstractProcessB {
 
             // if we are at the center we need to scan only the center
             if( currentGridRadius == 0 ) {
-                gridCellsToScan = new ArrayList<Vector2d<Integer>>(Arrays.asList(new Vector2d[]{gridCenterPosition}));
+                gridCellsToScan = new ArrayList<>();
+                gridCellsToScan.add(gridCenterPosition);
             }
             else {
                 gridCellsToScan = spatialAcceleratedMap2d.getGridLocationsWithNegativeDirectionOfGridRadius(gridCenterPosition, currentGridRadius);

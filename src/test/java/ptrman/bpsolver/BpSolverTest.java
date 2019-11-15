@@ -11,7 +11,6 @@ import ptrman.bpsolver.nodes.AttributeNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.levels.retina.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -166,7 +165,7 @@ public class BpSolverTest {
             }
         }
 
-        throw new NotImplementedException();
+        throw new RuntimeException("Not implemented!");
 
         /*
 

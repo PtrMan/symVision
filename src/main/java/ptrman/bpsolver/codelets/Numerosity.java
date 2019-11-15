@@ -4,7 +4,6 @@ import ptrman.FargGeneral.network.Node;
 import ptrman.bpsolver.BpSolver;
 import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.NodeTypes;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Random;
 
@@ -105,7 +104,7 @@ public class Numerosity extends SolverCodelet {
     
     @Override
     public SolverCodelet cloneObject() {
-        throw new NotImplementedException();
+        throw new RuntimeException(); // not implemented
     }
     
     

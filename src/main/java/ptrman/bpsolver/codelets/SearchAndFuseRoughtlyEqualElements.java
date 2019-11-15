@@ -12,7 +12,6 @@ import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveNode;
 import ptrman.math.DistinctUtility;
 import ptrman.misc.Assert;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.HashMap;
 import java.util.List;
@@ -93,7 +92,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
 
     @Override
     public SolverCodelet cloneObject() {
-        throw new NotImplementedException();
+        throw new RuntimeException("not implemented");
     }
     
     /**

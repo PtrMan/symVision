@@ -8,7 +8,6 @@ import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.math.Maths;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.media.opengl.*;
 import java.nio.FloatBuffer;
@@ -91,7 +90,7 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
 
         public void release() {
             // TODO
-            throw new NotImplementedException();
+            throw new RuntimeException("Not implemented!");
         }
 
         private final int vertexLocation;
@@ -171,7 +170,7 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
 
         public void release() {
             // TODO
-            throw new NotImplementedException();
+            throw new RuntimeException("Not Implemented!");
         }
 
         private int program;

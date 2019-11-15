@@ -8,7 +8,6 @@ import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.levels.retina.*;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -87,12 +86,12 @@ public class DebugDrawingHelper {
 
         @Override
         public void drawRetinaPrimitives(Graphics2D graphics2D, RetinaPrimitive[] primitives) {
-            throw new NotImplementedException();
+            throw new RuntimeException("Not Implemented!");
         }
 
         @Override
         public void drawCustom(Graphics2D graphics2D) {
-            throw new NotImplementedException();
+            throw new RuntimeException("Not Implemented!");
         }
 
         private final boolean showAltitude;
@@ -107,7 +106,7 @@ public class DebugDrawingHelper {
 
         @Override
         public void drawSamples(Graphics2D graphics, List<ProcessA.Sample> samples) {
-            throw new NotImplementedException();
+            throw new RuntimeException("Not Implemented!");
         }
 
         @Override
@@ -138,7 +137,7 @@ public class DebugDrawingHelper {
 
         @Override
         public void drawCustom(Graphics2D graphics2D) {
-            throw new NotImplementedException();
+            throw new RuntimeException("Not Implemented!");
         }
     }
 

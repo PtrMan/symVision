@@ -1,6 +1,6 @@
 package ptrman.levels.retina.nonFoundalis;
 
-import ptrman.Algorithms.ai.gng.NeuralGasNet;
+//import ptrman.Algorithms.ai.gng.NeuralGasNet;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
@@ -13,6 +13,7 @@ import java.util.List;
 /**
  * Tries to convert the input bitmaps(which can be anotated with a boundary) to a endosceleton (which doesn't have to be exact)
  */
+// not(partially) implemented!
 public class ProcessFastCalculateEndosceleton implements IProcess {
     @Override
     public void setImageSize(Vector2d<Integer> imageSize) {
@@ -85,6 +86,7 @@ public class ProcessFastCalculateEndosceleton implements IProcess {
 
     protected static List<IMap2d<Boolean>> corrodeInOneDirection(final List<IMap2d<Boolean>> inputs) {
         // TODO
+        throw new RuntimeException(); // HACK< we need to implement this maybe but throw now exception because we want to compile it >
     }
 
     @Override
@@ -95,7 +97,7 @@ public class ProcessFastCalculateEndosceleton implements IProcess {
 
     public List<IMap2d<Boolean>> inputs;
 
-    protected NeuralGasNet gng;
+    //protected NeuralGasNet gng;
 
     //public static void main(String[] args) {
     //}
