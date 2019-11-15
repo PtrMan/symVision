@@ -27,8 +27,8 @@ import java.util.ArrayList;
  */
 public class TestClustering {
 
-    final static int RETINA_WIDTH = 120;
-    final static int RETINA_HEIGHT = 120;
+    final static int RETINA_WIDTH = 128;
+    final static int RETINA_HEIGHT = 128;
 
     static File currentFile = null;
     static BufferedImage currentFileImage = null;
