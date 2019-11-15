@@ -3,7 +3,7 @@ package net.sourceforge.jannealer;
  *  This interface must be implemented by all the classes that encapsulate
  *  a function that is to be minimized 
  *
- * @author     Charles Mégnin
+ * @author     Charles M?gnin
  * @author     Øyvind Harboe
  * @since    October 29, 2001
  */

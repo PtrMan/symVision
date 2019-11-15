@@ -706,7 +706,7 @@ public class BpSolver {
     private ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessC;
     private ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessCToProcessF;
     private ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
-    private ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
+    public ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
     private ProcessConnector<RetinaPrimitive> connectorDetectorsExosceletonFromProcessD;
     private ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessF;
     private ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessH;

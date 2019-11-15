@@ -281,7 +281,7 @@ public class TestClustering {
 
 
     // TODO< move this into the functionality of the visual processor >
-    private static IMap2d<ColorRgb> translateFromImageToMap(BufferedImage javaImage) {
+    public static IMap2d<ColorRgb> translateFromImageToMap(BufferedImage javaImage) {
         DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
 
         int bufferI;

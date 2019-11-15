@@ -5,7 +5,7 @@ import java.util.ArrayList;
  *
  * @see org.theblueplanet.annealing.Simplex
  *
- * @author     Charles Mégnin
+ * @author     Charles M?gnin
  * @since    October 29, 2001
  */
 class SimplexList

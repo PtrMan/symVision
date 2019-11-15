@@ -2,7 +2,7 @@ package net.sourceforge.jannealer;
 /**
  *  Holds the vertices of the simplex and the function value at the vertices
  *
- * @author     Charles Mégnin
+ * @author     Charles M?gnin
  * @since    October 29, 2001
  * @version    1.0
  */
