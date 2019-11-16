@@ -289,7 +289,8 @@ public class TestClustering {
 
         convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
 
-        for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ )
+        int imgSize = imageBuffer.getSize();
+        for(bufferI = 0; bufferI < imgSize; bufferI++ )
         {
             int pixelValue;
 

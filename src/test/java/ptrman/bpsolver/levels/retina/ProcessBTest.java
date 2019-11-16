@@ -218,8 +218,8 @@ public class ProcessBTest {
 
 
     private static BufferedImage drawTestImage() {
-        final int RETINA_WIDTH = 160;
-        final int RETINA_HEIGHT = 160;
+        final int RETINA_WIDTH = 256;
+        final int RETINA_HEIGHT = 256;
 
         BufferedImage resultImage = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
 
