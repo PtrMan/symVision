@@ -30,19 +30,18 @@ Foundalis decided to not release his implementation due to ethical concerns. The
 
 ### Vision processes
 | Process        | Purpose           | Implementationstate  | current issues | tested? |
-| ------------- |:-------------:| -----:| -----:| 
-| Process A      | sampling of points from raw black and white image | 99% done | none | not directly because it is working fine |
-| Process D      | proposal of lines from points | working, buggy    | currently implementation leads to lines which are to short because it is hard to find points on the line by chance | visual tests will be added |
-
+|---|---|---|---|---| 
+| A      | sampling of points from raw black and white image | 99% done | none | not directly because it is working fine |
+| D      | proposal of lines from points | working, buggy    | currently implementation leads to lines which are to short because it is hard to find points on the line by chance | visual tests will be added |
 | | | | | |
-| Process B      | computation of altitude of points                            | partial | none? | no |
-| Process C      | identifies if a point is a point of the endo- or exoskeleton | minimal? | ? | no |
-| Process E      | finds line intersections                                     | partial | none? | no |
-| process F      | Sends traces in imagespace for samples which are deeper than a threshold | partial | none? | no |
-| Process G      | curve detection                                              | partial, ~20%? | ? | no |
-| Process H      | tries to combine linedetectors                               | partial | ? | no |
-| Process M      | identify M features                                          | partial, ~10%? | ? | no |
-| Process Z      | zooms in to resolve small features                           | partial | ? | no |
+| B      | computation of altitude of points                            | partial | none? | no |
+| C      | identifies if a point is a point of the endo- or exoskeleton | minimal? | ? | no |
+| E      | finds line intersections                                     | partial | none? | no |
+| F      | Sends traces in imagespace for samples which are deeper than a threshold | partial | none? | no |
+| G      | curve detection                                              | partial, ~20%? | ? | no |
+| H      | tries to combine linedetectors                               | partial | ? | no |
+| M      | identify M features                                          | partial, ~10%? | ? | no |
+| Z      | zooms in to resolve small features                           | partial | ? | no |
 
 Not implemented
 
