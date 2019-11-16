@@ -7,9 +7,11 @@ import java.lang.*;
 /**
  *
  */
-public class Kernels
+public enum Kernels
 {
-    public interface IKernel<Type, CoordinateType extends Number>
+	;
+
+	public interface IKernel<Type, CoordinateType extends Number>
     {
         Type calculateAt(Vector2d<CoordinateType> position);
     }

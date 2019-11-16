@@ -11,8 +11,10 @@ import java.util.ArrayList;
  *
  * 
  */
-public class TestGroupingForObjectCenters
+public enum TestGroupingForObjectCenters
 {
+    ;
+
     public static void main(String[] args)
     {
         test();

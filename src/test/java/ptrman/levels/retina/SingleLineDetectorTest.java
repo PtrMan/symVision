@@ -3,7 +3,7 @@ package ptrman.levels.retina;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 /**
  * Created by me on 7/16/15.
@@ -28,7 +28,7 @@ public class SingleLineDetectorTest  {
         }
         else {
             //throw new RuntimeException("Unittest failed (1)");
-            assertTrue(false);
+			fail();
         }
 
 
@@ -42,7 +42,7 @@ public class SingleLineDetectorTest  {
         }
         else {
             //throw new RuntimeException("Unittest failed (1)");
-            assertTrue(false);
+			fail();
         }
 
         testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{0.0f, 1.0f}), new ArrayRealVector(new double[]{1.0f, 0.0f}));

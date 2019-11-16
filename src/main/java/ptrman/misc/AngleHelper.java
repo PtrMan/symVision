@@ -6,9 +6,11 @@ import org.apache.commons.math3.linear.ArrayRealVector;
  *
  *
  */
-public class AngleHelper
+public enum AngleHelper
 {
-    public static double getMinimalAngleInDegreeBetweenNormalizedVectors(ArrayRealVector a, ArrayRealVector b)
+	;
+
+	public static double getMinimalAngleInDegreeBetweenNormalizedVectors(ArrayRealVector a, ArrayRealVector b)
     {
         double dotResult = a.dotProduct(b);
         double angleInRad = Math.acos(dotResult);

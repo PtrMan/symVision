@@ -1,14 +1,15 @@
 package ptrman.levels.retina;
 
 import com.google.common.collect.Lists;
-import com.gs.collections.api.list.primitive.IntList;
-import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
-import com.gs.collections.impl.map.mutable.primitive.IntBooleanHashMap;
+
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomAdaptor;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
+import org.eclipse.collections.api.list.primitive.IntList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.Parameters;
@@ -20,7 +21,6 @@ import ptrman.misc.Assert;
 
 import java.util.*;
 
-import static java.util.Collections.sort;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.add;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.sub;
 import static ptrman.math.ArrayRealVectorHelper.*;
@@ -197,7 +197,7 @@ public class ProcessD implements IProcess {
         for (int lengthCycle = 0; lengthCycle < numberOfMaximalLengthCycles; lengthCycle++) {
             // pick out a random cell and pick out a random sample in it and try to build a (small) line out of it
 
-            float selectionProbability = numberOfTries / accelerationMapCellUsed.size();
+            float selectionProbability = ((float)numberOfTries) / accelerationMapCellUsed.size();
             accelerationMapCellUsed.forEachKeyValue((k, v) -> {
 
                 if (random.nextFloat() > selectionProbability) return;
@@ -252,7 +252,7 @@ public class ProcessD implements IProcess {
                     final List<Vector2d<Integer>> accelerationCandidateCells = SpatialDrawer.getPositionsOfCellsOfLineUnbound(otherCellPosition, chosenAccelerationStructureNeightborCellPosition);
 
                     // * filter out valid candidates
-                    accelerationCandidateCells.removeIf(cellPosition -> cellPosition == null);
+                    accelerationCandidateCells.removeIf(Objects::isNull);
 
                     // * select random points from the validAccelerationCandidateCells (happens outside)
                     // * fitting (happens outside)
@@ -361,7 +361,7 @@ public class ProcessD implements IProcess {
 
             final double newMaxLength = currentLineLengthMean * HardParameters.ProcessD.LENGTH_MEAN_MULTIPLIER;
 
-            System.out.println("length mean " + Double.toString(currentLineLengthMean));
+            System.out.println("length mean " + currentLineLengthMean);
 
             final double finalizedMaxLength = Math.min(maxLength, newMaxLength);
 
@@ -410,10 +410,10 @@ public class ProcessD implements IProcess {
         IntArrayList resultIndices = new IntArrayList();
 
         for (final Vector2d<Integer> iterationCellPosition : cellPositions) {
-            final List<Integer> cellContent = accelerationMap.readAt(iterationCellPosition.xInt(), iterationCellPosition.yInt());
+            List<Integer> cellContent = accelerationMap.readAt(iterationCellPosition.xInt(), iterationCellPosition.yInt());
 
             if (cellContent != null) {
-                cellContent.forEach((Integer i) -> {
+                cellContent.forEach((i) -> {
                     if (i != null) resultIndices.add(i);
                 });
             }
@@ -459,11 +459,8 @@ public class ProcessD implements IProcess {
     }
 
     private static List<LineDetectorWithMultiplePoints> copyLineDetectors(final List<LineDetectorWithMultiplePoints> lineDetectors) {
-        List<LineDetectorWithMultiplePoints> result = new ArrayList<>();
 
-        for (final LineDetectorWithMultiplePoints iterationLineDetector : lineDetectors) {
-            result.add(iterationLineDetector);
-        }
+        List<LineDetectorWithMultiplePoints> result = new ArrayList<>(lineDetectors);
 
         return result;
     }
@@ -525,8 +522,7 @@ public class ProcessD implements IProcess {
             tempSet.add(cellPosition);
         }
 
-        List<Vector2d<Integer>> resultList = new ArrayList<>();
-        resultList.addAll(tempSet);
+        List<Vector2d<Integer>> resultList = new ArrayList<>(tempSet);
         return resultList;
     }
 
@@ -681,11 +677,9 @@ public class ProcessD implements IProcess {
         List<ArrayRealVector> samplePositions = new ArrayList<>();
 
         if (lineDetectorWithMultiplePoints.isYAxisSingularity()) {
-            for (ArrayRealVector iterationSamplePosition : lineDetectorWithMultiplePoints.cachedSamplePositions) {
-                samplePositions.add(iterationSamplePosition);
-            }
+            samplePositions.addAll(lineDetectorWithMultiplePoints.cachedSamplePositions);
 
-            sort(samplePositions, new VectorComperatorByAxis(EnumAxis.Y));
+            samplePositions.sort(new VectorComperatorByAxis(EnumAxis.Y));
         } else {
             // project
             for (ArrayRealVector iterationSamplePosition : lineDetectorWithMultiplePoints.cachedSamplePositions) {
@@ -694,7 +688,7 @@ public class ProcessD implements IProcess {
                 samplePositions.add(projectedSamplePosition);
             }
 
-            sort(samplePositions, new VectorComperatorByAxis(EnumAxis.X));
+            samplePositions.sort(new VectorComperatorByAxis(EnumAxis.X));
         }
 
         return samplePositions;

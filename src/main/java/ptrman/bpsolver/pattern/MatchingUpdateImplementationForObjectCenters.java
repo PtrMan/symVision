@@ -4,7 +4,7 @@ import ptrman.Datastructures.Vector2d;
 import static ptrman.Datastructures.Vector2d.FloatHelper.sub;
 import static ptrman.Datastructures.Vector2d.FloatHelper.add;
 import static ptrman.Datastructures.Vector2d.FloatHelper.getScaled;
-import ptrman.FargGeneral.network.Node;
+
 import ptrman.bpsolver.NetworkHandles;
 import java.util.ArrayList;
 import ptrman.misc.Assert;
@@ -54,14 +54,8 @@ public class MatchingUpdateImplementationForObjectCenters implements IMatchingUp
         // deep copy exemplars from orginal and additional
         createdPattern = new PatternWithCenterAndMass();
         createdPattern.exemplars = new ArrayList<>();
-        for( Node node : orginal.exemplars )
-        {
-            createdPattern.exemplars.add(node);
-        }
-        for( Node node : additional.exemplars )
-        {
-            createdPattern.exemplars.add(node);
-        }
+		createdPattern.exemplars.addAll(orginal.exemplars);
+		createdPattern.exemplars.addAll(additional.exemplars);
         
         newCenter = add(getScaled(orginalWithCenterAndMass.clusterCenter, orginalWithCenterAndMass.getWeight()), getScaled(additionalWithCenterAndMass.clusterCenter, additionalWithCenterAndMass.getWeight()));
         newCenter = getScaled(newCenter, 1.0f/(orginalWithCenterAndMass.getWeight()+additionalWithCenterAndMass.getWeight()));

@@ -8,8 +8,10 @@ import java.util.Deque;
 /**
  * Flood fill algorithm which is a bit more generalized
  */
-public class GeneralizedFloodFill {
-    public interface IFillExecutor {
+public enum GeneralizedFloodFill {
+	;
+
+	public interface IFillExecutor {
         void fillAt(final Vector2d<Integer> position, final Vector2d<Integer> fromDirection);
 
         boolean canAndShouldBeFilled(final Vector2d<Integer> position);
@@ -31,15 +33,12 @@ public class GeneralizedFloodFill {
         Deque<QueueElement> queue = new ArrayDeque<>();
         queue.push(new QueueElement(centerPosition, new Vector2d<>(0, 0)));
 
-        for(;;) {
-            if( queue.isEmpty() ) {
-                break;
-            }
+        while (!queue.isEmpty()) {
 
             final QueueElement currentQueueElement = queue.poll();
             final Vector2d<Integer> currentPosition = currentQueueElement.position;
 
-            if( !fillExecutor.canAndShouldBeFilled(currentPosition) ) {
+            if (!fillExecutor.canAndShouldBeFilled(currentPosition)) {
                 continue;
             }
 
@@ -50,7 +49,7 @@ public class GeneralizedFloodFill {
             fillRangeChecked(currentPosition, new Vector2d<>(0, -1), queue, fillExecutor);
             fillRangeChecked(currentPosition, new Vector2d<>(0, +1), queue, fillExecutor);
 
-            if( cross ) {
+            if (cross) {
                 fillRangeChecked(currentPosition, new Vector2d<>(-1, -1), queue, fillExecutor);
                 fillRangeChecked(currentPosition, new Vector2d<>(+1, -1), queue, fillExecutor);
                 fillRangeChecked(currentPosition, new Vector2d<>(-1, +1), queue, fillExecutor);

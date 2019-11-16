@@ -54,11 +54,7 @@ public class TestWebcam extends AnimatedShowcase {
 //                VisualizeFeatures.drawPoint(g2, (int) t.x, (int) t.y, Color.RED);
 //            }
 
-
-
-
-
-            gui.setBufferedImageSafe(webcamFrame);
+            gui.setImage(webcamFrame);
 
             Graphics2D g2 = off_Image.createGraphics();
 

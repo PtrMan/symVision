@@ -6,7 +6,7 @@ package net.sourceforge.jannealer;
  *  edition, 1994. The original versions of amebsa and amotsa can be found on
  *  pages 452 and 454 respectively.
  *
- * @author     Charles Mégnin
+ * @author     Charles Mï¿½gnin
  * @since    November 3, 2001
  */
 class Schedule
@@ -353,10 +353,7 @@ class Schedule
 		ytry = invokeDist(ptry);
 		if (ytry <= yb)
 		{
-			for (int j = 1; j <= ndim; j++)
-			{
-				pb[j] = ptry[j];
-			}
+			if (ndim >= 0) System.arraycopy(ptry, 1, pb, 1, ndim);
 			yb = ytry;
 		}
 		double yflu = ytry - tt * Math.log(RandomUtil.ran1(idum));
@@ -383,10 +380,7 @@ class Schedule
 	{
 		double ytry;
 		double[] t = new double[ptry.length - 1];
-		for (int i = 0; i < t.length; i++)
-		{
-			t[i] = ptry[1 + i];
-		}
+		System.arraycopy(ptry, 1, t, 0, t.length);
 		ytry = function.distance(t);
 		return ytry;
 	}

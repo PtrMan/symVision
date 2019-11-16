@@ -23,7 +23,7 @@ public class TuningWindow extends JPanel
         setVisible(true);
     }
     
-    private class ChangeListenerForProcessdMaxMse implements ChangeListener 
+    private static class ChangeListenerForProcessdMaxMse implements ChangeListener
     {
         public ChangeListenerForProcessdMaxMse(JLabel label)
         {
@@ -34,7 +34,7 @@ public class TuningWindow extends JPanel
         {
             JSlider source = (JSlider)e.getSource();
     
-            int valueInt = (int)source.getValue();
+            int valueInt = source.getValue();
             float value = (float)valueInt*0.01f;
             
             changeTo(value);
@@ -49,7 +49,7 @@ public class TuningWindow extends JPanel
         private JLabel label;
     }
     
-    private class ChangeListenerForProcessdLockingActivationOffset implements ChangeListener 
+    private static class ChangeListenerForProcessdLockingActivationOffset implements ChangeListener
     {
         public ChangeListenerForProcessdLockingActivationOffset(JLabel label)
         {
@@ -60,7 +60,7 @@ public class TuningWindow extends JPanel
         {
             JSlider source = (JSlider)e.getSource();
     
-            int valueInt = (int)source.getValue();
+            int valueInt = source.getValue();
             float value = (float)valueInt*0.1f;
             
             changeTo(value);
@@ -75,7 +75,7 @@ public class TuningWindow extends JPanel
         private JLabel label;
     }
     
-    private class ChangeListenerForProcessdLockingActivationScale implements ChangeListener 
+    private static class ChangeListenerForProcessdLockingActivationScale implements ChangeListener
     {
         public ChangeListenerForProcessdLockingActivationScale(JLabel label)
         {
@@ -86,7 +86,7 @@ public class TuningWindow extends JPanel
         {
             JSlider source = (JSlider)e.getSource();
     
-            int valueInt = (int)source.getValue();
+            int valueInt = source.getValue();
             float value = (float)valueInt*0.1f;
             
             changeTo(value);

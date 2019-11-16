@@ -1,6 +1,6 @@
 package ptrman.bpsolver;
 
-import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.RetinaPrimitive;
@@ -12,7 +12,9 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 /**
  *
  */
-public class Helper {
+public enum Helper {
+    ;
+
     public static IntObjectHashMap<Deque<RetinaPrimitive>> createMapByObjectIdsFromListOfRetinaPrimitives(List<RetinaPrimitive> primitives) {
 
         IntObjectHashMap<Deque<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = new IntObjectHashMap<>(primitives.size());

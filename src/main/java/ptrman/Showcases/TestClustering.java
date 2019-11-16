@@ -34,7 +34,7 @@ public class TestClustering {
     static BufferedImage currentFileImage = null;
 
 
-    private class InputDrawer implements IImageDrawer {
+    private static class InputDrawer implements IImageDrawer {
 
         BufferedImage off_Image;
 

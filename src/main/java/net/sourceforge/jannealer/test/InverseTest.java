@@ -11,10 +11,12 @@ import net.sourceforge.jannealer.ObjectiveFunction;
  * a=sin(x)*exp(y)*z
  * b=exp(x)*sin(y)
  * 
- * @author Øyvind Harboe
+ * @author ï¿½yvind Harboe
  */
-public class InverseTest
+public enum InverseTest
 {
+	;
+
 	public static void main(String[] args)
 	{
 		AnnealingScheme scheme = new AnnealingScheme();

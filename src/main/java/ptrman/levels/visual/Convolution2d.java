@@ -6,9 +6,11 @@ import ptrman.Datastructures.Map2d;
 /**
  *
  */
-public class Convolution2d
+public enum Convolution2d
 {
-    public static IMap2d<Float> convolution(IMap2d<Float> input, IMap2d<Float> inputKernel)
+	;
+
+	public static IMap2d<Float> convolution(IMap2d<Float> input, IMap2d<Float> inputKernel)
     {
         float[][] inputAsMatrix, kernelAsMatrix;
         IMap2d<Float> resultMap;

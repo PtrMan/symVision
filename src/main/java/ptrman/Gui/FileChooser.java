@@ -58,28 +58,26 @@ public class FileChooser {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                File f = new File(System.getProperty("user.home"));
-                FileChooser fl = new FileChooser();
-                Component c1 = fl.newComponent(f, new TextFileFilter(), true, null);
+        SwingUtilities.invokeLater(() -> {
+            File f = new File(System.getProperty("user.home"));
+            FileChooser fl = new FileChooser();
+            Component c1 = newComponent(f, new TextFileFilter(), true, null);
 
-                //f = new File(System.getProperty("user.home"));
-                Component c2 = fl.newComponent(f.listFiles(new TextFileFilter()), false, null);
+            //f = new File(System.getProperty("user.home"));
+            Component c2 = newComponent(f.listFiles(new TextFileFilter()), false, null);
 
-                JFrame frame = new JFrame("File List");
-                JPanel gui = new JPanel(new BorderLayout());
-                gui.add(c1,BorderLayout.WEST);
-                gui.add(c2,BorderLayout.CENTER);
-                c2.setPreferredSize(new Dimension(375,100));
-                gui.setBorder(new EmptyBorder(3,3,3,3));
+            JFrame frame = new JFrame("File List");
+            JPanel gui = new JPanel(new BorderLayout());
+            gui.add(c1,BorderLayout.WEST);
+            gui.add(c2,BorderLayout.CENTER);
+            c2.setPreferredSize(new Dimension(375,100));
+            gui.setBorder(new EmptyBorder(3,3,3,3));
 
-                frame.setContentPane(gui);
-                frame.pack();
-                frame.setLocationByPlatform(true);
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                frame.setVisible(true);
-            }
+            frame.setContentPane(gui);
+            frame.pack();
+            frame.setLocationByPlatform(true);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setVisible(true);
         });
     }
 }

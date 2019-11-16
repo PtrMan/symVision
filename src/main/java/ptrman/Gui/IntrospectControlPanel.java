@@ -1,8 +1,6 @@
 package ptrman.Gui;
 
 import javax.swing.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  *
@@ -28,19 +26,14 @@ public class IntrospectControlPanel
         controlAreaPanel.add(new JButton(">"));
         controlAreaPanel.add(introspectButton);
 
-        introspectButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                setIntrospectState(!introspectState);
-                handlerIntrospectionChanged.fire();
-            }
+        introspectButton.addActionListener(e -> {
+            setIntrospectState(!introspectState);
+            handlerIntrospectionChanged.fire();
         });
 
-        pauseResumeButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setRunningState(!runningState);
-                handlerPauseContinue.fire();
-            }
+        pauseResumeButton.addActionListener(e -> {
+            setRunningState(!runningState);
+            handlerPauseContinue.fire();
         });
     }
 

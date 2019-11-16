@@ -1,8 +1,9 @@
 package ptrman.math;
 
-public class RandomUtil
+public enum RandomUtil
 {
-    // this is the generator for the Halton sequence numbers
+	;
+	// this is the generator for the Halton sequence numbers
 
     static public float radicalInverse(int n, int baseValue)
     {

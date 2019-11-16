@@ -33,7 +33,7 @@ public class CodeletLtmLookup
             public float priority; // priority of the codelet 
         }
         
-        public ArrayList<CodeletInformation> codeletInformations = new ArrayList<CodeletInformation>();
+        public ArrayList<CodeletInformation> codeletInformations = new ArrayList<>();
     }
     
     public void lookupAndPutCodeletsAtCoderackForPrimitiveNode(Node node, Coderack coderack, Network ltm, NetworkHandles networkHandles)
@@ -106,7 +106,7 @@ public class CodeletLtmLookup
         }
     }
     
-    private static void instantiateAllCodeletsForWorkspaceNode(Node workspaceNode, Coderack coderack, ArrayList<RegisterEntry.CodeletInformation> codeletInformations)
+    private static void instantiateAllCodeletsForWorkspaceNode(Node workspaceNode, Coderack coderack, Iterable<RegisterEntry.CodeletInformation> codeletInformations)
     {
         for( RegisterEntry.CodeletInformation iterationCodeletInformation : codeletInformations )
         {
@@ -119,7 +119,7 @@ public class CodeletLtmLookup
         }
     }
     
-    public AbstractMap<String, RegisterEntry> registry = new HashMap<String, RegisterEntry>();
+    public AbstractMap<String, RegisterEntry> registry = new HashMap<>();
     
     /*
     // NOTE< should be moved maybe into its own class >

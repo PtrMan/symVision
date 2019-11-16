@@ -1,6 +1,7 @@
 package ptrman.levels.retina;
 
 import com.jogamp.common.nio.Buffers;
+import com.jogamp.opengl.*;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.IMap2d;
@@ -9,11 +10,13 @@ import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.math.Maths;
 
-import javax.media.opengl.*;
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
 
-import static javax.media.opengl.GL2.*;
+import static com.jogamp.opengl.GL.*;
+import static com.jogamp.opengl.GL2ES2.GL_DEPTH_COMPONENT;
+import static com.jogamp.opengl.GL2GL3.GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER;
+import static com.jogamp.opengl.GL2GL3.GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER;
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 import static ptrman.math.Maths.squaredDistance;
 import static ptrman.math.MatrixHelper.*;
@@ -67,7 +70,7 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
             checkError(gl);
             gl.glEnableVertexAttribArray(vertexLocation);
             checkError(gl);
-            gl.glVertexAttribPointer(vertexLocation, 3, GL3.GL_FLOAT, false, 0, 0);
+            gl.glVertexAttribPointer(vertexLocation, 3, GL_FLOAT, false, 0, 0);
             checkError(gl);
 
             // bind buffer for colors and copy data into buffer
@@ -77,7 +80,7 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
             checkError(gl);
             gl.glEnableVertexAttribArray(colorLocation);
             checkError(gl);
-            gl.glVertexAttribPointer(colorLocation, 3, GL3.GL_FLOAT, false, 0, 0);
+            gl.glVertexAttribPointer(colorLocation, 3, GL_FLOAT, false, 0, 0);
             checkError(gl);
         }
 
@@ -205,18 +208,19 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
 
 
 
-        GLDrawableFactory factory = GLDrawableFactory.getFactory(glp);
+//        GLDrawableFactory factory = GLDrawableFactory.getFactory(glp);
 
 
         //makes a new buffer
         // TODO< catch exception >
-        GLPbuffer pBuffer = factory.createGLPbuffer(GLProfile.getDefaultDevice(), caps, null, imageSize.x, imageSize.y, null);
+        //GLPixelBuffer pBuffer = factory.createOffscreenAutoDrawable(GLProfile.getDefaultDevice(), caps, null, imageSize.x, imageSize.y);
 
         //required for drawing to the buffer
-        context = pBuffer.createContext(null);
+//        context = pBuffer.createContext(null);
 
-        context.makeCurrent();
-        gl = (GL3)context.getCurrentGL();
+//        context.makeCurrent();
+//        gl = (GL3)context.getCurrentGL();
+        context = gl.getContext();
 
         initFbo(gl);
 
@@ -512,7 +516,7 @@ public class ProcessBOpenGlAccelerated extends AbstractProcessB {
                 break;
             case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT:
                 throw new RuntimeException("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT");
-            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:;
+            case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT:
                 throw new RuntimeException("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT");
             case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS:
                 throw new RuntimeException("FRAMEBUFFEROBJECT CHECK RESULT=GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT");

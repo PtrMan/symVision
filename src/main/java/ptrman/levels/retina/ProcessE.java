@@ -1,7 +1,7 @@
 package ptrman.levels.retina;
 
-import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import ptrman.Datastructures.IMap2d;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;

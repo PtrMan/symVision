@@ -6,10 +6,12 @@ import net.sourceforge.jannealer.AnnealingScheme;
  *
  * Test classes utilities
  * 
- * @author Øyvind Harboe
+ * @author ï¿½yvind Harboe
  */
-public class Util
+public enum Util
 {
+	;
+
 	/** dump solution to screen */
 	static public void printSolution(AnnealingScheme scheme)
 	{

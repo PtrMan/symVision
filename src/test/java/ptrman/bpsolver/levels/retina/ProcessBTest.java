@@ -146,10 +146,7 @@ public class ProcessBTest {
 
             one = new Vector2d<>(1, 1);
 
-            for(;;) {
-                if (-outwardIteratorOffsetUnbound.x > radius) {
-                    break;
-                }
+            while (-outwardIteratorOffsetUnbound.x <= radius) {
 
                 Vector2d<Integer> bestPosition = null;
                 double bestDistanceSquared = Double.MAX_VALUE;
@@ -157,8 +154,8 @@ public class ProcessBTest {
                 final Vector2d<Integer> iteratorOffsetBoundMin = Vector2d.IntegerHelper.max(borderMin, Vector2d.IntegerHelper.add(outwardIteratorOffsetUnbound, positionAsInt));
                 final Vector2d<Integer> iteratorOffsetBoundMax = Vector2d.IntegerHelper.min4(borderMax, Vector2d.IntegerHelper.add(Vector2d.IntegerHelper.add(Vector2d.IntegerHelper.getScaled(outwardIteratorOffsetUnbound, -1), one), positionAsInt), borderMax, borderMax);
 
-                for( int y = iteratorOffsetBoundMin.y; y < iteratorOffsetBoundMax.y; y++ ) {
-                    for( int x = iteratorOffsetBoundMin.x; x < iteratorOffsetBoundMax.x; x++ ) {
+                for (int y = iteratorOffsetBoundMin.y; y < iteratorOffsetBoundMax.y; y++) {
+                    for (int x = iteratorOffsetBoundMin.x; x < iteratorOffsetBoundMax.x; x++) {
                         // just find at the border
                         if (y == (iteratorOffsetBoundMin.y) || y == iteratorOffsetBoundMax.y - 1 || x == (iteratorOffsetBoundMin.x) || x == iteratorOffsetBoundMax.x - 1) {
                             final boolean valueAtPoint = image.readAt(x, y);
@@ -167,7 +164,7 @@ public class ProcessBTest {
                                 final ArrayRealVector diff = integerToArrayRealVector(new Vector2d<>(x, y)).subtract(integerToArrayRealVector(position));
                                 final double currentDistanceSquared = diff.dotProduct(diff);
 
-                                if( currentDistanceSquared < bestDistanceSquared ) {
+                                if (currentDistanceSquared < bestDistanceSquared) {
                                     bestDistanceSquared = currentDistanceSquared;
                                     bestPosition = new Vector2d<>(x, y);
                                 }
@@ -178,8 +175,8 @@ public class ProcessBTest {
                     }
                 }
 
-                if( bestPosition != null ) {
-                    return new Tuple2(bestPosition, java.lang.Math.sqrt(bestDistanceSquared));
+                if (bestPosition != null) {
+                    return new Tuple2(bestPosition, Math.sqrt(bestDistanceSquared));
                 }
 
                 outwardIteratorOffsetUnbound.x--;

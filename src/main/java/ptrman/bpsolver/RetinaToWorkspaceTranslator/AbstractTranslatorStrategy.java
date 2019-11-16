@@ -2,7 +2,6 @@ package ptrman.bpsolver.RetinaToWorkspaceTranslator;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.SpatialAcceleration;
-import ptrman.Datastructures.Vector2d;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
 import ptrman.levels.retina.Intersection;

@@ -4,9 +4,11 @@ package ptrman.bpsolver;
  * class to allow parameter tuning while the program is running, but also let parameters be set to constants (which the compiler or JIT hopefuly optimizes out)
  * 
  */
-public class Parameters
+public enum Parameters
 {
-    public static float getProcessdLockingActivation()
+	;
+
+	public static float getProcessdLockingActivation()
     {
         return getProcessdMaxMse()*getProcessdLockingActivationScale()+getProcessdLockingActivationOffset();
     }

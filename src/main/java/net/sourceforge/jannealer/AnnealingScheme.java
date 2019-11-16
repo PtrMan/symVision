@@ -2,8 +2,8 @@ package net.sourceforge.jannealer;
 /**
  * Implements downhill simplex simulated annealing algorithm
  *
- * @author     Charles Mégnin
- * @author     Øyvind Harboe
+ * @author     Charles Mï¿½gnin
+ * @author     ï¿½yvind Harboe
  * @since    October 17, 2001
  */
 public class AnnealingScheme
@@ -56,7 +56,7 @@ public class AnnealingScheme
 	 */
 	public void setSolution(double[] offset)
 	{
-		this.offset = (double[])offset.clone();
+		this.offset = offset.clone();
 	}
 	/**
 	 *  Sets the CoolingRate attribute of the AnnealingScheme object
@@ -83,7 +83,7 @@ public class AnnealingScheme
 	 */
 	public double[] getSolution()
 	{
-		return (double[])offset.clone();
+		return offset.clone();
 	}
 	/**
 	 * @return ObjectiveFunction object
@@ -165,10 +165,7 @@ public class AnnealingScheme
 	protected void setOffsetFromSimplex(double[] t)
 	{
 		double[] t2 = new double[t.length - 1];
-		for (int i = 0; i < t2.length; i++)
-		{
-			t2[i] = t[1 + i];
-		}
+		System.arraycopy(t, 1, t2, 0, t2.length);
 		setSolution(t2);
 	}
 	

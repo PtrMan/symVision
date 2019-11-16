@@ -8,7 +8,7 @@ import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.misc.Assert;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -42,7 +42,7 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
         // * match it recursivly
         // * strengthen links
 
-        matchingPathElements = featurePatternMatching.matchAnyRecursive(orginal.exemplars.get(0), additional.exemplars.get(0), networkHandles, Arrays.asList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
+        matchingPathElements = featurePatternMatching.matchAnyRecursive(orginal.exemplars.get(0), additional.exemplars.get(0), networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
 
         Node currentMatchNodeOrginal, currentMatchNodeAdditional;
 
@@ -102,7 +102,7 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
         Assert.Assert(b.exemplars.size() == 1, "size expected to be 1");
         Assert.Assert(b.exemplars.get(0).type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "");
 
-        matchingPathElements = featurePatternMatching.matchAnyRecursive(a.exemplars.get(0), b.exemplars.get(0), networkHandles, Arrays.asList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
+        matchingPathElements = featurePatternMatching.matchAnyRecursive(a.exemplars.get(0), b.exemplars.get(0), networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
         matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
 
         return matchingSimilarityValue;
@@ -132,7 +132,7 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
             
             float matchingValue = featurePatternMatching.matchAnyNonRecursive(template, iterationOther, networkHandles);
 
-            matchingPathElements = featurePatternMatching.matchAnyRecursive(template, iterationOther, networkHandles, Arrays.asList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
+            matchingPathElements = featurePatternMatching.matchAnyRecursive(template, iterationOther, networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
             matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
 
             if( matchingSimilarityValue > bestMatchingSimilarity )

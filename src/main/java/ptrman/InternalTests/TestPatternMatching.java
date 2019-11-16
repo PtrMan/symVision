@@ -12,14 +12,16 @@ import ptrman.bpsolver.RetinaToWorkspaceTranslator.NearIntersectionStrategy;
 import ptrman.bpsolver.pattern.FeaturePatternMatching;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 /**
  *
  */
-public class TestPatternMatching {
-    /**
+public enum TestPatternMatching {
+	;
+
+	/**
      *
      * tests if the pattern matching recognizes the same line as the same object
      *
@@ -58,7 +60,7 @@ public class TestPatternMatching {
                 List<FeaturePatternMatching.MatchingPathElement> matchingPathElements;
                 float matchingSimilarityValue;
 
-                matchingPathElements = featurePatternMatching.matchAnyRecursive(objectNodes.get(0), objectNodes.get(0), bpSolver.networkHandles, Arrays.asList(Link.EnumType.CONTAINS), MAXDEPTH);
+                matchingPathElements = featurePatternMatching.matchAnyRecursive(objectNodes.get(0), objectNodes.get(0), bpSolver.networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), MAXDEPTH);
                 matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
 
         if( matchingSimilarityValue > 1.001f || matchingSimilarityValue < 0.999f ) {

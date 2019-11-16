@@ -3,9 +3,11 @@ package ptrman.misc;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 
-public class GaborKernel
+public enum GaborKernel
 {
-    /**
+	;
+
+	/**
      * 
      * 
      * 

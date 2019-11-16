@@ -8,7 +8,7 @@ public class DualConvas extends JPanel
     public DualConvas() {
         super(new GridLayout(0,1));
 
-        leftCanvas=new GCanvas();
+        leftCanvas= new GCanvas();
         //leftCanvas.setSize(new Dimension(300, 200));
         add(leftCanvas);
         
@@ -26,7 +26,7 @@ public class DualConvas extends JPanel
     public final GCanvas rightCanvas;
     
     
-    public class GCanvas extends Canvas
+    public static class GCanvas extends Canvas
     {
         public GCanvas() {
             setIgnoreRepaint(true);

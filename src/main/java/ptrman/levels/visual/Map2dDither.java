@@ -14,8 +14,10 @@ import ptrman.math.Maths;
  * GPU can't be parellized
  */
 public class Map2dDither {
-    public static class Generic {
-        /**
+    public enum Generic {
+		;
+
+		/**
          *
          * a abstraction for a more generic algorithm
          *

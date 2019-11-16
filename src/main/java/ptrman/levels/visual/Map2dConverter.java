@@ -2,8 +2,10 @@ package ptrman.levels.visual;
 
 import ptrman.Datastructures.IMap2d;
 
-public class Map2dConverter {
-    public static void booleanToFloat(final IMap2d<Boolean> input, IMap2d<Float> output) {
+public enum Map2dConverter {
+	;
+
+	public static void booleanToFloat(final IMap2d<Boolean> input, IMap2d<Float> output) {
         for( int iy = 0; iy < input.getLength(); iy++ ) {
             for( int ix = 0; ix < input.getWidth(); ix++ ) {
                 boolean valueAtPosition = input.readAt(ix, iy);

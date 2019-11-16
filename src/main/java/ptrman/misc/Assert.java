@@ -1,8 +1,10 @@
 package ptrman.misc;
 
-public class Assert
+public enum Assert
 {
-    public static void Assert(boolean value, String message)
+	;
+
+	public static void Assert(boolean value, String message)
     {
         if( !value )
         {

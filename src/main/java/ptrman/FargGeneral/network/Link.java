@@ -32,7 +32,7 @@ public class Link
         
         private String string;
         
-        private EnumType(String name){string = name;}
+        EnumType(String name){string = name;}
 
         public String toString() {
             return string;

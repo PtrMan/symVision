@@ -1,14 +1,18 @@
 package ptrman.levels.retina;
 
 import com.google.common.collect.Lists;
-import com.gs.collections.api.list.primitive.IntList;
-import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
-import com.gs.collections.impl.map.mutable.primitive.IntBooleanHashMap;
+//import com.gs.collections.api.list.primitive.IntList;
+//import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
+//import com.gs.collections.impl.map.mutable.primitive.IntBooleanHashMap;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomAdaptor;
 import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
+import org.eclipse.collections.api.block.procedure.primitive.IntBooleanProcedure;
+import org.eclipse.collections.api.list.primitive.IntList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
+import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.Parameters;
@@ -20,7 +24,6 @@ import ptrman.misc.Assert;
 
 import java.util.*;
 
-import static java.util.Collections.sort;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.add;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.sub;
 import static ptrman.math.ArrayRealVectorHelper.*;
@@ -213,160 +216,163 @@ public class ProcessDAnnealing implements IProcess {
         final int numberOfMaximalLengthCycles = 5;
 
         Deque<LineDetectors> lineDetectorsRecords = new ArrayDeque<>();
+        float selectionProbability = ((float)numberOfTries) / accelerationMapCellUsed.size();
 
-        for (int lengthCycle = 0; lengthCycle < numberOfMaximalLengthCycles; lengthCycle++) {
-            // pick out a random cell and pick out a random sample in it and try to build a (small) line out of it
+        IntBooleanProcedure eachCell = (k, v) -> {
 
-            float selectionProbability = numberOfTries / accelerationMapCellUsed.size();
-            accelerationMapCellUsed.forEachKeyValue((k, v) -> {
-
-                if (random.nextFloat() > selectionProbability) return;
-                final int randomCellPositionIndex = k; //getRandomElementFromSet(accelerationMapCellUsed, random);
+            if (random.nextFloat() > selectionProbability) return;
+            final int randomCellPositionIndex = k; //getRandomElementFromSet(accelerationMapCellUsed, random);
 
 
-                final Vector2d<Integer> randomCellPosition = new Vector2d<>(
-                        randomCellPositionIndex % accelerationMap.getWidth(),
-                        randomCellPositionIndex / accelerationMap.getWidth());
+            final Vector2d<Integer> randomCellPosition = new Vector2d<>(
+                randomCellPositionIndex % accelerationMap.getWidth(),
+                randomCellPositionIndex / accelerationMap.getWidth());
 
 
-                final IntArrayList allCandidateSampleIndices;
+            final IntArrayList allCandidateSampleIndices;
 
-                // strategy for getting a "protoline"
+            // strategy for getting a "protoline"
 
-                final int ACCELERATIONSTRUCUTRE_LINE_CANDIDATES_RADIUS = 1;
+            final int ACCELERATIONSTRUCUTRE_LINE_CANDIDATES_RADIUS = 1;
 
-                // variables for LineDetectorWithMultiplePoints
-                final ArrayRealVector spatialAccelerationLineDirection;
-                final Vector2d<Integer> spatialAccelerationCenterPosition = randomCellPosition;
+            // variables for LineDetectorWithMultiplePoints
+            final ArrayRealVector spatialAccelerationLineDirection;
+            final Vector2d<Integer> spatialAccelerationCenterPosition = randomCellPosition;
 
-                // pick out possible direction(s) from the neightbor (acceleration structure) cells
-                final List<Vector2d<Integer>> possibleNeightborAccelerationCellsWithSamples = getAccelerationStructureNeightborCellsWithContent(spatialAccelerationCenterPosition, ACCELERATIONSTRUCUTRE_LINE_CANDIDATES_RADIUS);
+            // pick out possible direction(s) from the neightbor (acceleration structure) cells
+            final List<Vector2d<Integer>> possibleNeightborAccelerationCellsWithSamples = getAccelerationStructureNeightborCellsWithContent(spatialAccelerationCenterPosition, ACCELERATIONSTRUCUTRE_LINE_CANDIDATES_RADIUS);
 
-                if (possibleNeightborAccelerationCellsWithSamples.isEmpty()) {
-                    spatialAccelerationLineDirection = null;
+            if (possibleNeightborAccelerationCellsWithSamples.isEmpty()) {
+                spatialAccelerationLineDirection = null;
 
-                    // TODO< get sample indices just from the one cell >
-                    allCandidateSampleIndices = getAllIndicesOfSamplesOfCellAndNeightborCells(spatialAccelerationCenterPosition);
-
-                    if (allCandidateSampleIndices.size() < 3) {
-                        return;
-                    }
-                } else {
-                    // * pick out a random neightbor cell and pick out a random direction for the accelerationstructure line
-
-                    final int possibleNeightborAccelerationCellIndex = random.nextInt(possibleNeightborAccelerationCellsWithSamples.size());
-                    final Vector2d<Integer> chosenAccelerationStructureNeightborCellPosition = possibleNeightborAccelerationCellsWithSamples.get(possibleNeightborAccelerationCellIndex);
-
-                    final Vector2d<Integer> cellDelta = sub(chosenAccelerationStructureNeightborCellPosition, spatialAccelerationCenterPosition);
-                    final Vector2d<Integer> minusCellDelta = new Vector2d<>(-cellDelta.x, -cellDelta.y);
-                    final Vector2d<Integer> otherCellPosition = add(spatialAccelerationCenterPosition, minusCellDelta);
-
-                    final ArrayRealVector absoluteRandomPositionInChosenNeightborCell = calcAbsolutePositionInAccelerationCell(chosenAccelerationStructureNeightborCellPosition);
-                    final ArrayRealVector absoluteCenterPosition = getAbsolutePositionOfLeftTopCornerOfAccelerationCell(spatialAccelerationCenterPosition).add(new ArrayRealVector(new double[]{0.5 * (double) gridcellSize, 0.5 * (double) gridcellSize}));
-
-                    final ArrayRealVector absoluteDiff = absoluteRandomPositionInChosenNeightborCell.subtract(absoluteCenterPosition);
-                    spatialAccelerationLineDirection = normalize(absoluteDiff);
-
-                    // * draw line in acceleration structure
-
-                    final List<Vector2d<Integer>> accelerationCandidateCells = SpatialDrawer.getPositionsOfCellsOfLineUnbound(otherCellPosition, chosenAccelerationStructureNeightborCellPosition);
-
-                    // * filter out valid candidates
-                    accelerationCandidateCells.removeIf(cellPosition -> cellPosition == null);
-
-                    // * select random points from the validAccelerationCandidateCells (happens outside)
-                    // * fitting (happens outside)
-
-                    // TODO< other strategy, select two samples and find all points whcih are not too far away from the line >
-
-                    allCandidateSampleIndices = getAllSampleIndicesOfCells(accelerationCandidateCells);
-                }
-
+                // TODO< get sample indices just from the one cell >
+                allCandidateSampleIndices = getAllIndicesOfSamplesOfCellAndNeightborCells(spatialAccelerationCenterPosition);
 
                 if (allCandidateSampleIndices.size() < 3) {
                     return;
                 }
+            } else {
+                // * pick out a random neightbor cell and pick out a random direction for the accelerationstructure line
 
-                IntList chosenCandidateSampleIndices = getRandomElements(allCandidateSampleIndices, 3, random);
+                final int possibleNeightborAccelerationCellIndex = random.nextInt(possibleNeightborAccelerationCellsWithSamples.size());
+                final Vector2d<Integer> chosenAccelerationStructureNeightborCellPosition = possibleNeightborAccelerationCellsWithSamples.get(possibleNeightborAccelerationCellIndex);
 
+                final Vector2d<Integer> cellDelta = sub(chosenAccelerationStructureNeightborCellPosition, spatialAccelerationCenterPosition);
+                final Vector2d<Integer> minusCellDelta = new Vector2d<>(-cellDelta.x, -cellDelta.y);
+                final Vector2d<Integer> otherCellPosition = add(spatialAccelerationCenterPosition, minusCellDelta);
 
-                final List<ProcessA.Sample> selectedSamples = getSamplesByIndices(workingSamples, chosenCandidateSampleIndices);
+                final ArrayRealVector absoluteRandomPositionInChosenNeightborCell = calcAbsolutePositionInAccelerationCell(chosenAccelerationStructureNeightborCellPosition);
+                final ArrayRealVector absoluteCenterPosition = getAbsolutePositionOfLeftTopCornerOfAccelerationCell(spatialAccelerationCenterPosition).add(new ArrayRealVector(new double[]{0.5 * (double) gridcellSize, 0.5 * (double) gridcellSize}));
 
-                final boolean doAllSamplesHaveId = doAllSamplesHaveObjectId(selectedSamples);
-                if (!doAllSamplesHaveId) {
-                    return;
-                }
+                final ArrayRealVector absoluteDiff = absoluteRandomPositionInChosenNeightborCell.subtract(absoluteCenterPosition);
+                spatialAccelerationLineDirection = normalize(absoluteDiff);
 
-                // check if object ids are the same
-                final boolean objectIdsOfSamplesTheSame = areObjectIdsTheSameOfSamples(selectedSamples);
-                if (!objectIdsOfSamplesTheSame) {
-                    return;
-                }
+                // * draw line in acceleration structure
 
-                final List<ArrayRealVector> positionsOfSamples = getPositionsOfSamples(selectedSamples);
+                final List<Vector2d<Integer>> accelerationCandidateCells = SpatialDrawer.getPositionsOfCellsOfLineUnbound(otherCellPosition, chosenAccelerationStructureNeightborCellPosition);
 
-                final ArrayRealVector averageOfPositionsOfSamples = getAverage(positionsOfSamples);
-                final double currentMaximalDistanceOfPositions = getMaximalDistanceOfPositionsTo(positionsOfSamples, averageOfPositionsOfSamples);
+                // * filter out valid candidates
+                accelerationCandidateCells.removeIf(Objects::isNull);
 
-                if (currentMaximalDistanceOfPositions > Math.min(maximalDistanceOfPositions, maxLength * 0.5f)) {
-                    // one point is too far away from the average position, so this line is not formed
-                    return;
-                }
-                // else we are here
+                // * select random points from the validAccelerationCandidateCells (happens outside)
+                // * fitting (happens outside)
 
-                final RegressionForLineResult regressionResult = calcRegressionForPoints(positionsOfSamples);
+                // TODO< other strategy, select two samples and find all points whcih are not too far away from the line >
 
-                if (regressionResult.mse > Parameters.getProcessdMaxMse()) {
-                    return;
-                }
-                // else we are here
+                allCandidateSampleIndices = getAllSampleIndicesOfCells(accelerationCandidateCells);
+            }
 
 
-                // create new line detector
-                LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints();
-                createdLineDetector.integratedSampleIndices = chosenCandidateSampleIndices;
-                createdLineDetector.cachedSamplePositions = positionsOfSamples;
+            if (allCandidateSampleIndices.size() < 3) {
+                return;
+            }
 
-                createdLineDetector.spatialAccelerationLineDirection = spatialAccelerationLineDirection;
-                createdLineDetector.spatialAccelerationCenterPosition = spatialAccelerationCenterPosition;
+            IntList chosenCandidateSampleIndices = getRandomElements(allCandidateSampleIndices, 3, random);
 
 
-                Assert.Assert(areObjectIdsTheSameOfSamples(selectedSamples), "");
-                createdLineDetector.commonObjectId = selectedSamples.get(0).objectId;
+            final List<ProcessA.Sample> selectedSamples = getSamplesByIndices(workingSamples, chosenCandidateSampleIndices);
 
-                Assert.Assert(createdLineDetector.integratedSampleIndices.size() >= 2, "");
-                // the regression mse is not defined if it are only two points
+            final boolean doAllSamplesHaveId = doAllSamplesHaveObjectId(selectedSamples);
+            if (!doAllSamplesHaveId) {
+                return;
+            }
 
-                boolean addCreatedLineDetector = false;
+            // check if object ids are the same
+            final boolean objectIdsOfSamplesTheSame = areObjectIdsTheSameOfSamples(selectedSamples);
+            if (!objectIdsOfSamplesTheSame) {
+                return;
+            }
 
-                if (createdLineDetector.integratedSampleIndices.size() == 2) {
-                    createdLineDetector.mse = 0.0f;
+            final List<ArrayRealVector> positionsOfSamples = getPositionsOfSamples(selectedSamples);
+
+            final ArrayRealVector averageOfPositionsOfSamples = getAverage(positionsOfSamples);
+            final double currentMaximalDistanceOfPositions = getMaximalDistanceOfPositionsTo(positionsOfSamples, averageOfPositionsOfSamples);
+
+            if (currentMaximalDistanceOfPositions > Math.min(maximalDistanceOfPositions, maxLength * 0.5f)) {
+                // one point is too far away from the average position, so this line is not formed
+                return;
+            }
+            // else we are here
+
+            final RegressionForLineResult regressionResult = calcRegressionForPoints(positionsOfSamples);
+
+            if (regressionResult.mse > Parameters.getProcessdMaxMse()) {
+                return;
+            }
+            // else we are here
+
+
+            // create new line detector
+            LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints();
+            createdLineDetector.integratedSampleIndices = chosenCandidateSampleIndices;
+            createdLineDetector.cachedSamplePositions = positionsOfSamples;
+
+            createdLineDetector.spatialAccelerationLineDirection = spatialAccelerationLineDirection;
+            createdLineDetector.spatialAccelerationCenterPosition = spatialAccelerationCenterPosition;
+
+
+            Assert.Assert(areObjectIdsTheSameOfSamples(selectedSamples), "");
+            createdLineDetector.commonObjectId = selectedSamples.get(0).objectId;
+
+            Assert.Assert(createdLineDetector.integratedSampleIndices.size() >= 2, "");
+            // the regression mse is not defined if it are only two points
+
+            boolean addCreatedLineDetector = false;
+
+            if (createdLineDetector.integratedSampleIndices.size() == 2) {
+                createdLineDetector.mse = 0.0f;
+
+                createdLineDetector.n = regressionResult.n;
+                createdLineDetector.m = regressionResult.m;
+
+                addCreatedLineDetector = true;
+            } else {
+                if (regressionResult.mse < Parameters.getProcessdMaxMse()) {
+                    createdLineDetector.mse = regressionResult.mse;
 
                     createdLineDetector.n = regressionResult.n;
                     createdLineDetector.m = regressionResult.m;
 
                     addCreatedLineDetector = true;
-                } else {
-                    if (regressionResult.mse < Parameters.getProcessdMaxMse()) {
-                        createdLineDetector.mse = regressionResult.mse;
-
-                        createdLineDetector.n = regressionResult.n;
-                        createdLineDetector.m = regressionResult.m;
-
-                        addCreatedLineDetector = true;
-                    }
                 }
+            }
 
 
-                if (createdLineDetector.getLength() > maxLength) {
-                    return;
-                }
-                // else we are here
+            if (createdLineDetector.getLength() > maxLength) {
+                return;
+            }
+            // else we are here
 
-                if (addCreatedLineDetector) {
-                    multiplePointsLineDetector.add(createdLineDetector);
-                }
-            });
+            if (addCreatedLineDetector) {
+                multiplePointsLineDetector.add(createdLineDetector);
+            }
+        };
+
+        for (int lengthCycle = 0; lengthCycle < numberOfMaximalLengthCycles; lengthCycle++) {
+            // pick out a random cell and pick out a random sample in it and try to build a (small) line out of it
+
+
+            accelerationMapCellUsed.forEachKeyValue(eachCell);
 
 
             // compile statistics
@@ -381,7 +387,7 @@ public class ProcessDAnnealing implements IProcess {
 
             final double newMaxLength = currentLineLengthMean * HardParameters.ProcessD.LENGTH_MEAN_MULTIPLIER;
 
-            System.out.println("length mean " + Double.toString(currentLineLengthMean));
+            System.out.println("length mean " + currentLineLengthMean);
 
             final double finalizedMaxLength = Math.min(maxLength, newMaxLength);
 
@@ -490,11 +496,8 @@ public class ProcessDAnnealing implements IProcess {
     }
 
     private static List<LineDetectorWithMultiplePoints> copyLineDetectors(final List<LineDetectorWithMultiplePoints> lineDetectors) {
-        List<LineDetectorWithMultiplePoints> result = new ArrayList<>();
 
-        for (final LineDetectorWithMultiplePoints iterationLineDetector : lineDetectors) {
-            result.add(iterationLineDetector);
-        }
+        List<LineDetectorWithMultiplePoints> result = new ArrayList<>(lineDetectors);
 
         return result;
     }
@@ -556,8 +559,7 @@ public class ProcessDAnnealing implements IProcess {
             tempSet.add(cellPosition);
         }
 
-        List<Vector2d<Integer>> resultList = new ArrayList<>();
-        resultList.addAll(tempSet);
+        List<Vector2d<Integer>> resultList = new ArrayList<>(tempSet);
         return resultList;
     }
 
@@ -712,11 +714,9 @@ public class ProcessDAnnealing implements IProcess {
         List<ArrayRealVector> samplePositions = new ArrayList<>();
 
         if (lineDetectorWithMultiplePoints.isYAxisSingularity()) {
-            for (ArrayRealVector iterationSamplePosition : lineDetectorWithMultiplePoints.cachedSamplePositions) {
-                samplePositions.add(iterationSamplePosition);
-            }
+            samplePositions.addAll(lineDetectorWithMultiplePoints.cachedSamplePositions);
 
-            sort(samplePositions, new VectorComperatorByAxis(EnumAxis.Y));
+            samplePositions.sort(new VectorComperatorByAxis(EnumAxis.Y));
         } else {
             // project
             for (ArrayRealVector iterationSamplePosition : lineDetectorWithMultiplePoints.cachedSamplePositions) {
@@ -725,7 +725,7 @@ public class ProcessDAnnealing implements IProcess {
                 samplePositions.add(projectedSamplePosition);
             }
 
-            sort(samplePositions, new VectorComperatorByAxis(EnumAxis.X));
+            samplePositions.sort(new VectorComperatorByAxis(EnumAxis.X));
         }
 
         return samplePositions;

@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
-public class QueueHelper {
-    public static <Type> List<Type> getAllElementsFromQueueAsList(Queue<Type> queue) {
+public enum QueueHelper {
+	;
+
+	public static <Type> List<Type> getAllElementsFromQueueAsList(Queue<Type> queue) {
         final int size = queue.size();
 
         List<Type> result = new ArrayList<>();
@@ -18,8 +20,6 @@ public class QueueHelper {
     }
 
     public static <Type> void transferAllElementsFromListToQueue(final List<Type> elements, Queue<Type> queue) {
-        for( final Type element : elements ) {
-            queue.add(element);
-        }
+        queue.addAll(elements);
     }
 }

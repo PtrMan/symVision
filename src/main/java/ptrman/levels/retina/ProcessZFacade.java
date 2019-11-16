@@ -40,7 +40,7 @@ public class ProcessZFacade implements IProcess {
         this.alreadyCopiedImage = image.copy();
     }
 
-    private class PixelChangeListener implements FloodFill.IPixelSetListener {
+    private static class PixelChangeListener implements FloodFill.IPixelSetListener {
         public PixelChangeListener() {
         }
 
@@ -149,35 +149,31 @@ public class ProcessZFacade implements IProcess {
 
         rects.clear();
 
-        for(;;) {
-            if( notCompletlyProcessedCells.isEmpty() ) {
-                break;
-            }
+		while (!notCompletlyProcessedCells.isEmpty()) {
 
-            HashableVector2dInteger[] arrayOfNotCompletlyProcessedCells = notCompletlyProcessedCells.keySet().toArray(new HashableVector2dInteger[0]);
-            Vector2d<Integer> notCompletlyProcessedCellPosition = (Vector2d<Integer>)arrayOfNotCompletlyProcessedCells[random.nextInt(arrayOfNotCompletlyProcessedCells.length)];
-            Vector2d<Integer> randomPixelFromNotCompletlyProcessCell = getRandomPixelPositionOfCell(notCompletlyProcessedCellPosition);
+			HashableVector2dInteger[] arrayOfNotCompletlyProcessedCells = notCompletlyProcessedCells.keySet().toArray(new HashableVector2dInteger[0]);
+			Vector2d<Integer> notCompletlyProcessedCellPosition = arrayOfNotCompletlyProcessedCells[random.nextInt(arrayOfNotCompletlyProcessedCells.length)];
+			Vector2d<Integer> randomPixelFromNotCompletlyProcessCell = getRandomPixelPositionOfCell(notCompletlyProcessedCellPosition);
 
-            FloodFill.fill(input, randomPixelFromNotCompletlyProcessCell, Boolean.TRUE, Boolean.FALSE, true, pixelChangeListener);
+			FloodFill.fill(input, randomPixelFromNotCompletlyProcessCell, Boolean.TRUE, Boolean.FALSE, true, pixelChangeListener);
 
-            // TODO< decide with a propability if the filled patch should be magnified or not >
-            if( pixelChangeListener.setPixelPositions.size() < numberOfPixelsMagnificationThreshold) {
-                drawValuesIntoMap(pixelChangeListener.setPixelPositions, toMagnify, true);
-                //drawValuesIntoMap(pixelChangeListener.setPixelPositions, toMagnifiedOutputObjectIds, idCounter);
-            }
-            else {
-                drawValuesIntoMap(pixelChangeListener.setPixelPositions, notMagnifiedOutput, true);
-                drawValuesIntoMap(pixelChangeListener.setPixelPositions, notMagnifiedOutputObjectIds, idCounter);
-            }
+			// TODO< decide with a propability if the filled patch should be magnified or not >
+			if (pixelChangeListener.setPixelPositions.size() < numberOfPixelsMagnificationThreshold) {
+				drawValuesIntoMap(pixelChangeListener.setPixelPositions, toMagnify, true);
+				//drawValuesIntoMap(pixelChangeListener.setPixelPositions, toMagnifiedOutputObjectIds, idCounter);
+			} else {
+				drawValuesIntoMap(pixelChangeListener.setPixelPositions, notMagnifiedOutput, true);
+				drawValuesIntoMap(pixelChangeListener.setPixelPositions, notMagnifiedOutputObjectIds, idCounter);
+			}
 
-            idCounter++;
+			idCounter++;
 
-            removePixelsFromAccelerationDatastructures(pixelChangeListener.setPixelPositions);
-            rects.add(getRectForPixelPositions(pixelChangeListener.setPixelPositions));
+			removePixelsFromAccelerationDatastructures(pixelChangeListener.setPixelPositions);
+			rects.add(getRectForPixelPositions(pixelChangeListener.setPixelPositions));
 
-            pixelChangeListener.setPixelPositions.clear();
+			pixelChangeListener.setPixelPositions.clear();
 
-        }
+		}
     }
 
     private Rect getRectForPixelPositions(final List<Vector2d<Integer>> setPixelPositions) {

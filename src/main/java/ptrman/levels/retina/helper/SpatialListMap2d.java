@@ -1,6 +1,6 @@
 package ptrman.levels.retina.helper;
 
-import com.gs.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
@@ -28,13 +28,14 @@ public class SpatialListMap2d<Type> {
 
     // /return can be null
     public List<Type> readAt(final int x, final int y) {
-        List<Type> l = map.readAt(x, y);
-        return l;
+        return map.readAt(x, y);
     }
 
     public void clear() {
-        for( int y = 0; y < map.getLength(); y++ ) {
-            for( int x = 0; x < map.getWidth(); x++ ) {
+        int h = map.getLength();
+        int w = map.getWidth();
+        for(int y = 0; y < h; y++ ) {
+            for(int x = 0; x < w; x++ ) {
                 List<Type> l = map.readAt(x, y);
                 if (l != null)
                     l.clear();

@@ -3,8 +3,10 @@ package ptrman.math;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.ArrayRealVector;
 
-public class MatrixHelper {
-    public static float[] convertMatrixToArray(final Array2DRowRealMatrix matrix) {
+public enum MatrixHelper {
+	;
+
+	public static float[] convertMatrixToArray(final Array2DRowRealMatrix matrix) {
         float[] result = new float[16];
 
         for( int row = 0; row < 4; row++ ) {

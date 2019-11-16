@@ -4,10 +4,12 @@ import net.sourceforge.jannealer.AnnealingScheme;
 import net.sourceforge.jannealer.ObjectiveFunction;
 
 /** solve (x-3)^2=0 using simulated annealing
- * @author Øyvind Harboe
+ * @author ï¿½yvind Harboe
  */
-public class Trivial
+public enum Trivial
 {
+	;
+
 	public static void main(String[] args)
 	{
 		AnnealingScheme scheme = new AnnealingScheme();

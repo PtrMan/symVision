@@ -1,8 +1,10 @@
 package ptrman.levels.visual;
 
-public class ColorConversion
+public enum ColorConversion
 {
-    private enum EnumRgb
+	;
+
+	private enum EnumRgb
     {
         R,
         G,
@@ -20,7 +22,7 @@ public class ColorConversion
         float m;
         ptrman.misc.Assert.Assert(input.h >= 0.0f, "");
         c = 1.0f - Math.abs(2.0f * input.l - 1.0f) * input.s;
-        x = c * (1.0f - (float)Math.abs((float)((input.h / 0.25f) % 2.0f) - 1.0));
+        x = c * (1.0f - (float)Math.abs(((input.h / 0.25f) % 2.0f) - 1.0));
         m = input.l - c * 0.5f;
         if (input.h < 60.0f / 360.0f)
         {

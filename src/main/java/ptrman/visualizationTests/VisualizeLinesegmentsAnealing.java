@@ -7,7 +7,6 @@ import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.IImageDrawer;
 import ptrman.Showcases.TestClustering;
 import ptrman.bpsolver.BpSolver;
-import ptrman.bpsolver.Parameters;
 import ptrman.levels.retina.ProcessA;
 import ptrman.levels.retina.ProcessDAnnealing;
 import ptrman.levels.retina.ProcessZFacade;
@@ -18,7 +17,6 @@ import ptrman.levels.visual.VisualProcessor;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 // visualize linesegments of endosceleton
 public class VisualizeLinesegmentsAnealing extends PApplet {

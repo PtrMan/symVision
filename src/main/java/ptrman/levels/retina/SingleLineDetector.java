@@ -183,8 +183,8 @@ public class SingleLineDetector {
     public double getM() {
         Assert.Assert(!isYAxisSingularity(), "is singular!");
 
-        double aData[] = a.getDataRef();
-        double bData[] = b.getDataRef();
+        double[] aData = a.getDataRef();
+        double[] bData = b.getDataRef();
         return (bData[1]-aData[1]) / (bData[0]-aData[0]);
     }
 

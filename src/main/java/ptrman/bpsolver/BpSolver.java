@@ -13,10 +13,7 @@ import ptrman.bpsolver.nodes.PlatonicPrimitiveNode;
 import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 public class BpSolver {
     public float processdmaximalDistanceOfPositions = 30.0f;// was 6.0f;
@@ -242,8 +239,8 @@ public class BpSolver {
 
 
 
-        System.out.println("connectorDetectorsEndosceletonFromProcessD " + Integer.toString(connectorDetectorsEndosceletonFromProcessD.getSize()));
-        System.out.println("connectorDetectorsExosceletonFromProcessD " + Integer.toString(connectorDetectorsExosceletonFromProcessD.getSize()));
+        System.out.println("connectorDetectorsEndosceletonFromProcessD " + connectorDetectorsEndosceletonFromProcessD.getSize());
+        System.out.println("connectorDetectorsExosceletonFromProcessD " + connectorDetectorsExosceletonFromProcessD.getSize());
         /*
 
         // copy because processA changes the image
@@ -610,7 +607,7 @@ public class BpSolver {
 
 
     // TODO< refactor out >
-    private static List<Intersection> getAllLineIntersections(List<RetinaPrimitive> lineDetectors) {
+    private static List<Intersection> getAllLineIntersections(Iterable<RetinaPrimitive> lineDetectors) {
         List<Intersection> uniqueIntersections;
 
         uniqueIntersections = new ArrayList<>();
@@ -627,7 +624,7 @@ public class BpSolver {
     }
 
     // modifies uniqueIntersections
-    private static void findAndAddUniqueIntersections(List<Intersection> uniqueIntersections, List<Intersection> intersections) {
+    private static void findAndAddUniqueIntersections(Collection<Intersection> uniqueIntersections, Iterable<Intersection> intersections) {
         for( Intersection currentOuterIntersection : intersections ) {
             boolean found;
 
@@ -712,7 +709,7 @@ public class BpSolver {
     private ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessF;
     private ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessH;
 
-    private List<ProcessConnector> allConnectors = new ArrayList<>();
+    private Collection<ProcessConnector> allConnectors = new ArrayList<>();
 
 
 }

@@ -1,7 +1,7 @@
 package ptrman.levels.retina;
 
-import com.gs.collections.impl.list.mutable.FastList;
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.helper.ProcessConnector;

@@ -1,7 +1,10 @@
 package ptrman.Datastructures;
 
-import com.gs.collections.impl.list.mutable.FastList;
-import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
+//import com.gs.collections.impl.list.mutable.FastList;
+//import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
+
+import org.eclipse.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 
 import java.util.List;
 

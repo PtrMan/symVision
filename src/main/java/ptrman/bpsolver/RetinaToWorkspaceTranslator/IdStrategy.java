@@ -1,6 +1,7 @@
 package ptrman.bpsolver.RetinaToWorkspaceTranslator;
 
-import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+//import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
 import ptrman.bpsolver.BpSolver;

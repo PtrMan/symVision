@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Random;
 
 public class ProcessM {
-    public class LineParsing {
+    public static class LineParsing {
         public LineParsing(List<SingleLineDetector> lineParsing) {
             this.lineParsing = lineParsing;
         }
@@ -136,12 +136,8 @@ public class ProcessM {
     
     private static List<Intersection> deepCopyIntersections(List<Intersection> intersections) {
         List<Intersection> copyed;
-        
-        copyed = new ArrayList<>();
-        
-        for( Intersection iterationIntersection : intersections ) {
-            copyed.add(iterationIntersection);
-        }
+
+        copyed = new ArrayList<>(intersections);
         
         return copyed;
     }

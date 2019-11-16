@@ -1,7 +1,10 @@
 package ptrman.FargGeneral.network;
 
-import com.gs.collections.impl.list.mutable.FastList;
+//import com.gs.collections.impl.list.mutable.FastList;
 
+import org.eclipse.collections.impl.list.mutable.FastList;
+
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -12,16 +15,16 @@ public class Network
 {
     public interface IDepthToDecay
     {
-        public float translateDepthToDecayrate(int depth);
+        float translateDepthToDecayrate(int depth);
     }
     
     // used to create links with the right type
     public interface ILinkCreator
     {
-        public Link createLink(Link.EnumType type, Node target);
+        Link createLink(Link.EnumType type, Node target);
     }
     
-    public List<Node> nodes = new FastList<>();
+    public Collection<Node> nodes = new FastList<>();
     public IDepthToDecay depthToDecay;
     
     public void spreadActivation()

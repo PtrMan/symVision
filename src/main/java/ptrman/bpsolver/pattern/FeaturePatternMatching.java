@@ -25,7 +25,9 @@ import java.util.Map;
  * page 214 ff
  */
 public class FeaturePatternMatching {
-    public static class Converter {
+    public enum Converter {
+        ;
+
         /**
          *
          *
@@ -58,7 +60,7 @@ public class FeaturePatternMatching {
         }
     }
 
-    private class IntegrateTDistributionUpperIntegral implements UnivariateFunction {
+    private static class IntegrateTDistributionUpperIntegral implements UnivariateFunction {
         public double n;
         
         public double value(double d) {
@@ -71,7 +73,7 @@ public class FeaturePatternMatching {
         }
     }
     
-    private class IntegrateTDistributionLowerIntegral implements UnivariateFunction {
+    private static class IntegrateTDistributionLowerIntegral implements UnivariateFunction {
         public double n;
         
         public double value(double d) {
@@ -82,7 +84,7 @@ public class FeaturePatternMatching {
         }
     }
     
-    private class IntegrateEquation8Dot4 implements UnivariateFunction {
+    private static class IntegrateEquation8Dot4 implements UnivariateFunction {
         public double value(double d) {
             return Math.pow(Math.E, -0.5*d*d);
         }
@@ -211,7 +213,7 @@ public class FeaturePatternMatching {
         }
     }
 
-    public class MatchingPathElement {
+    public static class MatchingPathElement {
         public int bestMatchNodeAIndex;
         public int bestMatchNodeBIndex;
 

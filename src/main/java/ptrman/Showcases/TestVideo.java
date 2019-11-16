@@ -19,7 +19,7 @@ public class TestVideo extends AnimatedShowcase {
     final static int RETINA_WIDTH = 40*8;
     final static int RETINA_HEIGHT = 160;
 
-    private class InputDrawer implements IImageDrawer {
+    private static class InputDrawer implements IImageDrawer {
 
         BufferedImage off_Image;
 

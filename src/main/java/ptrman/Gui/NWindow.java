@@ -113,7 +113,7 @@ public class NWindow extends JFrame {
 
         if (b) {
             setDefaultLookAndFeelDecorated(false);
-            ((JPanel)getContentPane()).setOpaque(false);
+            ((JComponent) getContentPane()).setOpaque(false);
             setUndecorated(true);
 
             getContentPane().setBackground(transparentColor);

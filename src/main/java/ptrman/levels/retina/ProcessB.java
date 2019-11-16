@@ -7,7 +7,6 @@ import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
@@ -78,7 +77,7 @@ public class ProcessB extends AbstractProcessB {
             outputSampleConnector.add(outputSample);
         }
 
-        System.out.println("cell acceleration (positive cases): " + Float.toString(((float)counterCellPositiveCandidates / (float)counterCellCandidates) * 100.0f) + "%" );
+        System.out.println("cell acceleration (positive cases): " + ((float) counterCellPositiveCandidates / (float) counterCellCandidates) * 100.0f + "%" );
     }
 
     @Override
@@ -233,7 +232,7 @@ public class ProcessB extends AbstractProcessB {
 
             if( byteValueAt != 0xff ) {
                 for( int x = cellPosition.x * gridsize; x < (cellPosition.x+1) * gridsize; x++ ) {
-                    if( map.readAt(x, y) == value ) {
+                    if(!map.readAt(x, y)) {
                         result.add(new Vector2d<>(x, y));
                     }
                 }

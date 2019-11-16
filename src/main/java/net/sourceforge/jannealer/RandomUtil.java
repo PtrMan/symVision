@@ -3,14 +3,15 @@ package net.sourceforge.jannealer;
   * over a specified interval for 4 specified types:
   * int, long, float & double
   */
-class RandomUtil
+enum RandomUtil
 {
+	;
 	private static final long IA = 16807;
 	private static final long IM = 2147483647;
 	private static final long IQ = 127773;
 	private static final long IR = 2836;
 	private static final int NTAB = 32;
-	private static final long NDIV = (long) (1 + (IM - 1) / NTAB);
+	private static final long NDIV = 1 + (IM - 1) / NTAB;
 	private static final double AM = 1.0 / IM;
 	private static final double EPS = 1.2e-7;
 	private static final double RNMX = (1.0 - EPS);

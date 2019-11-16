@@ -146,9 +146,7 @@ public class NodeGraph
         remainingNodes = new ArrayDeque<>();
 
         if (nodes!=null) {
-            for (Node iterationNode : nodes) {
-                remainingNodes.add(iterationNode);
-            }
+            remainingNodes.addAll(nodes);
         }
         
         for(;;)
@@ -278,7 +276,7 @@ public class NodeGraph
 
     
     
-    private class VertexList
+    private static class VertexList
     {
         public ArrayList<VertexWithNode> verticesWithNode = new ArrayList<>();
         

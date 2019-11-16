@@ -3,8 +3,10 @@ package ptrman.misc;
 /**
  *
  */
-public class BooleanHelper {
-    public static boolean[] booleanNot(final boolean[] array) {
+public enum BooleanHelper {
+	;
+
+	public static boolean[] booleanNot(final boolean[] array) {
         boolean[] result = new boolean[array.length];
 
         for( int i = 0; i < result.length; i++ ) {

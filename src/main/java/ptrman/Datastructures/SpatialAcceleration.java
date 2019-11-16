@@ -140,7 +140,7 @@ public class SpatialAcceleration<Type> {
         public final List<Element> content = new ArrayList<>();
     }
     
-    private Cell cells[];
+    private Cell[] cells;
 
     private final int gridcountX;
     private final int gridcountY;

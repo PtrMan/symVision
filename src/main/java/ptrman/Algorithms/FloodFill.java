@@ -3,8 +3,10 @@ package ptrman.Algorithms;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 
-public class FloodFill {
-    public interface IPixelSetListener {
+public enum FloodFill {
+	;
+
+	public interface IPixelSetListener {
         void seted(Vector2d<Integer> position);
     }
 

@@ -1,8 +1,10 @@
 package ptrman.misc;
 
-public class Gaussian   
+public enum Gaussian
 {
-    public static float calculateGaussianDistribution(float x, float mu, float delta)
+	;
+
+	public static float calculateGaussianDistribution(float x, float mu, float delta)
     {
         final float ONEDIVSQRTTWO = 0.707107f; // 1.0 / Sqrt(2.0)
         

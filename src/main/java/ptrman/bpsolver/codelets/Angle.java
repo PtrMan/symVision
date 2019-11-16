@@ -101,7 +101,7 @@ public class Angle extends SolverCodelet {
         return new RunResult(false);
     }
     
-    private void createNodesAndLinkAngleInformation(PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, final List<AngleInformation> angleInformations) {
+    private void createNodesAndLinkAngleInformation(PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, final Iterable<AngleInformation> angleInformations) {
         for( AngleInformation iterationAngle : angleInformations ) {
             FeatureNode createdFeatureNode = FeatureNode.createFloatNode(getNetworkHandles().anglePointAngleValuePrimitiveNode, iterationAngle.angle, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().anglePointAngleValuePrimitiveNode));
             
@@ -161,7 +161,7 @@ public class Angle extends SolverCodelet {
         throw new InternalError();
     }
     
-    private List<PlatonicPrimitiveInstanceNode> getPartnersOfAnglepoint(final PlatonicPrimitiveInstanceNode anglePointNode) {
+    private static List<PlatonicPrimitiveInstanceNode> getPartnersOfAnglepoint(final PlatonicPrimitiveInstanceNode anglePointNode) {
         List<PlatonicPrimitiveInstanceNode> resultList = new ArrayList<>();
         
         for( Link iterationLink : anglePointNode.getLinksByType(Link.EnumType.ISPARTOF) ) {
@@ -192,7 +192,7 @@ public class Angle extends SolverCodelet {
     }
     
     
-    private List<AngleInformation> bundleAnglesAndCreateAngleInformations(List<Double> angles) {
+    private static List<AngleInformation> bundleAnglesAndCreateAngleInformations(Iterable<Double> angles) {
         List<AngleInformation> resultAngleInformation = new ArrayList<>();
         
         for( double angle : angles ) {
@@ -280,7 +280,7 @@ public class Angle extends SolverCodelet {
         // result 0xx000
         
         // ...
-        private Tuple<Integer> getIndicesOfTriangle(final int index) {
+        private static Tuple<Integer> getIndicesOfTriangle(final int index) {
             int yIndex = 0;
             int width = 1;
             int remainingIndex = index;

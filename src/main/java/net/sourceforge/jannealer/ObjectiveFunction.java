@@ -4,7 +4,7 @@ package net.sourceforge.jannealer;
  *  a function that is to be minimized 
  *
  * @author     Charles M?gnin
- * @author     Øyvind Harboe
+ * @author     ï¿½yvind Harboe
  * @since    October 29, 2001
  */
 public interface ObjectiveFunction
@@ -14,7 +14,7 @@ public interface ObjectiveFunction
 	 *
 	 * @return    The Ndim value
 	 */
-	public int getNdim();
+	int getNdim();
 	/**
 	 * @param params arguments to distance function 
 	 * @return
@@ -22,5 +22,5 @@ public interface ObjectiveFunction
 	 * Calculates distance. The tolerance/spread refers to the return value 
 	 * from this function.
 	 */
-	public double distance(double[] params);
+	double distance(double[] params);
 }

@@ -1,12 +1,15 @@
 package ptrman.misc;
 
-import com.gs.collections.api.map.primitive.IntBooleanMap;
+
+
+import org.eclipse.collections.api.map.primitive.IntBooleanMap;
 
 import java.util.Iterator;
 import java.util.Random;
 import java.util.Set;
 
-public class SetUtility {
+public enum SetUtility {
+    ;
 
     public static<Type> Type getRandomElementFromSet(final Set<Type> set, Random random) {
         final int index = random.nextInt(set.size());

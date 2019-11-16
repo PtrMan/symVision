@@ -2,9 +2,11 @@ package ptrman.levels.visual;
 
 import ptrman.Datastructures.Map2d;
 
-public class Histogram
+public enum Histogram
 {
-    static public Integer[] count(Map2d<Integer> map, int maxValue)
+	;
+
+	static public Integer[] count(Map2d<Integer> map, int maxValue)
     {
         Integer[] countArray;
         int ix, iy;

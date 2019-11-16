@@ -3,8 +3,10 @@ import net.sourceforge.jannealer.AnnealingScheme;
 import net.sourceforge.jannealer.ObjectiveFunction;
 
 /** shows how to invoke the annealing code using an example from JSimul */
-public class TestAnneal
+public enum TestAnneal
 {
+	;
+
 	public static void main(String[] args)
 	{
 		AnnealingScheme scheme = new AnnealingScheme();
@@ -26,7 +28,7 @@ public class TestAnneal
 				{
 					double q = vertex[jj] * wid[jj];
 					double r =
-						(double) (q >= 0 ? (int) (q + 0.5) : - (int) (0.5 - q));
+						q >= 0 ? (int) (q + 0.5) : - (int) (0.5 - q);
 					sumr += q * q;
 					sumd += (q - r) * (q - r);
 				}

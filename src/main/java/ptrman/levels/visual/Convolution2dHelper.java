@@ -8,9 +8,11 @@ import ptrman.math.Kernels;
 /**
  *
  */
-public class Convolution2dHelper
+public enum Convolution2dHelper
 {
-    public static IMap2d<Float> calculateMarrHildrethOperator(Vector2d<Integer> size, float sigma)
+	;
+
+	public static IMap2d<Float> calculateMarrHildrethOperator(Vector2d<Integer> size, float sigma)
     {
         IMap2d<Float> kernel;
         int x, y;

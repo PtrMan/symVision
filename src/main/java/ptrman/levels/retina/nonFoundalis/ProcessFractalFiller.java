@@ -2,9 +2,10 @@ package ptrman.levels.retina.nonFoundalis;
 
 import boofcv.struct.image.ImageFloat32;
 import boofcv.struct.image.MultiSpectral;
-import com.gs.collections.impl.list.mutable.FastList;
+//import com.gs.collections.impl.list.mutable.FastList;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Datastructures.FastBooleanMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.IProcess;

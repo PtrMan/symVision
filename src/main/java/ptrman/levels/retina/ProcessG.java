@@ -159,7 +159,7 @@ public class ProcessG {
             List<List<ArrayRealVector>> protocurves;
             List<ArrayRealVector> currentProtocurve;
             
-            protocurves = new ArrayList<List<ArrayRealVector>>();
+            protocurves = new ArrayList<>();
             currentProtocurve = null;
             
             for( int pointIndex = 1; pointIndex < currentLineParsing.lineParsing.size()-1; pointIndex++ ) {

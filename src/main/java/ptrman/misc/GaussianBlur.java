@@ -3,9 +3,11 @@ package ptrman.misc;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 
-public class GaussianBlur
+public enum GaussianBlur
 {
-    public static IMap2d<Float> blur(int radius, IMap2d<Float> input)
+	;
+
+	public static IMap2d<Float> blur(int radius, IMap2d<Float> input)
     {
         IMap2d<Float> resultMap;
         IMap2d<Float> tempMap;

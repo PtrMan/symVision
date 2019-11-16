@@ -11,9 +11,11 @@ import java.util.Set;
  * Foundalis disertation chapter 8.3.2
  * Foundalis disertation chapter 8.3.3
  */
-public class Grouping
+public enum Grouping
 {
-    public static Set<Pattern> group(List<Pattern> exemplarsSet, float clusteringThreshold, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
+	;
+
+	public static Set<Pattern> group(List<Pattern> exemplarsSet, float clusteringThreshold, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
     {
         Set<Pattern> patterns;
         Set<Pattern> knownExemplars;

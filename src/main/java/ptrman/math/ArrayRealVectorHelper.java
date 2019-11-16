@@ -8,7 +8,9 @@ import java.util.List;
 /**
  *
  */
-public class ArrayRealVectorHelper {
+public enum ArrayRealVectorHelper {
+    ;
+
     public enum EnumRoundMode {
         DOWN,
         NEAREST
@@ -18,7 +20,9 @@ public class ArrayRealVectorHelper {
         return new ArrayRealVector(new double[]{vector.x, vector.y}, false);
     }
 
-    public static class Dimensions2 {
+    public enum Dimensions2 {
+        ;
+
         public static ArrayRealVector getTangent(final ArrayRealVector vector) {
             final double[] vectorData = vector.getDataRef();
 
@@ -89,7 +93,7 @@ public class ArrayRealVectorHelper {
 
         final double[] d = result.getDataRef();
         for( int i = 0; i < elements.get(0).getDimension(); i++ ) {
-            d[i] /= (double)elements.size();
+            d[i] /= elements.size();
         }
 
         return result;

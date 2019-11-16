@@ -122,7 +122,7 @@ public class BpSolverTest {
         int bufferI;
         Map2d<Boolean> convertedToMap;
 
-        convertedToMap = new Map2d<Boolean>(javaImage.getWidth(), javaImage.getHeight());
+        convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
 
         for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ ) {
             boolean convertedPixel;
@@ -134,7 +134,7 @@ public class BpSolverTest {
         return convertedToMap;
     }
     
-    private BufferedImage drawToJavaImage(BpSolver bpSolver) {
+    private static BufferedImage drawToJavaImage(BpSolver bpSolver) {
         BufferedImage off_Image = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g2 = off_Image.createGraphics();
@@ -146,7 +146,7 @@ public class BpSolverTest {
         return off_Image;
     }
     
-    private List<Node> getNodesFromImage(Map2d<Boolean> image, BpSolver bpSolver) {
+    private static List<Node> getNodesFromImage(Map2d<Boolean> image, BpSolver bpSolver) {
         // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
         bpSolver.coderack.flush();
         

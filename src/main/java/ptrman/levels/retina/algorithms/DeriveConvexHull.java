@@ -15,8 +15,10 @@ import static ptrman.math.Maths.modNegativeWraparound;
  * Algorithm as described in the foundalis dissertation at
  * 10.3.18 Other image-processing functions
  */
-public class DeriveConvexHull {
-    public static class State {
+public enum DeriveConvexHull {
+	;
+
+	public static class State {
         // edges go from [0] to [1]  from [1] to [2] and so on and from [last] to [0]
         public List<ArrayRealVector> cornerPositions = new ArrayList<>();
     }

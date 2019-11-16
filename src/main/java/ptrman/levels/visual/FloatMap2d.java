@@ -10,7 +10,7 @@ import java.util.Arrays;
 public class FloatMap2d implements IMap2d<Float> {
     private final int w;
     private final int h;
-    public final float data[][];
+    public final float[][] data;
 
     public FloatMap2d(int w, int h) {
         this.w = w;

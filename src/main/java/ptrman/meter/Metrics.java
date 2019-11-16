@@ -57,7 +57,7 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
     * @param data
     * @return 
     */
-    public double[] getBounds(Iterable<SignalData> data) {
+    public static double[] getBounds(Iterable<SignalData> data) {
         double min = Double.POSITIVE_INFINITY;
         double max = Double.NEGATIVE_INFINITY;
     
@@ -97,15 +97,15 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
         double max = Double.NEGATIVE_INFINITY;
 
 
-        Iterator<Object[]> ii = iterator(); //signal);
-        while (ii.hasNext()) {
-            Object e = ii.next()[signal];
-            if (e instanceof Number) {
-                double d = ((Number)e).doubleValue();
-                if (d < min) min = d;
-                if (d > max) max = d;                
-            }
-        }
+		//signal);
+		for (Object[] objects : this) {
+			Object e = objects[signal];
+			if (e instanceof Number) {
+				double d = ((Number) e).doubleValue();
+				if (d < min) min = d;
+				if (d > max) max = d;
+			}
+		}
         s.setMin(min);
         s.setMax(max);
     }
@@ -291,7 +291,7 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
     private void invalidateExtrema(boolean added, Object[] row, boolean[] extremaToInvalidate) {
         for (int i = 0; i < row.length; i++) {
             Object ri = row[i];
-            if (ri == null || !(ri instanceof Number)) continue;
+            if (!(ri instanceof Number)) continue;
             
             double n = ((Number)row[i]).doubleValue();
             if (Double.isNaN(n)) continue;
@@ -419,7 +419,7 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
         return null;
     }*/
     
-    public Iterator<Object> iterateSignal(int column, boolean reverse) {
+    public static Iterator<Object> iterateSignal(int column, boolean reverse) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     

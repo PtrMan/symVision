@@ -221,7 +221,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
     }
     
     private static double weightDouble(final double valueA, final int weightAAsInt, final double valueB, final int weightBAsInt) {
-        return weightDoubles(valueA, (double) weightAAsInt, valueB, (double) weightBAsInt);
+        return weightDoubles(valueA, weightAAsInt, valueB, weightBAsInt);
     }
     
     private Random random;

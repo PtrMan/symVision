@@ -7,9 +7,11 @@ import java.awt.image.BufferedImage;
 
 import static java.awt.image.BufferedImage.TYPE_INT_ARGB;
 
-public class Map2dImageConverter
+public enum Map2dImageConverter
 {
-    public static IMap2d<ColorRgb> convertImageToMap(BufferedImage image)
+	;
+
+	public static IMap2d<ColorRgb> convertImageToMap(BufferedImage image)
     {
         IMap2d<ColorRgb> result;
 

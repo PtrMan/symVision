@@ -3,8 +3,6 @@ package ptrman.Algorithms.ai.gng;
 
 import com.syncleus.dann.graph.AbstractUndirectedEdge;
 
-import java.util.Objects;
-
 /**
  * Created by Scadgek on 11/3/2014.
  */
@@ -36,7 +34,7 @@ public class Connection extends AbstractUndirectedEdge<Node> implements Named<St
 
     @Override
     public int hashCode() {
-        return Objects.hash(from.id, to.id);
+        return 31 * from.id + to.id; //Objects.hash(from.id, to.id);
     }
 
     public int getAge() {

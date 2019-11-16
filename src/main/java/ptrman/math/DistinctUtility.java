@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class DistinctUtility
+public enum DistinctUtility
 {
-    public static List<Integer> getTwoDisjunctNumbers(Random random, int max)
+	;
+
+	public static List<Integer> getTwoDisjunctNumbers(Random random, int max)
     {
         int randomNumber;
         List<Integer> temporaryList;

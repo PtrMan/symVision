@@ -22,10 +22,7 @@ class Simplex
 	{
 		this.ndim = ndim;
 		this.vertex = new double[ndim + 1];
-		for (int ii = 0; ii <= ndim; ii++)
-		{
-			this.vertex[ii] = vertex[ii];
-		}
+		System.arraycopy(vertex, 0, this.vertex, 0, ndim + 1);
 		this.value = value;
 	}
 	/**

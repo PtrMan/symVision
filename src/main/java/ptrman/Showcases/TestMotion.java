@@ -1,7 +1,7 @@
 package ptrman.Showcases;
 
-import boofcv.core.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.image.GrayF32;
 import ptrman.Additional.CohesionParticleTracker;
 import ptrman.Additional.ParticleFlowTracker;
 import ptrman.Datastructures.Vector2d;
@@ -18,7 +18,6 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
-import java.io.File;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
 
@@ -31,7 +30,7 @@ public class TestMotion extends AnimatedShowcase {
     final static int RETINA_HEIGHT = 720;
 
 
-    private class InputDrawer implements IImageDrawer {
+    private static class InputDrawer implements IImageDrawer {
 
         BufferedImage off_Image;
 
@@ -162,7 +161,7 @@ public class TestMotion extends AnimatedShowcase {
     }
 
     public void stepWithInputImage(BufferedImage image) {
-        final ImageFloat32 convertedImage = convertImageToGrayscaleImageFloat32(image);
+        final GrayF32 convertedImage = convertImageToGrayscaleImageFloat32(image);
 
         if( framecounter == 0 ) {
             particleFlowTracker.firstImage(convertedImage);
@@ -176,8 +175,8 @@ public class TestMotion extends AnimatedShowcase {
         framecounter++;
     }
 
-    private static ImageFloat32 convertImageToGrayscaleImageFloat32(BufferedImage image) {
-        ImageFloat32 resultImage = new ImageFloat32(image.getWidth(), image.getHeight());
+    private static GrayF32 convertImageToGrayscaleImageFloat32(BufferedImage image) {
+        GrayF32 resultImage = new GrayF32(image.getWidth(), image.getHeight());
         ConvertBufferedImage.convertFrom(image, resultImage);
         return resultImage;
     }

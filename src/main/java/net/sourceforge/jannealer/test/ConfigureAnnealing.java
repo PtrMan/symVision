@@ -9,11 +9,13 @@ import net.sourceforge.jannealer.ObjectiveFunction;
  * Use simulated annealing to find the best configuration of
  * simulated annealing.
  * 
- * @author Øyvind Harboe
+ * @author ï¿½yvind Harboe
  *
  */
-public class ConfigureAnnealing
+public enum ConfigureAnnealing
 {
+	;
+
 	public static void main(String[] args)
 	{
 		AnnealingScheme configure = new AnnealingScheme();

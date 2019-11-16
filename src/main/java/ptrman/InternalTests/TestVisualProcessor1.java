@@ -1,8 +1,10 @@
 package ptrman.InternalTests;
 
-public class TestVisualProcessor1
+public enum TestVisualProcessor1
 {
-    public static void main(String[] args)
+	;
+
+	public static void main(String[] args)
     {
         /* outdated
 

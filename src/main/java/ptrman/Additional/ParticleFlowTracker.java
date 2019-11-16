@@ -2,10 +2,11 @@ package ptrman.Additional;
 
 import boofcv.abst.flow.DenseOpticalFlow;
 import boofcv.alg.distort.DistortImageOps;
-import boofcv.alg.interpolate.TypeInterpolate;
+import boofcv.alg.interpolate.InterpolationType;
 import boofcv.factory.flow.FactoryDenseOpticalFlow;
+import boofcv.struct.border.BorderType;
 import boofcv.struct.flow.ImageFlow;
-import boofcv.struct.image.ImageFloat32;
+import boofcv.struct.image.GrayF32;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.SpatialAcceleration;
 import ptrman.Datastructures.Vector2d;
@@ -45,15 +46,15 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
 
         denseFlow =
         //				FactoryDenseOpticalFlow.flowKlt(null, 6, ImageFloat32.class, null);
-        //				FactoryDenseOpticalFlow.region(null,ImageFloat32.class);
+        //				FactoryDenseOpticalFlow.region(null,GrayF32.class);
         //				FactoryDenseOpticalFlow.hornSchunck(20, 1000, ImageFloat32.class);
         //				FactoryDenseOpticalFlow.hornSchunckPyramid(null,ImageFloat32.class);
-        FactoryDenseOpticalFlow.broxWarping(null, ImageFloat32.class);
+            FactoryDenseOpticalFlow.broxWarping(null, GrayF32.class);
 
 
         // scaled down because the flow is computational expensive
-        previous = new ImageFloat32(imageSize.x/imageDownscaleFactor, imageSize.y/imageDownscaleFactor);
-        current = new ImageFloat32(imageSize.x/imageDownscaleFactor, imageSize.y/imageDownscaleFactor);
+        previous = new GrayF32(imageSize.x / imageDownscaleFactor, imageSize.y / imageDownscaleFactor);
+        current = new GrayF32(imageSize.x/imageDownscaleFactor, imageSize.y/imageDownscaleFactor);
 
         flow = new ImageFlow(previous.width, previous.height);
 
@@ -80,12 +81,12 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
         }
     }
 
-    public void firstImage(ImageFloat32 image) {
-        DistortImageOps.scale(image, current, TypeInterpolate.BILINEAR);
-        DistortImageOps.scale(image, previous, TypeInterpolate.BILINEAR);
+    public void firstImage(GrayF32 image) {
+        DistortImageOps.scale(image, current, BorderType.ZERO, InterpolationType.BILINEAR);
+        DistortImageOps.scale(image, previous,  BorderType.ZERO, InterpolationType.BILINEAR);
     }
 
-    public void step(ImageFloat32 newCurrent) {
+    public void step(GrayF32 newCurrent) {
         //particleMutex.lock();
 
         flip();
@@ -150,8 +151,8 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
         System.arraycopy(current.data, 0, previous.data, 0, previous.data.length);
     }
 
-    private void setCurrent(ImageFloat32 newCurrent) {
-        DistortImageOps.scale(newCurrent, current, TypeInterpolate.BILINEAR);
+    private void setCurrent(GrayF32 newCurrent) {
+        DistortImageOps.scale(newCurrent, current, BorderType.ZERO, InterpolationType.BILINEAR);
     }
 
     private void dragParticles() {
@@ -164,9 +165,8 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
 
             ImageFlow.D floatDirection = flow.get(positionAsInteger.x/imageDownscaleFactor, positionAsInteger.y/imageDownscaleFactor);
 
-            if( !floatDirection.isValid() ) {
+            if( !floatDirection.isValid() )
                 continue;
-            }
 
             iterationTrackingParticle.setVelocity(new ArrayRealVector(new double[]{(double)floatDirection.x*imageDownscaleFactor, (double)floatDirection.y*imageDownscaleFactor}));
             iterationTrackingParticle.setPosition(iterationTrackingParticle.getPosition().add(iterationTrackingParticle.getVelocity()));
@@ -179,11 +179,11 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
 
     private ArrayRealVector[] samplePositions;
 
-    private DenseOpticalFlow<ImageFloat32> denseFlow;
+    private DenseOpticalFlow<GrayF32> denseFlow;
     private ImageFlow flow;
 
-    private ImageFloat32 previous;
-    private ImageFloat32 current;
+    private GrayF32 previous;
+    private GrayF32 current;
 
     private SpatialAcceleration<ParticleType> trackingParticleAcceleration;
 

@@ -141,7 +141,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
         Object[] array;
         int index;
         
-        array = (Object[])map.keySet().toArray();
+        array = map.keySet().toArray();
         
         index = random.nextInt(array.length);
         return (RetinaPrimitive)array[index];

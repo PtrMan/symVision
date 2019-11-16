@@ -8,8 +8,10 @@ import ptrman.Datastructures.Vector2d;
  * for cirlce see german version of
  * http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
  */
-public class Bresenham {
-    public interface IDrawer {
+public enum Bresenham {
+	;
+
+	public interface IDrawer {
         void set(final Vector2d<Integer> position, final Vector2d<Integer> direction);
     }
 

@@ -42,7 +42,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         HashMap<Integer, PlatonicPrimitiveInstanceNode> objectNodesByGroupId;
         ArrayList<Node> resultNodes;
         
-        retinaObjectsWithAssociatedPoints = new ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode>();
+        retinaObjectsWithAssociatedPoints = new ArrayList<>();
         
         for( RetinaPrimitive iterationPrimitive : primitives ) {
             retinaObjectsWithAssociatedPoints.add(associatePointsToRetinaPrimitive(iterationPrimitive));
@@ -100,7 +100,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         final int GRIDCOUNTY = 10;
         
         spatialAccelerationForCrosspointsWithMappingOfRetinaObjects = new SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects();
-        spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints = new SpatialAcceleration<Crosspoint>(GRIDCOUNTX, GRIDCOUNTY, imageSize.x, imageSize.y);
+        spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints = new SpatialAcceleration<>(GRIDCOUNTX, GRIDCOUNTY, imageSize.x, imageSize.y);
         
         storeRetinaObjectWithAssocIntoMap(arrayOfRetinaObjectWithAssociatedPoints, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
         bundleAllIntersectionsOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, arrayOfRetinaObjectWithAssociatedPoints);

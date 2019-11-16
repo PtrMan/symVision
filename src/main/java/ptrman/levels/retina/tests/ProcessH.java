@@ -11,9 +11,11 @@ import java.util.ArrayList;
  *
  * 
  */
-public class ProcessH
+public enum ProcessH
 {
-    public static void main(String[] p)
+	;
+
+	public static void main(String[] p)
     {
         test();
     }

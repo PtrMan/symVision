@@ -1,6 +1,7 @@
 package ptrman.levels.retina;
 
-import com.gs.collections.impl.list.mutable.FastList;
+
+import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.levels.retina.helper.ProcessConnector;

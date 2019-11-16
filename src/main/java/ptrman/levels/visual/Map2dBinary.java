@@ -3,8 +3,10 @@ package ptrman.levels.visual;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 
-public class Map2dBinary {
-    public static IMap2d<Boolean> negate(IMap2d<Boolean> input) {
+public enum Map2dBinary {
+	;
+
+	public static IMap2d<Boolean> negate(IMap2d<Boolean> input) {
         IMap2d<Boolean> result = new Map2d<>(input.getWidth(), input.getLength());
 
         for (int y = 0; y < input.getLength(); y++) {

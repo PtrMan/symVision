@@ -1,6 +1,6 @@
 package ptrman.levels.retina.helper;
 
-import com.gs.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Algorithms.Bresenham;
 import ptrman.Datastructures.Vector2d;
 
@@ -13,7 +13,9 @@ import static ptrman.Datastructures.Vector2d.IntegerHelper.getScaled;
 /**
  * Used to draw circles in spatial datastructures
  */
-public final class SpatialDrawer {
+public enum SpatialDrawer {
+    ;
+
     static final private class Drawer implements Bresenham.IDrawer {
 
         public static class PositionWithDirection {

@@ -33,33 +33,30 @@ public class FastVectorizer {
         Stack<int[]> cursorStack = new Stack<>();
         cursorStack.push(start);
 
-        for(;;) {
-            if( cursorStack.isEmpty() ) {
-                break;
-            }
+		while (!cursorStack.isEmpty()) {
 
-            int[] cursor = cursorStack.pop();
+			int[] cursor = cursorStack.pop();
 
-            for(;;) {
-                workingBitmap.setAt(cursor[0], cursor[1], false);
-                // TODO< save cursor position in currrent patch >
+			for (; ; ) {
+				workingBitmap.setAt(cursor[0], cursor[1], false);
+				// TODO< save cursor position in currrent patch >
 
-                List<int[]> neightborhoodpixels = getNeightborSetPixelPositions(cursor);
+				List<int[]> neightborhoodpixels = getNeightborSetPixelPositions(cursor);
 
-                if( neightborhoodpixels.isEmpty() ) {
-                    continue;
-                }
+				if (neightborhoodpixels.isEmpty()) {
+					continue;
+				}
 
-                // carry on with last neightborhoodpixel and push the other pixels on the stack
-                final int[] nextCursorPosition = neightborhoodpixels.get(neightborhoodpixels.size()-1);
-                neightborhoodpixels.remove(neightborhoodpixels.size()-1);
-                cursorStack.addAll(neightborhoodpixels);
+				// carry on with last neightborhoodpixel and push the other pixels on the stack
+				final int[] nextCursorPosition = neightborhoodpixels.get(neightborhoodpixels.size() - 1);
+				neightborhoodpixels.remove(neightborhoodpixels.size() - 1);
+				cursorStack.addAll(neightborhoodpixels);
 
-                cursor = nextCursorPosition;
-            }
+				cursor = nextCursorPosition;
+			}
 
 
-        }
+		}
 
 
 

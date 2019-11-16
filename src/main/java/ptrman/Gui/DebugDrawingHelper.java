@@ -16,7 +16,9 @@ import java.util.List;
 /**
  *
  */
-public class DebugDrawingHelper {
+public enum DebugDrawingHelper {
+    ;
+
     public abstract static class DrawingEntity {
         public enum EnumDrawType {
             SAMPLES,
@@ -119,7 +121,7 @@ public class DebugDrawingHelper {
                 final ArrayRealVector aProjectedFloat = iterationDetector.a;
                 final ArrayRealVector bProjectedFloat = iterationDetector.b;
 
-                if( iterationDetector.resultOfCombination || false ) {
+                if(iterationDetector.resultOfCombination) {
                     graphics2D.setColor(Color.RED);
                 }
                 else {

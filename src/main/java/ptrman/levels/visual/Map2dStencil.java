@@ -3,9 +3,11 @@ package ptrman.levels.visual;
 import ptrman.Datastructures.Map2d;
 import java.util.List;
 
-public class Map2dStencil
+public enum Map2dStencil
 {
-    static public void stencilSingleValue(Map2d<Integer> input, Map2d<Boolean> result, int value)
+	;
+
+	static public void stencilSingleValue(Map2d<Integer> input, Map2d<Boolean> result, int value)
     {
         int ix, iy;
 

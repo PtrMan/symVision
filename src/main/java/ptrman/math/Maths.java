@@ -1,11 +1,14 @@
 package ptrman.math;
 
-import com.gs.collections.api.list.primitive.IntList;
-import com.gs.collections.impl.set.mutable.primitive.IntHashSet;
+
+import org.eclipse.collections.api.list.primitive.IntList;
+import org.eclipse.collections.impl.set.mutable.primitive.IntHashSet;
 
 import java.util.*;
 
-public class Maths {
+public enum Maths {
+    ;
+
     public static float weightFloats(final float valueA, final float weightA, final float valueB, final float weightB) {
         return (valueA*weightA + valueB*weightB)/(weightA + weightB);
     }
@@ -146,13 +149,12 @@ public class Maths {
         if( bitsFromLeft == 0 ) {
             result = 1 << 31;
 
-            return result;
         }
         else {
             result = 1 << (31+1+1-bitsFromLeft);
 
-            return result;
         }
+        return result;
     }
 
     public static boolean equals(final double a, final double b, final double epsilon) {

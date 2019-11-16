@@ -26,21 +26,23 @@ public class Vector2d<Type extends Number>
         return y.intValue();
     }
 
-    public static class IntegerHelper
+    public enum IntegerHelper
     {
+        ;
+
         public static Vector2d<Integer> add(Vector2d<Integer> a, Vector2d<Integer> b)
         {
-            return new Vector2d<Integer>(a.xInt() + b.xInt(), a.yInt() + b.yInt());
+            return new Vector2d<>(a.xInt() + b.xInt(), a.yInt() + b.yInt());
         }
         
         public static Vector2d<Integer> sub(Vector2d<Integer> a, Vector2d<Integer> b)
         {
-            return new Vector2d<Integer>(a.xInt() - b.xInt(), a.yInt() - b.yInt());
+            return new Vector2d<>(a.xInt() - b.xInt(), a.yInt() - b.yInt());
         }
         
         public static Vector2d<Integer> max(Vector2d<Integer> a, Vector2d<Integer> b)
         {
-            return new Vector2d<Integer>(Math.max(a.xInt(), b.xInt()), Math.max(a.yInt(), b.yInt()));
+            return new Vector2d<>(Math.max(a.xInt(), b.xInt()), Math.max(a.yInt(), b.yInt()));
         }
         
         public static Vector2d<Integer> max4(Vector2d<Integer> a, Vector2d<Integer> b, Vector2d<Integer> c, Vector2d<Integer> d)
@@ -52,7 +54,7 @@ public class Vector2d<Type extends Number>
         
         public static Vector2d<Integer> min(Vector2d<Integer> a, Vector2d<Integer> b)
         {
-            return new Vector2d<Integer>(Math.min(a.xInt(), b.xInt()), Math.min(a.yInt(), b.yInt()));
+            return new Vector2d<>(Math.min(a.xInt(), b.xInt()), Math.min(a.yInt(), b.yInt()));
         }
         
         public static Vector2d<Integer> min4(Vector2d<Integer> a, Vector2d<Integer> b, Vector2d<Integer> c, Vector2d<Integer> d)
@@ -64,12 +66,14 @@ public class Vector2d<Type extends Number>
         
         public static Vector2d<Integer> getScaled(Vector2d<Integer> a, int value)
         {
-            return new Vector2d<Integer>(a.xInt()*value, a.yInt()*value);
+            return new Vector2d<>(a.xInt() * value, a.yInt() * value);
         }
     }
     
-    public static class FloatHelper
+    public enum FloatHelper
     {
+        ;
+
         public static float dot(Vector2d<Float> a, Vector2d<Float> b)
         {
             return a.xFloat()*b.xFloat() + a.yFloat()*b.yFloat();
@@ -77,12 +81,12 @@ public class Vector2d<Type extends Number>
         
         public static Vector2d<Float> add(Vector2d<Float> a, Vector2d<Float> b)
         {
-            return new Vector2d<Float>(a.xFloat() + b.xFloat(), a.yFloat() + b.yFloat());
+            return new Vector2d<>(a.xFloat() + b.xFloat(), a.yFloat() + b.yFloat());
         }
         
         public static Vector2d<Float> sub(Vector2d<Float> a, Vector2d<Float> b)
         {
-            return new Vector2d<Float>(a.xFloat() - b.xFloat(), a.yFloat() - b.yFloat());
+            return new Vector2d<>(a.xFloat() - b.xFloat(), a.yFloat() - b.yFloat());
         }
         
         public static Vector2d<Float> normalize(Vector2d<Float> vector)
@@ -91,7 +95,7 @@ public class Vector2d<Type extends Number>
             
             length = getLength(vector);
             invLength = 1.0f/length;
-            return new Vector2d<Float>(vector.xFloat()*invLength, vector.yFloat()*invLength);
+            return new Vector2d<>(vector.xFloat() * invLength, vector.yFloat() * invLength);
         }
         
         public static float getLength(Vector2d<Float> vector)
@@ -101,20 +105,22 @@ public class Vector2d<Type extends Number>
         
         public static Vector2d<Float> getScaled(Vector2d<Float> a, float value)
         {
-            return new Vector2d<Float>(a.xFloat()*value, a.yFloat()*value);
+            return new Vector2d<>(a.xFloat() * value, a.yFloat() * value);
         }
     }
     
-    public static class ConverterHelper
+    public enum ConverterHelper
     {
+        ;
+
         public static Vector2d<Float> convertIntVectorToFloat(Vector2d<Integer> vector)
         {
-            return new Vector2d<Float>((float)vector.xInt(), (float)vector.xInt());
+            return new Vector2d<>((float) vector.xInt(), (float) vector.xInt());
         }
         
         public static Vector2d<Integer> convertFloatVectorToInt(Vector2d<Float> vector)
         {
-            return new Vector2d<Integer>(Math.round(vector.xFloat()), Math.round(vector.yFloat()));
+            return new Vector2d<>(Math.round(vector.xFloat()), Math.round(vector.yFloat()));
         }
     }
 }
