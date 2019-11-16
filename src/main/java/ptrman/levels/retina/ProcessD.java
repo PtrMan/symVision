@@ -30,7 +30,7 @@ import static ptrman.math.Maths.squaredDistance;
 // TODO< remove detectors which are removable which have a activation less than <constant> * sumofAllActivations >
 
 /**
- * detects lines
+ * proposal of lines from points
  * <p>
  * forms line hypothesis and tries to strengthen it
  * uses the method of the least squares to fit the potential lines

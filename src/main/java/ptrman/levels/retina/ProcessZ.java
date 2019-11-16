@@ -9,6 +9,9 @@ import ptrman.levels.visual.Map2dConverter;
 import ptrman.levels.visual.Map2dTransform;
 import ptrman.misc.GaussianBlur;
 
+/**
+ * zooms in to resolve small features
+ */
 public class ProcessZ implements IProcess {
     IMap2d<Float> floatNotMagnified;
     IMap2d<Float> floatMagnified;

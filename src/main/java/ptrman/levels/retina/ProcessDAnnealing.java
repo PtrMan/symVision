@@ -31,7 +31,7 @@ import static ptrman.math.Maths.getRandomElements;
 import static ptrman.math.Maths.squaredDistance;
 
 /**
- * detects lines
+ * proposal of lines from points
  * <p>
  * forms line hypothesis and tries to strengthen it
  * uses the method of the least squares to fit the potential lines

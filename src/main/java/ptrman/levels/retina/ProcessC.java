@@ -19,7 +19,7 @@ import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 /**
  *
- * identifies if a point is a point of the endo or exosceleton
+ * identifies if a point is a point of the endo- or exoskeleton
  */
 public class ProcessC implements IProcess {
 

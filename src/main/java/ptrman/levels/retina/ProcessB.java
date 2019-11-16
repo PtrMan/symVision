@@ -14,7 +14,7 @@ import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 /**
  *
- * java version of ProcessB
+ * computation of altitude of points
  */
 public class ProcessB extends AbstractProcessB {
 
@@ -40,7 +40,7 @@ public class ProcessB extends AbstractProcessB {
 
     /**
      *
-     * we use the whole image, in phaeaco he worked with the incomplete image with the guiding of processA, this is not implemented that way
+     * we use the whole image, in Phaeaco he worked with the incomplete image with the guiding of processA, this is not implemented that way
      */
     @Override
     public void processData() {
