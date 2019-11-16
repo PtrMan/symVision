@@ -21,7 +21,7 @@ import static ptrman.levels.retina.helper.SpatialDrawer.getPositionsOfCellsOfLin
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 /**
- * tries to combine linedetectors
+ * tries to combine line-detectors
  *
  * combines detectors only of the same objectId
  */

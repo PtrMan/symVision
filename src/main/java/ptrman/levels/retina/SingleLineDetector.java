@@ -82,7 +82,7 @@ public class SingleLineDetector {
     }
     /**
      * 
-     * swaps a and b if necessary to fullfil the invariant
+     * swaps a and b if necessary to fulfill the invariant
      * 
      */
     private void fullfillABInvariant() {

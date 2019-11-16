@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+/** identify M features
+ *
+ */
 public class ProcessM {
     public static class LineParsing {
         public LineParsing(List<SingleLineDetector> lineParsing) {

@@ -5,8 +5,10 @@ import ptrman.Datastructures.Vector2d;
 /**
  * Bresenham algorithms
  *
- * for cirlce see german version of
+ * for circle see german version of
  * http://en.wikipedia.org/wiki/Bresenham%27s_line_algorithm
+ * which is
+ * https://de.wikipedia.org/wiki/Bresenham-Algorithmus
  */
 public enum Bresenham {
 	;

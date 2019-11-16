@@ -11,7 +11,7 @@ import java.util.Stack;
  * * supplies connectivity information
  * * modifies the input bitmap
  *
- * * vectorization input diesn't have any gurantues in case of multineighbor pixels
+ * * vectorization input doesn't have any guaranties in case of multi-neighbor pixels
  */
 public class FastVectorizer {
     public IMap2d<Boolean> workingBitmap;
