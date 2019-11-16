@@ -53,8 +53,37 @@ Not implemented
 * Process Q
 * Process S
 
+# Graph
+
+Graph matching is just partially implemented and partially tested.
+
+## Nodes
+
+Phaeaco stored and revised knowledge of the perceived scene and known structures as graphs.
+It revised the graph to enrich it with perceived or known knowledge.
+
+Implemented
+* AttributeNode
+* FeatureNode
+* NumeriosityNode
+* PlatonicPrimitiveInstanceNode
+* PlatonicPrimitiveNode
+
+# Codelets
+
+Phaeaco processed modifications of the graph with a codelet based mechanism under AIKR. This was based on research from the FARG group.
+This implementation uses the same mechanism as described in Foundalis's dissertation.
+
+Implemented
+* Angle
+* Barycenter
+* EndPoint
+* LineSegmentLength
+* LineSegmentSlope
+* SearchAndFuseRoughtlyEqualElements
+
 # currently not implemented features based on Phaeaco
 
-* graph matching
+* full graph matching
 * a lot of graph nodes
 * a lot of codelets and the interaction of codelets and the graph
