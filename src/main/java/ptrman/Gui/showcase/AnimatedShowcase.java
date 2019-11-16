@@ -78,7 +78,7 @@ public class AnimatedShowcase {
             processingChain.filterChainDag.elements.add(newDagElement);
         }
 
-        public synchronized void process(float throttle) {
+        public void process(float throttle) {
             BufferedImage image;
             IMap2d<Boolean> mapBoolean;
             IMap2d<ColorRgb> mapColor;
@@ -173,7 +173,7 @@ public class AnimatedShowcase {
         float throttleMin = 0.15f;
         float throttleMax = 1f;
 
-        float targetFPS = 5f;
+        float targetFPS =15f;
 
         DescriptiveStatistics frameTimes = new DescriptiveStatistics(32);
 
@@ -287,52 +287,43 @@ public class AnimatedShowcase {
 
 
     // TODO< move this into the functionality of the visual processor >
-    public static IMap2d<ColorRgb> translateFromImageToMap(BufferedImage javaImage) {
-        DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
+    public static IMap2d<ColorRgb> translateFromImageToMap(BufferedImage x) {
 
-        int bufferI;
-        IMap2d<ColorRgb> convertedToMap;
 
-        convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
+        int w = x.getWidth();
+        IMap2d<ColorRgb> y = new Map2d<>(w, x.getHeight());
 
-        for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ )
-        {
-            int pixelValue;
+        DataBuffer xx = x.getData().getDataBuffer();
+        int s = xx.getSize();
+        for(int i = 0; i < s; i++ ) {
+            int bx = i % w;
+            int by = i / w;
 
-            pixelValue = javaImage.getRGB(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth());
+            int p = x.getRGB(bx, by); //24-bit RGB int
 
-            Color c = new Color(pixelValue);
+            //Color c = new Color(pixelValue);
+            int r = p >> 16 & 255;
+            int g = p >> 8 & 255;
+            int b = p & 255;
 
-            int r = c.getRed();
-            int g = c.getGreen();
-            int b = c.getBlue();
-
-            convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(), new ColorRgb((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f));
+            y.setAt(bx, by,
+                new ColorRgb((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f));
         }
 
-        return convertedToMap;
+        return y;
     }
 
     private static BufferedImage translateFromMapToImage(IMap2d<Boolean> map, BufferedImage result) {
         int x, y;
 
-        if (result == null || result.getWidth()!=map.getWidth() || result.getHeight() != map.getLength())
-            result = new BufferedImage(map.getWidth(), map.getLength(), BufferedImage.TYPE_INT_ARGB);
+        int h = map.getLength();
+        int w = map.getWidth();
+        if (result == null || result.getWidth()!= w || result.getHeight() != h)
+            result = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
 
-        for( y = 0; y < map.getLength(); y++ ) {
-            for( x = 0; x < map.getWidth(); x++ ) {
-                boolean booleanValue;
-
-                booleanValue = map.readAt(x, y);
-
-                if( booleanValue ) {
-                    result.setRGB(x, y, 0xffffffff);
-                }
-                else {
-                    result.setRGB(x, y, 0xff000000);
-                }
-            }
-        }
+        for(y = 0; y < h; y++ )
+            for(x = 0; x < w; x++ )
+                result.setRGB(x, y, map.readAt(x, y) ? 0xffffffff : 0xff000000);
 
         return result;
     }

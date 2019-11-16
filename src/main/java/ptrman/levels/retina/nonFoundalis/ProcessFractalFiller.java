@@ -1,8 +1,9 @@
 package ptrman.levels.retina.nonFoundalis;
 
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+
 //import com.gs.collections.impl.list.mutable.FastList;
+import boofcv.struct.image.GrayF32;
+import boofcv.struct.image.InterleavedF32;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.eclipse.collections.impl.list.mutable.FastList;
@@ -48,7 +49,7 @@ public class ProcessFractalFiller implements IProcess {
         public float[] varianceMultiplier;
     }
 
-    public void set(int accelerationGridSize, MultiSpectral<ImageFloat32> inputImage) {
+    public void set(int accelerationGridSize, InterleavedF32 inputImage) {
         this.accelerationGridSize = accelerationGridSize;
         this.inputImage = inputImage;
     }
@@ -248,11 +249,11 @@ public class ProcessFractalFiller implements IProcess {
     }
 
     private ArrayRealVector readInputImageAt(final Vector2d<Integer> position) {
-        double[] resultDoubles = new double[inputImage.getNumBands()];
+        int bands = inputImage.getNumBands();
+        double[] resultDoubles = new double[bands];
 
-        for( int band = 0; band < inputImage.getNumBands(); band++ ) {
-            resultDoubles[band] = inputImage.getBand(band).get(position.x, position.y);
-        }
+        for(int band = 0; band < bands; band++ )
+            resultDoubles[band] = inputImage.getBand(position.x, position.y, band);
 
         return new ArrayRealVector(resultDoubles);
     }
@@ -295,7 +296,7 @@ public class ProcessFractalFiller implements IProcess {
     */
 
 
-    private MultiSpectral<ImageFloat32> inputImage;
+    private InterleavedF32 inputImage;
 
     // map used for the acceleration of the "fractal" image segmentation
     //private IMap2d<AccelerationMapElement> accelerationMap;

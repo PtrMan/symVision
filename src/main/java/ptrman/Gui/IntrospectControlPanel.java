@@ -5,84 +5,54 @@ import javax.swing.*;
 /**
  *
  */
-public class IntrospectControlPanel
-{
+public class IntrospectControlPanel {
+	public Runnable handlerIntrospectionChanged = () -> { };
+	public Runnable handlerPauseContinue = () -> { };
+	private JPanel controlAreaPanel;
+	private JTextField frameTextfield = new JTextField();
+	private JButton pauseResumeButton = new JButton("||");
+	private JCheckBox introspectButton = new JCheckBox("introspect");
+	private boolean runningState = true;
+	public IntrospectControlPanel() {
+		controlAreaPanel = new JPanel();
 
+		controlAreaPanel.add(new JLabel("Frame "));
+		controlAreaPanel.add(frameTextfield);
+		controlAreaPanel.add(new JLabel("from x"));
+		controlAreaPanel.add(new JButton("<"));
+		controlAreaPanel.add(pauseResumeButton);
+		controlAreaPanel.add(new JButton(">"));
+		controlAreaPanel.add(introspectButton);
 
-    public interface IHandler
-    {
-        void fire();
-    }
+		introspectButton.addChangeListener(e -> {
+			setIntrospectState(getIntrospectionState());
+			handlerIntrospectionChanged.run();
+		});
 
-    public IntrospectControlPanel()
-    {
-        controlAreaPanel = new JPanel();
+		pauseResumeButton.addActionListener(e -> {
+			setRunningState(!runningState);
+			handlerPauseContinue.run();
+		});
+	}
 
-        controlAreaPanel.add(new JLabel("Frame "));
-        controlAreaPanel.add(frameTextfield);
-        controlAreaPanel.add(new JLabel("from x"));
-        controlAreaPanel.add(new JButton("<"));
-        controlAreaPanel.add(pauseResumeButton);
-        controlAreaPanel.add(new JButton(">"));
-        controlAreaPanel.add(introspectButton);
+	private void setRunningState(boolean runningState) {
+		this.runningState = runningState;
+		pauseResumeButton.setText(getTextForPauseResumeButton());
+	}
 
-        introspectButton.addActionListener(e -> {
-            setIntrospectState(!introspectState);
-            handlerIntrospectionChanged.fire();
-        });
+	private String getTextForPauseResumeButton() {
+        return runningState ? "||" : ">>";
+	}
 
-        pauseResumeButton.addActionListener(e -> {
-            setRunningState(!runningState);
-            handlerPauseContinue.fire();
-        });
-    }
+	public void setIntrospectState(boolean state) {
+		introspectButton.setSelected(state);
+	}
 
-    private void setRunningState(boolean runningState)
-    {
-        this.runningState = runningState;
-        pauseResumeButton.setText(getTextForPauseResumeButton());
-    }
+	public boolean getIntrospectionState() {
+		return introspectButton.isSelected();
+	}
 
-    private String getTextForPauseResumeButton() {
-        if( runningState )
-        {
-            return "||";
-        }
-        else
-        {
-            return ">>";
-        }
-    }
-
-    private String getTextForIntrospect()
-    {
-        return "Introspect " + (introspectState ? "on" : "off");
-    }
-
-    public void setIntrospectState(boolean state)
-    {
-        introspectState = state;
-        introspectButton.setText(getTextForIntrospect());
-    }
-
-    public boolean getIntrospectionState()
-    {
-        return introspectState;
-    }
-
-    public JPanel getPanel()
-    {
-        return controlAreaPanel;
-    }
-
-    public IHandler handlerIntrospectionChanged;
-    public IHandler handlerPauseContinue;
-
-    private JPanel controlAreaPanel;
-    private JTextField frameTextfield = new JTextField();
-    private JButton introspectButton = new JButton(getTextForIntrospect());
-    private JButton pauseResumeButton = new JButton("||");
-
-    private boolean introspectState = false;
-    private boolean runningState = true;
+	public JPanel getPanel() {
+		return controlAreaPanel;
+	}
 }

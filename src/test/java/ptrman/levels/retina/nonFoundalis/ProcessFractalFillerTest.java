@@ -1,8 +1,9 @@
 package ptrman.levels.retina.nonFoundalis;
 
-import boofcv.core.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageFloat32;
-import boofcv.struct.image.MultiSpectral;
+
+import boofcv.io.image.ConvertBufferedImage;
+import boofcv.struct.image.ImageInterleaved;
+import boofcv.struct.image.InterleavedF32;
 import org.junit.Test;
 import ptrman.Datastructures.Vector2d;
 
@@ -38,7 +39,7 @@ public class ProcessFractalFillerTest {
     public void singleCellTriangleCase() {
         Extended extended = new Extended();
 
-        extended.setImageSize(new Vector2d<>(9, 9));
+        extended.setImageSize(new Vector2d<>(64, 64));
 
         // TODO< create image for testing >
         BufferedImage testImage = new BufferedImage(9,9, BufferedImage.TYPE_INT_RGB);
@@ -56,7 +57,8 @@ public class ProcessFractalFillerTest {
 
         testImage.setRGB(0, 3, 0xFFFFFFFF);
 
-        MultiSpectral<ImageFloat32> inputImage = ConvertBufferedImage.convertFromMulti(testImage, null, true, ImageFloat32.class);
+        InterleavedF32 inputImage = new InterleavedF32();
+        ConvertBufferedImage.convertFromInterleaved(testImage,  inputImage, true);
 
         extended.set(9, inputImage);
 

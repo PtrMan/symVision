@@ -2,7 +2,9 @@ package ptrman.Showcases;
 
 import boofcv.gui.image.ImagePanel;
 import boofcv.gui.image.ShowImages;
+import boofcv.io.image.ConvertBufferedImage;
 import boofcv.io.webcamcapture.UtilWebcamCapture;
+import boofcv.struct.image.GrayF32;
 import com.github.sarxos.webcam.Webcam;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.IImageDrawer;
@@ -17,8 +19,8 @@ import java.awt.image.BufferedImage;
  */
 public class TestWebcam extends AnimatedShowcase {
 
-    final static int RETINA_WIDTH = 320;
-    final static int RETINA_HEIGHT = 160;
+    final static int RETINA_WIDTH = 64;
+    final static int RETINA_HEIGHT = 64;
     private final Webcam webcam;
     private final ImagePanel gui;
 
@@ -34,7 +36,7 @@ public class TestWebcam extends AnimatedShowcase {
             }
 
             BufferedImage webcamFrame = webcam.getImage();
-            //ImageFloat32 gray = ConvertBufferedImage.convertFrom(image, (ImageFloat32) null);
+//            GrayF32 gray = ConvertBufferedImage.convertFrom(webcamFrame, (GrayF32)null);
 
 //            tracker.process(gray);
 //
@@ -54,12 +56,15 @@ public class TestWebcam extends AnimatedShowcase {
 //                VisualizeFeatures.drawPoint(g2, (int) t.x, (int) t.y, Color.RED);
 //            }
 
-            gui.setImage(webcamFrame);
+            if (webcamFrame!=null) {
+                gui.setImageRepaint(webcamFrame);
 
-            Graphics2D g2 = off_Image.createGraphics();
+                Graphics2D g2 = off_Image.createGraphics();
 
-            g2.drawImage(webcamFrame, 0, 0, RETINA_WIDTH, RETINA_HEIGHT, null);
+                g2.drawImage(webcamFrame, 0, 0, RETINA_WIDTH, RETINA_HEIGHT, null);
 
+                g2.dispose();
+            }
 
             return off_Image;
         }
@@ -77,7 +82,10 @@ public class TestWebcam extends AnimatedShowcase {
         //PointTracker<ImageFloat32> tracker = FactoryPointTracker.klt(configKlt, configDetector, ImageFloat32.class, null);
 
         // Open a webcam at a resolution close to 640x480
-        webcam = UtilWebcamCapture.openDefault(640,480);
+        webcam = Webcam.getDefault(); //UtilWebcamCapture.openDefault(640,480);
+        webcam.open(true);
+
+        //webcam.addWebcamListener()
 
         // Create the panel used to display the image and
         gui = new ImagePanel();
