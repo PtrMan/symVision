@@ -1,4 +1,4 @@
-package ptrman.levels.retina.tests;
+package ptrman.InternalTests;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.levels.retina.RetinaPrimitive;

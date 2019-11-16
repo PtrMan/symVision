@@ -32,7 +32,7 @@ public enum TestPatternMatching {
         BpSolver bpSolver;
 
         bpSolver = new BpSolver();
-        bpSolver.setImageSize(new Vector2d<>(100, 100));
+        bpSolver.setImageSize(new Vector2d<>(128, 128));
         bpSolver.setup();
 
         lineDetectors = new ArrayList<>();
