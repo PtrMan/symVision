@@ -13,7 +13,7 @@ public class HardParameters
     
     public static class ProcessD
     {
-        public final static float MAXMSE = 5.04f; // max mean square error for inclusion of a point
+        public final static float MAXMSE = 50.0f; // 5.04f; // max mean square error for inclusion of a point
         
         public final static float LOCKINGACTIVATIONMSESCALE = 1.0f;
         public final static float MINIMALACTIVATIONTOSUMRATIO = 0.0f; // minimal ratio of the activation of an detector to the sum of all detectors to not get discarded

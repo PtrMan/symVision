@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Queue;
 
 public class BpSolver {
+    public float processdmaximalDistanceOfPositions = 30.0f;// was 6.0f;
 
 
     public List<ProcessA.Sample> debugSamples;
@@ -198,7 +199,7 @@ public class BpSolver {
 
         endosceletonSampleFilter.preProcessData();
 
-        final float processdmaximalDistanceOfPositions = 6.0f;
+
         endosceletonProcessD.setMaxDistancePositions(processdmaximalDistanceOfPositions);
 
         endosceletonProcessD.preProcessData();
