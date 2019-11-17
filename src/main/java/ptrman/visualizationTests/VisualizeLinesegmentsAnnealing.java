@@ -51,9 +51,16 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             g2.setColor(Color.WHITE);
 
             //g2.drawRect(2, 2, 100, 100);
-            g2.fillRect(10, 10, 70, 20);
+            //g2.fillRect(10, 10, 70, 20);
 
-            g2.fillRect(10, 50, 70, 20);
+            //g2.fillRect(10, 50, 70, 20);
+
+            // draw "A"
+            g2.setStroke(new BasicStroke(3));
+            g2.drawLine(10, 80, 40, 10);
+            g2.drawLine(90, 80, 40, 10);
+            g2.drawLine(30, 40, 70, 40);
+
 
             return off_Image;
         }
