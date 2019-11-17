@@ -166,24 +166,29 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             notMagnifiedOutputObjectIdsMapDebug = processZFacade.getNotMagnifiedOutputObjectIds();
 
             ProcessA processA = new ProcessA();
-
             ProcessB processB = new ProcessB();
-
-            processA.setImageSize(imageSize);
-            processA.setup();
-
-            processB.setImageSize(imageSize);
-            processB.setup();
+            ProcessC processC = new ProcessC();
 
             // copy image because processA changes the image
             ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
             processA.set(mapBoolean.copy(), processZFacade.getNotMagnifiedOutputObjectIds(), connectorSamplesFromProcessA);
+            processA.setImageSize(imageSize);
+            processA.setup();
 
             ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessB = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
             processB.set(mapBoolean.copy(), connectorSamplesFromProcessA, conntrSamplesFromProcessB);
+            processB.setImageSize(imageSize);
+            processB.setup();
+
+
+            ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessC0 = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+            ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessC1 = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+            processC.set(conntrSamplesFromProcessB, conntrSamplesFromProcessC0, conntrSamplesFromProcessC1);
+            processC.setImageSize(imageSize);
+            processC.setup();
 
             processD.setImageSize(imageSize);
-            connectorSamplesForEndosceleton = conntrSamplesFromProcessB;
+            connectorSamplesForEndosceleton = conntrSamplesFromProcessC0;
             processD.set(connectorSamplesForEndosceleton, connectorDetectorsEndosceletonFromProcessD);
 
             processA.preProcessData();
@@ -193,6 +198,10 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             processB.preProcessData();
             processB.processData();
             processB.postProcessData();
+
+            processC.preProcessData();
+            processC.processData();
+            processC.postProcessData();
 
             processD.preProcessData();
             processD.processData(1.0f);
@@ -217,9 +226,9 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             tint(255.0f, 255.0f); // reset tint
         }
 
-        boolean drawVisualizationOfLineDetectors = false;
         boolean drawVisualizationOfAltitude = true;
-        boolean drawVisualizationOfEndoSceletons = false; // do we visualize all samples of endo/exo -sceleton
+        boolean drawVisualizationOfEndoSceletons = true; // do we visualize all samples of endo/exo -sceleton
+        boolean drawVisualizationOfLineDetectors = true;
 
 
         if(drawVisualizationOfAltitude) {

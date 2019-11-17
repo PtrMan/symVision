@@ -36,7 +36,7 @@ public class ProcessC implements IProcess {
 
     final int maxSortedSamples = 8;
 
-    private int gridsize;
+    public int gridsize = 8;
     private Vector2d<Integer> imageSize;
 
     private final Random random = new Random();
@@ -70,11 +70,6 @@ public class ProcessC implements IProcess {
 
     public ProcessC() {
 
-    }
-
-
-    public void preSetupSet(final int gridsize) {
-        this.gridsize = gridsize;
     }
 
     public void set(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> resultSampleConnector, ProcessConnector<ProcessA.Sample> resultSamplesToProcessF) {

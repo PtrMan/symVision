@@ -89,7 +89,7 @@ public class Solver {
 
         final int PROCESSCGRIDSIZE = 8;
         processC.setImageSize(getImageSize());
-        processC.preSetupSet(PROCESSCGRIDSIZE);
+        processC.gridsize = PROCESSCGRIDSIZE;
         processC.setup();
 
         endosceletonProcessD.setImageSize(getImageSize());
