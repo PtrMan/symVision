@@ -122,12 +122,22 @@ public class ProcessA implements IProcess {
 
     }
 
+    public double defaultSampleConf = 0.1; // confidence of one sample
+
     public static class Sample {
+
+        public final ArrayRealVector position;
+        public double altitude = Double.NaN;
+        public EnumType type;
+        public int objectId = -1;
+        public double conf; // confidence from NAL
+
         public Sample getClone() {
             Sample clone = new Sample(position);
             clone.altitude = this.altitude;
             clone.type = this.type;
             clone.objectId = this.objectId;
+            clone.conf = this.conf;
 
             return clone;
         }
@@ -176,11 +186,7 @@ public class ProcessA implements IProcess {
         public boolean isObjectIdValid() {
             return objectId != -1;
         }
-        
-        public final ArrayRealVector position;
-        public double altitude = Double.NaN;
-        public EnumType type;
-        public int objectId = -1;
+
     }
     
     
@@ -192,10 +198,10 @@ public class ProcessA implements IProcess {
     }
 
     private void addSampleToOutput(final int x, final int y, final int objectId) {
-        Sample addSample = new Sample(x, y);
-        addSample.objectId = objectId;
-
-        outputSampleConnector.add(addSample);
+        Sample createdSample = new Sample(x, y);
+        createdSample.objectId = objectId;
+        createdSample.conf = defaultSampleConf;
+        outputSampleConnector.add(createdSample);
     }
 
     private static boolean sampleMaskAtPosition(int px, int py, boolean[] mask4by4) {
