@@ -39,7 +39,7 @@ Foundalis decided to not release his implementation due to ethical concerns. The
 | E      | finds line intersections                                     | partial | none? | no |
 | F      | Sends traces in imagespace for samples which are deeper than a threshold | partial | none? | no |
 | G      | curve detection                                              | partial, ~20%? | ? | no |
-| H      | tries to combine linedetectors                               | partial | ? | no |
+| H      | tries to combine linedetectors                               | partial, is able to fuse lines | ? | no |
 | M      | identify M features                                          | partial, ~10%? | ? | no |
 | Z      | zooms in to resolve small features                           | partial | ? | no |
 
