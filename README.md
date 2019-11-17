@@ -45,13 +45,13 @@ Foundalis decided to not release his implementation due to ethical concerns. The
 
 Not implemented
 
-* Process i
-* Process O
-* Process K
-* Process P
-* Process R
-* Process Q
-* Process S
+* Process i - detects dots in the raw image
+* Process O - detects closed regions
+* Process K - detects "K" points, points where the K intersects
+* Process P - "perception" - interface between Phaeaco’s retinal and cognitive levels
+* Process R - runs codelets from coderack
+* Process Q - managed "quality"(process for attention mechanism)
+* Process S - shirking of bitmap
 
 # Graph
 
