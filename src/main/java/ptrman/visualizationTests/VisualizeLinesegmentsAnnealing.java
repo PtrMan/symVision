@@ -63,7 +63,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
                 int endpointADeltaY = (int)(Math.sin(animationFrameNumber * 0.1) * 10);
 
 
-                g2.setStroke(new BasicStroke(3));
+                g2.setStroke(new BasicStroke(6));
                 g2.drawLine(10+endpointADeltaX, 80+endpointADeltaY, 40, 10);
                 g2.drawLine(90+endpointADeltaX, 80+endpointADeltaY, 40, 10);
                 g2.drawLine(30, 40, 70, 40);
@@ -257,7 +257,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
                 if (iSample.type != ProcessA.Sample.EnumType.ENDOSCELETON) {
                     continue;
                 }
-                stroke(255.0f, 0.0f, 0.0f);
+                stroke(200.0f, 255.0f, 200.0f);
 
                 rect((float)iSample.position.getDataRef()[0], (float)iSample.position.getDataRef()[1], 1, 1);
             }
