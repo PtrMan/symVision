@@ -42,14 +42,14 @@ Foundalis decided to not release his implementation due to ethical concerns. The
 | H      | tries to combine linedetectors                               | partial, is able to fuse lines | ? | no |
 | M      | identify M features                                          | partial, ~10%? | ? | no |
 | Z      | zooms in to resolve small features                           | partial | ? | no |
+| K      | detects "K" points, points where the K intersects            | NOT IMPLEMENTED - TODO | - | - |
 
-Not implemented
+Not implemented and not planned to be implemented soon, in order of importance
 
 * Process i - detects dots in the raw image
 * Process O - detects closed regions
-* Process K - detects "K" points, points where the K intersects
-* Process P - "perception" - interface between Phaeaco’s retinal and cognitive levels
 * Process R - runs codelets from coderack
+* Process P - "perception" - interface between Phaeaco’s retinal and cognitive levels
 * Process Q - managed "quality"(process for attention mechanism)
 * Process S - shirking of bitmap
 
