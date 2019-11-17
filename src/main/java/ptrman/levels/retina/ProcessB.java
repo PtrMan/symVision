@@ -211,35 +211,32 @@ public class ProcessB extends AbstractProcessB {
 
         Assert.Assert(!value, "only implemented for value = false");
 
-        for( final Vector2d<Integer> iterationCellPosition : cellPositions ) {
-            result.addAll(getPositionsOfCandidatePixelsOfCellWhereFalse(iterationCellPosition));
-        }
+        for( final Vector2d<Integer> iterationCellPosition : cellPositions )
+            getPositionsOfCandidatePixelsOfCellWhereFalse(iterationCellPosition, result);
 
         return result;
     }
 
-    private List<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCellWhereFalse(final Vector2d<Integer> cellPosition) {
-        List<Vector2d<Integer>> result = new ArrayList<>();
+    private void getPositionsOfCandidatePixelsOfCellWhereFalse(final Vector2d<Integer> cellPosition, List<Vector2d<Integer>> result) {
 
         final int gridsize = spatialAcceleratedMap2d.getGridsize();
 
         Assert.Assert(gridsize == 8, "only implemented for gridsize = 8");
 
-        final boolean value = false; // value to search for, for easier to change code
 
-        for( int y = cellPosition.y * gridsize; y < (cellPosition.y+1) * gridsize; y++ ) {
-            final int byteValueAt = map.readByteAtInt(cellPosition.x * gridsize, y);
+        int h = cellPosition.y + 1 * gridsize;
+        int w = (cellPosition.x + 1) * gridsize;
 
-            if( byteValueAt != 0xff ) {
-                for( int x = cellPosition.x * gridsize; x < (cellPosition.x+1) * gridsize; x++ ) {
-                    if(!map.readAt(x, y)) {
+        for(int y = cellPosition.y * gridsize; y < h; y++ ) {
+
+            if( map.readByteAtInt(cellPosition.x * gridsize, y) != 0xff ) {
+                for(int x = cellPosition.x * gridsize; x < w; x++ ) {
+                    if (!map.readAt(x, y)) {
                         result.add(new Vector2d<>(x, y));
                     }
                 }
             }
         }
-
-        return result;
     }
 
 

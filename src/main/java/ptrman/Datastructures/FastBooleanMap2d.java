@@ -44,7 +44,7 @@ public class FastBooleanMap2d implements IMap2d<Boolean> {
 
         final long nativeValueAtPosition = readLongAtInt(x, y);
 
-        return (nativeValueAtPosition & (1L << (x % 64))) == (1L << (x % 64));
+        return (nativeValueAtPosition & (1L << (x % 64))) != 0;
     }
 
     @Override
@@ -93,7 +93,7 @@ public class FastBooleanMap2d implements IMap2d<Boolean> {
         return (int)((longAt >>> ((x / 8) % (64/8))) & 0xff);
     }
 
-    public long readLongAtInt(final int x, final int y) {
+    final long readLongAtInt(final int x, final int y) {
         //Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
 
         final int indexX = x / 64;

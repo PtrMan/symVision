@@ -29,6 +29,7 @@ import java.awt.image.ColorModel;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
+import java.util.function.Function;
 
 // TODO
 /**
@@ -44,7 +45,7 @@ public class TestMotion extends AnimatedShowcase {
         BufferedImage off_Image;
 
         @Override
-        public BufferedImage drawToJavaImage(Solver bpSolver) {
+        public BufferedImage apply(Solver bpSolver) {
             if (off_Image == null || off_Image.getWidth() != RETINA_WIDTH || off_Image.getHeight() != RETINA_HEIGHT) {
                 off_Image = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             }
@@ -80,7 +81,7 @@ public class TestMotion extends AnimatedShowcase {
             this.testMotion = testMotion;
         }
 
-        public void preSetupSet(Solver bpSolver, IImageDrawer imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas) {
+        public void preSetupSet(Solver bpSolver, Function<Solver, BufferedImage> imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas) {
             this.bpSolver = bpSolver;
             this.imageDrawer = imageDrawer;
             this.introspectControlPanel = introspectControlPanel;
@@ -94,7 +95,7 @@ public class TestMotion extends AnimatedShowcase {
         public void process(float throttle) {
             // TODO< pull image from source >
             // for now imageDrawer does this
-            BufferedImage image = imageDrawer.drawToJavaImage(bpSolver);
+            BufferedImage image = imageDrawer.apply(bpSolver);
 
 
             BufferedImage copiedImage = deepCopyBufferedImage(image);
@@ -161,7 +162,7 @@ public class TestMotion extends AnimatedShowcase {
         }
 
         private Solver bpSolver;
-        private IImageDrawer imageDrawer;
+        private Function<Solver, BufferedImage> imageDrawer;
         private IntrospectControlPanel introspectControlPanel;
         private NodeGraph nodeGraph;
         private VisualProcessor.ProcessingChain processingChain;

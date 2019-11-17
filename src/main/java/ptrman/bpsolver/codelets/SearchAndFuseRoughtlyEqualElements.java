@@ -66,7 +66,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         commonChildnodesOfNodes = getCommonFeatureNodesOfNodes(nodeA, nodeB);
         
         // if the two nodes don't have at least one common type which is Measurable we are done here
-        if( commonChildnodesOfNodes.keySet().size() == 0 ) {
+        if( commonChildnodesOfNodes.isEmpty() ) {
             return new RunResult(true);
         }
         // else here
