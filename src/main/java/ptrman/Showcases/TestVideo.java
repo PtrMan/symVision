@@ -33,7 +33,7 @@ public class TestVideo extends AnimatedShowcase {
         BufferedImage off_Image;
 
         @Override
-        public BufferedImage drawToJavaImage(Solver bpSolver) {
+        public BufferedImage apply(Solver bpSolver) {
             if (off_Image == null || off_Image.getWidth() != RETINA_WIDTH || off_Image.getHeight() != RETINA_HEIGHT) {
                 off_Image = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             }

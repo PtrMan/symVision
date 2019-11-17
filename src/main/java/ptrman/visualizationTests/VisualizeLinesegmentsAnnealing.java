@@ -25,6 +25,7 @@ import ptrman.misc.ImageConverter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.function.Function;
 
 // visualize line-segments of endosceleton
 public class VisualizeLinesegmentsAnnealing extends PApplet {
@@ -38,7 +39,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
         BufferedImage off_Image;
 
         @Override
-        public BufferedImage drawToJavaImage(Solver bpSolver) {
+        public BufferedImage apply(Solver bpSolver) {
             if (off_Image == null || off_Image.getWidth() != RETINA_WIDTH || off_Image.getHeight() != RETINA_HEIGHT) {
                 off_Image = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             }
@@ -106,7 +107,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             // TODO< pull image from source >
             // for now imageDrawer does this
-            image = imageDrawer.drawToJavaImage(null);
+            image = imageDrawer.apply(null);
 
             Vector2d<Integer> imageSize = new Vector2d<>(image.getWidth(), image.getHeight());
 
@@ -230,8 +231,8 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
         frameCounter++;
 
         { // draw processed image in the background
-            IImageDrawer imgDrawer = new InputDrawer();
-            BufferedImage img = imgDrawer.drawToJavaImage(null);
+            Function<Solver, BufferedImage> imgDrawer = new InputDrawer();
+            BufferedImage img = imgDrawer.apply(null);
             PImage pimg = ImageConverter.convBufferedImageToPImage(img);
             tint(255.0f, 0.2f*255.0f);
             image(pimg, 0, 0); // draw image

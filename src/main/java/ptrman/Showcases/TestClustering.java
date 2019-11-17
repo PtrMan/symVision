@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.function.Function;
 
 /**
  *
@@ -48,7 +49,7 @@ public class TestClustering {
         BufferedImage off_Image;
 
         @Override
-        public BufferedImage drawToJavaImage(Solver bpSolver) {
+        public BufferedImage apply(Solver bpSolver) {
             if (off_Image == null || off_Image.getWidth() != RETINA_WIDTH || off_Image.getHeight() != RETINA_HEIGHT) {
                 off_Image = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             }
@@ -107,7 +108,7 @@ public class TestClustering {
 
 
 
-        public TimerActionListener(Solver bpSolver, IImageDrawer imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas, VisualProcessor.ProcessingChain processingChain) {
+        public TimerActionListener(Solver bpSolver, Function<Solver, BufferedImage> imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas, VisualProcessor.ProcessingChain processingChain) {
             this.bpSolver = bpSolver;
             this.imageDrawer = imageDrawer;
             this.introspectControlPanel = introspectControlPanel;
@@ -124,7 +125,7 @@ public class TestClustering {
 
             // TODO< pull image from source >
             // for now imageDrawer does this
-            image = imageDrawer.drawToJavaImage(bpSolver);
+            image = imageDrawer.apply(bpSolver);
 
 
 
@@ -166,7 +167,7 @@ public class TestClustering {
         }
 
         private Solver bpSolver;
-        private final IImageDrawer imageDrawer;
+        private final Function<Solver, BufferedImage> imageDrawer;
         private IntrospectControlPanel introspectControlPanel;
         private NodeGraph nodeGraph;
         private DualConvas dualCanvas;

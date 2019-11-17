@@ -27,6 +27,7 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.io.File;
 import java.io.FileFilter;
+import java.util.function.Function;
 
 /**
  *
@@ -39,7 +40,7 @@ public class AnimatedShowcase {
      *
      */
     public abstract static class RefreshAction {
-        public abstract void preSetupSet(Solver bpSolver, IImageDrawer imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas);
+        public abstract void preSetupSet(Solver bpSolver, Function<Solver, BufferedImage> imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas);
         public abstract void setup();
         public abstract void process(float throttle);
 
@@ -51,7 +52,7 @@ public class AnimatedShowcase {
         private BufferedImage detectorImage;
 
 
-        public void preSetupSet(Solver bpSolver, IImageDrawer imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas) {
+        public void preSetupSet(Solver bpSolver, Function<Solver, BufferedImage> imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas) {
             this.bpSolver = bpSolver;
             this.imageDrawer = imageDrawer;
             this.introspectControlPanel = introspectControlPanel;
@@ -94,7 +95,7 @@ public class AnimatedShowcase {
 
             // TODO< pull image from source >
             // for now imageDrawer does this
-            image = imageDrawer.drawToJavaImage(bpSolver);
+            image = imageDrawer.apply(bpSolver);
 
             System.out.print("begin processing @" + ((int)(100f * throttle)) + "%" );
 
@@ -163,7 +164,7 @@ public class AnimatedShowcase {
         }
 
         private Solver bpSolver;
-        private IImageDrawer imageDrawer;
+        private Function<Solver, BufferedImage> imageDrawer;
         private IntrospectControlPanel introspectControlPanel;
         private NodeGraph nodeGraph;
         private VisualProcessor.ProcessingChain processingChain;
@@ -228,7 +229,7 @@ public class AnimatedShowcase {
         }
     }
 
-    public void setup(final String titleString, final Vector2d<Integer> imageSize, IImageDrawer inputDrawer, RefreshAction refreshAction) {
+    public void setup(final String titleString, final Vector2d<Integer> imageSize, Function<Solver, BufferedImage> inputDrawer, RefreshAction refreshAction) {
         JFrame j = new JFrame(titleString);
 
         Solver bpSolver = new Solver();
