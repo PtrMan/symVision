@@ -175,6 +175,8 @@ public class ProcessD implements IProcess {
         Assert.Assert(createdLineDetector.integratedSampleIndices.size() >= 2, "");
         // the regression mse is not defined if it are only two points
 
+        createdLineDetector.recalcConf(); // necessary
+
         boolean addCreatedLineDetector = false;
 
         if (createdLineDetector.integratedSampleIndices.size() == 2) {
@@ -258,6 +260,9 @@ public class ProcessD implements IProcess {
                 iLinedetector.m = regressionResult.m;
                 iLinedetector.n = regressionResult.n;
                 iLinedetector.mse = regressionResult.mse;
+
+                // * recompute conf
+                iLinedetector.recalcConf();
             }
         }
     }
@@ -520,6 +525,10 @@ public class ProcessD implements IProcess {
         public int compare(ArrayRealVector a, ArrayRealVector b) {
             if (Helper.getAxis(a, axis) > Helper.getAxis(b, axis)) {
                 return 1;
+            }
+
+            if (Helper.getAxis(a, axis) == Helper.getAxis(b, axis)) {
+                return 0;
             }
 
             return -1;

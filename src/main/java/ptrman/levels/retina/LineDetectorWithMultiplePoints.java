@@ -4,6 +4,7 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 import org.eclipse.collections.api.list.primitive.IntList;
 import ptrman.bpsolver.Parameters;
 import ptrman.math.ArrayRealVectorHelper;
+import ptrman.math.NalTv;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
@@ -21,12 +22,13 @@ public class LineDetectorWithMultiplePoints {
     //public double spatialAccelerationLineLength; // can be null
     //public Vector2d<Integer> spatialAccelerationCenterPosition;
 
+    public double cachedConf = 0.0; // cached confidence of this line detector
 
     public double m, n;
 
     public double mse = 0.0f;
 
-    public boolean isLocked = false; // has the detector received enought activation so it stays?
+    public boolean isLocked = false; // has the detector received enough activation so it stays?
 
     public int commonObjectId = -1;
 
@@ -35,7 +37,10 @@ public class LineDetectorWithMultiplePoints {
     }
 
     public double getActivation() {
-        return integratedSampleIndices.size() + (Parameters.getProcessdMaxMse() - mse) * Parameters.getProcessdLockingActivationScale();
+        return
+            samples.size() * 0.1 +
+            cachedConf * 1.8 +
+            (Parameters.getProcessdMaxMse() - mse) * Parameters.getProcessdLockingActivationScale();
     }
 
     public boolean isCommonObjectIdValid() {
@@ -95,5 +100,16 @@ public class LineDetectorWithMultiplePoints {
         final ArrayRealVector firstSamplePosition = sortedSamplePositions.get(0);
 
         return lastSamplePosition.subtract(firstSamplePosition).getNorm();
+    }
+
+    public void recalcConf() {
+        cachedConf = samples.get(0).conf;
+        int idx = 0;
+        for(ProcessA.Sample iSample : samples) {
+            if (idx > 0) {
+                cachedConf = NalTv.calcRevConf(cachedConf, iSample.conf);
+            }
+            idx++;
+        }
     }
 }

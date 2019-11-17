@@ -199,8 +199,6 @@ public class Solver {
         endosceletonSampleFilter.preProcessData();
 
 
-        endosceletonProcessD.setMaxDistancePositions(processdmaximalDistanceOfPositions);
-
         endosceletonProcessD.preProcessData();
         //exosceletonProcessD.preProcessData();
 
