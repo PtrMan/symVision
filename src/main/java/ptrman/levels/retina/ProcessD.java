@@ -46,8 +46,6 @@ public class ProcessD implements IProcess {
 
     private Vector2d<Integer> imageSize;
 
-    private int gridcellSize = 8;
-
     private Random random = new RandomAdaptor(new MersenneTwister()); // new Random();
 
     public double maximalDistanceOfPositions;
@@ -78,13 +76,6 @@ public class ProcessD implements IProcess {
 
     @Override
     public void preProcessData() {
-        Assert.Assert((imageSize.x % gridcellSize) == 0, "");
-        Assert.Assert((imageSize.y % gridcellSize) == 0, "");
-
-        // small size hack because else the map is accessed out of range
-        //accelerationMap = new SpatialListMap2d<>(new Vector2d<>(imageSize.x + gridcellSize, imageSize.y + gridcellSize * 2), gridcellSize);
-
-        //accelerationMapCellUsed = new IntBooleanHashMap();
     }
 
     @Override
@@ -410,18 +401,6 @@ public class ProcessD implements IProcess {
         return max;
     }
 
-    private static List<RetinaPrimitive> splitDetectorsIntoLines(List<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints) {
-        List<RetinaPrimitive> result;
-
-        result = new ArrayList<>();
-
-        for (LineDetectorWithMultiplePoints iterationDetector : lineDetectorsWithMultiplePoints) {
-            result.addAll(splitDetectorIntoLines(iterationDetector));
-        }
-
-        return result;
-    }
-
     public static List<ArrayRealVector> getSortedSamplePositions(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints) {
         List<ArrayRealVector> samplePositions = new ArrayList<>();
 
@@ -499,11 +478,6 @@ public class ProcessD implements IProcess {
 
     // TODO< belongs into dedicated helper >
     static private class Helper {
-
-//        private static boolean isDistanceBetweenPositionsBelow(ArrayRealVector a, ArrayRealVector b, double maxDistance) {
-//            //return a.subtract(b).getNorm() < maxDistance;
-//        }
-
         private static double getAxis(ArrayRealVector vector, EnumAxis axis) {
             final double[] dr = vector.getDataRef();
             if (axis == EnumAxis.X) {
@@ -547,5 +521,4 @@ public class ProcessD implements IProcess {
         X,
         Y
     }
-
 }
