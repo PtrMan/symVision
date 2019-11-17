@@ -26,8 +26,6 @@ import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
  * computation of altitude of points
  */
 public class ProcessB extends AbstractProcessB {
-
-
     @Override
     public void set(IMap2d<Boolean> map, ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector) {
         this.inputMap = map;
@@ -35,16 +33,12 @@ public class ProcessB extends AbstractProcessB {
         this.outputSampleConnector = outputSampleConnector;
     }
 
-
-
     @Override
     public void setup() {
-
     }
 
     @Override
     public void preProcessData() {
-
     }
 
     /**
@@ -55,8 +49,6 @@ public class ProcessB extends AbstractProcessB {
     public void processData() {
         List<ProcessA.Sample> samples = inputSampleConnector.getWorkspace();
 
-        Vector2d<Integer> foundPosition;
-        
         final int MAXRADIUS = (int)Math.ceil( Math.sqrt( imageSize.x*imageSize.x + imageSize.y*imageSize.y) ); // (int)Math.sqrt(squaredDistance(new double[]{(double)imageSize.x, (double)imageSize.y}));
 
         final int GRIDSIZE_FOR_SPATIALACCELERATEDMAP2D = 8;
@@ -91,7 +83,6 @@ public class ProcessB extends AbstractProcessB {
 
     @Override
     public void postProcessData() {
-
     }
 
     private static FastBooleanMap2d convertMapToFastBooleanMap2d(IMap2d<Boolean> map) {

@@ -50,16 +50,20 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             g2.setColor(Color.WHITE);
 
-            //g2.drawRect(2, 2, 100, 100);
-            //g2.fillRect(10, 10, 70, 20);
 
-            //g2.fillRect(10, 50, 70, 20);
+            // draw big boxes
+            if(true) {
+                g2.fillRect(10, 10, 70, 20);
 
-            // draw "A"
-            g2.setStroke(new BasicStroke(3));
-            g2.drawLine(10, 80, 40, 10);
-            g2.drawLine(90, 80, 40, 10);
-            g2.drawLine(30, 40, 70, 40);
+                g2.fillRect(10, 50, 70, 20);
+            }
+
+            if(false) {// draw "A"
+                g2.setStroke(new BasicStroke(3));
+                g2.drawLine(10, 80, 40, 10);
+                g2.drawLine(90, 80, 40, 10);
+                g2.drawLine(30, 40, 70, 40);
+            }
 
 
             return off_Image;
@@ -163,24 +167,38 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             ProcessA processA = new ProcessA();
 
+            ProcessB processB = new ProcessB();
+
             processA.setImageSize(imageSize);
             processA.setup();
 
+            processB.setImageSize(imageSize);
+            processB.setup();
+
             // copy image because processA changes the image
-            ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = connectorSamplesForEndosceleton;
+            ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
             processA.set(mapBoolean.copy(), processZFacade.getNotMagnifiedOutputObjectIds(), connectorSamplesFromProcessA);
 
+            ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessB = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+            processB.set(mapBoolean.copy(), connectorSamplesFromProcessA, conntrSamplesFromProcessB);
+
             processD.setImageSize(imageSize);
+            connectorSamplesForEndosceleton = conntrSamplesFromProcessB;
             processD.set(connectorSamplesForEndosceleton, connectorDetectorsEndosceletonFromProcessD);
 
             processA.preProcessData();
             processA.processData(0.01f);
+            processA.postProcessData();
+
+            processB.preProcessData();
+            processB.processData();
+            processB.postProcessData();
 
             processD.preProcessData();
             processD.processData(1.0f);
             processD.postProcessData();
         }
-        else if( (frameCounter % 25) == 0 ) {
+        else if( (frameCounter % 15) == 0 ) {
             // do annealing step of process D
 
             processD.sampleNew();
@@ -199,7 +217,32 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             tint(255.0f, 255.0f); // reset tint
         }
 
-        { // draw visualization
+        boolean drawVisualizationOfLineDetectors = false;
+        boolean drawVisualizationOfAltitude = true;
+        boolean drawVisualizationOfEndoSceletons = false; // do we visualize all samples of endo/exo -sceleton
+
+
+        if(drawVisualizationOfAltitude) {
+            for (ProcessA.Sample iSample : connectorSamplesForEndosceleton.workspace) {
+                float color = Math.min((float)iSample.altitude / 20.0f, 1.0f);
+
+                stroke(color*255.0f);
+                rect((float)iSample.position.getDataRef()[0], (float)iSample.position.getDataRef()[1], 1, 1);
+            }
+        }
+
+        if(drawVisualizationOfEndoSceletons) {
+            for (ProcessA.Sample iSample : connectorSamplesForEndosceleton.workspace) {
+                if (iSample.type != ProcessA.Sample.EnumType.ENDOSCELETON) {
+                    continue;
+                }
+                stroke(255.0f, 0.0f, 0.0f);
+
+                rect((float)iSample.position.getDataRef()[0], (float)iSample.position.getDataRef()[1], 1, 1);
+            }
+        }
+
+        if(drawVisualizationOfLineDetectors) { // draw visualization of line detectors
             for(LineDetectorWithMultiplePoints iLineDetector : processD.annealedCandidates) {
                 // iLineDetector.cachedSamplePositions
 
