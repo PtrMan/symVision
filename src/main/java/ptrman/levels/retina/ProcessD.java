@@ -92,6 +92,7 @@ public class ProcessD implements IProcess {
 
         // limit size
         while(annealedCandidates.size() > anealedCandidatesMaxCount) {
+            annealedCandidates.get(anealedCandidatesMaxCount-1).cleanup(); // decrement ref count to free up samples
             annealedCandidates.remove(anealedCandidatesMaxCount-1);
         }
     }
@@ -112,7 +113,9 @@ public class ProcessD implements IProcess {
         int sampleIndex = 0; // NOTE< index in endosceletonPoint / workingSamples >
         IntArrayList allCandidateSampleIndices = new IntArrayList();
         for (final ProcessA.Sample iterationSample : workingSamples) {
-            if(!(onlyEndoskeleton && iterationSample.type != ProcessA.Sample.EnumType.ENDOSCELETON)) {
+            boolean onlyAddEndoskeletonEnable = !(onlyEndoskeleton && iterationSample.type != ProcessA.Sample.EnumType.ENDOSCELETON);
+            boolean isReferenced = iterationSample.refCount != 0;
+            if(!isReferenced && onlyAddEndoskeletonEnable ) {
                 allCandidateSampleIndices.add(sampleIndex);
             }
             sampleIndex++;
@@ -132,6 +135,10 @@ public class ProcessD implements IProcess {
         final boolean doAllSamplesHaveId = doAllSamplesHaveObjectId(selectedSamples);
         if (!doAllSamplesHaveId) {
             return;
+        }
+
+        if (selectedSamples.size() == 0) {
+            return; // special case
         }
 
         // check if object ids are the same
@@ -158,6 +165,10 @@ public class ProcessD implements IProcess {
         }
         // else we are here
 
+        if(chosenCandidateSampleIndices.size() <= 2) { // the regression mse is not defined if it are only two points
+            return; // only create detector if we have at least three samples
+        }
+
 
         // create new line detector
         LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints();
@@ -167,8 +178,6 @@ public class ProcessD implements IProcess {
         Assert.Assert(areObjectIdsTheSameOfSamples(selectedSamples), "");
         createdLineDetector.commonObjectId = selectedSamples.get(0).objectId;
 
-        Assert.Assert(createdLineDetector.integratedSampleIndices.size() >= 2, "");
-        // the regression mse is not defined if it are only two points
 
         createdLineDetector.recalcConf(); // necessary
 
@@ -199,6 +208,10 @@ public class ProcessD implements IProcess {
         // else we are here
 
         if (addCreatedLineDetector) {
+            for(ProcessA.Sample iSample : createdLineDetector.samples) {
+                iSample.refCount++;
+            }
+
             annealedCandidates.addAll(Arrays.asList(new LineDetectorWithMultiplePoints[]{createdLineDetector}));
         }
     }
@@ -243,6 +256,9 @@ public class ProcessD implements IProcess {
                 if(onlyEndoskeleton && sample.type != ProcessA.Sample.EnumType.ENDOSCELETON) {
                     continue;
                 }
+                if (sample.refCount > 0) {
+                    continue; // sample is already in use
+                }
 
                 // * project on line, check
                 if (iLinedetector.isYAxisSingularity()) {
@@ -256,6 +272,7 @@ public class ProcessD implements IProcess {
 
                 // * add to line
                 iLinedetector.samples.add(sample);
+                sample.refCount++;
 
                 // * recompute line and mse
                 RegressionForLineResult regressionResult = calcRegressionResultOfSamples(iLinedetector.samples);

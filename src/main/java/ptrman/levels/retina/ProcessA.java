@@ -138,6 +138,8 @@ public class ProcessA implements IProcess {
         public int objectId = -1;
         public double conf; // confidence from NAL
 
+        public int refCount = 0; // used to see in process-D if sample is already used
+
         public Sample getClone() {
             Sample clone = new Sample(position);
             clone.altitude = this.altitude;
