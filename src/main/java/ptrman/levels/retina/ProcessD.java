@@ -245,6 +245,9 @@ public class ProcessD implements IProcess {
                 }
 
                 // * project on line, check
+                if (iLinedetector.isYAxisSingularity()) {
+                    continue; // ignore because we can't project
+                }
                 ArrayRealVector projectedPosition = iLinedetector.projectPointOntoLine(sample.position);
                 double dist = calcDistance(sample.position, projectedPosition);
                 if (dist > widenSampleMaxDistance) {
