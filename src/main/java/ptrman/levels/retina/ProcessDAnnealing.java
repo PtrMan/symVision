@@ -28,7 +28,6 @@ import ptrman.bpsolver.Parameters;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.levels.retina.helper.SpatialDrawer;
 import ptrman.levels.retina.helper.SpatialListMap2d;
-import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
 import java.util.*;
@@ -49,94 +48,6 @@ import static ptrman.math.Maths.squaredDistance;
  * is using a kind of simulated annealing to weed out "old" not useful hypothesis of lines
  */
 public class ProcessDAnnealing implements IProcess {
-    public static class LineDetectorWithMultiplePoints {
-
-        public List<ArrayRealVector> cachedSamplePositions;
-        public IntList integratedSampleIndices;
-
-        // variable for the line drawing in the acceleration structure
-        public ArrayRealVector spatialAccelerationLineDirection; // can be null
-        public double spatialAccelerationLineLength; // can be null
-        public Vector2d<Integer> spatialAccelerationCenterPosition;
-
-
-        public double m, n;
-
-        public double mse = 0.0f;
-
-        public boolean isLocked = false; // has the detector received enought activation so it stays?
-
-        public int commonObjectId = -1;
-
-        public boolean doesContainSampleIndex(int index) {
-            return integratedSampleIndices.contains(index);
-        }
-
-        public double getActivation() {
-            return integratedSampleIndices.size() + (Parameters.getProcessdMaxMse() - mse) * Parameters.getProcessdLockingActivationScale();
-        }
-
-        public boolean isCommonObjectIdValid() {
-            return commonObjectId != -1;
-        }
-
-        public ArrayRealVector projectPointOntoLine(ArrayRealVector point) {
-            if (isYAxisSingularity()) {
-                // call isn't allowed
-                throw new RuntimeException("internal error");
-                //return projectPointOntoLineForSingular(point);
-            } else {
-                return projectPointOntoLineForNonsingular(point);
-            }
-        }
-
-        /*private Vector2d<Float> projectPointOntoLineForSingular(Vector2d<Float> point)
-        {
-            return new Vector2d<Float>(point.x, horizontalOffset);
-        }*/
-
-        public ArrayRealVector projectPointOntoLineForNonsingular(ArrayRealVector point) {
-            ArrayRealVector lineDirection = getNormalizedDirection();
-            ArrayRealVector diffFromAToPoint = point.subtract(new ArrayRealVector(new double[]{0.0f, n}));
-            double dotResult = lineDirection.dotProduct(diffFromAToPoint);
-
-            return new ArrayRealVector(new double[]{0.0f, n}).add(getScaled(lineDirection, dotResult));
-        }
-
-        private ArrayRealVector getNormalizedDirection() {
-            if (isYAxisSingularity()) {
-                throw new RuntimeException("internal error");
-            } else {
-                return ArrayRealVectorHelper.normalize(new ArrayRealVector(new double[]{1.0f, m}));
-            }
-        }
-
-        // TODO< just simply test flag >
-        public boolean isYAxisSingularity() {
-            return Double.isInfinite(m);
-        }
-
-        public double getHorizontalOffset(List<ProcessA.Sample> samples) {
-            Assert.Assert(isYAxisSingularity(), "");
-
-            int sampleIndex = integratedSampleIndices.get(0);
-            return samples.get(sampleIndex).position.getDataRef()[0];
-        }
-
-        public double getLength() {
-            List<ArrayRealVector> sortedSamplePositions = getSortedSamplePositions(this);
-
-            Assert.Assert(sortedSamplePositions.size() >= 2, "samples size must be equal or greater than two");
-
-            // it doesn't care if the line is singuar or not, the distance is always the length
-            final ArrayRealVector lastSamplePosition = sortedSamplePositions.get(sortedSamplePositions.size() - 1);
-            final ArrayRealVector firstSamplePosition = sortedSamplePositions.get(0);
-
-            return lastSamplePosition.subtract(firstSamplePosition).getNorm();
-        }
-    }
-
-
     private static class LineDetectors {
         public LineDetectors(List<LineDetectorWithMultiplePoints> lineDetectors) {
             this.lineDetectors = lineDetectors;
@@ -334,7 +245,7 @@ public class ProcessDAnnealing implements IProcess {
             // create new line detector
             LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints();
             createdLineDetector.integratedSampleIndices = chosenCandidateSampleIndices;
-            createdLineDetector.cachedSamplePositions = positionsOfSamples;
+            createdLineDetector.samples = selectedSamples;
 
             createdLineDetector.spatialAccelerationLineDirection = spatialAccelerationLineDirection;
             createdLineDetector.spatialAccelerationCenterPosition = spatialAccelerationCenterPosition;
@@ -719,16 +630,16 @@ public class ProcessDAnnealing implements IProcess {
         return result;
     }
 
-    private static List<ArrayRealVector> getSortedSamplePositions(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints) {
+    public static List<ArrayRealVector> getSortedSamplePositions(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints) {
         List<ArrayRealVector> samplePositions = new ArrayList<>();
 
         if (lineDetectorWithMultiplePoints.isYAxisSingularity()) {
-            samplePositions.addAll(lineDetectorWithMultiplePoints.cachedSamplePositions);
+            samplePositions.addAll(getPositionsOfSamples(lineDetectorWithMultiplePoints.samples));
 
             samplePositions.sort(new VectorComperatorByAxis(EnumAxis.Y));
         } else {
             // project
-            for (ArrayRealVector iterationSamplePosition : lineDetectorWithMultiplePoints.cachedSamplePositions) {
+            for (ArrayRealVector iterationSamplePosition : getPositionsOfSamples(lineDetectorWithMultiplePoints.samples)) {
                 ArrayRealVector projectedSamplePosition = lineDetectorWithMultiplePoints.projectPointOntoLine(iterationSamplePosition);
 
                 samplePositions.add(projectedSamplePosition);

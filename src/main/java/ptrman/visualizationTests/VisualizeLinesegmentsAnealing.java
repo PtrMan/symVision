@@ -16,10 +16,7 @@ import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.IImageDrawer;
 import ptrman.Showcases.TestClustering;
 import ptrman.bpsolver.Solver;
-import ptrman.levels.retina.ProcessA;
-import ptrman.levels.retina.ProcessDAnnealing;
-import ptrman.levels.retina.ProcessZFacade;
-import ptrman.levels.retina.RetinaPrimitive;
+import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.levels.visual.ColorRgb;
 import ptrman.levels.visual.VisualProcessor;
@@ -186,9 +183,10 @@ public class VisualizeLinesegmentsAnealing extends PApplet {
         frameCounter++;
 
         {
-            for(ProcessDAnnealing.LineDetectorWithMultiplePoints iLineDetector : processD.anealedCandidates) {
+            for(LineDetectorWithMultiplePoints iLineDetector : processD.anealedCandidates) {
                 // iLineDetector.cachedSamplePositions
 
+                color(1.0f, 1.0f, 1.0f);
                 for (RetinaPrimitive iLine : ProcessDAnnealing.splitDetectorIntoLines(iLineDetector)) {
                     double x0 = iLine.line.a.getDataRef()[0];
                     double y0 = iLine.line.a.getDataRef()[1];
@@ -196,6 +194,9 @@ public class VisualizeLinesegmentsAnealing extends PApplet {
                     double y1 = iLine.line.b.getDataRef()[1];
                     line((float)x0, (float)y0, (float)x1, (float)y1);
                 }
+
+                color(1.0f, 0.0f, 0.0f);
+                rect(0, 0, 1, 1);
             }
 
             int here = 5;
