@@ -35,7 +35,7 @@ Foundalis decided to not release his implementation due to ethical concerns. The
 | D      | proposal of lines from points | working good enough    | lines don't vote yet correcty | visual test |
 | | | | | |
 | B      | computation of altitude of points                            | sufficient | none | visual test |
-| C      | identifies if a point is a point of the endo- or exoskeleton | minimal? | ? | no |
+| C      | identifies if a point is a point of the endo- or exoskeleton | sufficient | some samples are not endosceleton, minor issue | visual test |
 | E      | finds line intersections                                     | partial | none? | no |
 | F      | Sends traces in imagespace for samples which are deeper than a threshold | partial | none? | no |
 | G      | curve detection                                              | partial, ~20%? | ? | no |
