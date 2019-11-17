@@ -112,4 +112,13 @@ public class LineDetectorWithMultiplePoints {
             idx++;
         }
     }
+
+
+    // must be called before removal in process-D
+    public void cleanup() {
+        for(ProcessA.Sample iSample : samples) {
+            iSample.refCount--;
+        }
+    }
+
 }
