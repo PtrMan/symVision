@@ -224,7 +224,7 @@ public class ProcessB extends AbstractProcessB {
         Assert.Assert(gridsize == 8, "only implemented for gridsize = 8");
 
 
-        int h = cellPosition.y + 1 * gridsize;
+        int h = (cellPosition.y + 1) * gridsize;
         int w = (cellPosition.x + 1) * gridsize;
 
         for(int y = cellPosition.y * gridsize; y < h; y++ ) {
