@@ -36,7 +36,7 @@ import static ptrman.math.Maths.squaredDistance;
  *
  * is using a kind of simulated annealing to weed out "old" not useful hypothesis of lines
  */
-public class ProcessDAnnealing implements IProcess {
+public class ProcessD implements IProcess {
     // candidates which are annealed
     public List<LineDetectorWithMultiplePoints> annealedCandidates = new ArrayList<>();
 

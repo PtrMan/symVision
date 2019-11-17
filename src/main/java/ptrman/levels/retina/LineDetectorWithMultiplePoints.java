@@ -2,7 +2,6 @@ package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.eclipse.collections.api.list.primitive.IntList;
-import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.Parameters;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
@@ -87,7 +86,7 @@ public class LineDetectorWithMultiplePoints {
     }
 
     public double getLength() {
-        List<ArrayRealVector> sortedSamplePositions = ProcessDAnnealing.getSortedSamplePositions(this);
+        List<ArrayRealVector> sortedSamplePositions = ProcessD.getSortedSamplePositions(this);
 
         Assert.Assert(sortedSamplePositions.size() >= 2, "samples size must be equal or greater than two");
 

@@ -60,13 +60,13 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
     }
 
     public VisualizeLinesegmentsAnnealing() {
-        processD = new ProcessDAnnealing();
+        processD = new ProcessD();
         processD.maximalDistanceOfPositions = 500.0;
 
         connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
     }
 
-    ProcessDAnnealing processD;
+    ProcessD processD;
     ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
     ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
 
@@ -197,7 +197,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
                 // iLineDetector.cachedSamplePositions
 
                 stroke(255.0f, 255.0f, 255.0f);
-                for (RetinaPrimitive iLine : ProcessDAnnealing.splitDetectorIntoLines(iLineDetector)) {
+                for (RetinaPrimitive iLine : ProcessD.splitDetectorIntoLines(iLineDetector)) {
                     double x0 = iLine.line.a.getDataRef()[0];
                     double y0 = iLine.line.a.getDataRef()[1];
                     double x1 = iLine.line.b.getDataRef()[0];
