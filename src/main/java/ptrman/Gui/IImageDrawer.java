@@ -1,6 +1,6 @@
 package ptrman.Gui;
 
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 
 import java.awt.image.BufferedImage;
 
@@ -9,5 +9,5 @@ import java.awt.image.BufferedImage;
  */
 public interface IImageDrawer
 {
-    BufferedImage drawToJavaImage(BpSolver bpSolver);
+    BufferedImage drawToJavaImage(Solver bpSolver);
 }

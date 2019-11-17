@@ -2,7 +2,7 @@ package ptrman.bpsolver.RetinaToWorkspaceTranslator;
 
 import ptrman.FargGeneral.network.Node;
 import ptrman.levels.retina.RetinaPrimitive;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 
 import java.util.List;
 
@@ -16,5 +16,5 @@ import java.util.List;
  */
 public interface ITranslatorStrategy
 {
-    List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, BpSolver bpSolver);
+    List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver);
 }

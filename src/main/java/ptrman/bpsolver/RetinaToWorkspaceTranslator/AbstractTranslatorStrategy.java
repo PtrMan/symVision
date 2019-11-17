@@ -6,7 +6,7 @@ import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
 import ptrman.levels.retina.Intersection;
 import ptrman.levels.retina.RetinaPrimitive;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.HelperFunctions;
 import ptrman.bpsolver.NetworkHandles;
 import ptrman.bpsolver.nodes.AttributeNode;
@@ -24,7 +24,7 @@ import java.util.Map;
  *
  */
 public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy {
-    public abstract List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, BpSolver bpSolver);
+    public abstract List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver);
     
     protected void storeRetinaObjectWithAssocIntoMap(List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects) {
         for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObjectWithAssoc : arrayOfRetinaObjectWithAssociatedPoints ) {
@@ -199,7 +199,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
         }
     }
     
-    protected static void createLinksAndNodesForAnglePoints(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, BpSolver bpSolver) {
+    protected static void createLinksAndNodesForAnglePoints(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, Solver bpSolver) {
         for( SpatialAcceleration<Crosspoint>.Element currentElement : spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getContentOfAllCells() ) {
             Crosspoint crosspoint;
             

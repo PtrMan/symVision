@@ -14,7 +14,7 @@ import ptrman.bpsolver.nodes.PlatonicPrimitiveNode;
 public enum HelperFunctions {
 	;
 
-	public static PlatonicPrimitiveInstanceNode createVectorAttributeNode(ArrayRealVector vector, PlatonicPrimitiveNode primitiveNodeType, BpSolver bpSolver) {
+	public static PlatonicPrimitiveInstanceNode createVectorAttributeNode(ArrayRealVector vector, PlatonicPrimitiveNode primitiveNodeType, Solver bpSolver) {
         PlatonicPrimitiveInstanceNode createdVectorInstanceNode = new PlatonicPrimitiveInstanceNode(primitiveNodeType);
         
         final FeatureNode createdXNode = FeatureNode.createFloatNode(bpSolver.networkHandles.xCoordinatePlatonicPrimitiveNode, vector.getDataRef()[0], 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(bpSolver.networkHandles.xCoordinatePlatonicPrimitiveNode));

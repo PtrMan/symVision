@@ -18,14 +18,14 @@ import java.awt.image.DataBuffer;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BpSolverTest {
-    public BpSolverTest() {
+public class SolverTest {
+    public SolverTest() {
         Parameters.init();
     }
 
     @Test
     public void testAnglePointV() {
-        BpSolver bpSolver = new BpSolver();
+        Solver bpSolver = new Solver();
         bpSolver.setImageSize(new Vector2d<>(100, 100));
         
         
@@ -134,7 +134,7 @@ public class BpSolverTest {
         return convertedToMap;
     }
     
-    private static BufferedImage drawToJavaImage(BpSolver bpSolver) {
+    private static BufferedImage drawToJavaImage(Solver bpSolver) {
         BufferedImage off_Image = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
 
         Graphics2D g2 = off_Image.createGraphics();
@@ -146,7 +146,7 @@ public class BpSolverTest {
         return off_Image;
     }
     
-    private static List<Node> getNodesFromImage(Map2d<Boolean> image, BpSolver bpSolver) {
+    private static List<Node> getNodesFromImage(Map2d<Boolean> image, Solver bpSolver) {
         // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
         bpSolver.coderack.flush();
         

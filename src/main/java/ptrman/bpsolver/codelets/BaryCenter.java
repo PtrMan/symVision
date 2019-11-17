@@ -2,7 +2,7 @@ package ptrman.bpsolver.codelets;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.FargGeneral.network.Link;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.HelperFunctions;
 import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.FeatureNode;
@@ -26,7 +26,7 @@ public class BaryCenter extends SolverCodelet {
         NO
     }
     
-    public BaryCenter(BpSolver bpSolver, EnumRecalculate recalculate) {
+    public BaryCenter(Solver bpSolver, EnumRecalculate recalculate) {
         super(bpSolver);
         this.recalculate = recalculate;
     }

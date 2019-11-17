@@ -7,7 +7,7 @@ import ptrman.FargGeneral.Coderack;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Network;
 import ptrman.FargGeneral.network.Node;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.CodeletLtmLookup;
 import ptrman.bpsolver.NetworkHandles;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
@@ -37,7 +37,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
      * \return the node which is the object node 
      */
     @Override
-    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, BpSolver bpSolver) {
+    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver) {
         ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints;
         HashMap<Integer, PlatonicPrimitiveInstanceNode> objectNodesByGroupId;
         ArrayList<Node> resultNodes;
@@ -68,7 +68,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         return resultArray;
     }
     
-    private ArrayList<ObjectNodeWithGroup> createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, BpSolver bpSolver, Vector2d<Float> imageSize) {
+    private ArrayList<ObjectNodeWithGroup> createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Solver bpSolver, Vector2d<Float> imageSize) {
         ArrayList<ObjectNodeWithGroup> resultObjectNodesWithGroup;
         
         resultObjectNodesWithGroup = new ArrayList<>();
@@ -92,7 +92,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     }
     
     
-    private void createAndLinkAnglePointsAndLink(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, BpSolver bpSolver, Vector2d<Float> imageSize) {
+    private void createAndLinkAnglePointsAndLink(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Solver bpSolver, Vector2d<Float> imageSize) {
         SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects;
         
         // TODO< hard parameters >

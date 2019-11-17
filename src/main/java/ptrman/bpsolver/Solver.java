@@ -15,20 +15,13 @@ import ptrman.levels.retina.helper.ProcessConnector;
 
 import java.util.*;
 
-public class BpSolver {
+public class Solver {
     public float processdmaximalDistanceOfPositions = 30.0f;// was 6.0f;
 
 
     public List<ProcessA.Sample> debugSamples;
 
-
-    public static void main(String[] args) {
-        Parameters.init();
-        
-        BpSolver solver = new BpSolver();
-    }
-    
-    public BpSolver() {
+    public Solver() {
     }
 
     public void setup() {
@@ -603,9 +596,6 @@ public class BpSolver {
 
 
 
-
-
-
     // TODO< refactor out >
     private static List<Intersection> getAllLineIntersections(Iterable<RetinaPrimitive> lineDetectors) {
         List<Intersection> uniqueIntersections;
@@ -710,6 +700,4 @@ public class BpSolver {
     private ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessH;
 
     private Collection<ProcessConnector> allConnectors = new ArrayList<>();
-
-
 }

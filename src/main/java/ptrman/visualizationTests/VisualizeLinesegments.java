@@ -6,7 +6,7 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.IImageDrawer;
 import ptrman.Showcases.TestClustering;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Parameters;
 import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.levels.visual.ColorRgb;
@@ -28,7 +28,7 @@ public class VisualizeLinesegments extends PApplet {
         BufferedImage off_Image;
 
         @Override
-        public BufferedImage drawToJavaImage(BpSolver bpSolver) {
+        public BufferedImage drawToJavaImage(Solver bpSolver) {
             if (off_Image == null || off_Image.getWidth() != RETINA_WIDTH || off_Image.getHeight() != RETINA_HEIGHT) {
                 off_Image = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             }
@@ -62,7 +62,7 @@ public class VisualizeLinesegments extends PApplet {
             IMap2d<ColorRgb> mapColor;
 
 
-            BpSolver bpSolver = new BpSolver();
+            Solver bpSolver = new Solver();
             bpSolver.setImageSize(new Vector2d<>(RETINA_WIDTH, RETINA_HEIGHT));
             bpSolver.setup();
 

@@ -2,7 +2,7 @@ package ptrman.bpsolver.codelets;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.FargGeneral.network.Link;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.HelperFunctions;
 import ptrman.bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
 import ptrman.bpsolver.SolverCodelet;
@@ -41,7 +41,7 @@ public class Angle extends SolverCodelet {
         public final double angle;
     }
     
-    public Angle(BpSolver bpSolver) {
+    public Angle(Solver bpSolver) {
         super(bpSolver);
     }
 

@@ -15,7 +15,7 @@ import ptrman.FargGeneral.network.Node;
  */
 public abstract class SolverCodelet extends Codelet
 {
-    public SolverCodelet(BpSolver bpSolver)
+    public SolverCodelet(Solver bpSolver)
     {
         this.bpSolver = bpSolver;
     }
@@ -40,6 +40,6 @@ public abstract class SolverCodelet extends Codelet
         return bpSolver.networkHandles;
     }
 
-    protected BpSolver bpSolver;
+    protected Solver bpSolver;
     protected Node startNode;
 }

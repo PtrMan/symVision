@@ -4,7 +4,7 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.SpatialAcceleration;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.levels.retina.Intersection;
 import ptrman.levels.retina.RetinaPrimitive;
@@ -20,7 +20,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
 
 
     @Override
-    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, BpSolver bpSolver) {
+    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver) {
         SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects;
         List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints;
         Map<RetinaPrimitive, Boolean> remainingRetinaObjects;
@@ -58,7 +58,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
         return NearIntersectionStrategy.pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(remainingRetinaObjects, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap, random, bpSolver);
     }
 
-    private static Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(List<RetinaPrimitive> primitives, BpSolver bpSolver) {
+    private static Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver) {
         Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> resultMap;
 
         resultMap = new HashMap<>();
@@ -179,7 +179,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
     }
     
 
-    private static List<Node> pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(Map<RetinaPrimitive, Boolean> map, Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitveToRetinaObjectWithAssocMap, Random random, BpSolver bpSolver) {
+    private static List<Node> pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(Map<RetinaPrimitive, Boolean> map, Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitveToRetinaObjectWithAssocMap, Random random, Solver bpSolver) {
         List<Node> resultObjectNodes = new ArrayList<>();
         
         for(;;) {

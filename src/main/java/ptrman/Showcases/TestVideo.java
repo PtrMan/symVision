@@ -3,7 +3,7 @@ package ptrman.Showcases;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.IImageDrawer;
 import ptrman.Gui.showcase.AnimatedShowcase;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -24,7 +24,7 @@ public class TestVideo extends AnimatedShowcase {
         BufferedImage off_Image;
 
         @Override
-        public BufferedImage drawToJavaImage(BpSolver bpSolver) {
+        public BufferedImage drawToJavaImage(Solver bpSolver) {
             if (off_Image == null || off_Image.getWidth() != RETINA_WIDTH || off_Image.getHeight() != RETINA_HEIGHT) {
                 off_Image = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             }

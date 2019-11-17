@@ -5,7 +5,7 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.*;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Parameters;
 import ptrman.levels.visual.ColorRgb;
 import ptrman.levels.visual.VisualProcessor;
@@ -39,7 +39,7 @@ public class TestClustering {
         BufferedImage off_Image;
 
         @Override
-        public BufferedImage drawToJavaImage(BpSolver bpSolver) {
+        public BufferedImage drawToJavaImage(Solver bpSolver) {
             if (off_Image == null || off_Image.getWidth() != RETINA_WIDTH || off_Image.getHeight() != RETINA_HEIGHT) {
                 off_Image = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             }
@@ -98,7 +98,7 @@ public class TestClustering {
 
 
 
-        public TimerActionListener(BpSolver bpSolver, IImageDrawer imageDrawer,  IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas, VisualProcessor.ProcessingChain processingChain) {
+        public TimerActionListener(Solver bpSolver, IImageDrawer imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas, VisualProcessor.ProcessingChain processingChain) {
             this.bpSolver = bpSolver;
             this.imageDrawer = imageDrawer;
             this.introspectControlPanel = introspectControlPanel;
@@ -156,7 +156,7 @@ public class TestClustering {
             dualCanvas.rightCanvas.setImage(detectorImage);
         }
 
-        private BpSolver bpSolver;
+        private Solver bpSolver;
         private final IImageDrawer imageDrawer;
         private IntrospectControlPanel introspectControlPanel;
         private NodeGraph nodeGraph;
@@ -169,7 +169,7 @@ public class TestClustering {
 
 
 
-        BpSolver bpSolver = new BpSolver();
+        Solver bpSolver = new Solver();
         bpSolver.setImageSize(new Vector2d<>(RETINA_WIDTH, RETINA_HEIGHT));
         bpSolver.setup();
 

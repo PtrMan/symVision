@@ -2,7 +2,7 @@ package ptrman.bpsolver.codelets;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.FargGeneral.network.Link;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.HelperFunctions;
 import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.NodeTypes;
@@ -14,7 +14,7 @@ import ptrman.misc.Assert;
  * must be called only once!
  */
 public class EndPoint extends SolverCodelet {
-    public EndPoint(BpSolver bpSolver) {
+    public EndPoint(Solver bpSolver) {
         super(bpSolver);
     }
 

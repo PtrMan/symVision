@@ -4,7 +4,7 @@ package ptrman.bpsolver.RetinaToWorkspaceTranslator;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.levels.retina.RetinaPrimitive;
 
@@ -20,12 +20,12 @@ import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimiti
  */
 public class IdStrategy extends AbstractTranslatorStrategy {
     @Override
-    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, BpSolver bpSolver) {
+    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver) {
         IntObjectHashMap<Deque<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(primitives);
         return createNodesFromMap(objectIdToRetinaPrimitivesMap, bpSolver);
     }
 
-    private static List<Node> createNodesFromMap(final IntObjectHashMap<Deque<RetinaPrimitive>> map, final BpSolver bpSolver) {
+    private static List<Node> createNodesFromMap(final IntObjectHashMap<Deque<RetinaPrimitive>> map, final Solver bpSolver) {
         List<Node> resultNodes = new ArrayList<>();
 
         map.forEachKeyValue( (k, v) -> {

@@ -10,7 +10,7 @@ import ptrman.Gui.IImageDrawer;
 import ptrman.Gui.IntrospectControlPanel;
 import ptrman.Gui.NodeGraph;
 import ptrman.Gui.showcase.AnimatedShowcase;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.levels.visual.VisualProcessor;
 
 import javax.imageio.ImageIO;
@@ -35,7 +35,7 @@ public class TestMotion extends AnimatedShowcase {
         BufferedImage off_Image;
 
         @Override
-        public BufferedImage drawToJavaImage(BpSolver bpSolver) {
+        public BufferedImage drawToJavaImage(Solver bpSolver) {
             if (off_Image == null || off_Image.getWidth() != RETINA_WIDTH || off_Image.getHeight() != RETINA_HEIGHT) {
                 off_Image = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
             }
@@ -71,7 +71,7 @@ public class TestMotion extends AnimatedShowcase {
             this.testMotion = testMotion;
         }
 
-        public void preSetupSet(BpSolver bpSolver, IImageDrawer imageDrawer,  IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas) {
+        public void preSetupSet(Solver bpSolver, IImageDrawer imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas) {
             this.bpSolver = bpSolver;
             this.imageDrawer = imageDrawer;
             this.introspectControlPanel = introspectControlPanel;
@@ -151,7 +151,7 @@ public class TestMotion extends AnimatedShowcase {
             return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
         }
 
-        private BpSolver bpSolver;
+        private Solver bpSolver;
         private IImageDrawer imageDrawer;
         private IntrospectControlPanel introspectControlPanel;
         private NodeGraph nodeGraph;

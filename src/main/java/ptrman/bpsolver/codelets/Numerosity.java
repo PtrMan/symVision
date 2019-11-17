@@ -1,14 +1,14 @@
 package ptrman.bpsolver.codelets;
 
 import ptrman.FargGeneral.network.Node;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.NodeTypes;
 
 import java.util.Random;
 
 public class Numerosity extends SolverCodelet {
-    public Numerosity(BpSolver bpSolver)
+    public Numerosity(Solver bpSolver)
     {
         super(bpSolver);
     }

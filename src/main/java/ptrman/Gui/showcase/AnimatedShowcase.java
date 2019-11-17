@@ -6,7 +6,7 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.*;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Parameters;
 import ptrman.levels.retina.ProcessA;
 import ptrman.levels.visual.ColorRgb;
@@ -30,7 +30,7 @@ public class AnimatedShowcase {
      *
      */
     public abstract static class RefreshAction {
-        public abstract void preSetupSet(BpSolver bpSolver, IImageDrawer imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas);
+        public abstract void preSetupSet(Solver bpSolver, IImageDrawer imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas);
         public abstract void setup();
         public abstract void process(float throttle);
 
@@ -42,7 +42,7 @@ public class AnimatedShowcase {
         private BufferedImage detectorImage;
 
 
-        public void preSetupSet(BpSolver bpSolver, IImageDrawer imageDrawer,  IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas) {
+        public void preSetupSet(Solver bpSolver, IImageDrawer imageDrawer, IntrospectControlPanel introspectControlPanel, NodeGraph nodeGraph, DualConvas dualCanvas) {
             this.bpSolver = bpSolver;
             this.imageDrawer = imageDrawer;
             this.introspectControlPanel = introspectControlPanel;
@@ -153,7 +153,7 @@ public class AnimatedShowcase {
             resultRightCanvasImage = detectorImage;
         }
 
-        private BpSolver bpSolver;
+        private Solver bpSolver;
         private IImageDrawer imageDrawer;
         private IntrospectControlPanel introspectControlPanel;
         private NodeGraph nodeGraph;
@@ -222,7 +222,7 @@ public class AnimatedShowcase {
     public void setup(final String titleString, final Vector2d<Integer> imageSize, IImageDrawer inputDrawer, RefreshAction refreshAction) {
         JFrame j = new JFrame(titleString);
 
-        BpSolver bpSolver = new BpSolver();
+        Solver bpSolver = new Solver();
         bpSolver.setImageSize(imageSize);
         bpSolver.setup();
 

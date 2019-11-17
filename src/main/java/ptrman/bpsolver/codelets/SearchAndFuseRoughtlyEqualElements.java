@@ -4,7 +4,7 @@ import ptrman.Datastructures.Tuple4;
 import ptrman.FargGeneral.Codelet;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.FeatureNode;
@@ -31,7 +31,7 @@ import static ptrman.math.Maths.weightDoubles;
  */
 public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
     // startnode must be a object node
-    public SearchAndFuseRoughtlyEqualElements(BpSolver bpSolver)
+    public SearchAndFuseRoughtlyEqualElements(Solver bpSolver)
     {
         super(bpSolver);
     }

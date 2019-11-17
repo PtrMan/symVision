@@ -1,7 +1,7 @@
 package ptrman.bpsolver.codelets;
 
 import ptrman.FargGeneral.network.Link;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
@@ -14,7 +14,7 @@ import ptrman.misc.Assert;
  * calculates the length of a LineSegment
  */
 public class LineSegmentLength extends SolverCodelet {
-    public LineSegmentLength(BpSolver bpSolver) {
+    public LineSegmentLength(Solver bpSolver) {
         super(bpSolver);
     }
     

@@ -6,7 +6,7 @@ import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
 import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.levels.retina.SingleLineDetector;
-import ptrman.bpsolver.BpSolver;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.RetinaToWorkspaceTranslator.ITranslatorStrategy;
 import ptrman.bpsolver.RetinaToWorkspaceTranslator.NearIntersectionStrategy;
 import ptrman.bpsolver.pattern.FeaturePatternMatching;
@@ -29,9 +29,9 @@ public enum TestPatternMatching {
     public static void main(String[] args) {
         List<RetinaPrimitive> lineDetectors;
 
-        BpSolver bpSolver;
+        Solver bpSolver;
 
-        bpSolver = new BpSolver();
+        bpSolver = new Solver();
         bpSolver.setImageSize(new Vector2d<>(128, 128));
         bpSolver.setup();
 
