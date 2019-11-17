@@ -41,7 +41,7 @@ public class ProcessD implements IProcess {
     public List<LineDetectorWithMultiplePoints> annealedCandidates = new ArrayList<>();
 
     // 5 for testing
-    public int anealedCandidatesMaxCount = 10; // maximal number of line segments which are considered
+    public int anealedCandidatesMaxCount = 40; // maximal number of line segments which are considered
 
 
     private Vector2d<Integer> imageSize;
@@ -55,7 +55,7 @@ public class ProcessD implements IProcess {
 
 
     public int widenSamplesPerTrial = 10; // how many points are considered when doing a widening step?
-    public double widenSampleMaxDistance = 3.0; // maximal distance of projected position to line to actual position
+    public double widenSampleMaxDistance = 4.0; // maximal distance of projected position to line to actual position
 
     public boolean onlyEndoskeleton = false; // only work with samples which belong to endoskeleton?
 
@@ -94,6 +94,15 @@ public class ProcessD implements IProcess {
         while(annealedCandidates.size() > anealedCandidatesMaxCount) {
             annealedCandidates.get(anealedCandidatesMaxCount-1).cleanup(); // decrement ref count to free up samples
             annealedCandidates.remove(anealedCandidatesMaxCount-1);
+        }
+    }
+
+    public void removeCandidatesBelowActivation(double threshold) {
+        for(int idx=annealedCandidates.size()-1;idx >= 0;idx--) {
+            double activation = annealedCandidates.get(idx).getActivation();
+            if (activation < threshold) {
+                annealedCandidates.remove(idx);
+            }
         }
     }
 

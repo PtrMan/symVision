@@ -90,12 +90,14 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
     static int animationFrameNumber = 0;
 
+    static int annealingStep = 0;
+
     public void draw(){
         background(64);
 
-        animationFrameNumber = (frameCounter / (5*10));
+        animationFrameNumber = (frameCounter / (5*30));
 
-        if ((frameCounter % (5*10)) == 0 ) {
+        if ((frameCounter % (5*30)) == 0 ) {
             InputDrawer imageDrawer = new InputDrawer();
 
             BufferedImage image;
@@ -218,6 +220,8 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             processD.preProcessData();
             processD.processData(1.0f);
             processD.postProcessData();
+
+            annealingStep = 0;
         }
         else if( (frameCounter % 5) == 0 ) {
             // do annealing step of process D
@@ -225,6 +229,12 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             processD.sampleNew();
             processD.tryWiden();
             processD.sortByActivationAndThrowAway();
+
+            if (annealingStep >= 20) { // remove only in later phases
+                processD.removeCandidatesBelowActivation(1.1);
+            }
+
+            annealingStep++;
         }
 
         frameCounter++;
