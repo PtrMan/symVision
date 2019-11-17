@@ -52,16 +52,20 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
 
             // draw big boxes
-            if(true) {
+            if(false) {
                 g2.fillRect(10, 10, 70, 20);
 
                 g2.fillRect(10, 50, 70, 20);
             }
 
-            if(false) {// draw "A"
+            if(true) {// draw "A"
+                int endpointADeltaX = (int)(Math.cos(animationFrameNumber * 0.1) * 10);
+                int endpointADeltaY = (int)(Math.sin(animationFrameNumber * 0.1) * 10);
+
+
                 g2.setStroke(new BasicStroke(3));
-                g2.drawLine(10, 80, 40, 10);
-                g2.drawLine(90, 80, 40, 10);
+                g2.drawLine(10+endpointADeltaX, 80+endpointADeltaY, 40, 10);
+                g2.drawLine(90+endpointADeltaX, 80+endpointADeltaY, 40, 10);
                 g2.drawLine(30, 40, 70, 40);
             }
 
@@ -84,10 +88,14 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
     int frameCounter = 0;
 
+    static int animationFrameNumber = 0;
+
     public void draw(){
         background(64);
 
-        if (frameCounter == 0) {
+        animationFrameNumber = (frameCounter / (5*10));
+
+        if ((frameCounter % (5*10)) == 0 ) {
             InputDrawer imageDrawer = new InputDrawer();
 
             BufferedImage image;
@@ -152,6 +160,9 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             final int processZGridsize = 8;
 
+            connectorSamplesForEndosceleton.workspace.clear();
+            processD.annealedCandidates.clear(); // TODO< cleanup in process with method >
+
             processZFacade.setImageSize(imageSize);
             processZFacade.preSetupSet(processZGridsize, processzNumberOfPixelsToMagnifyThreshold);
             processZFacade.setup();
@@ -208,7 +219,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             processD.processData(1.0f);
             processD.postProcessData();
         }
-        else if( (frameCounter % 15) == 0 ) {
+        else if( (frameCounter % 5) == 0 ) {
             // do annealing step of process D
 
             processD.sampleNew();

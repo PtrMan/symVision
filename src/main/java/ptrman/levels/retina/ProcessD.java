@@ -211,7 +211,7 @@ public class ProcessD implements IProcess {
 
     public void processData(float throttle) {
 
-        for(int i = 0; i < 5; i++) {
+        for(int i = 0; i < 9; i++) {
             sampleNew();
             tryWiden();
             sortByActivationAndThrowAway();
