@@ -107,4 +107,8 @@ public enum ArrayRealVectorHelper {
 
         return result;
     }
+
+    public static double calcDistance(ArrayRealVector a, ArrayRealVector b) {
+        return a.getDistance(b);
+    }
 }

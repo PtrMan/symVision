@@ -10,6 +10,7 @@
 package ptrman.visualizationTests;
 
 import processing.core.PApplet;
+import processing.core.PImage;
 import ptrman.Datastructures.Dag;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
@@ -20,12 +21,13 @@ import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.levels.visual.ColorRgb;
 import ptrman.levels.visual.VisualProcessor;
+import ptrman.misc.ImageConverter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
-// visualize linesegments of endosceleton
-public class VisualizeLinesegmentsAnealing extends PApplet {
+// visualize line-segments of endosceleton
+public class VisualizeLinesegmentsAnnealing extends PApplet {
 
     final static int RETINA_WIDTH = 128;
     final static int RETINA_HEIGHT = 128;
@@ -51,15 +53,13 @@ public class VisualizeLinesegmentsAnealing extends PApplet {
             //g2.drawRect(2, 2, 100, 100);
             g2.fillRect(10, 10, 70, 20);
 
-            return off_Image;
-        }
+            g2.fillRect(10, 50, 70, 20);
 
-        public void settings() {
-            size(500, 500);
+            return off_Image;
         }
     }
 
-    public VisualizeLinesegmentsAnealing() {
+    public VisualizeLinesegmentsAnnealing() {
         processD = new ProcessDAnnealing();
         processD.maximalDistanceOfPositions = 500.0;
 
@@ -173,17 +173,27 @@ public class VisualizeLinesegmentsAnealing extends PApplet {
             processD.processData(1.0f);
             processD.postProcessData();
         }
-        else if( (frameCounter % 60) == 0 ) {
-            // do anealing step of process D
+        else if( (frameCounter % 25) == 0 ) {
+            // do annealing step of process D
 
             processD.sampleNew();
+            processD.tryWiden();
             processD.sortByActivationAndThrowAway();
         }
 
         frameCounter++;
 
-        {
-            for(LineDetectorWithMultiplePoints iLineDetector : processD.anealedCandidates) {
+        { // draw processed image in the background
+            IImageDrawer imgDrawer = new InputDrawer();
+            BufferedImage img = imgDrawer.drawToJavaImage(null);
+            PImage pimg = ImageConverter.convBufferedImageToPImage(img);
+            tint(255.0f, 0.2f*255.0f);
+            image(pimg, 0, 0); // draw image
+            tint(255.0f, 255.0f); // reset tint
+        }
+
+        { // draw visualization
+            for(LineDetectorWithMultiplePoints iLineDetector : processD.annealedCandidates) {
                 // iLineDetector.cachedSamplePositions
 
                 stroke(255.0f, 255.0f, 255.0f);
@@ -210,8 +220,13 @@ public class VisualizeLinesegmentsAnealing extends PApplet {
         ellipse(mouseX, mouseY, 4, 4);
     }
 
+    @Override
+    public void settings() {
+        size(200, 200);
+    }
+
     public static void main(String[] passedArgs) {
-        String[] appletArgs = new String[] { "ptrman.visualizationTests.VisualizeLinesegmentsAnealing" };
+        String[] appletArgs = new String[] { "ptrman.visualizationTests.VisualizeLinesegmentsAnnealing" };
         PApplet.main(appletArgs);
     }
 }

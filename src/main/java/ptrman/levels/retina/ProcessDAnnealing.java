@@ -12,16 +12,13 @@ package ptrman.levels.retina;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomAdaptor;
-import org.apache.commons.math3.stat.descriptive.moment.Mean;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
-import org.eclipse.collections.impl.map.mutable.primitive.IntBooleanHashMap;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.Parameters;
 import ptrman.levels.retina.helper.ProcessConnector;
-import ptrman.levels.retina.helper.SpatialListMap2d;
 import ptrman.misc.Assert;
 
 import java.util.*;
@@ -40,6 +37,31 @@ import static ptrman.math.Maths.squaredDistance;
  * is using a kind of simulated annealing to weed out "old" not useful hypothesis of lines
  */
 public class ProcessDAnnealing implements IProcess {
+    // candidates which are annealed
+    public List<LineDetectorWithMultiplePoints> annealedCandidates = new ArrayList<>();
+
+    // 5 for testing
+    public int anealedCandidatesMaxCount = 10; // maximal number of line segments which are considered
+
+
+    private Vector2d<Integer> imageSize;
+
+    private int gridcellSize = 8;
+
+    private Random random = new RandomAdaptor(new MersenneTwister()); // new Random();
+
+    public double maximalDistanceOfPositions;
+
+    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
+    private ProcessConnector<RetinaPrimitive> outputLineDetectorConnector;
+
+
+    public int widenSamplesPerTrial = 10; // how many points are considered when doing a widening step?
+    public double widenSampleMaxDistance = 3.0; // maximal distance of projected position to line to actual position
+
+    public Random rng = new Random();
+
+
     public void set(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<RetinaPrimitive> outputLineDetectorConnector) {
         this.inputSampleConnector = inputSampleConnector;
         this.outputLineDetectorConnector = outputLineDetectorConnector;
@@ -60,32 +82,24 @@ public class ProcessDAnnealing implements IProcess {
         Assert.Assert((imageSize.y % gridcellSize) == 0, "");
 
         // small size hack because else the map is accessed out of range
-        accelerationMap = new SpatialListMap2d<>(new Vector2d<>(imageSize.x + gridcellSize, imageSize.y + gridcellSize * 2), gridcellSize);
+        //accelerationMap = new SpatialListMap2d<>(new Vector2d<>(imageSize.x + gridcellSize, imageSize.y + gridcellSize * 2), gridcellSize);
 
-        accelerationMapCellUsed = new IntBooleanHashMap();
+        //accelerationMapCellUsed = new IntBooleanHashMap();
     }
-
-    Mean lineLengthStatistics = new Mean();
 
     @Override
     public void processData() {
         processData(1f);
     }
 
-    // candidates which are annealed
-    public List<LineDetectorWithMultiplePoints> anealedCandidates = new ArrayList<>();
 
-
-    // 5 for testing
-    public int anealedCandidatesMaxCount = 5; // maximal number of line segments which are considered
-
-    // sorts anealedCandidates by activation and throws items with to low activation away
+    // sorts annealedCandidates by activation and throws items with to low activation away
     public void sortByActivationAndThrowAway() {
-        anealedCandidates.sort((a, b) -> a.getActivation() < b.getActivation() ? 1 : -1);
+        annealedCandidates.sort((a, b) -> a.getActivation() < b.getActivation() ? 1 : -1);
 
         // limit size
-        while(anealedCandidates.size() > anealedCandidatesMaxCount) {
-            anealedCandidates.remove(anealedCandidatesMaxCount-1);
+        while(annealedCandidates.size() > anealedCandidatesMaxCount) {
+            annealedCandidates.remove(anealedCandidatesMaxCount-1);
         }
     }
 
@@ -142,7 +156,7 @@ public class ProcessDAnnealing implements IProcess {
         }
         // else we are here
 
-        final RegressionForLineResult regressionResult = calcRegressionForPoints(positionsOfSamples);
+        final RegressionForLineResult regressionResult = calcRegressionResultOfSamples(selectedSamples);
 
         if (regressionResult.mse > Parameters.getProcessdMaxMse()) {
             return;
@@ -154,10 +168,6 @@ public class ProcessDAnnealing implements IProcess {
         LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints();
         createdLineDetector.integratedSampleIndices = chosenCandidateSampleIndices;
         createdLineDetector.samples = selectedSamples;
-
-        //createdLineDetector.spatialAccelerationLineDirection = spatialAccelerationLineDirection;
-        //createdLineDetector.spatialAccelerationCenterPosition = spatialAccelerationCenterPosition;
-
 
         Assert.Assert(areObjectIdsTheSameOfSamples(selectedSamples), "");
         createdLineDetector.commonObjectId = selectedSamples.get(0).objectId;
@@ -192,14 +202,21 @@ public class ProcessDAnnealing implements IProcess {
         // else we are here
 
         if (addCreatedLineDetector) {
-            anealedCandidates.addAll(Arrays.asList(new LineDetectorWithMultiplePoints[]{createdLineDetector}));
+            annealedCandidates.addAll(Arrays.asList(new LineDetectorWithMultiplePoints[]{createdLineDetector}));
         }
+    }
+
+    private static RegressionForLineResult calcRegressionResultOfSamples(List<ProcessA.Sample> samples) {
+        final List<ArrayRealVector> positionsOfSamples = getPositionsOfSamples(samples);
+        final RegressionForLineResult regressionResult = calcRegressionForPoints(positionsOfSamples);
+        return regressionResult;
     }
 
     public void processData(float throttle) {
 
         for(int i = 0; i < 5; i++) {
             sampleNew();
+            tryWiden();
             sortByActivationAndThrowAway();
         }
 
@@ -213,6 +230,36 @@ public class ProcessDAnnealing implements IProcess {
 
          */
 
+    }
+
+    /**
+     * tries to add points to existing lines
+     */
+    public void tryWiden() {
+        for (LineDetectorWithMultiplePoints iLinedetector : annealedCandidates) {
+
+            // sample samples and project to line, check distance if it is below threshold
+            for (int iSamplingAttempt=0;iSamplingAttempt<widenSamplesPerTrial;iSamplingAttempt++) {
+                int sampleIdx = rng.nextInt(inputSampleConnector.workspace.size());
+
+                // * project on line, check
+                ProcessA.Sample sample = inputSampleConnector.workspace.get(sampleIdx);
+                ArrayRealVector projectedPosition = iLinedetector.projectPointOntoLine(sample.position);
+                double dist = calcDistance(sample.position, projectedPosition);
+                if (dist > widenSampleMaxDistance) {
+                    continue;
+                }
+
+                // * add to line
+                iLinedetector.samples.add(sample);
+
+                // * recompute line and mse
+                RegressionForLineResult regressionResult = calcRegressionResultOfSamples(iLinedetector.samples);
+                iLinedetector.m = regressionResult.m;
+                iLinedetector.n = regressionResult.n;
+                iLinedetector.mse = regressionResult.mse;
+            }
+        }
     }
 
     @Override
@@ -492,19 +539,4 @@ public class ProcessDAnnealing implements IProcess {
         Y
     }
 
-    private Vector2d<Integer> imageSize;
-
-    private int gridcellSize = 8;
-
-    private Random random = new RandomAdaptor(new MersenneTwister()); // new Random();
-
-    // each cell contains the incides of the points/samples inside the accelerationMap
-    private SpatialListMap2d<Integer> accelerationMap;
-
-    private IntBooleanHashMap accelerationMapCellUsed;
-
-    public double maximalDistanceOfPositions;
-
-    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
-    private ProcessConnector<RetinaPrimitive> outputLineDetectorConnector;
 }
