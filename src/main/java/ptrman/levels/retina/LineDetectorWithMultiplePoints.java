@@ -18,9 +18,9 @@ public class LineDetectorWithMultiplePoints {
     public IntList integratedSampleIndices;
 
     // variable for the line drawing in the acceleration structure
-    public ArrayRealVector spatialAccelerationLineDirection; // can be null
-    public double spatialAccelerationLineLength; // can be null
-    public Vector2d<Integer> spatialAccelerationCenterPosition;
+    //public ArrayRealVector spatialAccelerationLineDirection; // can be null
+    //public double spatialAccelerationLineLength; // can be null
+    //public Vector2d<Integer> spatialAccelerationCenterPosition;
 
 
     public double m, n;

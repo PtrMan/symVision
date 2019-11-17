@@ -67,12 +67,13 @@ public class ProcessA implements IProcess {
             for( int blockX = 0; blockX < workingImage.getWidth()/4; blockX++ ) {
                 int hitCount = 0;
 
-                if (throttle < 1f)
-                    if (rng.nextInt(100) < throttle*100)
-                        continue;
-
                 for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
                     for (int x = blockX; x < (blockX+1)*4; x++) {
+                        if (throttle < 1f) {
+                            if (rng.nextDouble() > throttle)
+                                continue;
+                        }
+
                         if( sampleMaskAtPosition(x, y, MaskDetail0) ) {
                             if( workingImage.readAt(x, y) ) {
                                 hitCount++;
@@ -97,6 +98,11 @@ public class ProcessA implements IProcess {
                 // sample it a second time for nearly all of the missing pixels
                 for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
                     for (int x = blockX; x < (blockX+1)*4; x++) {
+                        if (throttle < 1f) {
+                            if (rng.nextDouble() > throttle)
+                                continue;
+                        }
+
                         if( sampleMaskAtPosition(x, y, MaskDetail1) ) {
                             if( workingImage.readAt(x, y) ) {
                                 hitCount++;

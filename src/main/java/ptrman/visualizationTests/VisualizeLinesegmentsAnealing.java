@@ -167,7 +167,7 @@ public class VisualizeLinesegmentsAnealing extends PApplet {
             processD.set(connectorSamplesForEndosceleton, connectorDetectorsEndosceletonFromProcessD);
 
             processA.preProcessData();
-            processA.processData(1.0f);
+            processA.processData(0.01f);
 
             processD.preProcessData();
             processD.processData(1.0f);
@@ -186,7 +186,7 @@ public class VisualizeLinesegmentsAnealing extends PApplet {
             for(LineDetectorWithMultiplePoints iLineDetector : processD.anealedCandidates) {
                 // iLineDetector.cachedSamplePositions
 
-                color(1.0f, 1.0f, 1.0f);
+                stroke(255.0f, 255.0f, 255.0f);
                 for (RetinaPrimitive iLine : ProcessDAnnealing.splitDetectorIntoLines(iLineDetector)) {
                     double x0 = iLine.line.a.getDataRef()[0];
                     double y0 = iLine.line.a.getDataRef()[1];
@@ -195,15 +195,19 @@ public class VisualizeLinesegmentsAnealing extends PApplet {
                     line((float)x0, (float)y0, (float)x1, (float)y1);
                 }
 
-                color(1.0f, 0.0f, 0.0f);
-                rect(0, 0, 1, 1);
+                stroke(255.0f, 0.0f, 0.0f);
+                for( ProcessA.Sample iSample : iLineDetector.samples) {
+
+                    rect((float)iSample.position.getDataRef()[0], (float)iSample.position.getDataRef()[1], 1, 1);
+                }
+
             }
 
             int here = 5;
         }
 
-
-        ellipse(mouseX, mouseY, 20, 20);
+        // mouse cursor
+        ellipse(mouseX, mouseY, 4, 4);
     }
 
     public static void main(String[] passedArgs) {

@@ -78,7 +78,7 @@ public enum Parameters
         currentPatternMatchingMinSimilarity = HardParameters.PatternMatching.MINSIMILARITY;
     }
     
-    public static float currentProcessdMaxMse;
+    public static float currentProcessdMaxMse = 50.0f;
     public static float currentProcessdLockingActivationOffset;
     public static float currentProcessdLockingActivationScale;
     public static float currentPatternMatchingMinSimilarity;
