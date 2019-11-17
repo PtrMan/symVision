@@ -73,6 +73,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
     public VisualizeLinesegmentsAnnealing() {
         processD = new ProcessD();
         processD.maximalDistanceOfPositions = 500.0;
+        processD.onlyEndoskeleton = true;
 
         connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
     }

@@ -57,6 +57,8 @@ public class ProcessD implements IProcess {
     public int widenSamplesPerTrial = 10; // how many points are considered when doing a widening step?
     public double widenSampleMaxDistance = 3.0; // maximal distance of projected position to line to actual position
 
+    public boolean onlyEndoskeleton = false; // only work with samples which belong to endoskeleton?
+
     public Random rng = new Random();
 
 
@@ -110,7 +112,9 @@ public class ProcessD implements IProcess {
         int sampleIndex = 0; // NOTE< index in endosceletonPoint / workingSamples >
         IntArrayList allCandidateSampleIndices = new IntArrayList();
         for (final ProcessA.Sample iterationSample : workingSamples) {
-            allCandidateSampleIndices.add(sampleIndex);
+            if(!(onlyEndoskeleton && iterationSample.type != ProcessA.Sample.EnumType.ENDOSCELETON)) {
+                allCandidateSampleIndices.add(sampleIndex);
+            }
             sampleIndex++;
         }
 
@@ -235,8 +239,12 @@ public class ProcessD implements IProcess {
             for (int iSamplingAttempt=0;iSamplingAttempt<widenSamplesPerTrial;iSamplingAttempt++) {
                 int sampleIdx = rng.nextInt(inputSampleConnector.workspace.size());
 
-                // * project on line, check
                 ProcessA.Sample sample = inputSampleConnector.workspace.get(sampleIdx);
+                if(onlyEndoskeleton && sample.type != ProcessA.Sample.EnumType.ENDOSCELETON) {
+                    continue;
+                }
+
+                // * project on line, check
                 ArrayRealVector projectedPosition = iLinedetector.projectPointOntoLine(sample.position);
                 double dist = calcDistance(sample.position, projectedPosition);
                 if (dist > widenSampleMaxDistance) {
