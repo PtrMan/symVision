@@ -106,19 +106,16 @@ public class LineDetectorWithMultiplePoints {
         cachedConf = samples.get(0).conf;
         int idx = 0;
         for(ProcessA.Sample iSample : samples) {
-            if (idx > 0) {
+            if (idx++ > 0)
                 cachedConf = NalTv.calcRevConf(cachedConf, iSample.conf);
-            }
-            idx++;
         }
     }
 
 
     // must be called before removal in process-D
     public void cleanup() {
-        for(ProcessA.Sample iSample : samples) {
+        for(ProcessA.Sample iSample : samples)
             iSample.refCount--;
-        }
     }
 
 }

@@ -172,6 +172,7 @@ public class ProcessA implements IProcess {
 
         }
 
+        /** sKeletor */
         public enum EnumType {
             ENDOSCELETON,
             EXOSCELETON

@@ -63,25 +63,29 @@ public enum SpatialDrawer {
         return resultPositions;
     }
 
-    public static List<Vector2d<Integer>> getPositionsOfCellsWithNegativeDirectionOfCircleBound(final Vector2d<Integer> center, final int radius, final Vector2d<Integer> boundary) {
+    public static List<Vector2d<Integer>> getPositionsOfCellsWithNegativeDirectionOfCircleBound(final Vector2d<Integer> center, final int radius, final Vector2d<Integer> boundary, List<Vector2d<Integer>> y) {
         Drawer drawer = new Drawer();
 
         Bresenham.rasterCircle(center, radius, drawer);
 
-        List<Vector2d<Integer>> resultPositions = new FastList<>(drawer.positionWithDirections.size());
+        if (y == null)
+            y = new FastList<>(drawer.positionWithDirections.size());
+        else
+            y.clear();
+
         for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections) {
 
             final Vector2d<Integer> a = iterationPositionWithDirection.position;
             if (isGridLocationInBound(a, boundary))
-                resultPositions.add(a);
+                y.add(a);
 
             final Vector2d<Integer> b = add(a, getScaled(iterationPositionWithDirection.direction, -1));
             if (isGridLocationInBound(b, boundary))
-                resultPositions.add(b);
+                y.add(b);
         }
 
 
-        return resultPositions;
+        return y;
     }
 
     public static List<Vector2d<Integer>> getPositionsOfCellsOfLineUnbound(final Vector2d<Integer> a, final Vector2d<Integer> b) {

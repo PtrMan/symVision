@@ -89,7 +89,7 @@ public class ProcessD implements IProcess {
 
     // sorts annealedCandidates by activation and throws items with to low activation away
     public void sortByActivationAndThrowAway() {
-        annealedCandidates.sort((a, b) -> a.getActivation() < b.getActivation() ? 1 : -1);
+        annealedCandidates.sort((a, b) -> (a==b) ? 0 : a.getActivation() < b.getActivation() ? 1 : -1);
 
         // limit size
         while(annealedCandidates.size() > anealedCandidatesMaxCount) {

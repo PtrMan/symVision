@@ -117,7 +117,7 @@ public class TuningWindow extends JPanel
         labelProcessdMaxMse = new JLabel();
         add(labelProcessdMaxMse); 
         
-        sliderProcessdMaxMse = new JSlider(JSlider.HORIZONTAL, 0, 8000, Math.round(HardParameters.ProcessD.MAXMSE*100));
+        sliderProcessdMaxMse = new JSlider(SwingConstants.HORIZONTAL, 0, 8000, Math.round(HardParameters.ProcessD.MAXMSE*100));
         ChangeListenerForProcessdMaxMse changeListenerMaxMse = new ChangeListenerForProcessdMaxMse(labelProcessdMaxMse);
         changeListenerMaxMse.changeTo(HardParameters.ProcessD.MAXMSE);
         sliderProcessdMaxMse.addChangeListener(changeListenerMaxMse);
@@ -127,7 +127,7 @@ public class TuningWindow extends JPanel
         labelProcessdLockingActivationOffset = new JLabel();
         add(labelProcessdLockingActivationOffset); 
         
-        sliderProcessdLockingActivationOffset = new JSlider(JSlider.HORIZONTAL, 0, 100, Math.round(HardParameters.ProcessD.LOCKINGACTIVATIONOFFSET*10));
+        sliderProcessdLockingActivationOffset = new JSlider(SwingConstants.HORIZONTAL, 0, 100, Math.round(HardParameters.ProcessD.LOCKINGACTIVATIONOFFSET*10));
         ChangeListenerForProcessdLockingActivationOffset changeListenerOffset = new ChangeListenerForProcessdLockingActivationOffset(labelProcessdLockingActivationOffset);
         changeListenerOffset.changeTo(HardParameters.ProcessD.LOCKINGACTIVATIONOFFSET);
         sliderProcessdLockingActivationOffset.addChangeListener(changeListenerOffset);
@@ -137,7 +137,7 @@ public class TuningWindow extends JPanel
         labelProcessdLockingActivationScale = new JLabel();
         add(labelProcessdLockingActivationScale); 
         
-        sliderProcessdLockingActivationScale = new JSlider(JSlider.HORIZONTAL, 0, 10, Math.round(HardParameters.ProcessD.LOCKINGACTIVATIONMSESCALE*10));
+        sliderProcessdLockingActivationScale = new JSlider(SwingConstants.HORIZONTAL, 0, 10, Math.round(HardParameters.ProcessD.LOCKINGACTIVATIONMSESCALE*10));
         ChangeListenerForProcessdLockingActivationScale changeListenerScale = new ChangeListenerForProcessdLockingActivationScale(labelProcessdLockingActivationScale);
         changeListenerScale.changeTo(HardParameters.ProcessD.LOCKINGACTIVATIONMSESCALE);
         sliderProcessdLockingActivationScale.addChangeListener(changeListenerScale);

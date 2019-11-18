@@ -20,6 +20,11 @@ import java.util.List;
 public enum ArrayRealVectorHelper {
     ;
 
+    public static double diffDotProduct(ArrayRealVector positionReal, Vector2d<Integer> i) {
+        final ArrayRealVector diff = positionReal.subtract(ArrayRealVectorHelper.integerToArrayRealVector(i));
+        return diff.dotProduct(diff);
+    }
+
     public enum EnumRoundMode {
         DOWN,
         NEAREST

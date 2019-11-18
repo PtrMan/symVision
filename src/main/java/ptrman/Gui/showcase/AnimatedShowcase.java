@@ -280,7 +280,7 @@ public class AnimatedShowcase {
         }
 
         j.setSize(1024, 1000);
-        j.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        j.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         j.setVisible(true);
 
         new Thread(() -> {

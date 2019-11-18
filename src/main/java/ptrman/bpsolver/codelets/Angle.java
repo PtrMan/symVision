@@ -11,6 +11,7 @@ package ptrman.bpsolver.codelets;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.FargGeneral.network.Link;
+import ptrman.bpsolver.RetinaToWorkspaceTranslator.AbstractTranslatorStrategy;
 import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.HelperFunctions;
 import ptrman.bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
@@ -70,21 +71,21 @@ public class Angle extends SolverCodelet {
     public RunResult run() {
         Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() && ((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(getNetworkHandles().anglePointNodePlatonicPrimitiveNode), "");
 
-        PointProximityStrategy.Crosspoint.EnumAnglePointType anglePointType = getAnglePointType((PlatonicPrimitiveInstanceNode) startNode);
+        AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType anglePointType = getAnglePointType((PlatonicPrimitiveInstanceNode) startNode);
         final List<PlatonicPrimitiveInstanceNode> anglePartners = getPartnersOfAnglepoint((PlatonicPrimitiveInstanceNode)startNode);
         final ArrayRealVector anglePosition = getAnglePosition((PlatonicPrimitiveInstanceNode)startNode);
         
         // checks
-        if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.K ) {
+        if( anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.K ) {
             Assert.Assert(anglePartners.size() >= 3, "");
         }
-        else if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.V ) {
+        else if( anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.V ) {
             Assert.Assert(anglePartners.size() == 2, "");
         }
-        else if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.X ) {
+        else if( anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.X ) {
             Assert.Assert(anglePartners.size() >= 2 && anglePartners.size() <= 4, "");
         }
-        else if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.T ) {
+        else if( anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.T ) {
             Assert.Assert(anglePartners.size() == 2 || anglePartners.size() == 3, "");
         }
         else {
@@ -97,7 +98,7 @@ public class Angle extends SolverCodelet {
         }
 
 
-        final List<Double> angles = calculateAnglesBetweenPartners(anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.K ? EnumIsKPoint.YES : EnumIsKPoint.NO,
+        final List<Double> angles = calculateAnglesBetweenPartners(anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.K ? EnumIsKPoint.YES : EnumIsKPoint.NO,
                 anglePartners,
                 anglePosition
         );
@@ -121,14 +122,14 @@ public class Angle extends SolverCodelet {
         }
     }
     
-    private void createAndLinkAnglePointType(PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, final PointProximityStrategy.Crosspoint.EnumAnglePointType anglePointType) {
+    private void createAndLinkAnglePointType(PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, final AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType anglePointType) {
         final AttributeNode createAnglePointTypeNode = AttributeNode.createIntegerNode(getNetworkHandles().anglePointFeatureTypePrimitiveNode, anglePointType.ordinal());
         
         final Link createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createAnglePointTypeNode);
         anglePointPrimitiveInstanceNode.outgoingLinks.add(createdLink);
     }
     
-    private PointProximityStrategy.Crosspoint.EnumAnglePointType getAnglePointType(final PlatonicPrimitiveInstanceNode anglePointNode) {
+    private AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType getAnglePointType(final PlatonicPrimitiveInstanceNode anglePointNode) {
         for( Link iterationLink : anglePointNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
 
             if( iterationLink.target.type != NodeTypes.EnumType.ATTRIBUTENODE.ordinal() ) {
@@ -141,7 +142,7 @@ public class Angle extends SolverCodelet {
                 continue;
             }
             
-            return PointProximityStrategy.Crosspoint.EnumAnglePointType.fromInteger(targetAttributeNode.getValueAsInt());
+            return AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.fromInteger(targetAttributeNode.getValueAsInt());
             
         }
         

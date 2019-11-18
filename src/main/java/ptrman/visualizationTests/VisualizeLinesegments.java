@@ -114,22 +114,21 @@ public class VisualizeLinesegments extends PApplet {
 
             processingChain.filterChain(mapColor);
 
-            IMap2d<Boolean> mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(1).content).result;
-
-            bpSolver.recalculate(mapBoolean);
+            bpSolver.recalculate(
+                ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(1).content).result
+            );
 
             int s = bpSolver.connectorDetectorsEndosceletonFromProcessD.workspace.size();
 
-            List<RetinaPrimitive> endosceletonLines = bpSolver.connectorDetectorsEndosceletonFromProcessD.workspace;
-            for(RetinaPrimitive iLine : endosceletonLines) {
-                double x0 = iLine.line.a.getDataRef()[0];
-                double y0 = iLine.line.a.getDataRef()[1];
-                double x1 = iLine.line.b.getDataRef()[0];
-                double y1 = iLine.line.b.getDataRef()[1];
+            for(RetinaPrimitive l : bpSolver.connectorDetectorsEndosceletonFromProcessD.workspace) {
+                double[] A = l.line.a.getDataRef();
+                double x0 = A[0], y0 = A[1];
+                double[] B = l.line.b.getDataRef();
+                double x1 = B[0], y1 = B[1];
                 line((float)x0, (float)y0, (float)x1, (float)y1);
             }
 
-            int here = 5;
+//            int here = 5;
         }
 
 

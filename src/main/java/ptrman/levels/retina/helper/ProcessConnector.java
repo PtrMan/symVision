@@ -28,8 +28,8 @@ public class ProcessConnector<Type> {
         PRIMARY_QUEUE // workspace is used as a "logger", behaves like a queue
     }
 
-    public static ProcessConnector createWithDefaultQueues(final EnumMode mode) {
-        return new ProcessConnector(new ArrayDeque<>(), new ArrayList<>(), mode);
+    public static <T> ProcessConnector<T> createWithDefaultQueues(final EnumMode mode) {
+        return new ProcessConnector<>(new ArrayDeque<>(), new ArrayList<>(), mode);
     }
 
     private ProcessConnector(Queue<Type> queueImplementation, List<Type> workspaceImplementation, EnumMode mode) {
@@ -72,12 +72,7 @@ public class ProcessConnector<Type> {
     }
 
     public int getSize() {
-        if( mode == WORKSPACE ) {
-            return workspace.size();
-        }
-        else {
-            return queue.size();
-        }
+        return mode == WORKSPACE ? workspace.size() : queue.size();
     }
 
     public void flush() {

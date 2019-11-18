@@ -153,7 +153,7 @@ public class NWindow extends JFrame {
     public NWindow show(int w, int h, boolean exitOnClose) {
         show(w, h);
         if (exitOnClose)
-            setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);                
+            setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         return this;
     }
 
