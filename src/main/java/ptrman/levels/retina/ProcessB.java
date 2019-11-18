@@ -9,6 +9,7 @@
  */
 package ptrman.levels.retina;
 
+import com.google.common.collect.Streams;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.*;
 import ptrman.levels.retina.helper.ProcessConnector;
@@ -17,7 +18,10 @@ import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
+import static java.lang.Boolean.FALSE;
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 
@@ -127,8 +131,8 @@ public class ProcessB extends AbstractProcessB {
         // set this to int.max when the radius is not limited
         int radiusToScan = gridMaxSearchRadius;
 
-        Vector2d<Integer> nearestPixelCandidate = null;
-        double nearestPixelCandidateDistanceSquared = Double.MAX_VALUE;
+        final Vector2d<Integer>[] nearestPixelCandidate = new Vector2d[]{null};
+        final double[] nearestPixelCandidateDistanceSquared = {Double.MAX_VALUE};
 
         for( int currentGridRadius = 0; currentGridRadius < radiusToScan; currentGridRadius++ ) {
             final List<Vector2d<Integer>> gridCellsToScan;
@@ -176,67 +180,65 @@ public class ProcessB extends AbstractProcessB {
             counterCellCandidates += gridCellsToScan.size();
             counterCellPositiveCandidates += gridCellsToScan.size();
 
-            final List<Vector2d<Integer>> pixelPositionsToCheck = getPositionsOfCandidatePixelsOfCells(gridCellsToScan, value);
+            // do this because we need to scan the next radius too
+            radiusToScan = java.lang.Math.min(radiusToScan, currentGridRadius+1+1);
+
+            final Stream<Vector2d<Integer>> pixelPositionsToCheck = getPositionsOfCandidatePixelsOfCells(gridCellsToScan, value);
 
             // pixel scan logic
-
-            if( !pixelPositionsToCheck.isEmpty() ) {
-                // do this because we need to scan the next radius too
-                radiusToScan = java.lang.Math.min(radiusToScan, currentGridRadius+1+1);
-            }
-
-            for( final Vector2d<Integer> iterationPixelPosition : pixelPositionsToCheck ) {
+            //TODO use .collect or something
+            pixelPositionsToCheck.forEach(iterationPixelPosition -> {
                 final ArrayRealVector iterationPixelPositionReal = ptrman.math.ArrayRealVectorHelper.integerToArrayRealVector(iterationPixelPosition);
 
                 final ArrayRealVector diff = positionReal.subtract(iterationPixelPositionReal);
                 final double currentDistanceSquared = diff.dotProduct(diff);
-                if( currentDistanceSquared < nearestPixelCandidateDistanceSquared ) {
-                    nearestPixelCandidateDistanceSquared = currentDistanceSquared;
-                    nearestPixelCandidate = iterationPixelPosition;
+                if( currentDistanceSquared < nearestPixelCandidateDistanceSquared[0]) {
+                    nearestPixelCandidateDistanceSquared[0] = currentDistanceSquared;
+                    nearestPixelCandidate[0] = iterationPixelPosition;
                 }
-            }
+            });
         }
 
-        if( nearestPixelCandidate == null ) {
-            return null;
-        }
-        else {
-            final double nearestPixelCandidateDistance = java.lang.Math.sqrt(nearestPixelCandidateDistanceSquared);
-            return new Tuple2<>(nearestPixelCandidate, nearestPixelCandidateDistance);
-        }
+        return nearestPixelCandidate[0] == null ? null :
+            new Tuple2<>(nearestPixelCandidate[0], Math.sqrt(nearestPixelCandidateDistanceSquared[0]));
     }
 
-    private List<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCells(final List<Vector2d<Integer>> cellPositions, final boolean value) {
-        List<Vector2d<Integer>> result = new ArrayList<>();
+    private Stream<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCells(final List<Vector2d<Integer>> cellPositions, final boolean value) {
+
 
         Assert.Assert(!value, "only implemented for value = false");
 
-        for( final Vector2d<Integer> iterationCellPosition : cellPositions )
-            getPositionsOfCandidatePixelsOfCellWhereFalse(iterationCellPosition, result);
-
-        return result;
+        return cellPositions.stream().flatMap(this::getPositionsOfCandidatePixelsOfCellWhereFalse);
+//        for( final Vector2d<Integer> iterationCellPosition : cellPositions )
+//            getPositionsOfCandidatePixelsOfCellWhereFalse(iterationCellPosition, result);
+        //return result;
     }
 
-    private void getPositionsOfCandidatePixelsOfCellWhereFalse(final Vector2d<Integer> cellPosition, List<Vector2d<Integer>> result) {
+    private Stream<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCellWhereFalse(final Vector2d<Integer> cellPosition) {
 
         final int gridsize = spatialAcceleratedMap2d.getGridsize();
 
         Assert.Assert(gridsize == 8, "only implemented for gridsize = 8");
 
+        return IntStream.range(cellPosition.y * gridsize, (cellPosition.y + 1) * gridsize).mapToObj((int y) ->
+                IntStream.range(cellPosition.x * gridsize, (cellPosition.x + 1) * gridsize)
+                    .filter((int x) -> !map.readAt(x, y))
+                    .mapToObj((int x) -> new Vector2d<>(x, y))
+        ).flatMap(x -> x);
 
-        int h = (cellPosition.y + 1) * gridsize;
-        int w = (cellPosition.x + 1) * gridsize;
-
-        for(int y = cellPosition.y * gridsize; y < h; y++ ) {
-
-            if( map.readByteAtInt(cellPosition.x * gridsize, y) != 0xff ) {
-                for(int x = cellPosition.x * gridsize; x < w; x++ ) {
-                    if (!map.readAt(x, y)) {
-                        result.add(new Vector2d<>(x, y));
-                    }
-                }
-            }
-        }
+//        int h = (cellPosition.y + 1) * gridsize;
+//        int w = (cellPosition.x + 1) * gridsize;
+//
+//        for(int y = cellPosition.y * gridsize; y < h; y++ ) {
+//
+//            if( map.readByteAtInt(cellPosition.x * gridsize, y) != 0xff ) {
+//                for(int x = cellPosition.x * gridsize; x < w; x++ ) {
+//                    if (!map.readAt(x, y)) {
+//                        result.add(new Vector2d<>(x, y));
+//                    }
+//                }
+//            }
+//        }
     }
 
 
