@@ -260,7 +260,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
                 float color = Math.min((float)iSample.altitude / 20.0f, 1.0f);
 
                 stroke(color*255.0f);
-                rect((float)iSample.position.getDataRef()[0], (float)iSample.position.getDataRef()[1], 1, 1);
+                rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
             }
         }
 
@@ -271,7 +271,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
                 }
                 stroke(200.0f, 255.0f, 200.0f);
 
-                rect((float)iSample.position.getDataRef()[0], (float)iSample.position.getDataRef()[1], 1, 1);
+                rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
             }
         }
 
@@ -291,7 +291,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
                 stroke(255.0f, 0.0f, 0.0f);
                 for( ProcessA.Sample iSample : iLineDetector.samples) {
 
-                    rect((float)iSample.position.getDataRef()[0], (float)iSample.position.getDataRef()[1], 1, 1);
+                    rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
                 }
 
             }

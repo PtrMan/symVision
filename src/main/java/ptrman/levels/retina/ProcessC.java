@@ -10,6 +10,7 @@
 package ptrman.levels.retina;
 
 
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
@@ -24,6 +25,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 /**
@@ -111,8 +113,8 @@ public class ProcessC implements IProcess {
 
         // fill
         for( final ProcessA.Sample iterationSample : inputSampleConnector.getWorkspace()  ) {
-            final Vector2d<Integer> sampleIntegerPosition = accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN));
-            List<ProcessA.Sample> samplesOfCell = accelerationMap.addAt(sampleIntegerPosition.x, sampleIntegerPosition.y, iterationSample);
+            final IntIntPair p = accelerationMap.getCellPositionOfIntegerPosition(iterationSample.position);
+            List<ProcessA.Sample> samplesOfCell = accelerationMap.addAt(p.getOne(), p.getTwo(), iterationSample);
         }
 
 
@@ -135,18 +137,18 @@ public class ProcessC implements IProcess {
                     maxRadius = Math.min(currentRadius + 2, maxRadius);
                 }
 
-                List<Vector2d<Integer>> cellPositionsToScan;
+                List<IntIntPair> cellPositionsToScan;
 
                 if( currentRadius == 0 ) {
-                    cellPositionsToScan = new FastList<>();
-                    cellPositionsToScan.add(accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(outerSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN)));
+                    cellPositionsToScan = new FastList<>(1);
+                    cellPositionsToScan.add(accelerationMap.getCellPositionOfIntegerPosition(outerSample.position));
                 }
                 else {
-                    cellPositionsToScan = SpatialDrawer.getPositionsOfCellsOfCircleBound(accelerationMap.getCellPositionOfIntegerPosition(arrayRealVectorToInteger(outerSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN)), currentRadius, new Vector2d<>(accelerationMap.getWidth(), accelerationMap.getLength()));
+                    cellPositionsToScan = SpatialDrawer.getPositionsOfCellsOfCircleBound(accelerationMap.getCellPositionOfIntegerPosition(outerSample.position), currentRadius, pair(accelerationMap.getWidth(), accelerationMap.getLength()));
                 }
 
-                for( final Vector2d<Integer> currentCellPosition : cellPositionsToScan ) {
-                    final List<ProcessA.Sample> samplesOfCurrentCell = accelerationMap.readAt(currentCellPosition.xInt(), currentCellPosition.yInt());
+                for( final IntIntPair currentCellPosition : cellPositionsToScan ) {
+                    final List<ProcessA.Sample> samplesOfCurrentCell = accelerationMap.readAt(currentCellPosition.getOne(), currentCellPosition.getTwo());
                     if (samplesOfCurrentCell!=null) {
 
                         for (final ProcessA.Sample iterationSample : samplesOfCurrentCell) {
@@ -253,7 +255,12 @@ public class ProcessC implements IProcess {
 
     
     private static double calculateDistanceBetweenSamples(ProcessA.Sample a, ProcessA.Sample b) {
-        return a.position.getDistance(b.position);
+        if (a==b) return 0;
+
+        //a.position.getDistance(b.position);
+        double dx = b.position.getOne() - a.position.getOne();
+        double dy = b.position.getTwo() - a.position.getTwo();
+        return Math.sqrt(dx*dx+dy*dy);
     }
     
     private static boolean noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(Collection<SampleWithDistance> neightborArray, ProcessA.Sample compareSample) {

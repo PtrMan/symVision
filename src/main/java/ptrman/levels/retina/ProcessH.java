@@ -11,6 +11,7 @@ package ptrman.levels.retina;
 
 //import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
@@ -180,19 +181,17 @@ public class ProcessH implements IProcess {
         workingDetectors.add(newLine);
     }
 
-    private void drawLineToAccelerationStructure(final SingleLineDetector lineDetector, final boolean value) {
-        final Vector2d<Integer> integerAbsolutePositionA = arrayRealVectorToInteger(lineDetector.a, ArrayRealVectorHelper.EnumRoundMode.DOWN);
-        final Vector2d<Integer> integerAbsolutePositionB = arrayRealVectorToInteger(lineDetector.b, ArrayRealVectorHelper.EnumRoundMode.DOWN);
-
-        final Vector2d<Integer> integerAccelerationPositionA = new Vector2d<>(integerAbsolutePositionA.x / GRIDSIZE, integerAbsolutePositionA.y / GRIDSIZE);
-        final Vector2d<Integer> integerAccelerationPositionB = new Vector2d<>(integerAbsolutePositionB.x / GRIDSIZE, integerAbsolutePositionB.y / GRIDSIZE);
-
-        final List<Vector2d<Integer>> detectorLowPositions = getPositionsOfCellsOfLineUnbound(integerAccelerationPositionA, integerAccelerationPositionB);
-
-        for( final Vector2d<Integer> iterationPosition : detectorLowPositions ) {
-            accelerationMap.setAt(iterationPosition.x, iterationPosition.y, value);
-        }
-    }
+//    private void drawLineToAccelerationStructure(final SingleLineDetector lineDetector, final boolean value) {
+//        final Vector2d<Integer> integerAbsolutePositionA = arrayRealVectorToInteger(lineDetector.a, ArrayRealVectorHelper.EnumRoundMode.DOWN);
+//        final Vector2d<Integer> integerAbsolutePositionB = arrayRealVectorToInteger(lineDetector.b, ArrayRealVectorHelper.EnumRoundMode.DOWN);
+//
+//        final Vector2d<Integer> integerAccelerationPositionA = new Vector2d<>(integerAbsolutePositionA.x / GRIDSIZE, integerAbsolutePositionA.y / GRIDSIZE);
+//        final Vector2d<Integer> integerAccelerationPositionB = new Vector2d<>(integerAbsolutePositionB.x / GRIDSIZE, integerAbsolutePositionB.y / GRIDSIZE);
+//
+//        for( final IntIntPair iterationPosition : getPositionsOfCellsOfLineUnbound(integerAccelerationPositionA, integerAccelerationPositionB)) {
+//            accelerationMap.setAt(iterationPosition.getOne(), iterationPosition.getTwo(), value);
+//        }
+//    }
 
     // overlap case
     private static boolean canDetectorsBeFusedOverlap(SingleLineDetector detectorA, SingleLineDetector detectorB) {

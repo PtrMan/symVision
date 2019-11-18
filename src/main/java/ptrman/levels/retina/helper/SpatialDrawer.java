@@ -9,6 +9,7 @@
  */
 package ptrman.levels.retina.helper;
 
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Algorithms.Bresenham;
 import ptrman.Datastructures.Vector2d;
@@ -28,10 +29,10 @@ public enum SpatialDrawer {
     static final private class Drawer implements Bresenham.IDrawer {
 
         public static class PositionWithDirection {
-            private final Vector2d<Integer> position;
-            private final Vector2d<Integer> direction;
+            private final IntIntPair position;
+            private final IntIntPair direction;
 
-            public PositionWithDirection(final Vector2d<Integer> position, final Vector2d<Integer> direction) {
+            public PositionWithDirection(final IntIntPair position, final IntIntPair direction) {
                 this.position = position;
                 this.direction = direction;
             }
@@ -41,19 +42,19 @@ public enum SpatialDrawer {
         //public final List<Vector2d<Integer>> directions = new FastList<>();
 
         @Override
-        public void set(final Vector2d<Integer> position, final Vector2d<Integer> direction) {
+        public void set(final IntIntPair position, final IntIntPair direction) {
             positionWithDirections.add(new PositionWithDirection(position, direction));
         }
     }
 
-    public static List<Vector2d<Integer>> getPositionsOfCellsOfCircleBound(final Vector2d<Integer> center, final int radius, final Vector2d<Integer> boundary) {
+    public static List<IntIntPair> getPositionsOfCellsOfCircleBound(final IntIntPair center, final int radius, final IntIntPair boundary) {
         Drawer drawer = new Drawer();
 
         Bresenham.rasterCircle(center, radius, drawer);
 
-        List<Vector2d<Integer>> resultPositions = new FastList<>(drawer.positionWithDirections.size());
+        List<IntIntPair> resultPositions = new FastList<>(drawer.positionWithDirections.size());
         for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections) {
-            Vector2d<Integer> position = iterationPositionWithDirection.position;
+            IntIntPair position = iterationPositionWithDirection.position;
             if (isGridLocationInBound(position, boundary))
                 resultPositions.add(position);
         }
@@ -63,7 +64,7 @@ public enum SpatialDrawer {
         return resultPositions;
     }
 
-    public static List<Vector2d<Integer>> getPositionsOfCellsWithNegativeDirectionOfCircleBound(final Vector2d<Integer> center, final int radius, final Vector2d<Integer> boundary, List<Vector2d<Integer>> y) {
+    public static List<IntIntPair> getPositionsOfCellsWithNegativeDirectionOfCircleBound(final IntIntPair center, final int radius, IntIntPair boundary, List<IntIntPair> y) {
         Drawer drawer = new Drawer();
 
         Bresenham.rasterCircle(center, radius, drawer);
@@ -75,11 +76,11 @@ public enum SpatialDrawer {
 
         for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections) {
 
-            final Vector2d<Integer> a = iterationPositionWithDirection.position;
+            final IntIntPair a = iterationPositionWithDirection.position;
             if (isGridLocationInBound(a, boundary))
                 y.add(a);
 
-            final Vector2d<Integer> b = add(a, getScaled(iterationPositionWithDirection.direction, -1));
+            final IntIntPair b = add(a, getScaled(iterationPositionWithDirection.direction, -1));
             if (isGridLocationInBound(b, boundary))
                 y.add(b);
         }
@@ -88,21 +89,26 @@ public enum SpatialDrawer {
         return y;
     }
 
-    public static List<Vector2d<Integer>> getPositionsOfCellsOfLineUnbound(final Vector2d<Integer> a, final Vector2d<Integer> b) {
+    /** TODO stream */
+    public static Iterable<IntIntPair> getPositionsOfCellsOfLineUnbound(final IntIntPair a, final IntIntPair b) {
         Drawer drawer = new Drawer();
 
         Bresenham.rasterLine(a, b, drawer);
 
-        List<Vector2d<Integer>> resultPositions = new ArrayList<>(drawer.positionWithDirections.size());
-        for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections) {
+        List<IntIntPair> resultPositions = new ArrayList<>(drawer.positionWithDirections.size());
+        for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections)
             resultPositions.add(iterationPositionWithDirection.position);
-        }
+
         return resultPositions;
     }
 
-    private static boolean isGridLocationInBound(final Vector2d<Integer> position, final Vector2d<Integer> boundary) {
-        final int x = position.xInt();
-        final int y = position.yInt();
-        return x >= 0 && x < boundary.x && y >= 0 && y < boundary.y;
+    private static boolean isGridLocationInBound(final IntIntPair position, final IntIntPair boundary) {
+        final int x = position.getOne();
+        if (x >= 0 && x < boundary.getOne()) {
+            final int y = position.getTwo();
+            if (y >= 0 && y < boundary.getTwo())
+                return true;
+        }
+        return false;
     }
 }

@@ -9,7 +9,10 @@
  */
 package ptrman.Algorithms;
 
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import ptrman.Datastructures.Vector2d;
+
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  * Bresenham algorithms
@@ -23,20 +26,21 @@ public enum Bresenham {
 	;
 
 	public interface IDrawer {
-        void set(final Vector2d<Integer> position, final Vector2d<Integer> direction);
+        void set(final IntIntPair position, final IntIntPair direction);
     }
 
-    public static void rasterCircle(final Vector2d<Integer> position, final int radius, IDrawer drawer) {
+    public static void rasterCircle(final IntIntPair position, final int radius, IDrawer drawer) {
         int f = 1 - radius;
         int ddF_x = 0;
         int ddF_y = -2 * radius;
         int x = 0;
         int y = radius;
 
-        drawer.set(new Vector2d<>(position.x, position.y + radius), new Vector2d<>(0, 1));
-        drawer.set(new Vector2d<>(position.x, position.y - radius), new Vector2d<>(0, -1));
-        drawer.set(new Vector2d<>(position.x + radius, position.y), new Vector2d<>(1, 0));
-        drawer.set(new Vector2d<>(position.x - radius, position.y), new Vector2d<>(-1, 0));
+        int positionx = position.getOne(), positiony = position.getTwo();
+        drawer.set(pair(positionx, positiony + radius), pair(0, 1));
+        drawer.set(pair(positionx, positiony - radius), pair(0, -1));
+        drawer.set(pair(positionx + radius, positiony), pair(1, 0));
+        drawer.set(pair(positionx - radius, positiony), pair(-1, 0));
 
         while(x < y) {
             if(f >= 0) {
@@ -48,52 +52,56 @@ public enum Bresenham {
             ddF_x += 2;
             f += ddF_x + 1;
 
-            drawer.set(new Vector2d<>(position.x + x, position.y + y), new Vector2d<>(0, 1)); // ok
-            drawer.set(new Vector2d<>(position.x - x, position.y + y), new Vector2d<>(0, 1));
-            drawer.set(new Vector2d<>(position.x + x, position.y - y), new Vector2d<>(0, -1));
-            drawer.set(new Vector2d<>(position.x - x, position.y - y), new Vector2d<>(0, -1));
-            drawer.set(new Vector2d<>(position.x + y, position.y + x), new Vector2d<>(1, 0));
-            drawer.set(new Vector2d<>(position.x - y, position.y + x), new Vector2d<>(-1, 0));
-            drawer.set(new Vector2d<>(position.x + y, position.y - x), new Vector2d<>(1, 0));
-            drawer.set(new Vector2d<>(position.x - y, position.y - x), new Vector2d<>(-1, 0));
+            drawer.set(pair(positionx + x, positiony + y), pair(0, 1)); // ok
+            drawer.set(pair(positionx - x, positiony + y), pair(0, 1));
+            drawer.set(pair(positionx + x, positiony - y), pair(0, -1));
+            drawer.set(pair(positionx - x, positiony - y), pair(0, -1));
+            drawer.set(pair(positionx + y, positiony + x), pair(1, 0));
+            drawer.set(pair(positionx - y, positiony + x), pair(-1, 0));
+            drawer.set(pair(positionx + y, positiony - x), pair(1, 0));
+            drawer.set(pair(positionx - y, positiony - x), pair(-1, 0));
         }
     }
 
-    public static void rasterLine(final Vector2d<Integer> a, final Vector2d<Integer> b, IDrawer drawer) {
+    public static void rasterLine(final IntIntPair a, final IntIntPair b, IDrawer drawer) {
         // special cases
-        if( a.y == b.y ) {
+        int ay = a.getTwo();
+        int by = b.getTwo();
+        int ax = a.getOne();
+        int bx = b.getOne();
+        if( ay == by) {
             final int x1, x2;
 
-            if( a.x > b.x ) {
-                x1 = b.x;
-                x2 = a.x;
+            if( ax > bx) {
+                x1 = b.getOne();
+                x2 = a.getOne();
             }
             else {
-                x1 = a.x;
-                x2 = b.x;
+                x1 = a.getOne();
+                x2 = b.getOne();
             }
 
             for( int x = x1; x <= x2; x++ ) {
-                drawer.set(new Vector2d<>(x, a.y), null);
+                drawer.set(pair(x, ay), null);
             }
 
             return;
         }
 
-        if( a.x == b.x ) {
+        if( ax == bx) {
             final int y1, y2;
 
-            if( a.y > b.y ) {
-                y1 = b.y;
-                y2 = a.y;
+            if( ay > by) {
+                y1 = by;
+                y2 = ay;
             }
             else {
-                y1 = a.y;
-                y2 = b.y;
+                y1 = ay;
+                y2 = by;
             }
 
             for( int y = y1; y <= y2; y++ ) {
-                drawer.set(new Vector2d<>(a.x, y), null);
+                drawer.set(pair(ax, y), null);
             }
 
             return;
@@ -102,22 +110,22 @@ public enum Bresenham {
         rasterLineBresenham(a, b, drawer);
     }
 
-    private static void rasterLineBresenham(final Vector2d<Integer> a, final Vector2d<Integer> b, IDrawer drawer) {
-        final int dx = java.lang.Math.abs(b.x - a.x);
-        final int dy = -java.lang.Math.abs(b.y - a.y);
+    private static void rasterLineBresenham(final IntIntPair a, final IntIntPair b, IDrawer drawer) {
+        final int dx = java.lang.Math.abs(b.getOne() - a.getOne());
+        final int dy = -java.lang.Math.abs(b.getTwo() - a.getTwo());
 
-        final int sx = signumWithoutZero(b.x - a.x);
-        final int sy = signumWithoutZero(b.y - a.y);
+        final int sx = signumWithoutZero(b.getOne() - a.getOne());
+        final int sy = signumWithoutZero(b.getTwo() - a.getTwo());
 
         int err = dx+dy;
 
-        int x = a.x;
-        int y = a.y;
+        int x = a.getOne();
+        int y = a.getTwo();
 
         for(;;) {
-            drawer.set(new Vector2d<>(x, y), null);
+            drawer.set(pair(x, y), null);
 
-            if( x == b.x && y == b.y ) {
+            if( x == b.getOne() && y == b.getTwo() ) {
                 break;
             }
 
@@ -137,11 +145,6 @@ public enum Bresenham {
         //if( value == 0 ) {
         //    return 0;
         //}
-        if( value > 0 ) {
-            return  1;
-        }
-        else {
-            return -1;
-        }
+        return (value > 0) ? 1 : -1;
     }
 }

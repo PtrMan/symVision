@@ -9,6 +9,7 @@
  */
 package ptrman.levels.retina.helper;
 
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
@@ -16,6 +17,8 @@ import ptrman.Datastructures.Vector2d;
 import ptrman.misc.Assert;
 
 import java.util.List;
+
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  * Spatial acceleration structure where the elements are lists
@@ -31,8 +34,8 @@ public class SpatialListMap2d<Type> {
         this.map = new Map2d<>(size.x / gridsize, size.y / gridsize);
     }
 
-    public Vector2d<Integer> getCellPositionOfIntegerPosition(final Vector2d<Integer> integerPosition) {
-        return new Vector2d<>(integerPosition.x / gridsize, integerPosition.y / gridsize);
+    public IntIntPair getCellPositionOfIntegerPosition(final IntIntPair integerPosition) {
+        return pair(integerPosition.getOne() / gridsize, integerPosition.getTwo() / gridsize);
     }
 
     // /return can be null

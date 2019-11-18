@@ -10,6 +10,7 @@
 package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Datastructures.*;
 import ptrman.levels.retina.helper.ProcessConnector;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 
@@ -66,7 +68,7 @@ public class ProcessB extends AbstractProcessB {
         
         for( ProcessA.Sample iterationSample : samples ) {
 
-            Tuple2<Vector2d<Integer>, Double> nearestResult = findNearestPositionWhereMapIs(false, arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN), map, MAXRADIUS);
+            Tuple2<IntIntPair, Double> nearestResult = findNearestPositionWhereMapIs(false, iterationSample.position, map, MAXRADIUS);
             if( nearestResult == null ) {
                 iterationSample.altitude = ((MAXRADIUS+1)*2)*((MAXRADIUS+1)*2);
                 continue;
@@ -106,7 +108,7 @@ public class ProcessB extends AbstractProcessB {
      * 
      * \return null if no point could be found in the radius 
      */
-    private Tuple2<Vector2d<Integer>, Double> findNearestPositionWhereMapIs(boolean value, Vector2d<Integer> position, IMap2d<Boolean> image, int radius) {
+    private Tuple2<IntIntPair, Double> findNearestPositionWhereMapIs(boolean value, IntIntPair position, IMap2d<Boolean> image, int radius) {
         /* debug
         if( position.x > 80 && position.x < 90 && position.y > 60 && position.y < 70 ) {
             int x = 0;
@@ -120,20 +122,20 @@ public class ProcessB extends AbstractProcessB {
             }
         }
 
-        final ArrayRealVector positionReal = ptrman.math.ArrayRealVectorHelper.integerToArrayRealVector(position);
+//        final ArrayRealVector positionReal = ptrman.math.ArrayRealVectorHelper.integerToArrayRealVector(position);
 
-        final Vector2d<Integer> gridCenterPosition = spatialAcceleratedMap2d.getGridPositionOfPosition(position);
+        final IntIntPair gridCenterPosition = spatialAcceleratedMap2d.getGridPositionOfPosition(position);
 
         float gridMaxSearchRadius = 2f + ((float)radius) / spatialAcceleratedMap2d.getGridsize();
 
         // set this to int.max when the radius is not limited
 
-        final Vector2d<Integer>[] nearestPixelCandidate = new Vector2d[]{null};
+        final IntIntPair[] nearestPixelCandidate = new IntIntPair[]{null};
         final double[] nearestPixelCandidateDistanceSquared = {Double.MAX_VALUE};
 
         int radiusToScan = (int) Math.ceil(gridMaxSearchRadius);
 
-        List<Vector2d<Integer>> gridCellsToScan = new FastList();
+        List<IntIntPair> gridCellsToScan = new FastList();
 
         for( int currentGridRadius = 0; currentGridRadius < radiusToScan; currentGridRadius++ ) {
 
@@ -187,7 +189,7 @@ public class ProcessB extends AbstractProcessB {
             // pixel scan logic
             //TODO use .collect or something
             getPositionsOfCandidatePixelsOfCells(gridCellsToScan.stream(), value).forEach(i -> {
-                final double currentDistanceSquared = ArrayRealVectorHelper.diffDotProduct(positionReal, i);
+                final double currentDistanceSquared = ArrayRealVectorHelper.diffDotProduct(position, i);
                 if( currentDistanceSquared < nearestPixelCandidateDistanceSquared[0]) {
                     nearestPixelCandidateDistanceSquared[0] = currentDistanceSquared;
                     nearestPixelCandidate[0] = i;
@@ -199,7 +201,7 @@ public class ProcessB extends AbstractProcessB {
             new Tuple2<>(nearestPixelCandidate[0], Math.sqrt(nearestPixelCandidateDistanceSquared[0]));
     }
 
-    private Stream<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCells(final Stream<Vector2d<Integer>> cellPositions, final boolean value) {
+    private Stream<IntIntPair> getPositionsOfCandidatePixelsOfCells(final Stream<IntIntPair> cellPositions, final boolean value) {
 
 
         Assert.Assert(!value, "only implemented for value = false");
@@ -210,16 +212,21 @@ public class ProcessB extends AbstractProcessB {
         //return result;
     }
 
-    private Stream<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCellWhereFalse(final Vector2d<Integer> cellPosition) {
+    private Stream<IntIntPair> getPositionsOfCandidatePixelsOfCellWhereFalse(final IntIntPair cellPosition) {
 
         final int gridsize = spatialAcceleratedMap2d.getGridsize();
 
         Assert.Assert(gridsize == 8, "only implemented for gridsize = 8");
 
-        return IntStream.range(cellPosition.y * gridsize, (cellPosition.y + 1) * gridsize).mapToObj((int y) ->
-                IntStream.range(cellPosition.x * gridsize, (cellPosition.x + 1) * gridsize)
-                    .filter((int x) -> !map.readAt(x, y))
-                    .mapToObj((int x) -> new Vector2d<>(x, y))
+        int px = cellPosition.getOne();
+        int x0 = px * gridsize;
+        int x1 = (px + 1) * gridsize;
+
+        int py = cellPosition.getTwo();
+        return IntStream.range(py * gridsize, (py + 1) * gridsize).mapToObj((int y) ->
+            IntStream.range(x0, x1)
+                .filter((int x) -> !map.readAt(x, y))
+                .mapToObj((int x) -> pair(x,y))
         ).flatMap(x -> x);
 
 //        int h = (cellPosition.y + 1) * gridsize;

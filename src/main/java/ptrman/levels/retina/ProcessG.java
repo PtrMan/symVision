@@ -9,19 +9,19 @@
  */
 package ptrman.levels.retina;
 
+import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Sets;
 import org.apache.commons.math3.linear.*;
 import ptrman.Datastructures.Map2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static ptrman.bpsolver.Helper.isNeightborhoodPixelSet;
-import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
-import static ptrman.math.ArrayRealVectorHelper.normalize;
+import static ptrman.levels.retina.LineDetectorWithMultiplePoints.real;
+import static ptrman.math.ArrayRealVectorHelper.*;
 
 /** curve detection
  *
@@ -418,15 +418,17 @@ public class ProcessG {
     
     private static List<ProcessA.Sample> queryPointsInRadius(List<ProcessA.Sample> samples, ArrayRealVector centerPoint, double radius, ProcessA.Sample.EnumType[] typeFilterCriteria) {
 
+        Set<ProcessA.Sample.EnumType> filterCriteria = ImmutableSet.copyOf(typeFilterCriteria);
+
         List<ProcessA.Sample> samplesInRadius = new ArrayList<>();
-        
+
         // TODO< query the points in the radius with a optimized spartial scheme >
         for( ProcessA.Sample iterationSample : samples ) {
-            double distance = iterationSample.position.getDistance(centerPoint);
+            double distance = distance(iterationSample.position, centerPoint);
 
-            if( distance < radius && Arrays.asList(typeFilterCriteria).contains(iterationSample.type) ) {
+            if( distance < radius && filterCriteria.contains(iterationSample.type))
                 samplesInRadius.add(iterationSample);
-            }
+
         }
         
         return samplesInRadius;
@@ -449,7 +451,7 @@ public class ProcessG {
      */
     private static boolean areAllSamplesNearLines(List<ProcessA.Sample> samples, List<SingleLineDetector> lines, final double maximalDistance) {
         for( ProcessA.Sample iterationSample : samples ) {
-            ArrayRealVector iterationSamplePosition = iterationSample.position;
+            ArrayRealVector iterationSamplePosition = real(iterationSample.position);
 
             boolean sampleNearAnyLine = false;
 

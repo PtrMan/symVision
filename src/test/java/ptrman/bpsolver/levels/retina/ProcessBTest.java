@@ -1,6 +1,7 @@
 package ptrman.bpsolver.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.junit.Test;
 import ptrman.Datastructures.*;
 import ptrman.levels.retina.ProcessA;
@@ -13,6 +14,8 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.util.List;
 
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
+import static ptrman.levels.retina.LineDetectorWithMultiplePoints.real;
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 import static ptrman.math.ArrayRealVectorHelper.integerToArrayRealVector;
 
@@ -109,7 +112,9 @@ public class ProcessBTest {
 
             for( ProcessA.Sample iterationSample : samples ) {
 
-                Tuple2<Vector2d<Integer>, Double> nearestResult = findNearestPositionWhereMapIs(false, arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN), image, MAXRADIUS);
+                Tuple2<Vector2d<Integer>, Double> nearestResult = findNearestPositionWhereMapIs(false,
+                    arrayRealVectorToInteger(real(iterationSample.position), ArrayRealVectorHelper.EnumRoundMode.DOWN), image, MAXRADIUS);
+
                 if( nearestResult == null ) {
                     iterationSample.altitude = ((MAXRADIUS+1)*2)*((MAXRADIUS+1)*2);
                     continue;
@@ -142,7 +147,9 @@ public class ProcessBTest {
                 double bestDistanceSquared = Double.MAX_VALUE;
 
                 final Vector2d<Integer> iteratorOffsetBoundMin = Vector2d.IntegerHelper.max(borderMin, Vector2d.IntegerHelper.add(outwardIteratorOffsetUnbound, positionAsInt));
-                final Vector2d<Integer> iteratorOffsetBoundMax = Vector2d.IntegerHelper.min4(borderMax, Vector2d.IntegerHelper.add(Vector2d.IntegerHelper.add(Vector2d.IntegerHelper.getScaled(outwardIteratorOffsetUnbound, -1), one), positionAsInt), borderMax, borderMax);
+                final Vector2d<Integer> iteratorOffsetBoundMax = Vector2d.IntegerHelper.min4(borderMax, Vector2d.IntegerHelper.add((Vector2d<Integer>) Vector2d.IntegerHelper.add(
+                    Vector2d.IntegerHelper.getScaled(outwardIteratorOffsetUnbound, -1),
+                    one), positionAsInt), borderMax, borderMax);
 
                 for (int y = iteratorOffsetBoundMin.y; y < iteratorOffsetBoundMax.y; y++) {
                     for (int x = iteratorOffsetBoundMin.x; x < iteratorOffsetBoundMax.x; x++) {

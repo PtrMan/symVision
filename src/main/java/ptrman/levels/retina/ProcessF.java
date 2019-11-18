@@ -17,6 +17,8 @@ import ptrman.levels.retina.helper.ProcessConnector;
 
 import java.util.List;
 
+import static ptrman.levels.retina.LineDetectorWithMultiplePoints.real;
+
 /**
  * Sends traces in imagespace for samples which are deeper than a threshold
  *
@@ -72,7 +74,7 @@ public class ProcessF implements IProcess {
 
         activeRays.clear();
         for( ArrayRealVector currentRayDirection : RAYDIRECTIONS ) {
-            activeRays.add(new Ray(sample.position, currentRayDirection));
+            activeRays.add(new Ray(real(sample.position), currentRayDirection));
         }
 
         int remaining = COUNTOFRAYDIRECTIONS;

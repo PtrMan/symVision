@@ -24,6 +24,7 @@ import ptrman.misc.Assert;
 
 import java.util.*;
 
+import static ptrman.levels.retina.LineDetectorWithMultiplePoints.real;
 import static ptrman.math.ArrayRealVectorHelper.*;
 import static ptrman.math.Maths.getRandomElements;
 import static ptrman.math.Maths.squaredDistance;
@@ -275,7 +276,7 @@ public class ProcessD implements IProcess {
                     continue; // ignore because we can't project
                 }
                 ArrayRealVector projectedPosition = iLinedetector.projectPointOntoLine(sample.position);
-                double dist = calcDistance(sample.position, projectedPosition);
+                double dist = distance(sample.position, projectedPosition);
                 if (dist > widenSampleMaxDistance) {
                     continue;
                 }
@@ -327,12 +328,12 @@ public class ProcessD implements IProcess {
         return true;
     }
 
+    /** TODO stream */
     private static List<ArrayRealVector> getPositionsOfSamples(final Iterable<ProcessA.Sample> samples) {
         List<ArrayRealVector> resultPositions = new ArrayList<>();
 
-        for (final ProcessA.Sample iterationSample : samples) {
-            resultPositions.add(iterationSample.position);
-        }
+        for (final ProcessA.Sample iterationSample : samples)
+            resultPositions.add(real(iterationSample.position));
 
         return resultPositions;
     }

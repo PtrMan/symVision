@@ -10,6 +10,7 @@
 package ptrman.math;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import ptrman.Datastructures.Vector2d;
 
 import java.util.List;
@@ -20,8 +21,10 @@ import java.util.List;
 public enum ArrayRealVectorHelper {
     ;
 
-    public static double diffDotProduct(ArrayRealVector positionReal, Vector2d<Integer> i) {
-        final ArrayRealVector diff = positionReal.subtract(ArrayRealVectorHelper.integerToArrayRealVector(i));
+    public static double diffDotProduct(IntIntPair a, IntIntPair b) {
+        final ArrayRealVector diff = new ArrayRealVector(new double[] {
+            a.getOne() - b.getOne(), a.getTwo() - b.getTwo()
+        });
         return diff.dotProduct(diff);
     }
 
@@ -113,7 +116,14 @@ public enum ArrayRealVectorHelper {
         return result;
     }
 
-    public static double calcDistance(ArrayRealVector a, ArrayRealVector b) {
+    /** cartesian distance */
+    public static double distance(ArrayRealVector a, ArrayRealVector b) {
         return a.getDistance(b);
+    }
+    /** cartesian distance */
+    public static double distance(IntIntPair a, ArrayRealVector b) {
+        double dx = b.getEntry(0) - a.getOne();
+        double dy = b.getEntry(1) - a.getTwo();
+        return Math.sqrt( dx*dx+dy*dy);
     }
 }

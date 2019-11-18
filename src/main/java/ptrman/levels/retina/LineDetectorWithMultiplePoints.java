@@ -2,6 +2,7 @@ package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.eclipse.collections.api.list.primitive.IntList;
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import ptrman.bpsolver.Parameters;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.math.NalTv;
@@ -47,6 +48,14 @@ public class LineDetectorWithMultiplePoints {
         return commonObjectId != -1;
     }
 
+    @Deprecated public ArrayRealVector projectPointOntoLine(IntIntPair point) {
+        return projectPointOntoLine(real(point));
+    }
+
+    public static ArrayRealVector real(IntIntPair point) {
+        return new ArrayRealVector(new double[] { point.getOne(), point.getTwo()}, false);
+    }
+
     public ArrayRealVector projectPointOntoLine(ArrayRealVector point) {
         if (isYAxisSingularity()) {
             // call isn't allowed
@@ -83,12 +92,12 @@ public class LineDetectorWithMultiplePoints {
         return Double.isInfinite(m);
     }
 
-    public double getHorizontalOffset(List<ProcessA.Sample> samples) {
-        Assert.Assert(isYAxisSingularity(), "");
-
-        int sampleIndex = integratedSampleIndices.get(0);
-        return samples.get(sampleIndex).position.getDataRef()[0];
-    }
+//    public double getHorizontalOffset(List<ProcessA.Sample> samples) {
+//        Assert.Assert(isYAxisSingularity(), "");
+//
+//        int sampleIndex = integratedSampleIndices.get(0);
+//        return samples.get(sampleIndex).position.getOne();
+//    }
 
     public double getLength() {
         List<ArrayRealVector> sortedSamplePositions = ProcessD.getSortedSamplePositions(this);

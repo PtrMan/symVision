@@ -9,6 +9,10 @@
  */
 package ptrman.Datastructures;
 
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
+
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
+
 public class Vector2d<Type extends Number>
 {
     public Vector2d(Type x, Type y)
@@ -39,11 +43,18 @@ public class Vector2d<Type extends Number>
     {
         ;
 
-        public static Vector2d<Integer> add(Vector2d<Integer> a, Vector2d<Integer> b)
+        public static IntIntPair add(IntIntPair a, IntIntPair b)
         {
-            return new Vector2d<>(a.xInt() + b.xInt(), a.yInt() + b.yInt());
+            return pair(a.getOne() + b.getOne(), a.getTwo() + b.getTwo());
         }
-        
+        public static IntIntPair add(Vector2d<Integer> a, Vector2d<Integer> b)
+        {
+            return pair(a.xInt() + b.xInt(), a.yInt() + b.yInt());
+        }
+        public static IntIntPair add(Vector2d<Integer> a, IntIntPair b)
+        {
+            return pair(a.xInt() + b.getOne(), a.yInt() + b.getTwo());
+        }
         public static Vector2d<Integer> sub(Vector2d<Integer> a, Vector2d<Integer> b)
         {
             return new Vector2d<>(a.xInt() - b.xInt(), a.yInt() - b.yInt());
@@ -53,7 +64,11 @@ public class Vector2d<Type extends Number>
         {
             return new Vector2d<>(Math.max(a.xInt(), b.xInt()), Math.max(a.yInt(), b.yInt()));
         }
-        
+        public static Vector2d<Integer> max(Vector2d<Integer> a, IntIntPair b)
+        {
+            return new Vector2d<>(Math.max(a.xInt(), b.getOne()), Math.max(a.yInt(), b.getTwo()));
+        }
+
         public static Vector2d<Integer> max4(Vector2d<Integer> a, Vector2d<Integer> b, Vector2d<Integer> c, Vector2d<Integer> d)
         {
             Vector2d<Integer> maxLeft = max(a, b);
@@ -65,14 +80,28 @@ public class Vector2d<Type extends Number>
         {
             return new Vector2d<>(Math.min(a.xInt(), b.xInt()), Math.min(a.yInt(), b.yInt()));
         }
-        
+        public static Vector2d<Integer> min(Vector2d<Integer> a, IntIntPair b)
+        {
+            return new Vector2d<>(Math.min(a.xInt(), b.getOne()), Math.min(a.yInt(), b.getTwo()));
+        }
+
         public static Vector2d<Integer> min4(Vector2d<Integer> a, Vector2d<Integer> b, Vector2d<Integer> c, Vector2d<Integer> d)
         {
             Vector2d<Integer> minLeft = min(a, b);
             Vector2d<Integer> minRight = min(c, d);
             return min(minLeft, minRight);
         }
-        
+        public static Vector2d<Integer> min4(Vector2d<Integer> a, IntIntPair b, Vector2d<Integer> c, Vector2d<Integer> d)
+        {
+            Vector2d<Integer> minLeft = min(a, b);
+            Vector2d<Integer> minRight = min(c, d);
+            return min(minLeft, minRight);
+        }
+
+        public static IntIntPair getScaled(IntIntPair a, int value)
+        {
+            return pair(a.getOne() * value, a.getTwo() * value);
+        }
         public static Vector2d<Integer> getScaled(Vector2d<Integer> a, int value)
         {
             return new Vector2d<>(a.xInt() * value, a.yInt() * value);

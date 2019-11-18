@@ -3,17 +3,20 @@ package ptrman.levels.retina.nonFoundalis;
 
 import boofcv.io.image.ConvertBufferedImage;
 import boofcv.struct.image.InterleavedF32;
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.junit.Test;
 import ptrman.Datastructures.Vector2d;
 
 import java.awt.image.BufferedImage;
+
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  *
  */
 public class ProcessFractalFillerTest {
     public static class Extended extends ProcessFractalFiller {
-        public void scanGridCell(final Vector2d<Integer> gridCellPosition, final Vector2d<Integer> entryDirection, final boolean[] entryPixels, ProcessFractalFiller.FillContext fillContext) {
+        public void scanGridCell(final IntIntPair gridCellPosition, final IntIntPair entryDirection, final boolean[] entryPixels, ProcessFractalFiller.FillContext fillContext) {
             super.scanGridCell(gridCellPosition, entryDirection, entryPixels, fillContext);
         }
     }
@@ -67,6 +70,6 @@ public class ProcessFractalFillerTest {
 
         ProcessFractalFiller.FillContext fillContext = new ProcessFractalFiller.FillContext();
 
-        extended.scanGridCell(new Vector2d<>(0, 0), new Vector2d<>(0, 1), entryPixelsForTest, fillContext);
+        extended.scanGridCell(pair(0, 0), pair(0, 1), entryPixelsForTest, fillContext);
     }
 }

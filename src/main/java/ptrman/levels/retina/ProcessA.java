@@ -12,6 +12,7 @@ package ptrman.levels.retina;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomAdaptor;
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.helper.ProcessConnector;
@@ -19,6 +20,8 @@ import ptrman.misc.Assert;
 
 import java.awt.*;
 import java.util.Random;
+
+import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 /**
  *
@@ -132,7 +135,7 @@ public class ProcessA implements IProcess {
 
     public static class Sample {
 
-        public final ArrayRealVector position;
+        public final IntIntPair position;
         public double altitude = Double.NaN;
         public EnumType type;
         public int objectId = -1;
@@ -158,9 +161,9 @@ public class ProcessA implements IProcess {
                 detectorImageGraphics.setColor(Color.BLUE);
             }
 
-            final double[] pos = position.getDataRef();
-            int positionX = (int) pos[0];
-            int positionY = (int) pos[1];
+
+            int positionX = position.getOne();
+            int positionY = position.getTwo();
 
             detectorImageGraphics.fillRect(positionX, positionY, 1, 1);
 
@@ -184,9 +187,19 @@ public class ProcessA implements IProcess {
         public Sample(float x, float y) {
             this(new ArrayRealVector(new double[] { x, y}, false));
         }
-        public Sample(ArrayRealVector position) {
+        public Sample(int x, int y) {
+            this(pair(x, y));
+        }
+        public Sample(IntIntPair position) {
             this.position = position;
         }
+        public Sample(ArrayRealVector position) {
+            this(
+                (int)Math.round(position.getEntry(0)),
+                (int)Math.round(position.getEntry(1))
+            );
+        }
+
         
         public boolean isAltitudeValid() {
             return Double.isFinite(altitude);

@@ -91,7 +91,7 @@ public enum DebugDrawingHelper {
                 }
 
 
-                graphics.drawLine((int)iterationSample.position.getDataRef()[0], (int)iterationSample.position.getDataRef()[1], (int)iterationSample.position.getDataRef()[0], (int)iterationSample.position.getDataRef()[1]);
+                graphics.drawLine(iterationSample.position.getOne(), iterationSample.position.getTwo(), iterationSample.position.getOne(), iterationSample.position.getTwo());
             }
         }
 
