@@ -18,10 +18,7 @@ import ptrman.FargGeneral.network.Node;
 import ptrman.bpsolver.NetworkHandles;
 import ptrman.bpsolver.nodes.*;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 public class NodeGraph {
 	private final mxGraph graph = new mxGraph();
@@ -35,7 +32,7 @@ public class NodeGraph {
 
 	private static void populateEdgesBetweenNodes(VertexList vv) {
 		for (VertexWithNode v : vv.verticesWithNode) {
-			for (Link l : v.node.outgoingLinks) {
+			for (Link l : v.node.out) {
 				v.outgoingVerticesWithNode.add(
 					vv.getVertexWithNodeByNode(l.target)
                 );
@@ -44,7 +41,7 @@ public class NodeGraph {
 	}
 
 	private static Link getLinkCorespondingToTargetNode(Node s, Node t) {
-		for (Link l : s.outgoingLinks)
+		for (Link l : s.out)
 			if (l.target.equals(t))
 				return l;
 
@@ -55,7 +52,7 @@ public class NodeGraph {
 		return graphComponent;
 	}
 
-	public void repopulateAfterNodes(List<Node> nodes, NetworkHandles networkHandles) {
+	public void repopulateAfterNodes(Collection<Node> nodes, NetworkHandles networkHandles) {
 		clear();
 		populateAfterNodes(nodes, networkHandles);
 	}
@@ -64,7 +61,7 @@ public class NodeGraph {
 		graph.removeCells(graph.getChildVertices(graph.getDefaultParent()));
 	}
 
-	private void populateAfterNodes(List<Node> nodes, NetworkHandles networkHandles) {
+	private void populateAfterNodes(Collection<Node> nodes, NetworkHandles networkHandles) {
 
         graph.getModel().beginUpdate();
 
@@ -118,7 +115,7 @@ public class NodeGraph {
 		}
 	}
 
-	private VertexList convertNodesToVertexWithNodeRecursivly(List<Node> nodes, NetworkHandles networkHandles) {
+	private VertexList convertNodesToVertexWithNodeRecursivly(Collection<Node> nodes, NetworkHandles networkHandles) {
         //Object graphParent;
 
         VertexList resultVertexList = new VertexList();
@@ -145,7 +142,7 @@ public class NodeGraph {
 			resultVertexList.verticesWithNode.add(VertexWithNode.createFromNodeAndVertex(currentNode, createVertexForNode(currentNode, networkHandles)));
 
 			// look for connected childnodes
-			for (Link iterationLink : currentNode.outgoingLinks) {
+			for (Link iterationLink : currentNode.out) {
 				// TODO< hyperlinks >
 				// optimization
 				if (!resultVertexList.existsVertexWthNodeByNode(iterationLink.target))
@@ -219,7 +216,7 @@ public class NodeGraph {
 
 
 	private static class VertexList {
-		public final ArrayList<VertexWithNode> verticesWithNode = new ArrayList<>();
+		public final Collection<VertexWithNode> verticesWithNode = new ArrayList<>();
 
 		public VertexWithNode getVertexWithNodeByNode(Node node) {
 			for (VertexWithNode iterationVertex : verticesWithNode)
@@ -240,7 +237,7 @@ public class NodeGraph {
 
 
 	private static class VertexWithNode {
-		public final ArrayList<VertexWithNode> outgoingVerticesWithNode = new ArrayList<>();
+		public final Collection<VertexWithNode> outgoingVerticesWithNode = new ArrayList<>();
 		Node node;
 		Object vertexForNode;
 

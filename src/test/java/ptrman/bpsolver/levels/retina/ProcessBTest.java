@@ -1,7 +1,6 @@
 package ptrman.bpsolver.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
-import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.junit.Test;
 import ptrman.Datastructures.*;
 import ptrman.levels.retina.ProcessA;
@@ -14,7 +13,6 @@ import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.util.List;
 
-import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 import static ptrman.levels.retina.LineDetectorWithMultiplePoints.real;
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 import static ptrman.math.ArrayRealVectorHelper.integerToArrayRealVector;

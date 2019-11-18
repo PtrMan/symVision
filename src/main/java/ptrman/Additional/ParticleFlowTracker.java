@@ -21,11 +21,13 @@ import ptrman.Datastructures.SpatialAcceleration;
 import ptrman.Datastructures.Vector2d;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.math.RandomUtil;
-//import sun.awt.Mutex;
-import java.util.concurrent.Semaphore;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.concurrent.Semaphore;
+
+//import sun.awt.Mutex;
 
 // TODO< remove particles which are too dense >
 /**
@@ -108,7 +110,7 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
     }
 
     private void removeParticlesOutOfImage() {
-        List<ParticleType> particlesToBeRemoved = new ArrayList<>();
+        Collection<ParticleType> particlesToBeRemoved = new ArrayList<>();
 
         for (ParticleType iterationTrackingParticle : trackingParticles) {
             if (
@@ -181,7 +183,7 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
 
     }
 
-    public final List<ParticleType> trackingParticles = new ArrayList<>();
+    public final Collection<ParticleType> trackingParticles = new ArrayList<>();
 
 
     private ArrayRealVector[] samplePositions;

@@ -28,7 +28,7 @@ public enum Grouping
     {
 
         Set<Pattern> patterns = new LinkedHashSet<>();
-        Set<Pattern> knownExemplars = new LinkedHashSet<>();
+        Collection<Pattern> knownExemplars = new LinkedHashSet<>();
         
         for( Pattern iterationExemplarI : exemplarsSet )
         {

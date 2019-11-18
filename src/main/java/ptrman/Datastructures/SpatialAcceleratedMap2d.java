@@ -14,7 +14,7 @@ import ptrman.levels.retina.helper.SpatialDrawer;
 import ptrman.math.Maths;
 import ptrman.misc.Assert;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
@@ -70,8 +70,8 @@ public class SpatialAcceleratedMap2d {
 		return SpatialDrawer.getPositionsOfCellsOfCircleBound(gridPosition, gridRadius, gridBoundary);
 	}
 
-	public List<IntIntPair> getGridLocationsWithNegativeDirectionOfGridRadius(final IntIntPair gridPosition, final int gridRadius, List<IntIntPair> resultPositions) {
-		return SpatialDrawer.getPositionsOfCellsWithNegativeDirectionOfCircleBound(gridPosition, gridRadius, gridBoundary, resultPositions);
+	public void getGridLocationsWithNegativeDirectionOfGridRadius(final IntIntPair gridPosition, final int gridRadius, Collection<IntIntPair> resultPositions) {
+		SpatialDrawer.getPositionsOfCellsWithNegativeDirectionOfCircleBound(gridPosition, gridRadius, gridBoundary, resultPositions);
 	}
 
 	public void recalculateGridCellStateMap() {

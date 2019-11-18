@@ -10,6 +10,7 @@
 package ptrman.bpsolver.RetinaToWorkspaceTranslator;
 
 //import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.api.map.primitive.IntObjectMap;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
@@ -34,7 +35,7 @@ public class IdStrategy extends AbstractTranslatorStrategy {
         return createNodesFromMap(objectIdToRetinaPrimitivesMap, bpSolver);
     }
 
-    private static List<Node> createNodesFromMap(final IntObjectHashMap<Deque<RetinaPrimitive>> map, final Solver bpSolver) {
+    private static List<Node> createNodesFromMap(final IntObjectMap<Deque<RetinaPrimitive>> map, final Solver bpSolver) {
         List<Node> resultNodes = new ArrayList<>();
 
         map.forEachKeyValue( (k, v) -> {
@@ -45,10 +46,10 @@ public class IdStrategy extends AbstractTranslatorStrategy {
 
                 // linkage
                 Link createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.CONTAINS, nodeForRetinaPrimitive);
-                objectNode.outgoingLinks.add(createdForwardLink);
+                objectNode.out.add(createdForwardLink);
 
                 Link createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
-                nodeForRetinaPrimitive.outgoingLinks.add(createdBackwardLink);
+                nodeForRetinaPrimitive.out.add(createdBackwardLink);
             }
 
             resultNodes.add(objectNode);

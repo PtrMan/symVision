@@ -16,18 +16,15 @@ import ptrman.FargGeneral.Coderack;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Network;
 import ptrman.FargGeneral.network.Node;
-import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.CodeletLtmLookup;
 import ptrman.bpsolver.NetworkHandles;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.levels.retina.Intersection;
 import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.misc.Assert;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 // BUGS
 // BUG 0001
@@ -95,7 +92,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     }
     
     
-    private void createAndLinkAnglePointsAndLink(List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Solver bpSolver, Vector2d<Float> imageSize) {
+    private void createAndLinkAnglePointsAndLink(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Solver bpSolver, Vector2d<Float> imageSize) {
 
         // TODO< hard parameters >
         final int GRIDCOUNTX = 10;
@@ -126,7 +123,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
      * stores all intersections into a spatial acceleration structure
      *  
      */
-    private void bundleAllIntersectionsOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints) {
+    private void bundleAllIntersectionsOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints) {
         bundleAllIntersections(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, getRetinaPrimitivesOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(arrayOfRetinaObjectWithAssociatedPoints));
     }
     
@@ -222,7 +219,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         return nearestElement;
     }
     
-    private void createPlatonicInstanceNodeForRetinaObjectsAndLinkToParent(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, PlatonicPrimitiveInstanceNode objectNode, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup) {
+    private static void createPlatonicInstanceNodeForRetinaObjectsAndLinkToParent(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, PlatonicPrimitiveInstanceNode objectNode, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup) {
         for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject : arrayOfRetinaObjectWithAssociatedPoints ) {
             createPlatonicInstanceNodeForRetinaObjectAndLinkToParent(iterationRetinaObject, objectNode, coderack, network, networkHandles, codeletLtmLookup);
         }
@@ -235,17 +232,17 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         
         // linkage
         Link createdForwardLink = network.linkCreator.createLink(Link.EnumType.CONTAINS, createdPlatonicInstanceNodeForRetinaObject);
-        objectNode.outgoingLinks.add(createdForwardLink);
+        objectNode.out.add(createdForwardLink);
 
         Link createdBackwardLink = network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
-        createdPlatonicInstanceNodeForRetinaObject.outgoingLinks.add(createdBackwardLink);
+        createdPlatonicInstanceNodeForRetinaObject.out.add(createdBackwardLink);
 
         // add all codelet's of it
         codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdPlatonicInstanceNodeForRetinaObject, coderack, network, networkHandles);
 
     }
     
-    private ArrayList<GroupOfRetinaObjectWithAssociatedPoints> createAndPropagateRetinaLevelObjects(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints) {
+    private static ArrayList<GroupOfRetinaObjectWithAssociatedPoints> createAndPropagateRetinaLevelObjects(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints) {
         int retinaObjectI;
 
         ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groups = new ArrayList<>();
@@ -341,7 +338,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     }
     
     private static class GroupOfRetinaObjectWithAssociatedPoints {
-        public final ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints = new ArrayList<>();
+        public final Collection<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints = new ArrayList<>();
         
         public boolean canBeIncludedInCluster(RetinaObjectWithAssociatedPointsAndWorkspaceNode candidate) {
             for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject : arrayOfRetinaObjectWithAssociatedPoints ) {

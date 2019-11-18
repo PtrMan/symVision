@@ -90,7 +90,7 @@ public class ThreadCPUTimeTracker extends DoubleMeter {
         return cpuTimeMonitoringEnabled;
     }
 
-    protected ThreadInfo getCurrentThreadInfo() {
+    protected static ThreadInfo getCurrentThreadInfo() {
         if (contentionMonitoringEnabled) {
             return threadMXBean.getThreadInfo(Thread.currentThread().getId(), 0);
         }

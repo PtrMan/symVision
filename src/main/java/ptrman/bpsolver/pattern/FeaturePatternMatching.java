@@ -9,6 +9,9 @@
  */
 package ptrman.bpsolver.pattern;
 
+import org.apache.commons.math3.analysis.UnivariateFunction;
+import org.apache.commons.math3.analysis.integration.BaseAbstractUnivariateIntegrator;
+import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
 import ptrman.bpsolver.FeatureStatistics;
@@ -19,9 +22,6 @@ import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.math.Maths;
 import ptrman.misc.Assert;
-import org.apache.commons.math3.analysis.UnivariateFunction;
-import org.apache.commons.math3.analysis.integration.BaseAbstractUnivariateIntegrator;
-import org.apache.commons.math3.analysis.integration.SimpsonIntegrator;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -58,43 +58,34 @@ public class FeaturePatternMatching {
         @Override
         public float calculate(List<MatchingPathElement> matchingPathElements) {
 
-            float result = 1.0f;
+            double result = 1.0f;
 
-            for( MatchingPathElement iterationMatchingPathElement : matchingPathElements ) {
+            for( MatchingPathElement iterationMatchingPathElement : matchingPathElements )
                 result *= iterationMatchingPathElement.similarityValue;
-            }
 
-            return result;
+            return (float)result;
         }
     }
 
     private static class IntegrateTDistributionUpperIntegral implements UnivariateFunction {
         public double n;
         
-        public double value(double d) {
-            double x = d;
-
-            double insidePower = (n - 1.0f)/(n - 1.0f + x*x);
-            double result = (float)Math.pow(insidePower, n/2.0f);
-
-            return result;
+        public double value(double x) {
+            return (float)Math.pow((n - 1.0f)/(n - 1.0f + x * x), n/2.0f);
         }
     }
     
     private static class IntegrateTDistributionLowerIntegral implements UnivariateFunction {
         public double n;
         
-        public double value(double d) {
-            double x = d;
-            double result = (float)Math.pow(Math.sin(x), n);
-
-            return result;
+        public double value(double x) {
+            return (float)Math.pow(Math.sin(x), n);
         }
     }
     
     private static class IntegrateEquation8Dot4 implements UnivariateFunction {
-        public double value(double d) {
-            return Math.pow(Math.E, -0.5*d*d);
+        public double value(double x) {
+            return Math.pow(Math.E, -0.5*x*x);
         }
     }
     
@@ -186,15 +177,15 @@ public class FeaturePatternMatching {
         bestMatchingPathElement.bestMatchNodeBIndex = -1;
         bestMatchingPathElement.similarityValue = 0.0f;
 
-        for( linkIndexA = 0; linkIndexA < nodeA.outgoingLinks.size(); linkIndexA++ ) {
-            for( linkIndexB = 0; linkIndexB < nodeB.outgoingLinks.size(); linkIndexB++ ) {
+        for(linkIndexA = 0; linkIndexA < nodeA.out.size(); linkIndexA++ ) {
+            for(linkIndexB = 0; linkIndexB < nodeB.out.size(); linkIndexB++ ) {
 
-                Link linkA = nodeA.outgoingLinks.get(linkIndexA);
-                Link linkB = nodeB.outgoingLinks.get(linkIndexB);
+                Link linkA = nodeA.out.get(linkIndexA);
+                Link linkB = nodeB.out.get(linkIndexB);
 
-                if( !doesLinkTypeListContainType(linkWhitelist, linkA.type) || !doesLinkTypeListContainType(linkWhitelist, linkB.type) ) {
+                if( !doesLinkTypeListContainType(linkWhitelist, linkA.type) || !doesLinkTypeListContainType(linkWhitelist, linkB.type) )
                     continue;
-                }
+
 
                 float currentDistance = matchAnyNonRecursive(linkA.target, linkB.target, networkHandles);
                 float currentSimilarity = Converter.distanceToSimilarity(currentDistance);
@@ -210,7 +201,7 @@ public class FeaturePatternMatching {
         if( bestMatchingPathElement.similarityValue != 0.0f ) {
             resultMatchingPath.add(bestMatchingPathElement);
 
-            matchAnyRecursiveInternal(resultMatchingPath, nodeA.outgoingLinks.get(bestMatchingPathElement.bestMatchNodeAIndex).target, nodeB.outgoingLinks.get(bestMatchingPathElement.bestMatchNodeBIndex).target, networkHandles, linkWhitelist, maxDepth, currentDepth+1);
+            matchAnyRecursiveInternal(resultMatchingPath, nodeA.out.get(bestMatchingPathElement.bestMatchNodeAIndex).target, nodeB.out.get(bestMatchingPathElement.bestMatchNodeBIndex).target, networkHandles, linkWhitelist, maxDepth, currentDepth+1);
         }
     }
 
@@ -248,7 +239,7 @@ public class FeaturePatternMatching {
                 featureDistance = 0.0;
             }
             
-            float weight = (nodeArrayListEntry.getKey().activiation + getSystemWeightOfPlatonicFeatureType(nodeArrayListEntry.getKey(), networkHandles)) * 0.5f;
+            float weight = (nodeArrayListEntry.getKey().activation + getSystemWeightOfPlatonicFeatureType(nodeArrayListEntry.getKey(), networkHandles)) * 0.5f;
             
             upperSum += (featureDistance * weight);
             weightSum += weight;
@@ -267,20 +258,17 @@ public class FeaturePatternMatching {
     
     // helper for matchAnyNonRecursive
     private static void getAllFeatureNodesAndAddToMap(Node node, Map<Node, ArrayList<FeatureNode>> featureNodesByType) {
-        final List<Link> attributeLinksFromNode = node.getLinksByType(Link.EnumType.HASATTRIBUTE);
-        
-        for( Link iterationAttributeLink : attributeLinksFromNode ) {
 
-            if( iterationAttributeLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() ) {
+        for( Link iterationAttributeLink : node.getLinksByType(Link.EnumType.HASATTRIBUTE)) {
+
+            if( iterationAttributeLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() )
                 continue;
-            }
 
             FeatureNode targetFeatureNode = (FeatureNode) iterationAttributeLink.target;
             
             if( featureNodesByType.containsKey(targetFeatureNode.featureTypeNode) ) {
                 featureNodesByType.get(targetFeatureNode.featureTypeNode).add(targetFeatureNode);
-            }
-            else {
+            } else {
 
                 ArrayList<FeatureNode> createdFeatureNodeList = new ArrayList<>(1);
                 createdFeatureNodeList.add(targetFeatureNode);
@@ -290,7 +278,7 @@ public class FeaturePatternMatching {
     }
 
     // helper
-    private static boolean doesLinkTypeListContainType(List<Link.EnumType> list, Link.EnumType searchFor) {
+    private static boolean doesLinkTypeListContainType(Iterable<Link.EnumType> list, Link.EnumType searchFor) {
         for( Link.EnumType iterationType : list ) {
             if( iterationType.ordinal() == searchFor.ordinal() ) {
                 return true;
@@ -375,7 +363,7 @@ public class FeaturePatternMatching {
     public final BaseAbstractUnivariateIntegrator integrator = new SimpsonIntegrator();
     private final IntegrateTDistributionUpperIntegral integrateTDistributionUpperIntegral = new IntegrateTDistributionUpperIntegral();
     private final IntegrateTDistributionLowerIntegral integrateTDistributionLowerIntegral = new IntegrateTDistributionLowerIntegral();
-    private final IntegrateEquation8Dot4 integrateEquation8Dot4 = new IntegrateEquation8Dot4();
+    private final UnivariateFunction integrateEquation8Dot4 = new IntegrateEquation8Dot4();
     
     private final static float SIGMAZERO = 1.0f; // used in the comparison of numerosity nodes
     

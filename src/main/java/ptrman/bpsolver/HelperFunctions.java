@@ -29,9 +29,9 @@ public enum HelperFunctions {
         final FeatureNode createdXNode = FeatureNode.createFloatNode(bpSolver.networkHandles.xCoordinatePlatonicPrimitiveNode, vector.getDataRef()[0], 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(bpSolver.networkHandles.xCoordinatePlatonicPrimitiveNode));
         final FeatureNode createdYNode = FeatureNode.createFloatNode(bpSolver.networkHandles.yCoordinatePlatonicPrimitiveNode, vector.getDataRef()[1], 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(bpSolver.networkHandles.yCoordinatePlatonicPrimitiveNode));
         final Link linkToXNode = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdXNode);
-        createdVectorInstanceNode.outgoingLinks.add(linkToXNode);
+        createdVectorInstanceNode.out.add(linkToXNode);
         final Link linkToYNode = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdYNode);
-        createdVectorInstanceNode.outgoingLinks.add(linkToYNode);
+        createdVectorInstanceNode.out.add(linkToYNode);
         
         return createdVectorInstanceNode;
     }

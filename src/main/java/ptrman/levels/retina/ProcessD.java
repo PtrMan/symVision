@@ -25,7 +25,8 @@ import ptrman.misc.Assert;
 import java.util.*;
 
 import static ptrman.levels.retina.LineDetectorWithMultiplePoints.real;
-import static ptrman.math.ArrayRealVectorHelper.*;
+import static ptrman.math.ArrayRealVectorHelper.distance;
+import static ptrman.math.ArrayRealVectorHelper.getAverage;
 import static ptrman.math.Maths.getRandomElements;
 import static ptrman.math.Maths.squaredDistance;
 
@@ -227,10 +228,8 @@ public class ProcessD implements IProcess {
         }
     }
 
-    private static RegressionForLineResult calcRegressionResultOfSamples(List<ProcessA.Sample> samples) {
-        final List<ArrayRealVector> positionsOfSamples = getPositionsOfSamples(samples);
-        final RegressionForLineResult regressionResult = calcRegressionForPoints(positionsOfSamples);
-        return regressionResult;
+    private static RegressionForLineResult calcRegressionResultOfSamples(Iterable<ProcessA.Sample> samples) {
+        return calcRegressionForPoints(getPositionsOfSamples(samples));
     }
 
     public void processData(float throttle) {
@@ -260,7 +259,7 @@ public class ProcessD implements IProcess {
         }
     }
 
-    private static List<RetinaPrimitive> splitDetectorsIntoLines(List<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints) {
+    private static List<RetinaPrimitive> splitDetectorsIntoLines(Iterable<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints) {
         List<RetinaPrimitive> result;
 
         result = new ArrayList<>();
@@ -377,7 +376,7 @@ public class ProcessD implements IProcess {
     /**
      * works by counting the "overlapping" pixel coordinates, chooses the axis with the less overlappings
      */
-    private static RegressionForLineResult calcRegressionForPoints(List<ArrayRealVector> positions) {
+    private static RegressionForLineResult calcRegressionForPoints(Iterable<ArrayRealVector> positions) {
 
         int overlappingPixelsOnX = calcCountOfOverlappingPixelsForAxis(positions, EnumAxis.X);
         int overlappingPixelsOnY = calcCountOfOverlappingPixelsForAxis(positions, EnumAxis.Y);
@@ -420,7 +419,7 @@ public class ProcessD implements IProcess {
         return regressionResultForLine;
     }
 
-    private static int calcCountOfOverlappingPixelsForAxis(List<ArrayRealVector> positions, EnumAxis axis) {
+    private static int calcCountOfOverlappingPixelsForAxis(Iterable<ArrayRealVector> positions, EnumAxis axis) {
         double maxCoordinatOnAxis = getMaximalCoordinateForPoints(positions, axis);
         int arraysizeOfDimension = Math.round((float) maxCoordinatOnAxis) + 1;
         int[] dimensionCounter = new int[arraysizeOfDimension];

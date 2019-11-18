@@ -10,13 +10,12 @@
 package ptrman.bpsolver.pattern;
 
 import ptrman.Datastructures.Vector2d;
-import static ptrman.Datastructures.Vector2d.FloatHelper.sub;
-import static ptrman.Datastructures.Vector2d.FloatHelper.add;
-import static ptrman.Datastructures.Vector2d.FloatHelper.getScaled;
-
 import ptrman.bpsolver.NetworkHandles;
-import java.util.ArrayList;
 import ptrman.misc.Assert;
+
+import java.util.ArrayList;
+
+import static ptrman.Datastructures.Vector2d.FloatHelper.*;
 
 /**
  * Implementation for grouping based on the barycenter (center) of objects

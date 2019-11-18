@@ -15,7 +15,8 @@ import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.misc.Assert;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 /**
@@ -24,7 +25,7 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 public enum Helper {
     ;
 
-    public static IntObjectHashMap<Deque<RetinaPrimitive>> createMapByObjectIdsFromListOfRetinaPrimitives(List<RetinaPrimitive> primitives) {
+    public static IntObjectHashMap<Deque<RetinaPrimitive>> createMapByObjectIdsFromListOfRetinaPrimitives(Collection<RetinaPrimitive> primitives) {
 
         IntObjectHashMap<Deque<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = new IntObjectHashMap<>(primitives.size());
 

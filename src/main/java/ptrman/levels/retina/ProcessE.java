@@ -15,8 +15,8 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
+import java.util.Collection;
 import java.util.Deque;
-import java.util.List;
 
 import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimitives;
 import static ptrman.bpsolver.Helper.isNeightborhoodPixelSet;
@@ -29,7 +29,7 @@ import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 public class ProcessE {
     // TODO< sort out only the line detectors or make sure only linedetectors get in, remove asserts if its made sure >
 
-    public void process(List<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
+    public static void process(Collection<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
         // we examine ALL possible intersections of all lines
         // this is only possible if we have the whole image at an instance
         // we assume here that this is the case
@@ -42,7 +42,7 @@ public class ProcessE {
         }
     }
 
-    private static void FindIntersectionOfLineDetectorsWithDifferentObjectIds(Deque<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
+    private static void FindIntersectionOfLineDetectorsWithDifferentObjectIds(Iterable<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
         for (RetinaPrimitive lowLinePrimitive : lineDetectors) {
             Assert.Assert(lowLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
 

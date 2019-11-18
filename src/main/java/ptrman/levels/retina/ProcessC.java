@@ -17,16 +17,13 @@ import ptrman.bpsolver.HardParameters;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.levels.retina.helper.SpatialDrawer;
 import ptrman.levels.retina.helper.SpatialListMap2d;
-import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
-import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 /**
  *
@@ -263,7 +260,7 @@ public class ProcessC implements IProcess {
         return Math.sqrt(dx*dx+dy*dy);
     }
     
-    private static boolean noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(Collection<SampleWithDistance> neightborArray, ProcessA.Sample compareSample) {
+    private static boolean noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(Iterable<SampleWithDistance> neightborArray, ProcessA.Sample compareSample) {
         int numberOfNeightborsWithAltitudeStrictlyGreaterThan = 0;
 
         for (SampleWithDistance s : neightborArray) {

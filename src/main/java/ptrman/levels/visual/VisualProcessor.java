@@ -15,13 +15,14 @@ import ptrman.misc.Assert;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
+import java.util.function.Function;
 
 /**
  *
  */
 public class VisualProcessor
 {
-    public static class ThresholdMap2dMapperFunction implements java.util.function.Function<Float, Boolean> {
+    public static class ThresholdMap2dMapperFunction implements Function<Float, Boolean> {
         public ThresholdMap2dMapperFunction(float threshold) {
             this.threshold = threshold;
         }
@@ -35,7 +36,7 @@ public class VisualProcessor
         private final float threshold;
     }
 
-    public static class ConvertToGrayImageMap2dMapperFunction implements java.util.function.Function<ColorRgb, Float> {
+    public static class ConvertToGrayImageMap2dMapperFunction implements Function<ColorRgb, Float> {
         private final ColorRgb colorScale;
 
         public ConvertToGrayImageMap2dMapperFunction(ColorRgb colorScale)

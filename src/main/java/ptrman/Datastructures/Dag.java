@@ -12,6 +12,7 @@ package ptrman.Datastructures;
 //import com.gs.collections.impl.list.mutable.FastList;
 //import com.gs.collections.impl.list.mutable.primitive.IntArrayList;
 
+import org.eclipse.collections.api.collection.primitive.MutableIntCollection;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 
@@ -27,7 +28,7 @@ public class Dag<Type> {
             this.content = content;
         }
 
-        public final IntArrayList childIndices = new IntArrayList();
+        public final MutableIntCollection childIndices = new IntArrayList();
         public final ElementType content;
     }
 

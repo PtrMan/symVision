@@ -10,7 +10,6 @@
 package ptrman.Algorithms;
 
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
-import ptrman.Datastructures.Vector2d;
 
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 

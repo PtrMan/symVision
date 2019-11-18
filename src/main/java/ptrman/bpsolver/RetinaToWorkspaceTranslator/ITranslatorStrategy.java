@@ -10,8 +10,8 @@
 package ptrman.bpsolver.RetinaToWorkspaceTranslator;
 
 import ptrman.FargGeneral.network.Node;
-import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.bpsolver.Solver;
+import ptrman.levels.retina.RetinaPrimitive;
 
 import java.util.List;
 

@@ -10,6 +10,7 @@
 package ptrman.bpsolver.pattern;
 
 import ptrman.FargGeneral.network.Node;
+
 import java.util.ArrayList;
 
 /**

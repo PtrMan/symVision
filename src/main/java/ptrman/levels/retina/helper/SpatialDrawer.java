@@ -12,9 +12,9 @@ package ptrman.levels.retina.helper;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Algorithms.Bresenham;
-import ptrman.Datastructures.Vector2d;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static ptrman.Datastructures.Vector2d.IntegerHelper.add;
@@ -38,7 +38,7 @@ public enum SpatialDrawer {
             }
         }
 
-        public final List<PositionWithDirection> positionWithDirections = new FastList<>();
+        public final Collection<PositionWithDirection> positionWithDirections = new FastList<>();
         //public final List<Vector2d<Integer>> directions = new FastList<>();
 
         @Override
@@ -64,29 +64,23 @@ public enum SpatialDrawer {
         return resultPositions;
     }
 
-    public static List<IntIntPair> getPositionsOfCellsWithNegativeDirectionOfCircleBound(final IntIntPair center, final int radius, IntIntPair boundary, List<IntIntPair> y) {
+    public static void getPositionsOfCellsWithNegativeDirectionOfCircleBound(final IntIntPair center, final int radius, IntIntPair boundary, Collection<IntIntPair> y) {
         Drawer drawer = new Drawer();
 
         Bresenham.rasterCircle(center, radius, drawer);
 
-        if (y == null)
-            y = new FastList<>(drawer.positionWithDirections.size());
-        else
-            y.clear();
-
         for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections) {
 
             final IntIntPair a = iterationPositionWithDirection.position;
-            if (isGridLocationInBound(a, boundary))
+            if (isGridLocationInBound(a, boundary)) {
                 y.add(a);
+            }
 
             final IntIntPair b = add(a, getScaled(iterationPositionWithDirection.direction, -1));
             if (isGridLocationInBound(b, boundary))
                 y.add(b);
         }
 
-
-        return y;
     }
 
     /** TODO stream */
@@ -95,7 +89,7 @@ public enum SpatialDrawer {
 
         Bresenham.rasterLine(a, b, drawer);
 
-        List<IntIntPair> resultPositions = new ArrayList<>(drawer.positionWithDirections.size());
+        Collection<IntIntPair> resultPositions = new ArrayList<>(drawer.positionWithDirections.size());
         for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections)
             resultPositions.add(iterationPositionWithDirection.position);
 

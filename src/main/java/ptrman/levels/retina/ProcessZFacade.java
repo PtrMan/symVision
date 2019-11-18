@@ -184,12 +184,12 @@ public class ProcessZFacade implements IProcess {
 		}
     }
 
-    private Rect getRectForPixelPositions(final List<Vector2d<Integer>> setPixelPositions) {
+    private static Rect getRectForPixelPositions(final List<Vector2d<Integer>> setPixelPositions) {
         Rect rect = Rect.createFromSinglePoint(setPixelPositions.get(0));
 
-        for( Vector2d<Integer> iterationPosition : setPixelPositions ) {
+        for( Vector2d<Integer> iterationPosition : setPixelPositions )
             rect.addPosition(iterationPosition);
-        }
+
 
         return rect;
     }
@@ -209,7 +209,7 @@ public class ProcessZFacade implements IProcess {
         return candidateList.get(candidateIndex);
     }
 
-    private static<Type> void drawValuesIntoMap(final List<Vector2d<Integer>> positions, IMap2d<Type> map, final Type value) {
+    private static<Type> void drawValuesIntoMap(final Iterable<Vector2d<Integer>> positions, IMap2d<Type> map, final Type value) {
         for( Vector2d<Integer> iterationPosition : positions ) {
             map.setAt(iterationPosition.x, iterationPosition.y, value);
         }
@@ -247,7 +247,7 @@ public class ProcessZFacade implements IProcess {
         }
     }
 
-    private void removePixelsFromAccelerationDatastructures(final List<Vector2d<Integer>> pixels) {
+    private void removePixelsFromAccelerationDatastructures(final Iterable<Vector2d<Integer>> pixels) {
         drawValuesIntoMap(pixels, unprocessedPixelsMap, false);
 
         for( final Vector2d<Integer> iterationPixel : pixels ) {
@@ -302,5 +302,5 @@ public class ProcessZFacade implements IProcess {
     private IMap2d<Boolean> alreadyCopiedImage;
 
     // stores all rectangles of the filled regions
-    public final List<Rect> rects = new ArrayList<>();
+    public final Collection<Rect> rects = new ArrayList<>();
 }

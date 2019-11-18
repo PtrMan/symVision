@@ -61,7 +61,7 @@ public class ProcessFastCalculateEndosceleton implements IProcess {
         // TODO< convert result back to symvision vector form and store in this object >
     }
 
-    protected List<IMap2d<Boolean>> corrodeDirectional(List<IMap2d<Boolean>> inputs) {
+    protected static List<IMap2d<Boolean>> corrodeDirectional(List<IMap2d<Boolean>> inputs) {
         List<IMap2d<Boolean>> directonalCorrededInputs = new ArrayList<>();
 
         // TODO< corrode in just one direction the inputs >
