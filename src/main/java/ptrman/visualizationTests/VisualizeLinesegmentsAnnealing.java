@@ -16,13 +16,12 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.IImageDrawer;
 import ptrman.Showcases.TestClustering;
-//import ptrman.bindingNars.NarsBinding;
-//import ptrman.bindingNars.OpenNarsNarseseConsumer;
+import ptrman.bindingNars.NarsBinding;
+import ptrman.bindingNars.OpenNarsNarseseConsumer;
 import ptrman.bpsolver.Solver;
 import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
-import ptrman.levels.visual.ColorRgb;
-import ptrman.levels.visual.VisualProcessor;
+import ptrman.levels.visual.*;
 import ptrman.misc.ImageConverter;
 
 import java.awt.*;
@@ -98,16 +97,16 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
         connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
 
-//        { // create NARS-binding
-//            narsBinding = new NarsBinding(new OpenNarsNarseseConsumer());
-//        }
+        { // create NARS-binding
+            narsBinding = new NarsBinding(new OpenNarsNarseseConsumer());
+        }
     }
 
     final ProcessD processD;
     ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
     ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
 
-//    public NarsBinding narsBinding;
+    public NarsBinding narsBinding;
 
     int frameCounter = 0;
 
@@ -150,11 +149,11 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
                     imageSize
                 )
             );
-            newDagElement.childIndices.add(1);
+            //newDagElement.childIndices.add(1);
 
             processingChain.filterChainDag.elements.add(newDagElement);
 
-
+            /* commented because we don't dither
             newDagElement = new Dag.Element(
                     new VisualProcessor.ProcessingChain.ChainElementFloatBoolean(
                             new VisualProcessor.ProcessingChain.DitheringFilter(),
@@ -164,14 +163,22 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             );
 
             processingChain.filterChainDag.elements.add(newDagElement);
-
+             */
 
 
             processingChain.filterChain(mapColor);
 
-            IMap2d<Boolean> mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(1).content).result;
+            IMap2d<Float> mapGrayscale = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(processingChain.filterChainDag.elements.size()-1).content).result; // get from last element in the chain
 
 
+            // convolution
+            Map2dApplyConvolution[] edgeDetectors = new Map2dApplyConvolution[1];
+            edgeDetectors[0] = new Map2dApplyConvolution(Convolution2dHelper.calcGaborKernel(8, 0.0f, 10.0f/64.0f, (float)Math.PI*0.5f, 0.4f));
+
+            IMap2d<Float>[] edges = new IMap2d[1];
+            edges[0] = edgeDetectors[0].process(mapGrayscale);
+
+            IMap2d<Boolean> mapBoolean = Map2dBinary.threshold(edges[0], 0.01f); // convert from edges[0]
 
             ProcessZFacade processZFacade = new ProcessZFacade();
 
@@ -256,7 +263,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
                 processD.commitLineDetectors(); // split line detectors into "real" primitives
 
-//                narsBinding.emitRetinaPrimitives(connectorDetectorsEndosceletonFromProcessD.workspace); // emit all collected primitives from process D
+                narsBinding.emitRetinaPrimitives(connectorDetectorsEndosceletonFromProcessD.workspace); // emit all collected primitives from process D
             }
 
             annealingStep++;

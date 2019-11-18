@@ -15,12 +15,10 @@ import ptrman.Datastructures.Map2d;
 /**
  *
  */
-public enum Convolution2d
-{
+public enum Convolution2d {
 	;
 
-	public static IMap2d<Float> convolution(IMap2d<Float> input, IMap2d<Float> inputKernel)
-    {
+	public static IMap2d<Float> convolution(IMap2d<Float> input, IMap2d<Float> inputKernel) {
 		int x, y;
         int i;
 
@@ -30,34 +28,27 @@ public enum Convolution2d
 		IMap2d<Float> resultMap = new Map2d<>(input.getWidth(), input.getLength());
 
         // TODO optimize for cpu? (opencl is senseless)
-        for( i = 0; i < input.getWidth()*input.getLength(); i++ )
-        {
+        for( i = 0; i < input.getWidth()*input.getLength(); i++ ) {
             resultMap.setAt(i % input.getWidth(), i / input.getWidth(), 0.0f);
         }
 
-        for( y = 0; y < input.getLength() - inputKernel.getLength(); y++ )
-        {
-            for( x = 0; x < input.getWidth() - inputKernel.getWidth(); x++ )
-            {
-
+        for( y = 0; y < input.getLength() - inputKernel.getLength(); y++ ) {
+            for( x = 0; x < input.getWidth() - inputKernel.getWidth(); x++ ) {
 				float value = convolutionAt(inputAsMatrix, kernelAsMatrix, x, y);
-                resultMap.setAt(x, y, value);
+                resultMap.setAt(x+inputKernel.getWidth()/2, y+inputKernel.getLength()/2, value);
             }
         }
 
         return resultMap;
     }
 
-    private static float convolutionAt(float[][] input, float[][] kernel, int startX, int startY)
-    {
+    private static float convolutionAt(float[][] input, float[][] kernel, int startX, int startY) {
 		int x, y;
 
 		float result = 0.0f;
 
-        for( y = 0; y < kernel.length; y++ )
-        {
-            for( x = 0; x < kernel[0].length; x++ )
-            {
+        for( y = 0; y < kernel.length; y++ ) {
+            for( x = 0; x < kernel[0].length; x++ ) {
                 result += (input[x + startX][ y + startY] * kernel[x][y]);
             }
         }
@@ -71,15 +62,12 @@ public enum Convolution2d
 
 		float[][] result = new float[map.getWidth()][map.getLength()];
 
-        for( y = 0; y < map.getWidth(); y++ )
-        {
+        for( y = 0; y < map.getWidth(); y++ ) {
             result[y] = new float[map.getLength()];
         }
 
-        for( y = 0; y < map.getLength(); y++ )
-        {
-            for( x = 0; x < map.getWidth(); x++ )
-            {
+        for( y = 0; y < map.getLength(); y++ ) {
+            for( x = 0; x < map.getWidth(); x++ ) {
                 result[x][y] = map.readAt(x, y);
             }
         }

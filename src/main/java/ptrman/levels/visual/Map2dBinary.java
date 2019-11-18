@@ -203,9 +203,8 @@ public enum Map2dBinary {
 
         for( int y = 0; y < input.getLength(); y++ ) {
             for( int x = 0; x < input.getWidth(); x++ ) {
-                if( input.readAt(x, y) > threshold ) {
-                    result.setAt(x, y, true);
-                }
+                boolean val = input.readAt(x, y) > threshold;
+                result.setAt(x, y, val);
             }
         }
 
