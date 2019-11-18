@@ -71,10 +71,15 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
                     g2.drawLine(30, 40, 70, 40);
                 }
             }
-            else {
+            else if(chosenImage == 1){
                 // draw star
                 g2.setFont(new Font("TimesRoman", Font.PLAIN, 230));
                 g2.drawString("*", 20, 170);
+            }
+            else if(chosenImage == 2){
+                // text
+                g2.setFont(new Font("TimesRoman", Font.PLAIN, 90));
+                g2.drawString("/en-", 2, 100);
             }
 
 
@@ -108,7 +113,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
         animationFrameNumber = (frameCounter / (5*30));
 
         if ((frameCounter % (5*30)) == 0 ) {
-            chosenImage = new Random().nextInt(2);
+            chosenImage = new Random().nextInt(3);
 
             InputDrawer imageDrawer = new InputDrawer();
 
@@ -208,7 +213,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             processD.set(connectorSamplesForEndosceleton, connectorDetectorsEndosceletonFromProcessD);
 
             processA.preProcessData();
-            processA.processData(0.01f);
+            processA.processData(0.03f);
             processA.postProcessData();
 
             processB.preProcessData();
