@@ -16,11 +16,12 @@ import java.util.function.Function;
 /**
  *
  */
-public class Map2dMapper
+public enum Map2dMapper
 {
+    ;
 
 
-        public static <X,Y> void map(Function<X, Y> f, IMap2d<X> m, IMap2d<Y> resultMap) {
+    public static <X,Y> void map(Function<X, Y> f, IMap2d<X> m, IMap2d<Y> resultMap) {
             int x, y;
 
             int h = m.getLength();

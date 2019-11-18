@@ -39,7 +39,7 @@ public class LineSegmentLength extends SolverCodelet {
         FeatureNode createdLineSegmentLength = FeatureNode.createFloatNode(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode, lineSegmentLength, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode));
         
         Link createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdLineSegmentLength);
-        thisLine.outgoingLinks.add(createdLink);
+        thisLine.out.add(createdLink);
         
         return new RunResult(false);
     }

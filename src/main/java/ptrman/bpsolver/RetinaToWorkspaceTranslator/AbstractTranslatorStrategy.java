@@ -13,13 +13,13 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.SpatialAcceleration;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
-import ptrman.levels.retina.Intersection;
-import ptrman.levels.retina.RetinaPrimitive;
-import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.HelperFunctions;
 import ptrman.bpsolver.NetworkHandles;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.nodes.AttributeNode;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
+import ptrman.levels.retina.Intersection;
+import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.misc.AngleHelper;
 import ptrman.misc.Assert;
 
@@ -35,7 +35,7 @@ import java.util.Map;
 public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy {
     public abstract List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver);
     
-    protected void storeRetinaObjectWithAssocIntoMap(List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects) {
+    protected static void storeRetinaObjectWithAssocIntoMap(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects) {
         for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObjectWithAssoc : arrayOfRetinaObjectWithAssociatedPoints ) {
             spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.put(iterationRetinaObjectWithAssoc.primitive, iterationRetinaObjectWithAssoc);
         }
@@ -72,7 +72,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
 
     }
     
-    protected RetinaObjectWithAssociatedPointsAndWorkspaceNode associatePointsToRetinaPrimitive(RetinaPrimitive primitive) {
+    protected static RetinaObjectWithAssociatedPointsAndWorkspaceNode associatePointsToRetinaPrimitive(RetinaPrimitive primitive) {
 
         Assert.Assert(primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "only implemented for linesegment");
 
@@ -222,20 +222,20 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
                 Node workspaceNode = iterationRetinaObjectWithAssoc.retinaObjectWithAssociatedPointsAndWorkspaceNode.workspaceNode;
 
                 Link createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, workspaceNode);
-                createdAnglePointNode.outgoingLinks.add(createdForwardLink);
+                createdAnglePointNode.out.add(createdForwardLink);
 
                 Link createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASNODE, createdAnglePointNode);
-                workspaceNode.outgoingLinks.add(createdBackwardLink);
+                workspaceNode.out.add(createdBackwardLink);
             }
 
 
             AttributeNode createdAnglePointAttributeNode = AttributeNode.createIntegerNode(bpSolver.networkHandles.anglePointFeatureTypePrimitiveNode, crosspoint.type.ordinal());
             Link createdFeatureTypeNodeLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointAttributeNode);
-            createdAnglePointNode.outgoingLinks.add(createdFeatureTypeNodeLink);
+            createdAnglePointNode.out.add(createdFeatureTypeNodeLink);
 
             PlatonicPrimitiveInstanceNode createdAnglePointPosition = HelperFunctions.createVectorAttributeNode(crosspoint.position, bpSolver.networkHandles.anglePointPositionPlatonicPrimitiveNode, bpSolver);
             Link createdPositionLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointPosition);
-            createdAnglePointNode.outgoingLinks.add(createdPositionLink);
+            createdAnglePointNode.out.add(createdPositionLink);
         }
     }
     

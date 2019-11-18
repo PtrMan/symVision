@@ -9,14 +9,14 @@
  */
 package ptrman.levels.visual;
 
+import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
-import java.util.List;
 
 public enum Map2dStencil
 {
 	;
 
-	static public void stencilSingleValue(Map2d<Integer> input, Map2d<Boolean> result, int value)
+	static public void stencilSingleValue(Map2d<Integer> input, IMap2d<Boolean> result, int value)
     {
         int ix, iy;
 
@@ -31,14 +31,14 @@ public enum Map2dStencil
         }
     }
 
-    static public void stencilValues(Map2d<Integer> input, Map2d<Boolean> result, List<Integer> values, int maxValue)
+    static public void stencilValues(Map2d<Integer> input, IMap2d<Boolean> result, Iterable<Integer> values, int maxValue)
     {
 
         boolean[] stencilBooleanArray = convertValuesToBooleanArray(values, maxValue);
         stencilWithBooleanArray(input, result, stencilBooleanArray);
     }
 
-    static private boolean[] convertValuesToBooleanArray(List<Integer> values, int maxValue)
+    static private boolean[] convertValuesToBooleanArray(Iterable<Integer> values, int maxValue)
     {
 
         boolean[] resultArray = new boolean[maxValue + 1];
@@ -51,7 +51,7 @@ public enum Map2dStencil
         return resultArray;
     }
 
-    static private void stencilWithBooleanArray(Map2d<Integer> input, Map2d<Boolean> result, boolean[] booleanArray)
+    static private void stencilWithBooleanArray(Map2d<Integer> input, IMap2d<Boolean> result, boolean[] booleanArray)
     {
         int ix, iy;
 

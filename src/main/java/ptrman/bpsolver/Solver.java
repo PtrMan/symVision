@@ -477,74 +477,74 @@ public class Solver {
         
         networkHandles.lineStructureAbstractPrimitiveNode.isAbstract = true;
         ptrman.FargGeneral.network.Link link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.endpointPlatonicPrimitiveNode);
-        networkHandles.lineStructureAbstractPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.lineStructureAbstractPrimitiveNode.out.add(link);
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.bayPlatonicPrimitiveNode);
-        networkHandles.lineStructureAbstractPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.lineStructureAbstractPrimitiveNode.out.add(link);
         
         
         network.nodes.add(networkHandles.lineSegmentPlatonicPrimitiveNode);
         
         
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.ISA, networkHandles.lineStructureAbstractPrimitiveNode);
-        networkHandles.lineSegmentPlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.lineSegmentPlatonicPrimitiveNode.out.add(link);
         
         
         
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.lineSegmentFeatureLineLengthPrimitiveNode);
-        networkHandles.lineSegmentPlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.lineSegmentPlatonicPrimitiveNode.out.add(link);
         
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.lineSegmentFeatureLineSlopePrimitiveNode);
-        networkHandles.lineSegmentPlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.lineSegmentPlatonicPrimitiveNode.out.add(link);
         
         
         
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.ISA, networkHandles.objectPlatonicPrimitiveNode);
-        networkHandles.lineStructureAbstractPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.lineStructureAbstractPrimitiveNode.out.add(link);
         
         // TODO< imagination of circle, center, tangent lines, etc >
         
         
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.xCoordinatePlatonicPrimitiveNode);
-        networkHandles.endpointPlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.endpointPlatonicPrimitiveNode.out.add(link);
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.yCoordinatePlatonicPrimitiveNode);
-        networkHandles.endpointPlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.endpointPlatonicPrimitiveNode.out.add(link);
         
         
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.xCoordinatePlatonicPrimitiveNode);
-        networkHandles.bayPlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.bayPlatonicPrimitiveNode.out.add(link);
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.yCoordinatePlatonicPrimitiveNode);
-        networkHandles.bayPlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.bayPlatonicPrimitiveNode.out.add(link);
         
         
         
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.xCoordinatePlatonicPrimitiveNode);
-        networkHandles.barycenterPlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.barycenterPlatonicPrimitiveNode.out.add(link);
         
         
         
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.yCoordinatePlatonicPrimitiveNode);
-        networkHandles.barycenterPlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.barycenterPlatonicPrimitiveNode.out.add(link);
         
         
         
         // a object has a barycenter
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.barycenterPlatonicPrimitiveNode);
-        networkHandles.objectPlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.objectPlatonicPrimitiveNode.out.add(link);
         
         
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASATTRIBUTE, networkHandles.anglePointFeatureTypePrimitiveNode);
-        networkHandles.anglePointNodePlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.anglePointNodePlatonicPrimitiveNode.out.add(link);
         
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.anglePointPositionPlatonicPrimitiveNode);
-        networkHandles.anglePointNodePlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.anglePointNodePlatonicPrimitiveNode.out.add(link);
         
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.anglePointAngleValuePrimitiveNode);
-        networkHandles.anglePointNodePlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.anglePointNodePlatonicPrimitiveNode.out.add(link);
         
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.xCoordinatePlatonicPrimitiveNode);
-        networkHandles.anglePointPositionPlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.anglePointPositionPlatonicPrimitiveNode.out.add(link);
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.yCoordinatePlatonicPrimitiveNode);
-        networkHandles.anglePointPositionPlatonicPrimitiveNode.outgoingLinks.add(link);
+        networkHandles.anglePointPositionPlatonicPrimitiveNode.out.add(link);
     }
     
     private void initializeNetwork() {

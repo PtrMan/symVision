@@ -19,7 +19,6 @@ import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.levels.retina.*;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -151,7 +150,7 @@ public enum DebugDrawingHelper {
         }
     }
 
-    public static void drawLineParsings(Graphics2D graphics, ArrayList<ProcessM.LineParsing> lineParsings) {
+    public static void drawLineParsings(Graphics2D graphics, Iterable<ProcessM.LineParsing> lineParsings) {
         for( ProcessM.LineParsing iterationLineParsing : lineParsings ) {
             drawLineParsing(graphics, iterationLineParsing);
         }
@@ -169,7 +168,7 @@ public enum DebugDrawingHelper {
     }
 
     // draws the barycenters if possible
-    public static void drawObjectBaryCenters(Graphics2D graphics, ArrayList<Node> objectNodes, NetworkHandles networkHandles) {
+    public static void drawObjectBaryCenters(Graphics2D graphics, Iterable<Node> objectNodes, NetworkHandles networkHandles) {
         graphics.setColor(Color.GREEN);
 
         for( Node iterationNode : objectNodes ) {
@@ -222,7 +221,7 @@ public enum DebugDrawingHelper {
     // just execute one big draw sequence
     public static void drawDetectors(Graphics2D graphics,
                                      List<RetinaPrimitive> retinaPrimitivesArray,
-                                     List<Intersection> intersections,
+                                     Iterable<Intersection> intersections,
                                      List<ProcessA.Sample> samplesArray, List<DrawingEntity> drawingEntities) {
 
         for( Intersection iterationIntersection : intersections ) {

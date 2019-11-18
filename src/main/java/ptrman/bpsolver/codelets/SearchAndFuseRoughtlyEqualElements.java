@@ -13,8 +13,8 @@ import ptrman.Datastructures.Tuple4;
 import ptrman.FargGeneral.Codelet;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
-import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.HardParameters;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
@@ -50,15 +50,15 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
 
         // choose two random nodes
         
-        if( startNode.outgoingLinks.size() < 2 ) {
+        if( startNode.out.size() < 2 ) {
             return new RunResult(true);
         }
         // else here
 
-        List<Integer> distinctEdgeIndices = DistinctUtility.getTwoDisjunctNumbers(random, startNode.outgoingLinks.size());
+        List<Integer> distinctEdgeIndices = DistinctUtility.getTwoDisjunctNumbers(random, startNode.out.size());
 
-        Node nodeA = startNode.outgoingLinks.get(distinctEdgeIndices.get(0)).target;
-        Node nodeB = startNode.outgoingLinks.get(distinctEdgeIndices.get(1)).target;
+        Node nodeA = startNode.out.get(distinctEdgeIndices.get(0)).target;
+        Node nodeB = startNode.out.get(distinctEdgeIndices.get(1)).target;
 
         HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> commonChildnodesOfNodes = getCommonFeatureNodesOfNodes(nodeA, nodeB);
         
@@ -107,7 +107,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
      *         the indices 0 and 2 are the subnodes which are the features
      *         the key is the (common) type of the feature, by default points at the featureTypeNode of both nodes
      */
-    private HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> getCommonFeatureNodesOfNodes(Node nodeA, Node nodeB) {
+    private static HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> getCommonFeatureNodesOfNodes(Node nodeA, Node nodeB) {
         int linkIndexA, linkIndexB;
 
         HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> resultMap = new HashMap<>();
@@ -120,11 +120,11 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         }
         // else here
         
-        for( linkIndexA = 0; linkIndexA < nodeA.outgoingLinks.size(); linkIndexA++ ) {
-            for( linkIndexB = 0; linkIndexB < nodeB.outgoingLinks.size(); linkIndexB++ ) {
+        for(linkIndexA = 0; linkIndexA < nodeA.out.size(); linkIndexA++ ) {
+            for(linkIndexB = 0; linkIndexB < nodeB.out.size(); linkIndexB++ ) {
 
-                Node iterationChildNodeOfNodeA = nodeA.outgoingLinks.get(linkIndexA).target;
-                Node iterationChildNodeOfNodeB = nodeB.outgoingLinks.get(linkIndexB).target;
+                Node iterationChildNodeOfNodeA = nodeA.out.get(linkIndexA).target;
+                Node iterationChildNodeOfNodeB = nodeB.out.get(linkIndexB).target;
                 
                 if( iterationChildNodeOfNodeA.type != iterationChildNodeOfNodeB.type ) {
                     continue;
@@ -156,7 +156,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         return resultMap;
     }
     
-    private boolean isFeatureNode(Node node) {
+    private static boolean isFeatureNode(Node node) {
         return node.type == NodeTypes.EnumType.FEATURENODE.ordinal();
     }
     
@@ -197,8 +197,8 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
 
         Node combinedNode = combineFeatureNodes(relinkInfoTuple.e0, relinkInfoTuple.e2);
         
-        nodeA.outgoingLinks.set(linkIndexOfNodeA, getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));
-        nodeB.outgoingLinks.set(linkIndexOfNodeB, getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));
+        nodeA.out.set(linkIndexOfNodeA, getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));
+        nodeB.out.set(linkIndexOfNodeB, getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));
     }
     
     private FeatureNode combineFeatureNodes(FeatureNode nodeA, FeatureNode nodeB) {

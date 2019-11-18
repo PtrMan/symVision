@@ -14,8 +14,8 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.*;
-import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Parameters;
+import ptrman.bpsolver.Solver;
 import ptrman.levels.visual.ColorRgb;
 import ptrman.levels.visual.VisualProcessor;
 
@@ -30,6 +30,7 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.function.Function;
 
 /**
@@ -145,7 +146,7 @@ public class TestClustering {
             Graphics2D graphics = (Graphics2D)detectorImage.getGraphics();
 
             // TODO create graphics and draw it to a created image and put the image into the canvas
-            java.util.List<DebugDrawingHelper.DrawingEntity> drawingEntities = new ArrayList<>();
+            Collection<DebugDrawingHelper.DrawingEntity> drawingEntities = new ArrayList<>();
             drawingEntities.add(new DebugDrawingHelper.SampleDrawingEntity(2, true, 40.0));
 
 //            DebugDrawingHelper.drawDetectors(graphics,
@@ -243,7 +244,7 @@ public class TestClustering {
 
 
 
-            GridLayout experimentLayout = new GridLayout(3,1);
+            LayoutManager experimentLayout = new GridLayout(3,1);
 
             final JPanel compsToExperiment = new JPanel();
             compsToExperiment.setLayout(experimentLayout);

@@ -12,7 +12,7 @@ package ptrman.bpsolver;
 import ptrman.math.Maths;
 
 import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
 
 /**
  * statistics of a feature
@@ -27,7 +27,7 @@ public class FeatureStatistics
     private float mean = 0.0f;
     private float min = Float.MAX_VALUE;
     private float max = Float.MIN_VALUE;
-    private final List<Float> values = new ArrayList<>();
+    private final Collection<Float> values = new ArrayList<>();
     
     public float primitiveFeatureMax; // page 214, maximal value related to feature, e.g. slope 100%, angle 180 degree, etc.
     

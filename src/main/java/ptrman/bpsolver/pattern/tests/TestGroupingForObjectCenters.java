@@ -12,9 +12,12 @@ package ptrman.bpsolver.pattern.tests;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.nodes.NumeriosityNode;
 import ptrman.bpsolver.pattern.Grouping;
+import ptrman.bpsolver.pattern.IMatchingUpdate;
 import ptrman.bpsolver.pattern.MatchingUpdateImplementationForObjectCenters;
 import ptrman.bpsolver.pattern.Pattern;
+
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
@@ -38,9 +41,9 @@ public enum TestGroupingForObjectCenters
     {
         // for testing we use the numerosity node as content to tell the elements apart
 
-        ArrayList<Pattern> exemplars = new ArrayList<>();
+        Collection<Pattern> exemplars = new ArrayList<>();
 
-        MatchingUpdateImplementationForObjectCenters matchingUpdateImplementation = new MatchingUpdateImplementationForObjectCenters(10.0f, 0.6f);
+        IMatchingUpdate matchingUpdateImplementation = new MatchingUpdateImplementationForObjectCenters(10.0f, 0.6f);
         
         MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass patternA = new MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass();
         patternA.clusterCenter = new Vector2d<>(5.0f, 0.0f);

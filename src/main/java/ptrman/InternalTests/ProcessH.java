@@ -15,6 +15,7 @@ import ptrman.levels.retina.SingleLineDetector;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 /**
  *
@@ -39,7 +40,7 @@ public enum ProcessH
     {
 		ptrman.levels.retina.ProcessH processH = new ptrman.levels.retina.ProcessH();
 
-		ArrayList<RetinaPrimitive> detectors = new ArrayList<>();
+		Collection<RetinaPrimitive> detectors = new ArrayList<>();
         detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{7.0f, 5.0f+2.0f*7.0f}), new ArrayRealVector(new double[]{15.0f, 5.0f+2.0f*15.0f}))));
         detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f+2.0f}), new ArrayRealVector(new double[]{10.0f, 5.0f+2.0f*10.0f+2.0f}))));
         
@@ -57,7 +58,7 @@ public enum ProcessH
     {
 		ptrman.levels.retina.ProcessH processH = new ptrman.levels.retina.ProcessH();
 
-		ArrayList<RetinaPrimitive> detectors = new ArrayList<>();
+		Collection<RetinaPrimitive> detectors = new ArrayList<>();
         detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f}), new ArrayRealVector(new double[]{15.0f, 5.0f+2.0f*15.0f}))));
         detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f+2.0f}), new ArrayRealVector(new double[]{10.0f, 5.0f+2.0f*10.0f+2.0f}))));
         

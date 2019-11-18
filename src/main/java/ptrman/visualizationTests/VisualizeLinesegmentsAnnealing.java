@@ -9,6 +9,7 @@
  */
 package ptrman.visualizationTests;
 
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import processing.core.PApplet;
 import processing.core.PImage;
 import ptrman.Datastructures.Dag;
@@ -16,8 +17,6 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.IImageDrawer;
 import ptrman.Showcases.TestClustering;
-//import ptrman.bindingNars.NarsBinding;
-//import ptrman.bindingNars.OpenNarsNarseseConsumer;
 import ptrman.bpsolver.Solver;
 import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
@@ -28,7 +27,9 @@ import ptrman.misc.ImageConverter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
-import java.util.function.Function;
+
+//import ptrman.bindingNars.NarsBinding;
+//import ptrman.bindingNars.OpenNarsNarseseConsumer;
 
 // visualize line-segments of endosceleton
 public class VisualizeLinesegmentsAnnealing extends PApplet {
@@ -265,9 +266,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
         frameCounter++;
 
         { // draw processed image in the background
-            Function<Solver, BufferedImage> imgDrawer = new InputDrawer();
-            BufferedImage img = imgDrawer.apply(null);
-            PImage pimg = ImageConverter.convBufferedImageToPImage(img);
+            PImage pimg = ImageConverter.convBufferedImageToPImage((new InputDrawer()).apply(null));
             tint(255.0f, 0.2f*255.0f);
             image(pimg, 0, 0); // draw image
             tint(255.0f, 255.0f); // reset tint
@@ -288,13 +287,14 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
         }
 
         if(drawVisualizationOfEndoSceletons) {
-            for (ProcessA.Sample iSample : connectorSamplesForEndosceleton.workspace) {
-                if (iSample.type != ProcessA.Sample.EnumType.ENDOSCELETON) {
-                    continue;
-                }
-                stroke(200.0f, 255.0f, 200.0f);
 
-                rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
+            stroke(200.0f, 255.0f, 200.0f);
+
+            for (ProcessA.Sample s : connectorSamplesForEndosceleton.workspace) {
+                if (s.type == ProcessA.Sample.EnumType.ENDOSCELETON) {
+                    IntIntPair p = s.position;
+                    rect(p.getOne(), p.getTwo(), 1, 1);
+                }
             }
         }
 

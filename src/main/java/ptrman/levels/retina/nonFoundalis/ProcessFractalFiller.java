@@ -20,11 +20,10 @@ import ptrman.Datastructures.FastBooleanMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.IProcess;
 import ptrman.levels.retina.ProcessA;
-import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 import ptrman.misc.BooleanHelper;
 
-import java.util.List;
+import java.util.Collection;
 
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
@@ -55,7 +54,7 @@ public class ProcessFractalFiller implements IProcess {
         // for each channel one context
         public GaussianContext[] gaussianContext;
 
-        public final List<ProcessA.Sample> samples = new FastList<>();
+        public final Collection<ProcessA.Sample> samples = new FastList<>();
 
         public float[] varianceMultiplier;
     }
@@ -163,7 +162,7 @@ public class ProcessFractalFiller implements IProcess {
         return true;
     }
 
-    private void addSamplesForCurrentFront(IntIntPair gridCellPosition, IntIntPair entryDirection, int scanFrontCounter, boolean[] filledPixelsOfCurrentFront, List<ProcessA.Sample> samples) {
+    private void addSamplesForCurrentFront(IntIntPair gridCellPosition, IntIntPair entryDirection, int scanFrontCounter, boolean[] filledPixelsOfCurrentFront, Collection<ProcessA.Sample> samples) {
         final int MIDDLE_INDEX = (accelerationGridSize-1)/2;
 
         final boolean WRITE_MIDDLE_SAMPLE = true;
@@ -194,7 +193,7 @@ public class ProcessFractalFiller implements IProcess {
         }
     }
 
-    private void addSamples(final IntIntPair gridCellPosition, final IntIntPair entryDirection, int scanFrontCounter, final boolean[] frontWhereSamplesShouldBeTakes, List<ProcessA.Sample> samples) {
+    private void addSamples(final IntIntPair gridCellPosition, final IntIntPair entryDirection, int scanFrontCounter, final boolean[] frontWhereSamplesShouldBeTakes, Collection<ProcessA.Sample> samples) {
         for (boolean frontWhereSamplesShouldBeTake : frontWhereSamplesShouldBeTakes) {
             final IntIntPair sample1Position = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, 0);
 
@@ -204,9 +203,8 @@ public class ProcessFractalFiller implements IProcess {
         }
     }
 
-    private boolean[] getFrontWhereSamplesShouldBeTaken(boolean[] front) {
-        final boolean[] broadcasted = booleanBroadcast(front);
-        return BooleanHelper.booleanAnd(broadcasted, BooleanHelper.booleanNot(front));
+    private static boolean[] getFrontWhereSamplesShouldBeTaken(boolean[] front) {
+        return BooleanHelper.booleanAnd(booleanBroadcast(front), BooleanHelper.booleanNot(front));
     }
 
     private IntIntPair getAbsolutePosition(final IntIntPair gridCellPosition, final IntIntPair entryDirection, int scanFrontCounter, int frontIndex) {
@@ -219,15 +217,13 @@ public class ProcessFractalFiller implements IProcess {
         return Vector2d.IntegerHelper.add(absoluteMapTopLeftPosition, Vector2d.IntegerHelper.add(scanFrontOffset, indexOffset));
     }
 
+    static final IntIntPair UP = pair(0, 1);
+    static final IntIntPair DOWN = pair(1, 0);
+
     // returns the direction for the other axis
     // is not just a 90 degrees rotation
-    private IntIntPair getRotatedEntryDirection(IntIntPair entryDirection) {
-        if( entryDirection.getTwo() == 0 ) {
-            return pair(0, 1);
-        }
-        else {
-            return pair(1, 0);
-        }
+    private static IntIntPair getRotatedEntryDirection(IntIntPair entryDirection) {
+        return entryDirection.getTwo() == 0 ? UP : DOWN;
     }
 
 

@@ -11,14 +11,12 @@ package ptrman.levels.retina;
 
 //import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.apache.commons.math3.linear.ArrayRealVector;
-import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.levels.retina.helper.ProcessConnector;
-import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
 import java.util.Collection;
@@ -27,8 +25,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimitives;
-import static ptrman.levels.retina.helper.SpatialDrawer.getPositionsOfCellsOfLineUnbound;
-import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 /**
  * tries to combine line-detectors
@@ -96,7 +92,7 @@ public class ProcessH implements IProcess {
 
     }
 
-    public void combineOfObjectId(Deque<RetinaPrimitive> workingDetectors, final int objectId, float maxFusionPercent) {
+    public static void combineOfObjectId(Deque<RetinaPrimitive> workingDetectors, final int objectId, float maxFusionPercent) {
         // called low and high because the index low is always lower than high
 
 
@@ -174,7 +170,7 @@ public class ProcessH implements IProcess {
         }
     }
 
-    private void addNewLine(Collection<RetinaPrimitive> workingDetectors, int objectId, SingleLineDetector fusedLineDetector) {
+    private static void addNewLine(Collection<RetinaPrimitive> workingDetectors, int objectId, SingleLineDetector fusedLineDetector) {
 
         RetinaPrimitive newLine = RetinaPrimitive.makeLine(fusedLineDetector);
         newLine.objectId = objectId;

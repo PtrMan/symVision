@@ -17,6 +17,7 @@ import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.misc.Assert;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -60,23 +61,23 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
 
 			FeaturePatternMatching.MatchingPathElement currentMatchPathElement = matchingPathElements.get(currentMatchPathElementI);
 
-            currentMatchNodeOrginal = currentMatchNodeOrginal.outgoingLinks.get(currentMatchPathElement.bestMatchNodeAIndex).target;
-            currentMatchNodeAdditional = currentMatchNodeAdditional.outgoingLinks.get(currentMatchPathElement.bestMatchNodeBIndex).target;
+            currentMatchNodeOrginal = currentMatchNodeOrginal.out.get(currentMatchPathElement.bestMatchNodeAIndex).target;
+            currentMatchNodeAdditional = currentMatchNodeAdditional.out.get(currentMatchPathElement.bestMatchNodeBIndex).target;
         }
 
         // strengthen links
 
 		FeaturePatternMatching.MatchingPathElement currentMatchLastPathElement = matchingPathElements.get(matchingPathElements.size() - 1);
 
-        currentMatchNodeOrginal.outgoingLinks.get(currentMatchLastPathElement.bestMatchNodeAIndex).strength += additionalStrength;
-        currentMatchNodeAdditional.outgoingLinks.get(currentMatchLastPathElement.bestMatchNodeBIndex).strength += additionalStrength;
+        currentMatchNodeOrginal.out.get(currentMatchLastPathElement.bestMatchNodeAIndex).strength += additionalStrength;
+        currentMatchNodeAdditional.out.get(currentMatchLastPathElement.bestMatchNodeBIndex).strength += additionalStrength;
         // TODO< limit it in some way? >
 
         // update the statistics
         // TODO< update the statistics of the other FeatureNodes along the way and at the bottom ? >
 
-		Node lastOrginalNode = orginal.exemplars.get(0).outgoingLinks.get(currentMatchLastPathElement.bestMatchNodeAIndex).target;
-		Node lastAdditionalNode = additional.exemplars.get(0).outgoingLinks.get(currentMatchLastPathElement.bestMatchNodeBIndex).target;
+		Node lastOrginalNode = orginal.exemplars.get(0).out.get(currentMatchLastPathElement.bestMatchNodeAIndex).target;
+		Node lastAdditionalNode = additional.exemplars.get(0).out.get(currentMatchLastPathElement.bestMatchNodeBIndex).target;
 
         // NOTE< should we just build around this case with an if? >
         Assert.Assert(lastOrginalNode.type == NodeTypes.EnumType.FEATURENODE.ordinal(), "lastOrginalNode is not a featurenode as expected");
@@ -106,7 +107,7 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
     }
 
 
-    private static Node findClosestMatchForSameTypesForPlatonicInstances(Node template, List<Node> others, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
+    private static Node findClosestMatchForSameTypesForPlatonicInstances(Node template, Collection<Node> others, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
     {
 
 		Assert.Assert(others.size() >= 1, "");

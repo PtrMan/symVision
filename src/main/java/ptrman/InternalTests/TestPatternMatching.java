@@ -13,12 +13,12 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.Vector2d;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
-import ptrman.levels.retina.RetinaPrimitive;
-import ptrman.levels.retina.SingleLineDetector;
-import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.RetinaToWorkspaceTranslator.ITranslatorStrategy;
 import ptrman.bpsolver.RetinaToWorkspaceTranslator.NearIntersectionStrategy;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.pattern.FeaturePatternMatching;
+import ptrman.levels.retina.RetinaPrimitive;
+import ptrman.levels.retina.SingleLineDetector;
 
 import java.util.ArrayList;
 import java.util.Collections;

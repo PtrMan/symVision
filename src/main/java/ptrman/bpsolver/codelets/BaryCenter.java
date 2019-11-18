@@ -11,8 +11,8 @@ package ptrman.bpsolver.codelets;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.FargGeneral.network.Link;
-import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.HelperFunctions;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
@@ -47,10 +47,7 @@ public class BaryCenter extends SolverCodelet {
 
     @Override
     public SolverCodelet cloneObject() {
-
-        BaryCenter cloned = new BaryCenter(bpSolver, recalculate);
-        
-        return cloned;
+        return new BaryCenter(bpSolver, recalculate);
     }
 
     @Override
@@ -96,7 +93,7 @@ public class BaryCenter extends SolverCodelet {
 
             PlatonicPrimitiveInstanceNode createdBaryCenterInstanceNode = HelperFunctions.createVectorAttributeNode(calculatedBaryCenter, getNetworkHandles().barycenterPlatonicPrimitiveNode, bpSolver);
             Link linkToBaryCenter = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdBaryCenterInstanceNode);
-            startNode.outgoingLinks.add(linkToBaryCenter);
+            startNode.out.add(linkToBaryCenter);
             
         }
         
@@ -109,8 +106,7 @@ public class BaryCenter extends SolverCodelet {
     
     // returns null if the object has no BaryCenter
     private PlatonicPrimitiveInstanceNode getBaryCenterNodeOfObject() {
-        final List<Link>  linksOfObject = startNode.getLinksByType(Link.EnumType.HASATTRIBUTE);
-        for( Link iterationLink : linksOfObject ) {
+        for( Link iterationLink : startNode.getLinksByType(Link.EnumType.HASATTRIBUTE)) {
 
             if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
                 continue;
@@ -133,9 +129,8 @@ public class BaryCenter extends SolverCodelet {
         float weight = 0.0f;
 
         ArrayRealVector baryCenter = new ArrayRealVector(new double[]{0.0, 0.0});
-        
-        final List<Link> linksOfObject = startNode.getLinksByType(Link.EnumType.CONTAINS);
-        for( Link iterationLink : linksOfObject ) {
+
+        for( Link iterationLink : startNode.getLinksByType(Link.EnumType.CONTAINS)) {
 
             if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
                 continue;

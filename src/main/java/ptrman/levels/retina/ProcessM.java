@@ -54,13 +54,13 @@ public class ProcessM {
         }
     }
     
-    private static void resetMarkingsWithLocking(List<RetinaPrimitive> lineDetectors) {
+    private static void resetMarkingsWithLocking(Iterable<RetinaPrimitive> lineDetectors) {
         // TODO< lock >
         resetMarkingsSynchronous(lineDetectors);
         // TODO< unlock >
     }
     
-    private static void resetMarkingsSynchronous(List<RetinaPrimitive> lineDetectors) {
+    private static void resetMarkingsSynchronous(Iterable<RetinaPrimitive> lineDetectors) {
         for( RetinaPrimitive iterationDetector : lineDetectors ) {
             iterationDetector.line.marked = false;
         }

@@ -11,10 +11,9 @@ package ptrman.bpsolver.codelets;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.FargGeneral.network.Link;
+import ptrman.bpsolver.HelperFunctions;
 import ptrman.bpsolver.RetinaToWorkspaceTranslator.AbstractTranslatorStrategy;
 import ptrman.bpsolver.Solver;
-import ptrman.bpsolver.HelperFunctions;
-import ptrman.bpsolver.RetinaToWorkspaceTranslator.PointProximityStrategy;
 import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.AttributeNode;
 import ptrman.bpsolver.nodes.FeatureNode;
@@ -62,9 +61,7 @@ public class Angle extends SolverCodelet {
 
     @Override
     public SolverCodelet cloneObject() {
-
-        Angle cloned = new Angle(bpSolver);
-        return cloned;
+        return new Angle(bpSolver);
     }
 
     @Override
@@ -117,7 +114,7 @@ public class Angle extends SolverCodelet {
             for( int linkI = 0; linkI < iterationAngle.count; linkI++ ) {
                 Link createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASFEATURE, createdFeatureNode);
                 
-                anglePointPrimitiveInstanceNode.outgoingLinks.add(createdLink);
+                anglePointPrimitiveInstanceNode.out.add(createdLink);
             }
         }
     }
@@ -126,7 +123,7 @@ public class Angle extends SolverCodelet {
         final AttributeNode createAnglePointTypeNode = AttributeNode.createIntegerNode(getNetworkHandles().anglePointFeatureTypePrimitiveNode, anglePointType.ordinal());
         
         final Link createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createAnglePointTypeNode);
-        anglePointPrimitiveInstanceNode.outgoingLinks.add(createdLink);
+        anglePointPrimitiveInstanceNode.out.add(createdLink);
     }
     
     private AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType getAnglePointType(final PlatonicPrimitiveInstanceNode anglePointNode) {

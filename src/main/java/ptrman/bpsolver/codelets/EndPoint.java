@@ -11,8 +11,8 @@ package ptrman.bpsolver.codelets;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.FargGeneral.network.Link;
-import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.HelperFunctions;
+import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
@@ -34,10 +34,7 @@ public class EndPoint extends SolverCodelet {
 
     @Override
     public SolverCodelet cloneObject() {
-
-		EndPoint cloned = new EndPoint(bpSolver);
-        
-        return cloned;
+        return new EndPoint(bpSolver);
     }
 
     @Override
@@ -50,7 +47,7 @@ public class EndPoint extends SolverCodelet {
         for( int endpointI = 0; endpointI < 2; endpointI++ ) {
             final PlatonicPrimitiveInstanceNode createdEndpointInstanceNode = HelperFunctions.createVectorAttributeNode(endPoints[endpointI], getNetworkHandles().endpointPlatonicPrimitiveNode, bpSolver);
             final Link linkToEndpoint = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdEndpointInstanceNode);
-            startNode.outgoingLinks.add(linkToEndpoint);
+            startNode.out.add(linkToEndpoint);
         }
         
         return new RunResult(false);

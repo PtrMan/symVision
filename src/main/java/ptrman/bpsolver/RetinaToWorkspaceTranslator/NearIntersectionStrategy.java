@@ -65,7 +65,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
         return NearIntersectionStrategy.pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(remainingRetinaObjects, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap, random, bpSolver);
     }
 
-    private static Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver) {
+    private static Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(Iterable<RetinaPrimitive> primitives, Solver bpSolver) {
 
         Map<RetinaPrimitive, RetinaObjectWithAssociatedPointsAndWorkspaceNode> resultMap = new HashMap<>();
 
@@ -85,7 +85,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
         return resultMap;
     }
 
-    private List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> convertPrimitivesToRetinaObjectsWithAssoc(final List<RetinaPrimitive> primitives) {
+    private static List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> convertPrimitivesToRetinaObjectsWithAssoc(final Iterable<RetinaPrimitive> primitives) {
         List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints = new ArrayList<>();
         
         for( RetinaPrimitive iterationPrimitive : primitives ) {
@@ -95,7 +95,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
         return retinaObjectsWithAssociatedPoints;
     }
     
-    private void storeAllRetinaPrimitivesInMap(List<RetinaPrimitive> primitives, Map<RetinaPrimitive, Boolean> map) {
+    private static void storeAllRetinaPrimitivesInMap(Iterable<RetinaPrimitive> primitives, Map<RetinaPrimitive, Boolean> map) {
         for( RetinaPrimitive iterationPrimitive : primitives ) {
             map.put(iterationPrimitive, Boolean.FALSE);
         }
@@ -146,7 +146,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
 
     private static List<RetinaPrimitive> getNotYetMarkedConnectedRetinaPrimitives(RetinaPrimitive retinaPrimitiveFromOpenList) {
 
-        List<RetinaPrimitive> unfilteredIntersectionPartners = new ArrayList<>();
+        Collection<RetinaPrimitive> unfilteredIntersectionPartners = new ArrayList<>();
 
         List<Intersection> allIntersections = retinaPrimitiveFromOpenList.getIntersections();
         
@@ -158,7 +158,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
         return filteredIntersectionPartners;
     }
     
-    private static List<RetinaPrimitive> filterRetinaPrimitivesForUnmarkedOnes(List<RetinaPrimitive> unfilteredIntersectionPartners) {
+    private static List<RetinaPrimitive> filterRetinaPrimitivesForUnmarkedOnes(Iterable<RetinaPrimitive> unfilteredIntersectionPartners) {
 
         List<RetinaPrimitive> result = new ArrayList<>();
         
@@ -193,10 +193,10 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
 
                     // linkage
                     Link createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.CONTAINS, nodeForRetinaPrimitive);
-                    objectNode.outgoingLinks.add(createdForwardLink);
+                    objectNode.out.add(createdForwardLink);
 
                     Link createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
-                    nodeForRetinaPrimitive.outgoingLinks.add(createdBackwardLink);
+                    nodeForRetinaPrimitive.out.add(createdBackwardLink);
                 }
             }
             
@@ -205,13 +205,13 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
     }
     
 
-    private static void resetAllMarkings(List<RetinaPrimitive> primitives) {
+    private static void resetAllMarkings(Iterable<RetinaPrimitive> primitives) {
         for( RetinaPrimitive iterationPrimitive : primitives ) {
             iterationPrimitive.marked = false;
         }
     }
     
-    private void bundleAllIntersections(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, List<RetinaPrimitive> listOfRetinaPrimitives) {
+    private void bundleAllIntersections(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, Iterable<RetinaPrimitive> listOfRetinaPrimitives) {
         for( RetinaPrimitive iterationRetinaPrimitive : listOfRetinaPrimitives ) {
 
             // we store the intersectionposition and the intersectionpartners

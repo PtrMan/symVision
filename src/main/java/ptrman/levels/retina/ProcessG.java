@@ -10,14 +10,16 @@
 package ptrman.levels.retina;
 
 import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Sets;
 import org.apache.commons.math3.linear.*;
-import ptrman.Datastructures.Map2d;
+import ptrman.Datastructures.IMap2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
 
 import static ptrman.bpsolver.Helper.isNeightborhoodPixelSet;
 import static ptrman.levels.retina.LineDetectorWithMultiplePoints.real;
@@ -135,7 +137,7 @@ public class ProcessG {
         }
     }
     
-    public void process(ArrayList<SingleLineDetector> lineDetectors, ArrayList<ProcessM.LineParsing> lineParsings, ArrayList<ProcessA.Sample> samples, Map2d<Boolean> image) {
+    public void process(ArrayList<SingleLineDetector> lineDetectors, Iterable<ProcessM.LineParsing> lineParsings, Iterable<ProcessA.Sample> samples, IMap2d<Boolean> image) {
         resultCurves.clear();
         
         rerateLineParsings(lineParsings);
@@ -156,7 +158,7 @@ public class ProcessG {
 
             // try to covert (at least) a part of the lineParsing to a curve
 
-            List<List<ArrayRealVector>> protocurves = new ArrayList<>();
+            Collection<List<ArrayRealVector>> protocurves = new ArrayList<>();
             List<ArrayRealVector> currentProtocurve = null;
 
             for (int pointIndex = 1; pointIndex < currentLineParsing.lineParsing.size() - 1; pointIndex++) {
@@ -217,7 +219,7 @@ public class ProcessG {
     
     // calculates only intersections of tangents
     // TODO< other intersections >
-    private static void recalculateIntersections(List<SingleLineDetector> lineDetectors, List<Curve> curves, Map2d<Boolean> image) {
+    private static void recalculateIntersections(Iterable<SingleLineDetector> lineDetectors, Iterable<Curve> curves, IMap2d<Boolean> image) {
         // intersections between curves and lines
         
         for( Curve iterationCurve : curves ) {
@@ -353,7 +355,7 @@ public class ProcessG {
         }
     }
     
-    private static void rerateLineParsings(ArrayList<ProcessM.LineParsing> lineParsings) {
+    private static void rerateLineParsings(Iterable<ProcessM.LineParsing> lineParsings) {
         for( ProcessM.LineParsing iterationLineParsing : lineParsings ) {
             rerateLineParsing(iterationLineParsing);
         }
@@ -403,7 +405,7 @@ public class ProcessG {
     
     
     
-    private static boolean examineVincityOfSegmentPoint(int pointIndex, ProcessM.LineParsing lineParsing, List<ProcessA.Sample> samples) {
+    private static boolean examineVincityOfSegmentPoint(int pointIndex, ProcessM.LineParsing lineParsing, Iterable<ProcessA.Sample> samples) {
         ArrayRealVector centerPoint = lineParsing.lineParsing.get(pointIndex).getBProjected();
         List<ProcessA.Sample> endosceletonSamplesInVicinity = queryEndosceletonPointsInVicinityOf(samples, centerPoint);
         List<SingleLineDetector> neightborLinesOfPoint = getNeightborLinesOfPoint(pointIndex, lineParsing);
@@ -412,11 +414,11 @@ public class ProcessG {
         return atLeastOneSampleNotNearLine;
     }
     
-    private static List<ProcessA.Sample> queryEndosceletonPointsInVicinityOf(List<ProcessA.Sample> samples, ArrayRealVector centerPoint) {
+    private static List<ProcessA.Sample> queryEndosceletonPointsInVicinityOf(Iterable<ProcessA.Sample> samples, ArrayRealVector centerPoint) {
         return queryPointsInRadius(samples, centerPoint, HardParameters.ProcessG.VICINITYRADIUS, new ProcessA.Sample.EnumType[]{ProcessA.Sample.EnumType.ENDOSCELETON});
     }
     
-    private static List<ProcessA.Sample> queryPointsInRadius(List<ProcessA.Sample> samples, ArrayRealVector centerPoint, double radius, ProcessA.Sample.EnumType[] typeFilterCriteria) {
+    private static List<ProcessA.Sample> queryPointsInRadius(Iterable<ProcessA.Sample> samples, ArrayRealVector centerPoint, double radius, ProcessA.Sample.EnumType[] typeFilterCriteria) {
 
         Set<ProcessA.Sample.EnumType> filterCriteria = ImmutableSet.copyOf(typeFilterCriteria);
 
@@ -449,7 +451,7 @@ public class ProcessG {
      * if this is not the case for one sample, it returns false
      *  
      */
-    private static boolean areAllSamplesNearLines(List<ProcessA.Sample> samples, List<SingleLineDetector> lines, final double maximalDistance) {
+    private static boolean areAllSamplesNearLines(Iterable<ProcessA.Sample> samples, Iterable<SingleLineDetector> lines, final double maximalDistance) {
         for( ProcessA.Sample iterationSample : samples ) {
             ArrayRealVector iterationSamplePosition = real(iterationSample.position);
 

@@ -16,10 +16,12 @@ import ptrman.FargGeneral.network.Node;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveNode;
+import ptrman.misc.Assert;
+
 import java.util.AbstractMap;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
-import ptrman.misc.Assert;
 
 /**
  *
@@ -42,7 +44,7 @@ public class CodeletLtmLookup
             public final float priority; // priority of the codelet
         }
         
-        public final ArrayList<CodeletInformation> codeletInformations = new ArrayList<>();
+        public final Collection<CodeletInformation> codeletInformations = new ArrayList<>();
     }
     
     public void lookupAndPutCodeletsAtCoderackForPrimitiveNode(Node node, Coderack coderack, Network ltm, NetworkHandles networkHandles)
@@ -61,7 +63,7 @@ public class CodeletLtmLookup
 
             // we search for all "HAS" nodes and instantiate the codelets
             
-            for( Link iterationLink : currentLtmNodeForPrimitiveNode.outgoingLinks )
+            for( Link iterationLink : currentLtmNodeForPrimitiveNode.out)
             {
 
                 if( iterationLink.type != ptrman.FargGeneral.network.Link.EnumType.HASFEATURE )
@@ -91,7 +93,7 @@ public class CodeletLtmLookup
             boolean continueIsaRelationshipWalk = false;
             
             // search for a ISA node
-            for( Link iterationLink : currentLtmNodeForPrimitiveNode.outgoingLinks )
+            for( Link iterationLink : currentLtmNodeForPrimitiveNode.out)
             {
                 if( iterationLink.type == Link.EnumType.ISA )
                 {

@@ -15,15 +15,14 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.IImageDrawer;
 import ptrman.Showcases.TestClustering;
-import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Parameters;
+import ptrman.bpsolver.Solver;
 import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.levels.visual.ColorRgb;
 import ptrman.levels.visual.VisualProcessor;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.List;
 
 // visualize linesegments of endosceleton
 public class VisualizeLinesegments extends PApplet {

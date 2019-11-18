@@ -13,6 +13,7 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 
 import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -71,7 +72,7 @@ public class SpatialAcceleration<Type> {
         return new Vector2d<>(centerX, centerY);
     }
     
-    private List<Element> getElementsInRadius(List<Element> adjacentElements, ArrayRealVector point, float maximalRadius) {
+    private List<Element> getElementsInRadius(Iterable<Element> adjacentElements, ArrayRealVector point, float maximalRadius) {
         List<Element> result = new ArrayList<>();
         
         for( Element iterationElement : adjacentElements ) {
@@ -120,7 +121,7 @@ public class SpatialAcceleration<Type> {
 
     public Iterable<Element> getContentOfAllCells() {
 
-        List<Element> result = new ArrayList<>();
+        Collection<Element> result = new ArrayList<>();
         
         for( Cell iterationCell : cells ) {
             result.addAll(iterationCell.content);
@@ -138,7 +139,7 @@ public class SpatialAcceleration<Type> {
 
     //would help to make this static class
     private class Cell {
-        public final List<Element> content = new ArrayList<>();
+        public final Collection<Element> content = new ArrayList<>();
     }
     
     private final Cell[] cells;

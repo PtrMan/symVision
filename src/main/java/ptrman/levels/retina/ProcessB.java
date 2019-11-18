@@ -9,21 +9,20 @@
  */
 package ptrman.levels.retina;
 
-import org.apache.commons.math3.linear.ArrayRealVector;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
-import org.eclipse.collections.impl.list.mutable.FastList;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import ptrman.Datastructures.*;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
-import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 
 /**
@@ -115,7 +114,7 @@ public class ProcessB extends AbstractProcessB {
         }
         */
 
-        Map2d<Boolean> debugMap = new Map2d<>(spatialAcceleratedMap2d.getSize().x, spatialAcceleratedMap2d.getSize().y);
+        IMap2d<Boolean> debugMap = new Map2d<>(spatialAcceleratedMap2d.getSize().x, spatialAcceleratedMap2d.getSize().y);
         for( int y = 0; y < debugMap.getLength(); y++ ) {
             for( int x = 0; x < debugMap.getWidth(); x++ ) {
                 debugMap.setAt(x, y, false);
@@ -135,17 +134,19 @@ public class ProcessB extends AbstractProcessB {
 
         int radiusToScan = (int) Math.ceil(gridMaxSearchRadius);
 
-        List<IntIntPair> gridCellsToScan = new FastList();
+        /** grid cells to scan TODO use a LongHashSet storing the int pair into 64-bit long, or 32-bit int */
+        Collection<IntIntPair> toScan = new UnifiedSet((int)Math.ceil(radius * radius * Math.PI));
 
         for( int currentGridRadius = 0; currentGridRadius < radiusToScan; currentGridRadius++ ) {
 
             // if we are at the center we need to scan only the center
-            if( currentGridRadius == 0 ) {
-                gridCellsToScan.clear();
-                gridCellsToScan.add(gridCenterPosition);
-            }
+
+            toScan.clear();
+
+            if( currentGridRadius == 0 )
+                toScan.add(gridCenterPosition);
             else {
-                gridCellsToScan = spatialAcceleratedMap2d.getGridLocationsWithNegativeDirectionOfGridRadius(gridCenterPosition, currentGridRadius, gridCellsToScan);
+                spatialAcceleratedMap2d.getGridLocationsWithNegativeDirectionOfGridRadius(gridCenterPosition, currentGridRadius, toScan);
             }
 
             /*
@@ -176,10 +177,10 @@ public class ProcessB extends AbstractProcessB {
              */
 
             // use acceleration map and filter out the gridcells we don't need to scan
-            gridCellsToScan.removeIf(c -> !spatialAcceleratedMap2d.canValueBeFoundInCell(c, value));
+            toScan.removeIf(c -> !spatialAcceleratedMap2d.canValueBeFoundInCell(c, value));
 
             // statistics
-            int scanSize = gridCellsToScan.size();
+            int scanSize = toScan.size();
             counterCellCandidates += scanSize;
             counterCellPositiveCandidates += scanSize;
 
@@ -188,7 +189,7 @@ public class ProcessB extends AbstractProcessB {
 
             // pixel scan logic
             //TODO use .collect or something
-            getPositionsOfCandidatePixelsOfCells(gridCellsToScan.stream(), value).forEach(i -> {
+            toScan.stream().flatMap(this::getPositionsOfCandidatePixelsOfCellWhereFalse).forEach(i -> {
                 final double currentDistanceSquared = ArrayRealVectorHelper.diffDotProduct(position, i);
                 if( currentDistanceSquared < nearestPixelCandidateDistanceSquared[0]) {
                     nearestPixelCandidateDistanceSquared[0] = currentDistanceSquared;
@@ -199,17 +200,6 @@ public class ProcessB extends AbstractProcessB {
 
         return nearestPixelCandidate[0] == null ? null :
             new Tuple2<>(nearestPixelCandidate[0], Math.sqrt(nearestPixelCandidateDistanceSquared[0]));
-    }
-
-    private Stream<IntIntPair> getPositionsOfCandidatePixelsOfCells(final Stream<IntIntPair> cellPositions, final boolean value) {
-
-
-        Assert.Assert(!value, "only implemented for value = false");
-
-        return cellPositions.flatMap(this::getPositionsOfCandidatePixelsOfCellWhereFalse);
-//        for( final Vector2d<Integer> iterationCellPosition : cellPositions )
-//            getPositionsOfCandidatePixelsOfCellWhereFalse(iterationCellPosition, result);
-        //return result;
     }
 
     private Stream<IntIntPair> getPositionsOfCandidatePixelsOfCellWhereFalse(final IntIntPair cellPosition) {

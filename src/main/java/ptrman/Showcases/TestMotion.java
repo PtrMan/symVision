@@ -26,6 +26,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.awt.image.ColorModel;
+import java.awt.image.RenderedImage;
 import java.awt.image.WritableRaster;
 import java.io.IOException;
 import java.util.concurrent.Semaphore;
@@ -154,7 +155,7 @@ public class TestMotion extends AnimatedShowcase {
 
         }
 
-        private static BufferedImage deepCopyBufferedImage(BufferedImage bi) {
+        private static BufferedImage deepCopyBufferedImage(RenderedImage bi) {
             ColorModel cm = bi.getColorModel();
             boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
             WritableRaster raster = bi.copyData(null);

@@ -15,8 +15,8 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.*;
-import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Parameters;
+import ptrman.bpsolver.Solver;
 import ptrman.levels.retina.ProcessA;
 import ptrman.levels.visual.ColorRgb;
 import ptrman.levels.visual.VisualProcessor;
@@ -190,7 +190,7 @@ public class AnimatedShowcase {
         }
 
         @Override
-        public void run() {
+        public final void run() {
             long start = System.currentTimeMillis();
             refreshAction.process(throttle);
             long end = System.currentTimeMillis();
@@ -247,7 +247,7 @@ public class AnimatedShowcase {
         refreshAction.preSetupSet(bpSolver, inputDrawer, introspectControlPanel, graphWindow.getNodeGraph(), dualCanvas);
         refreshAction.setup();
 
-        FrameTask frame = new FrameTask(dualCanvas, refreshAction);
+        Runnable frame = new FrameTask(dualCanvas, refreshAction);
         //timer.setInitialDelay(0);
         //timer.start();
 

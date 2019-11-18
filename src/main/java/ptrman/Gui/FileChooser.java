@@ -29,7 +29,8 @@ import java.util.function.Consumer;
  This code uses a JList in two forms (layout orientation vertical & horizontal wrap) to
  display a File[].  The renderer displays the file icon obtained from FileSystemView.
  */
-public class FileChooser {
+public enum FileChooser {
+    ;
 
 
     public static Component newComponent(File dir, FileFilter filter, boolean vertical, final Consumer<File> l) {

@@ -11,8 +11,6 @@ package ptrman.math;
 
 import ptrman.Datastructures.Vector2d;
 
-import java.lang.*;
-
 /**
  *
  */

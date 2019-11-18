@@ -10,6 +10,7 @@
 package ptrman.levels.retina.helper;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
 
@@ -28,7 +29,7 @@ public enum QueueHelper {
         return result;
     }
 
-    public static <Type> void transferAllElementsFromListToQueue(final List<Type> elements, Queue<Type> queue) {
+    public static <Type> void transferAllElementsFromListToQueue(final Collection<Type> elements, Collection<Type> queue) {
         queue.addAll(elements);
     }
 }

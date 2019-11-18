@@ -1,9 +1,9 @@
 package net.sourceforge.jannealer.test;
 
-import java.util.Date;
-
 import net.sourceforge.jannealer.AnnealingScheme;
 import net.sourceforge.jannealer.ObjectiveFunction;
+
+import java.util.Date;
 
 /**
  * Use simulated annealing to find the best configuration of
