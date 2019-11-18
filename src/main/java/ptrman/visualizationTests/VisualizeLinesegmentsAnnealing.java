@@ -25,6 +25,7 @@ import ptrman.misc.ImageConverter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Random;
 import java.util.function.Function;
 
 // visualize line-segments of endosceleton
@@ -51,29 +52,37 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             g2.setColor(Color.WHITE);
 
+            if (chosenImage == 0) {
+                // draw big boxes
+                if(false) {
+                    g2.fillRect(10, 10, 70, 20);
 
-            // draw big boxes
-            if(false) {
-                g2.fillRect(10, 10, 70, 20);
+                    g2.fillRect(10, 50, 70, 20);
+                }
 
-                g2.fillRect(10, 50, 70, 20);
+                if(true) {// draw "A"
+                    int endpointADeltaX = (int)(Math.cos(animationFrameNumber * 0.1) * 10);
+                    int endpointADeltaY = (int)(Math.sin(animationFrameNumber * 0.1) * 10);
+
+
+                    g2.setStroke(new BasicStroke(12));
+                    g2.drawLine(10+endpointADeltaX, 80+endpointADeltaY, 40, 10);
+                    g2.drawLine(90+endpointADeltaX, 80+endpointADeltaY, 40, 10);
+                    g2.drawLine(30, 40, 70, 40);
+                }
             }
-
-            if(true) {// draw "A"
-                int endpointADeltaX = (int)(Math.cos(animationFrameNumber * 0.1) * 10);
-                int endpointADeltaY = (int)(Math.sin(animationFrameNumber * 0.1) * 10);
-
-
-                g2.setStroke(new BasicStroke(6));
-                g2.drawLine(10+endpointADeltaX, 80+endpointADeltaY, 40, 10);
-                g2.drawLine(90+endpointADeltaX, 80+endpointADeltaY, 40, 10);
-                g2.drawLine(30, 40, 70, 40);
+            else {
+                // draw star
+                g2.setFont(new Font("TimesRoman", Font.PLAIN, 230));
+                g2.drawString("*", 20, 170);
             }
 
 
             return off_Image;
         }
     }
+
+    static int chosenImage = 0; // chosen image
 
     public VisualizeLinesegmentsAnnealing() {
         processD = new ProcessD();
@@ -99,6 +108,8 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
         animationFrameNumber = (frameCounter / (5*30));
 
         if ((frameCounter % (5*30)) == 0 ) {
+            chosenImage = new Random().nextInt(2);
+
             InputDrawer imageDrawer = new InputDrawer();
 
             BufferedImage image;
