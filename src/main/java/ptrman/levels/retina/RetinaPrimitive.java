@@ -62,9 +62,8 @@ public class RetinaPrimitive {
     }
     
     public static RetinaPrimitive makeLine(SingleLineDetector line) {
-        RetinaPrimitive resultPrimitive;
 
-        resultPrimitive = new RetinaPrimitive();
+		RetinaPrimitive resultPrimitive = new RetinaPrimitive();
         resultPrimitive.line = line;
         resultPrimitive.type = EnumType.LINESEGMENT;
 
@@ -72,9 +71,8 @@ public class RetinaPrimitive {
     }
 
     public static RetinaPrimitive makeCurve(ProcessG.Curve curve) {
-        RetinaPrimitive resultPrimitive;
 
-        resultPrimitive = new RetinaPrimitive();
+		RetinaPrimitive resultPrimitive = new RetinaPrimitive();
         resultPrimitive.curve = curve;
         resultPrimitive.type = EnumType.CURVE;
 

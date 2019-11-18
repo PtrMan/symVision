@@ -72,9 +72,8 @@ public class Map2d<Type> implements IMap2d<Type>
 
     public Map2d<Type> copy()
     {
-        Map2d<Type> cloned;
-        
-        cloned = new Map2d<>(width, length);
+
+        Map2d<Type> cloned = new Map2d<>(width, length);
         arraycopy(array, 0, cloned.array, 0, array.length);
         
         return cloned;

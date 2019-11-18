@@ -36,21 +36,16 @@ public enum TestPatternMatching {
      *
      */
     public static void main(String[] args) {
-        List<RetinaPrimitive> lineDetectors;
 
-        Solver bpSolver;
-
-        bpSolver = new Solver();
+		Solver bpSolver = new Solver();
         bpSolver.setImageSize(new Vector2d<>(128, 128));
         bpSolver.setup();
 
-        lineDetectors = new ArrayList<>();
+		List<RetinaPrimitive> lineDetectors = new ArrayList<>();
 
         lineDetectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{0.0f, 0.0f}), new ArrayRealVector(new double[]{10.0f, 40.0f}))));
 
-        ITranslatorStrategy retinaToWorkspaceTranslatorStrategy;
-
-        retinaToWorkspaceTranslatorStrategy = new NearIntersectionStrategy();
+		ITranslatorStrategy retinaToWorkspaceTranslatorStrategy = new NearIntersectionStrategy();
 
         List<Node> objectNodes = retinaToWorkspaceTranslatorStrategy.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver);
 
@@ -62,15 +57,10 @@ public enum TestPatternMatching {
 
         final int MAXDEPTH = 3;
 
-        FeaturePatternMatching featurePatternMatching;
+		FeaturePatternMatching featurePatternMatching = new FeaturePatternMatching();
 
-        featurePatternMatching = new FeaturePatternMatching();
-
-                List<FeaturePatternMatching.MatchingPathElement> matchingPathElements;
-                float matchingSimilarityValue;
-
-                matchingPathElements = featurePatternMatching.matchAnyRecursive(objectNodes.get(0), objectNodes.get(0), bpSolver.networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), MAXDEPTH);
-                matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
+		List<FeaturePatternMatching.MatchingPathElement> matchingPathElements = featurePatternMatching.matchAnyRecursive(objectNodes.get(0), objectNodes.get(0), bpSolver.networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), MAXDEPTH);
+		float matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
 
         if( matchingSimilarityValue > 1.001f || matchingSimilarityValue < 0.999f ) {
             // test failed

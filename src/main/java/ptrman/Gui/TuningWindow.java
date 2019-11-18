@@ -147,9 +147,8 @@ public class TuningWindow extends JPanel
     
     private static String getTextFromInt(String text, float value)
     {
-        String valueAsString;
-        
-        valueAsString = Float.toString(value);
+
+        String valueAsString = Float.toString(value);
         
         return text + ": " + valueAsString;
     }

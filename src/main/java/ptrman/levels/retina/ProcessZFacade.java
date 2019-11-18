@@ -152,9 +152,8 @@ public class ProcessZFacade implements IProcess {
     }
 
     private void takeRandomPixelFromHashmapUntilNoCandidatesAndFillAndDecide(IMap2d<Boolean> input) {
-        PixelChangeListener pixelChangeListener;
 
-        pixelChangeListener = new PixelChangeListener();
+        PixelChangeListener pixelChangeListener = new PixelChangeListener();
 
         rects.clear();
 

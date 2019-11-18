@@ -18,33 +18,26 @@ public enum GaussianBlur
 
 	public static IMap2d<Float> blur(int radius, IMap2d<Float> input)
     {
-        IMap2d<Float> resultMap;
-        IMap2d<Float> tempMap;
-        float[] kernel;
-        int i;
+		int i;
         int di;
 
         // create kernel
-        kernel = new float[(radius - 1) * 2 + 1];
-        float variance;
-        float normalisation;
-        variance = (float)Math.sqrt(0.15f);
+		float[] kernel = new float[(radius - 1) * 2 + 1];
+		float variance = (float) Math.sqrt(0.15f);
         kernel[radius - 1] = 1.0f;
-        normalisation = ptrman.misc.Gaussian.calculateGaussianDistribution(0.0f, 0.0f, variance);
+		float normalisation = Gaussian.calculateGaussianDistribution(0.0f, 0.0f, variance);
         
         for (di = 1;di < radius;di++)
         {
-            float gaussianResult;
-            float normalizedResult;
 
-            gaussianResult = ptrman.misc.Gaussian.calculateGaussianDistribution((float)(di) / (float)(radius), 0.0f, variance);
-            normalizedResult = gaussianResult / normalisation;
+			float gaussianResult = Gaussian.calculateGaussianDistribution((float) (di) / (float) (radius), 0.0f, variance);
+			float normalizedResult = gaussianResult / normalisation;
             kernel[radius - 1 + di] = normalizedResult;
             kernel[radius - 1 - di] = normalizedResult;
         }
-        
-        resultMap = new Map2d<>(input.getWidth(), input.getLength());
-        tempMap = new Map2d<>(input.getWidth(), input.getLength());
+
+		IMap2d<Float> resultMap = new Map2d<>(input.getWidth(), input.getLength());
+		IMap2d<Float> tempMap = new Map2d<>(input.getWidth(), input.getLength());
         blurX(input, tempMap, kernel);
         blurY(tempMap, resultMap, kernel);
         return resultMap;
@@ -59,8 +52,7 @@ public enum GaussianBlur
             for (x = 0;x < input.getWidth();x++)
             {
                 int ir;
-                float temp;
-                temp = 0.0f;
+				float temp = 0.0f;
                 for (ir = -radius;ir < radius - 1;ir++)
                 {
                     if (ir + x < 0 || ir + x >= input.getWidth())
@@ -84,9 +76,8 @@ public enum GaussianBlur
             for (y = 0;y < input.getLength();y++)
             {
                 int ir;
-                float temp;
 
-                temp = 0.0f;
+				float temp = 0.0f;
                 for (ir = -radius;ir < radius - 1;ir++)
                 {
                     if (ir + y < 0 || ir + y >= input.getLength())

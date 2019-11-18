@@ -51,9 +51,8 @@ public class LineSegmentLength extends SolverCodelet {
     
     @Override
     public SolverCodelet cloneObject() {
-        LineSegmentLength cloned;
-        
-        cloned = new LineSegmentLength(bpSolver);
+
+        LineSegmentLength cloned = new LineSegmentLength(bpSolver);
         
         return cloned;
     }

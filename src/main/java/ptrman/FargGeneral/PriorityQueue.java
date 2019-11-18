@@ -26,9 +26,8 @@ public class PriorityQueue<Type> {
     }
     
     public QueueElement getReference() {
-        int chosenIndex;
-        
-        chosenIndex = getNextQueueIndex();
+
+        int chosenIndex = getNextQueueIndex();
 
         return queue.get(chosenIndex);
     }
@@ -38,9 +37,8 @@ public class PriorityQueue<Type> {
     * only used for (re)filling
     */
     public void add(Type value, float priority) {
-        QueueElement element;
-        
-        element = new QueueElement();
+
+        QueueElement element = new QueueElement();
         element.priority = priority;
         element.value = value;
         
@@ -63,32 +61,26 @@ public class PriorityQueue<Type> {
     }
     
     public QueueElement<Type> dequeueQueueElement() {
-        int chosenIndex;
-        QueueElement<Type> result;
-        
-        chosenIndex = getNextQueueIndex();
-        result = queue.get(chosenIndex);
+
+        int chosenIndex = getNextQueueIndex();
+        QueueElement<Type> result = queue.get(chosenIndex);
         queue.remove(chosenIndex);
         
         return result;
     }
     
     private int getNextQueueIndex() {
-        int chosenIndex;
-        int priorityDiscreteRange;
-        int chosenDiscretePriority;
-        float remainingPriority;
 
         // NOTE< a priority 10 times as high means the concept gets selected 10 times as much >
         // algorithm is (very) inefficient
 
         //System.Diagnostics.Debug.Assert(queue.Count > 0);
 
-        priorityDiscreteRange = (int)(prioritySum / PRIORITYGRANULARITY);
-        chosenDiscretePriority = random.nextInt(priorityDiscreteRange);
-        remainingPriority = (float)chosenDiscretePriority * PRIORITYGRANULARITY;
+        int priorityDiscreteRange = (int) (prioritySum / PRIORITYGRANULARITY);
+        int chosenDiscretePriority = random.nextInt(priorityDiscreteRange);
+        float remainingPriority = (float) chosenDiscretePriority * PRIORITYGRANULARITY;
 
-        chosenIndex = 0;
+        int chosenIndex = 0;
         for (; ; ) {
             Assert.Assert(chosenIndex <= queue.size(), "");
             

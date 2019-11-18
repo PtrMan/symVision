@@ -110,13 +110,11 @@ public class VisualProcessor
 
             @Override
             public void apply(IMap2d<Float> input, IMap2d<Boolean> output) {
-                ThresholdMap2dMapperFunction imageMapper;
-                Map2dMapper.Mapper<Float, Boolean> mapper;
 
-                imageMapper = new ThresholdMap2dMapperFunction(threshold);
+                ThresholdMap2dMapperFunction imageMapper = new ThresholdMap2dMapperFunction(threshold);
 
 
-                mapper = new Map2dMapper.Mapper<>();
+                Map2dMapper.Mapper<Float, Boolean> mapper = new Map2dMapper.Mapper<>();
 
                 mapper.map(imageMapper, input, output);
             }
@@ -132,11 +130,9 @@ public class VisualProcessor
 
             @Override
             public void apply(IMap2d<ColorRgb> input, IMap2d<Float> output) {
-                ConvertToGrayImageMap2dMapperFunction mapperFunction;
-                Map2dMapper.Mapper<ColorRgb, Float> mapper;
 
-                mapperFunction = new ConvertToGrayImageMap2dMapperFunction(colorToGrayColorScale);
-                mapper = new Map2dMapper.Mapper<>();
+                ConvertToGrayImageMap2dMapperFunction mapperFunction = new ConvertToGrayImageMap2dMapperFunction(colorToGrayColorScale);
+                Map2dMapper.Mapper<ColorRgb, Float> mapper = new Map2dMapper.Mapper<>();
 
                 mapper.map(mapperFunction, input, output);
             }
@@ -220,52 +216,43 @@ public class VisualProcessor
 
         public void filterChain(IMap2d<ColorRgb> inputColorImage)
         {
-            Deque<Integer> chainIndicesToProcess;
-            boolean processFromInput;
 
 
+            Deque<Integer> chainIndicesToProcess = new ArrayDeque<>();
 
-            chainIndicesToProcess = new ArrayDeque<>();
-
-            processFromInput = true;
+            boolean processFromInput = true;
             chainIndicesToProcess.add(0);
 
             for(;;) {
-                int currentDagElementIndex;
-                Dag.Element<ChainElement> currentDagElement;
-
-                IMap2d MapForFilterOutput;
 
                 if( chainIndicesToProcess.isEmpty() ) {
                     break;
                 }
 
-                currentDagElementIndex = chainIndicesToProcess.pollFirst();
+                int currentDagElementIndex = chainIndicesToProcess.pollFirst();
 
-                currentDagElement = filterChainDag.elements.get(currentDagElementIndex);
+                Dag.Element<ChainElement> currentDagElement = filterChainDag.elements.get(currentDagElementIndex);
 
                 if( processFromInput ) {
-                    ChainElementColorFloat chainElement;
 
                     processFromInput = false;
 
                     Assert.Assert(currentDagElement.content.inputType == EnumMapType.COLOR, "");
                     Assert.Assert(currentDagElement.content.outputType == EnumMapType.FLOAT, "");
 
-                    chainElement = (ChainElementColorFloat)currentDagElement.content;
+                    ChainElementColorFloat chainElement = (ChainElementColorFloat) currentDagElement.content;
 
                     chainElement.input = inputColorImage;
                 }
 
                 currentDagElement.content.apply();
 
-                MapForFilterOutput = ((ApplyChainElement)currentDagElement.content).result;
+                IMap2d MapForFilterOutput = ((ApplyChainElement) currentDagElement.content).result;
 
 
                 currentDagElement.childIndices.forEach( iterationChildIndex -> {
-                    Dag.Element<ChainElement> iterationDagElement;
 
-                    iterationDagElement = filterChainDag.elements.get(iterationChildIndex);
+                    Dag.Element<ChainElement> iterationDagElement = filterChainDag.elements.get(iterationChildIndex);
 
                     Assert.Assert(iterationDagElement.content.inputType == currentDagElement.content.outputType, "Types of filters are incompatible");
 

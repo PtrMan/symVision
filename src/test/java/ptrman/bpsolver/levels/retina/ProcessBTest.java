@@ -22,20 +22,16 @@ public class ProcessBTest {
         final BufferedImage testImage = drawTestImage();
         final IMap2d<ColorRgb> colorMap = translateFromImageToMap(testImage);
 
-        VisualProcessor.ProcessingChain processingChain;
-
         // setup the processing chain
 
-        processingChain = new VisualProcessor.ProcessingChain();
+        VisualProcessor.ProcessingChain processingChain = new VisualProcessor.ProcessingChain();
 
-        Dag.Element newDagElement;
-
-        newDagElement = new Dag.Element(
-                new VisualProcessor.ProcessingChain.ChainElementColorFloat(
-                        new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
-                        "convertRgbToGrayscale",
-                        new Vector2d<>(colorMap.getWidth(), colorMap.getLength())
-                )
+        Dag.Element newDagElement = new Dag.Element(
+            new VisualProcessor.ProcessingChain.ChainElementColorFloat(
+                new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
+                "convertRgbToGrayscale",
+                new Vector2d<>(colorMap.getWidth(), colorMap.getLength())
+            )
         );
         newDagElement.childIndices.add(1);
 
@@ -112,9 +108,8 @@ public class ProcessBTest {
             final int MAXRADIUS = 100;
 
             for( ProcessA.Sample iterationSample : samples ) {
-                Tuple2<Vector2d<Integer>, Double> nearestResult;
 
-                nearestResult = findNearestPositionWhereMapIs(false, arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN), image, MAXRADIUS);
+                Tuple2<Vector2d<Integer>, Double> nearestResult = findNearestPositionWhereMapIs(false, arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN), image, MAXRADIUS);
                 if( nearestResult == null ) {
                     iterationSample.altitude = ((MAXRADIUS+1)*2)*((MAXRADIUS+1)*2);
                     continue;
@@ -132,19 +127,14 @@ public class ProcessBTest {
          * \return null if no point could be found in the radius
          */
         private static Tuple2<Vector2d<Integer>, Double> findNearestPositionWhereMapIs(final boolean value, final Vector2d<Integer> position, final IMap2d<Boolean> image, final int radius) {
-            Vector2d<Integer> outwardIteratorOffsetUnbound;
-            Vector2d<Integer> borderMin;
-            Vector2d<Integer> borderMax;
-            Vector2d<Integer> one;
-            Vector2d<Integer> positionAsInt;
 
-            outwardIteratorOffsetUnbound = new Vector2d<>(0, 0);
-            borderMin = new Vector2d<>(0, 0);
-            borderMax = new Vector2d<>(image.getWidth(), image.getLength());
+            Vector2d<Integer> outwardIteratorOffsetUnbound = new Vector2d<>(0, 0);
+            Vector2d<Integer> borderMin = new Vector2d<>(0, 0);
+            Vector2d<Integer> borderMax = new Vector2d<>(image.getWidth(), image.getLength());
 
-            positionAsInt = position;
+            Vector2d<Integer> positionAsInt = position;
 
-            one = new Vector2d<>(1, 1);
+            Vector2d<Integer> one = new Vector2d<>(1, 1);
 
             while (-outwardIteratorOffsetUnbound.x <= radius) {
 
@@ -194,15 +184,13 @@ public class ProcessBTest {
         DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
 
         int bufferI;
-        IMap2d<ColorRgb> convertedToMap;
 
-        convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
+        IMap2d<ColorRgb> convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
 
         for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ )
         {
-            int pixelValue;
 
-            pixelValue = javaImage.getRGB(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth());
+            int pixelValue = javaImage.getRGB(bufferI % convertedToMap.getWidth(), bufferI / convertedToMap.getWidth());
 
             Color c = new Color(pixelValue);
 

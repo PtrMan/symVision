@@ -36,9 +36,8 @@ public class SolverTest {
         List<Node> nodes = getNodesFromImage(image, bpSolver);
         
         for( Node iterationNode : nodes ) {
-            boolean doesHaveAtLeastOneVAnglePoint;
-            
-            doesHaveAtLeastOneVAnglePoint = doesNodeHaveAtLeastOneVAnglePoint(iterationNode, bpSolver.networkHandles);
+
+            boolean doesHaveAtLeastOneVAnglePoint = doesNodeHaveAtLeastOneVAnglePoint(iterationNode, bpSolver.networkHandles);
             if( doesHaveAtLeastOneVAnglePoint ) {
                 // pass
                 int DEBUG0 = 0;
@@ -54,21 +53,18 @@ public class SolverTest {
     }
     
     private static boolean doesNodeHaveAtLeastOneVAnglePoint(Node node, NetworkHandles networkHandles) {
-        ArrayList<Node> nodeHeap;
-        ArrayList<Node> doneList;
-        
-        doneList = new ArrayList<>();
-        nodeHeap = new ArrayList<>();
+
+        ArrayList<Node> doneList = new ArrayList<>();
+        ArrayList<Node> nodeHeap = new ArrayList<>();
         nodeHeap.add(node);
         
         for(;;) {
-            Node currentNode;
-            
+
             if( nodeHeap.size() == 0) {
                 return false;
             }
-            
-            currentNode = nodeHeap.get(0);
+
+            Node currentNode = nodeHeap.get(0);
             nodeHeap.remove(0);
             
             if( doneList.contains(currentNode) ) {
@@ -82,31 +78,27 @@ public class SolverTest {
             }
             
             if( currentNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
-                PlatonicPrimitiveInstanceNode currentNodeAsPlatonicPrimitiveInstanceNode;
-                
-                currentNodeAsPlatonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode)currentNode;
+
+                PlatonicPrimitiveInstanceNode currentNodeAsPlatonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode) currentNode;
                 
                 if( currentNodeAsPlatonicPrimitiveInstanceNode.primitiveNode.equals(networkHandles.anglePointNodePlatonicPrimitiveNode) ) {
                     // test if it is a V
                     for( Link iterationLink : currentNodeAsPlatonicPrimitiveInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
-                        AttributeNode anglePointTypeAttributeNode;
-                        AttributeNode targetAttributeNode;
-                        int anglePointType;
-                        
+
                         if( !(iterationLink.target.type == NodeTypes.EnumType.ATTRIBUTENODE.ordinal()) ) {
                             continue;
                         }
-                        
-                        targetAttributeNode = (AttributeNode)iterationLink.target;
+
+                        AttributeNode targetAttributeNode = (AttributeNode) iterationLink.target;
                         
                         if( !targetAttributeNode.attributeTypeNode.equals(networkHandles.anglePointFeatureTypePrimitiveNode) ) {
                             continue;
                         }
                         // if here -> is a anglePointFeatureTypeNode
-                        
-                        anglePointTypeAttributeNode = targetAttributeNode;
-                        
-                        anglePointType = anglePointTypeAttributeNode.getValueAsInt();
+
+                        AttributeNode anglePointTypeAttributeNode = targetAttributeNode;
+
+                        int anglePointType = anglePointTypeAttributeNode.getValueAsInt();
                         if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.V.ordinal() ) {
                             return true;
                         }
@@ -120,14 +112,12 @@ public class SolverTest {
         DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
 
         int bufferI;
-        Map2d<Boolean> convertedToMap;
 
-        convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
+        Map2d<Boolean> convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
 
         for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ ) {
-            boolean convertedPixel;
 
-            convertedPixel = imageBuffer.getElem(bufferI) != 0;
+            boolean convertedPixel = imageBuffer.getElem(bufferI) != 0;
             convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(), convertedPixel);
         }
 
@@ -230,9 +220,8 @@ public class SolverTest {
     // modifies uniqueIntersections
     private static void findAndAddUniqueIntersections(List<Intersection> uniqueIntersections, List<Intersection> intersections) {
         for( Intersection currentOuterIntersection : intersections ) {
-            boolean found;
 
-            found = false;
+            boolean found = false;
 
             for( Intersection currentUnqiueIntersection : uniqueIntersections ) {
                 if( currentUnqiueIntersection.equals(currentOuterIntersection) ) {

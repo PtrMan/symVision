@@ -42,9 +42,8 @@ public abstract class Node
     // TODO< good place to access a Map of the links >
     public List<Link> getLinksByType(Link.EnumType type)
     {
-        List<Link> result;
-        
-        result = new ArrayList<>();
+
+        List<Link> result = new ArrayList<>();
         
         for( Link iterationLink : outgoingLinks )
         {

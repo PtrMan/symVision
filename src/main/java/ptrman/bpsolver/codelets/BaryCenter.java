@@ -47,9 +47,8 @@ public class BaryCenter extends SolverCodelet {
 
     @Override
     public SolverCodelet cloneObject() {
-        BaryCenter cloned;
-        
-        cloned = new BaryCenter(bpSolver, recalculate);
+
+        BaryCenter cloned = new BaryCenter(bpSolver, recalculate);
         
         return cloned;
     }
@@ -64,9 +63,8 @@ public class BaryCenter extends SolverCodelet {
         
         // now we store the calculated barycenter
         if( hasObjectAlreadyABaryCenter() ) {
-            PlatonicPrimitiveInstanceNode baryCenterInstanceNode;
-            
-            baryCenterInstanceNode = getBaryCenterNodeOfObject();
+
+            PlatonicPrimitiveInstanceNode baryCenterInstanceNode = getBaryCenterNodeOfObject();
             Assert.Assert(baryCenterInstanceNode != null, "");
             
             // update the coordinate nodes
@@ -89,17 +87,15 @@ public class BaryCenter extends SolverCodelet {
         }
         else {
             // NOTE< we don't add the Nodes to the list here, because this makes managment more easy >
-            
-            PlatonicPrimitiveInstanceNode createdBaryCenterInstanceNode;
+
             FeatureNode createdCoordinateXNode, createdCoordinateYNode;
             Link linkToXNode, linkToYNode;
-            Link linkToBaryCenter;
 
             // create barycenter node and link it to the object
             // add the coordinate nodes
-            
-            createdBaryCenterInstanceNode = HelperFunctions.createVectorAttributeNode(calculatedBaryCenter, getNetworkHandles().barycenterPlatonicPrimitiveNode, bpSolver);
-            linkToBaryCenter = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdBaryCenterInstanceNode);
+
+            PlatonicPrimitiveInstanceNode createdBaryCenterInstanceNode = HelperFunctions.createVectorAttributeNode(calculatedBaryCenter, getNetworkHandles().barycenterPlatonicPrimitiveNode, bpSolver);
+            Link linkToBaryCenter = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdBaryCenterInstanceNode);
             startNode.outgoingLinks.add(linkToBaryCenter);
             
         }
@@ -115,14 +111,13 @@ public class BaryCenter extends SolverCodelet {
     private PlatonicPrimitiveInstanceNode getBaryCenterNodeOfObject() {
         final List<Link>  linksOfObject = startNode.getLinksByType(Link.EnumType.HASATTRIBUTE);
         for( Link iterationLink : linksOfObject ) {
-            PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNodeOfTarget;
-            
+
             if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
                 continue;
             }
             // is platonic primitive instance node
-            
-            platonicPrimitiveInstanceNodeOfTarget = (PlatonicPrimitiveInstanceNode)iterationLink.target;
+
+            PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNodeOfTarget = (PlatonicPrimitiveInstanceNode) iterationLink.target;
             
             if( !platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(getNetworkHandles().barycenterPlatonicPrimitiveNode) ) {
                 continue;
@@ -141,14 +136,13 @@ public class BaryCenter extends SolverCodelet {
         
         final List<Link> linksOfObject = startNode.getLinksByType(Link.EnumType.CONTAINS);
         for( Link iterationLink : linksOfObject ) {
-            PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNodeOfTarget;
-            
+
             if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
                 continue;
             }
             // is platonic primitive instance node
-            
-            platonicPrimitiveInstanceNodeOfTarget = (PlatonicPrimitiveInstanceNode)iterationLink.target;
+
+            PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNodeOfTarget = (PlatonicPrimitiveInstanceNode) iterationLink.target;
             
             if( platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) ) {
                 final ArrayRealVector centerOfLine = getScaled(platonicPrimitiveInstanceNodeOfTarget.p1.add(platonicPrimitiveInstanceNodeOfTarget.p2), 0.5);

@@ -39,41 +39,34 @@ public class SpatialAcceleration<Type> {
     }
     
     public void addElement(Element element) {
-        Vector2d<Integer> center;
-        
-        center = calcCenterInt(element.position);
+
+        Vector2d<Integer> center = calcCenterInt(element.position);
         getCellAt(center.x, center.y).content.add(element);
     }
     
     public List<Element> getElementsNearPoint(ArrayRealVector point, float maximalRadius) {
-        Vector2d<Integer> neightborRadiusInBlocks;
-        Vector2d<Integer> center;
-        List<Element> adjacentElements;
-        List<Element> adjacentElementsInRadius;
 
-        neightborRadiusInBlocks = calcNeightborRadiusInBlocks(maximalRadius);
-        center = calcCenterInt(point);
-        
-        adjacentElements = getElementsInAdjacentCells(center, neightborRadiusInBlocks);
-        adjacentElementsInRadius = getElementsInRadius(adjacentElements, point, maximalRadius);
+        Vector2d<Integer> neightborRadiusInBlocks = calcNeightborRadiusInBlocks(maximalRadius);
+        Vector2d<Integer> center = calcCenterInt(point);
+
+        List<Element> adjacentElements = getElementsInAdjacentCells(center, neightborRadiusInBlocks);
+        List<Element> adjacentElementsInRadius = getElementsInRadius(adjacentElements, point, maximalRadius);
         return adjacentElementsInRadius;
     }
     
     private Vector2d<Integer> calcNeightborRadiusInBlocks(float maximalRadius) {
         Vector2d<Integer> neightborRadiusInBlocks;
-        int neightborRadiusInBlocksX, neightborRadiusInBlocksY;
-        
-        neightborRadiusInBlocksX = 1 + (int)(maximalRadius / gridelementSizeX);
-        neightborRadiusInBlocksY = 1 + (int)(maximalRadius / gridelementSizeY);
+
+        int neightborRadiusInBlocksX = 1 + (int) (maximalRadius / gridelementSizeX);
+        int neightborRadiusInBlocksY = 1 + (int) (maximalRadius / gridelementSizeY);
         
         return new Vector2d<>(neightborRadiusInBlocksX, neightborRadiusInBlocksY);
     }
     
     private Vector2d<Integer> calcCenterInt(ArrayRealVector point) {
-        int centerX, centerY;
 
-        centerX = (int)(point.getDataRef()[0] / gridelementSizeX);
-        centerY = (int)(point.getDataRef()[1] / gridelementSizeY);
+        int centerX = (int) (point.getDataRef()[0] / gridelementSizeX);
+        int centerY = (int) (point.getDataRef()[1] / gridelementSizeY);
 
         return new Vector2d<>(centerX, centerY);
     }
@@ -113,10 +106,9 @@ public class SpatialAcceleration<Type> {
     }
 
     private Cell[] createCells(int gridcountX, int gridcountY) {
-        Cell[] result;
         int i;
-        
-        result = (Cell[]) Array.newInstance(Cell.class, gridcountX*gridcountY);
+
+        Cell[] result = (Cell[]) Array.newInstance(Cell.class, gridcountX * gridcountY);
         
         for( i = 0; i < gridcountX*gridcountY; i++ )
         {

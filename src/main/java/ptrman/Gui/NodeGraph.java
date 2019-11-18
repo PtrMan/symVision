@@ -65,11 +65,10 @@ public class NodeGraph {
 	}
 
 	private void populateAfterNodes(List<Node> nodes, NetworkHandles networkHandles) {
-		VertexList verticesWithNode;
 
-		graph.getModel().beginUpdate();
+        graph.getModel().beginUpdate();
 
-		verticesWithNode = convertNodesToVertexWithNodeRecursivly(nodes, networkHandles);
+        VertexList verticesWithNode = convertNodesToVertexWithNodeRecursivly(nodes, networkHandles);
 		populateEdgesBetweenNodes(verticesWithNode);
 		insertLinksBetweenVertexNodes(verticesWithNode);
 
@@ -105,17 +104,14 @@ public class NodeGraph {
 	}
 
 	private void insertLinksBetweenVertexNodes(VertexList vertexList) {
-		Object parent;
 
-		parent = graph.getDefaultParent();
+        Object parent = graph.getDefaultParent();
 
 		for (VertexWithNode iterationVertex : vertexList.verticesWithNode) {
 			for (VertexWithNode outgoingVertex : iterationVertex.outgoingVerticesWithNode) {
 				// TODO< label edgetype >
 
-				Link outgoingLinkForOutgoingVertex;
-
-				outgoingLinkForOutgoingVertex = getLinkCorespondingToTargetNode(iterationVertex.node, outgoingVertex.node);
+                Link outgoingLinkForOutgoingVertex = getLinkCorespondingToTargetNode(iterationVertex.node, outgoingVertex.node);
 
 				graph.insertEdge(parent, null, outgoingLinkForOutgoingVertex.type.toString(), iterationVertex.vertexForNode, outgoingVertex.vertexForNode);
 			}
@@ -123,25 +119,22 @@ public class NodeGraph {
 	}
 
 	private VertexList convertNodesToVertexWithNodeRecursivly(List<Node> nodes, NetworkHandles networkHandles) {
-		VertexList resultVertexList;
-		Deque<Node> remainingNodes;
-		//Object graphParent;
+        //Object graphParent;
 
-		resultVertexList = new VertexList();
+        VertexList resultVertexList = new VertexList();
 
-		remainingNodes = new ArrayDeque<>();
+        Deque<Node> remainingNodes = new ArrayDeque<>();
 
 		if (nodes != null) {
 			remainingNodes.addAll(nodes);
 		}
 
 		for (; ; ) {
-			Node currentNode;
 
-			if (remainingNodes.size() == 0)
+            if (remainingNodes.size() == 0)
 				break;
 
-			currentNode = remainingNodes.removeFirst();
+            Node currentNode = remainingNodes.removeFirst();
 
 			// we don't need to create/inert it if it is already in there
 			if (resultVertexList.existsVertexWthNodeByNode(currentNode))
@@ -165,21 +158,18 @@ public class NodeGraph {
 
 	private Object createVertexForNode(Node node, NetworkHandles networkHandles) {
 //		Object vertexForNode;
-		Object graphParent;
 
-		graphParent = graph.getDefaultParent();
+        Object graphParent = graph.getDefaultParent();
 
 		if (node.type == NodeTypes.EnumType.FEATURENODE.ordinal()) {
-			FeatureNode featureNode;
-			PlatonicPrimitiveNode featureTypeNodeAsPlatonicPrimitiveNode;
 
-			featureNode = (FeatureNode) node;
+            FeatureNode featureNode = (FeatureNode) node;
 
 			String featureName;
 
 			// we try to cast it, if we suceed it is a type which wasn't learned by the system
 			// so we can add the text of the type
-			featureTypeNodeAsPlatonicPrimitiveNode = (PlatonicPrimitiveNode) featureNode.featureTypeNode;
+            PlatonicPrimitiveNode featureTypeNodeAsPlatonicPrimitiveNode = (PlatonicPrimitiveNode) featureNode.featureTypeNode;
 
 			if (featureTypeNodeAsPlatonicPrimitiveNode != null) {
 				featureName = featureTypeNodeAsPlatonicPrimitiveNode.platonicType;
@@ -190,18 +180,15 @@ public class NodeGraph {
 
 			return graph.insertVertex(graphParent, null, "FeatureNode" + "<br>" + featureName, 20, 20, 80, 30);
 		} else if (node.type == NodeTypes.EnumType.NUMEROSITYNODE.ordinal()) {
-			NumeriosityNode numeriosityNode;
-			String nodeTextContent;
 
-			numeriosityNode = (NumeriosityNode) node;
+            NumeriosityNode numeriosityNode = (NumeriosityNode) node;
 
-			nodeTextContent = Integer.toString(numeriosityNode.numerosity);
+            String nodeTextContent = Integer.toString(numeriosityNode.numerosity);
 
 			return graph.insertVertex(graphParent, null, "NumerosityNode" + "<br>" + nodeTextContent, 20, 20, 80, 30);
 		} else if (node.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal()) {
-			PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode;
 
-			platonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode) node;
+            PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode) node;
 
             String primitiveName = platonicPrimitiveInstanceNode.primitiveNode.platonicType;
 
@@ -209,15 +196,13 @@ public class NodeGraph {
 		} else if (node.type == NodeTypes.EnumType.PLATONICPRIMITIVENODE.ordinal()) {
 			return graph.insertVertex(graphParent, null, "PlatonicPrimitiveNode", 20, 20, 80, 30);
 		} else if (node.type == NodeTypes.EnumType.ATTRIBUTENODE.ordinal()) {
-			AttributeNode attributeNode;
-			String attributeName;
-			PlatonicPrimitiveNode attributeTypeNodeAsPlatinicPrimitiveNode;
+            String attributeName;
 
-			attributeNode = (AttributeNode) node;
+            AttributeNode attributeNode = (AttributeNode) node;
 
 			// we try to cast it, if we suceed it is a type which wasn't learned by the system
 			// so we can add the text of the type
-			attributeTypeNodeAsPlatinicPrimitiveNode = (PlatonicPrimitiveNode) attributeNode.attributeTypeNode;
+            PlatonicPrimitiveNode attributeTypeNodeAsPlatinicPrimitiveNode = (PlatonicPrimitiveNode) attributeNode.attributeTypeNode;
 
 			if (attributeTypeNodeAsPlatinicPrimitiveNode != null) {
 				attributeName = attributeTypeNodeAsPlatinicPrimitiveNode.platonicType;
@@ -260,9 +245,8 @@ public class NodeGraph {
 		Object vertexForNode;
 
 		public static VertexWithNode createFromNodeAndVertex(Node node, Object vertexForNode) {
-			VertexWithNode resultVertex;
 
-			resultVertex = new VertexWithNode();
+            VertexWithNode resultVertex = new VertexWithNode();
 			resultVertex.node = node;
 			resultVertex.vertexForNode = vertexForNode;
 			return resultVertex;

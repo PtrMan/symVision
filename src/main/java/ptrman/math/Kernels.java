@@ -36,11 +36,10 @@ public enum Kernels
         @Override
         public Float calculateAt(Vector2d<Float> position)
         {
-            double gaussianFactor, scalingFactor;
-            final double factor = -1.0/(java.lang.Math.PI*java.lang.Math.pow(sigma, 4.0f));
+			final double factor = -1.0/(java.lang.Math.PI*java.lang.Math.pow(sigma, 4.0f));
 
-            gaussianFactor = java.lang.Math.exp(-1.0f*(Maths.squaredDistance(new double[]{position.x, position.y})/(2.0* Maths.power2(sigma))));
-            scalingFactor = 1.0 - Maths.squaredDistance(new double[]{position.x, position.y})/(2.0* Maths.power2(sigma));
+			double gaussianFactor = Math.exp(-1.0f * (Maths.squaredDistance(new double[]{position.x, position.y}) / (2.0 * Maths.power2(sigma))));
+			double scalingFactor = 1.0 - Maths.squaredDistance(new double[]{position.x, position.y}) / (2.0 * Maths.power2(sigma));
 
             return (float)(factor*gaussianFactor*scalingFactor);
         }

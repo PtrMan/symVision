@@ -47,23 +47,20 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
     
     @Override
     public Codelet.RunResult run() {
-        List<Integer> distinctEdgeIndices;
-        Node nodeA, nodeB;
-        HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> commonChildnodesOfNodes;
-        
+
         // choose two random nodes
         
         if( startNode.outgoingLinks.size() < 2 ) {
             return new RunResult(true);
         }
         // else here
-        
-        distinctEdgeIndices = DistinctUtility.getTwoDisjunctNumbers(random, startNode.outgoingLinks.size());
-        
-        nodeA = startNode.outgoingLinks.get(distinctEdgeIndices.get(0)).target;
-        nodeB = startNode.outgoingLinks.get(distinctEdgeIndices.get(1)).target;
-        
-        commonChildnodesOfNodes = getCommonFeatureNodesOfNodes(nodeA, nodeB);
+
+        List<Integer> distinctEdgeIndices = DistinctUtility.getTwoDisjunctNumbers(random, startNode.outgoingLinks.size());
+
+        Node nodeA = startNode.outgoingLinks.get(distinctEdgeIndices.get(0)).target;
+        Node nodeB = startNode.outgoingLinks.get(distinctEdgeIndices.get(1)).target;
+
+        HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> commonChildnodesOfNodes = getCommonFeatureNodesOfNodes(nodeA, nodeB);
         
         // if the two nodes don't have at least one common type which is Measurable we are done here
         if( commonChildnodesOfNodes.isEmpty() ) {
@@ -111,10 +108,9 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
      *         the key is the (common) type of the feature, by default points at the featureTypeNode of both nodes
      */
     private HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> getCommonFeatureNodesOfNodes(Node nodeA, Node nodeB) {
-        HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> resultMap;
         int linkIndexA, linkIndexB;
-        
-        resultMap = new HashMap<>();
+
+        HashMap<Node, Tuple4<FeatureNode, Integer, FeatureNode, Integer>> resultMap = new HashMap<>();
         
         if( nodeA.type != nodeB.type) {
             return resultMap;
@@ -126,11 +122,9 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         
         for( linkIndexA = 0; linkIndexA < nodeA.outgoingLinks.size(); linkIndexA++ ) {
             for( linkIndexB = 0; linkIndexB < nodeB.outgoingLinks.size(); linkIndexB++ ) {
-                Node iterationChildNodeOfNodeA, iterationChildNodeOfNodeB;
-                FeatureNode iterationChildNodeOfNodeAAsFeatureNode, iterationChildNodeOfNodeBAsFeatureNode;
-                
-                iterationChildNodeOfNodeA = nodeA.outgoingLinks.get(linkIndexA).target;
-                iterationChildNodeOfNodeB = nodeB.outgoingLinks.get(linkIndexB).target;
+
+                Node iterationChildNodeOfNodeA = nodeA.outgoingLinks.get(linkIndexA).target;
+                Node iterationChildNodeOfNodeB = nodeB.outgoingLinks.get(linkIndexB).target;
                 
                 if( iterationChildNodeOfNodeA.type != iterationChildNodeOfNodeB.type ) {
                     continue;
@@ -139,9 +133,9 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
                     continue;
                 }
                 // else here
-                
-                iterationChildNodeOfNodeAAsFeatureNode = (FeatureNode)iterationChildNodeOfNodeA;
-                iterationChildNodeOfNodeBAsFeatureNode = (FeatureNode)iterationChildNodeOfNodeB;
+
+                FeatureNode iterationChildNodeOfNodeAAsFeatureNode = (FeatureNode) iterationChildNodeOfNodeA;
+                FeatureNode iterationChildNodeOfNodeBAsFeatureNode = (FeatureNode) iterationChildNodeOfNodeB;
                 
                 if( iterationChildNodeOfNodeAAsFeatureNode.featureTypeNode.equals(iterationChildNodeOfNodeBAsFeatureNode.featureTypeNode) ) {
                     continue;
@@ -167,13 +161,12 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
     }
     
     private boolean areMeasurementsRoughtlyEqual(Node nodeA, Node nodeB) {
-        FeatureNode nodeAAsFeatureNode, nodeBAsFeatureNode;
-        
+
         Assert.Assert(nodeA.type == NodeTypes.EnumType.FEATURENODE.ordinal(), "");
         Assert.Assert(nodeB.type == NodeTypes.EnumType.FEATURENODE.ordinal(), "");
-        
-        nodeAAsFeatureNode = (FeatureNode)nodeA;
-        nodeBAsFeatureNode = (FeatureNode)nodeB;
+
+        FeatureNode nodeAAsFeatureNode = (FeatureNode) nodeA;
+        FeatureNode nodeBAsFeatureNode = (FeatureNode) nodeB;
         
         Assert.Assert(nodeAAsFeatureNode.featureTypeNode.equals(nodeBAsFeatureNode), "types are not the same");
         
@@ -198,13 +191,11 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
     }
     
     private void relinkGraph(Node parentNode, Node nodeA, Node nodeB, Tuple4<FeatureNode, Integer, FeatureNode, Integer> relinkInfoTuple) {
-        int linkIndexOfNodeA, linkIndexOfNodeB;
-        Node combinedNode;
 
-        linkIndexOfNodeA = relinkInfoTuple.e1;
-        linkIndexOfNodeB = relinkInfoTuple.e3;
-        
-        combinedNode = combineFeatureNodes(relinkInfoTuple.e0, relinkInfoTuple.e2);
+        int linkIndexOfNodeA = relinkInfoTuple.e1;
+        int linkIndexOfNodeB = relinkInfoTuple.e3;
+
+        Node combinedNode = combineFeatureNodes(relinkInfoTuple.e0, relinkInfoTuple.e2);
         
         nodeA.outgoingLinks.set(linkIndexOfNodeA, getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));
         nodeB.outgoingLinks.set(linkIndexOfNodeB, getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, combinedNode));

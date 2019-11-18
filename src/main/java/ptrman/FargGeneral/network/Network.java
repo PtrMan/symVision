@@ -47,9 +47,8 @@ public class Network
     {
         for( Node iterationNode : nodes )
         {
-            float decayRate;
-            
-            decayRate = depthToDecay.translateDepthToDecayrate(iterationNode.conceptualDepth);
+
+            float decayRate = depthToDecay.translateDepthToDecayrate(iterationNode.conceptualDepth);
             iterationNode.activiation *= (1.0f - decayRate);
         }
     }
@@ -66,9 +65,8 @@ public class Network
     {
         for( Node iterationNode : nodes )
         {
-            float sourceNodeActivation;
-            
-            sourceNodeActivation = iterationNode.activiation;
+
+            float sourceNodeActivation = iterationNode.activiation;
             
             for( Link iterationLink : iterationNode.outgoingLinks )
             {

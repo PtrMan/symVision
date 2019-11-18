@@ -89,21 +89,18 @@ public class AnimatedShowcase {
         }
 
         public void process(float throttle) {
-            BufferedImage image;
-            IMap2d<Boolean> mapBoolean;
-            IMap2d<ColorRgb> mapColor;
 
             // TODO< pull image from source >
             // for now imageDrawer does this
-            image = imageDrawer.apply(bpSolver);
+            BufferedImage image = imageDrawer.apply(bpSolver);
 
             System.out.print("begin processing @" + ((int)(100f * throttle)) + "%" );
 
-            mapColor = AnimatedShowcase.translateFromImageToMap(image);
+            IMap2d<ColorRgb> mapColor = AnimatedShowcase.translateFromImageToMap(image);
 
             processingChain.filterChain(mapColor);
 
-            mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(1).content).result;
+            IMap2d<Boolean> mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(1).content).result;
 
             System.out.println("begin symVision");
 
@@ -243,9 +240,7 @@ public class AnimatedShowcase {
         GraphWindow graphWindow = new GraphWindow();
 
 
-        IntrospectControlPanel introspectControlPanel;
-
-        introspectControlPanel = new IntrospectControlPanel();
+        IntrospectControlPanel introspectControlPanel = new IntrospectControlPanel();
 
         DualConvas dualCanvas = new DualConvas();
 

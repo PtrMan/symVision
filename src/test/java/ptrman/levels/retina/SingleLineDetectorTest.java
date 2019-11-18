@@ -14,14 +14,11 @@ public class SingleLineDetectorTest  {
     // tests
     @Test
     public void unittestProjectPoint() {
-        SingleLineDetector testLine;
-        ArrayRealVector point;
-        ArrayRealVector projectedPoint;
 
-        testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{1.0f, 2.0f}), new ArrayRealVector(new double[]{2.0f, 3.0f}));
-        point = new ArrayRealVector(new double[]{2.0f, 1.0f}, false);
+		SingleLineDetector testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{1.0f, 2.0f}), new ArrayRealVector(new double[]{2.0f, 3.0f}));
+		ArrayRealVector point = new ArrayRealVector(new double[]{2.0f, 1.0f}, false);
 
-        projectedPoint = testLine.projectPointOntoLine(point);
+		ArrayRealVector projectedPoint = testLine.projectPointOntoLine(point);
 
         if( projectedPoint.getEntry(0) < 1.0f + 0.01f && projectedPoint.getEntry(0) > 1.0f - 0.01f && projectedPoint.getEntry(1) < 2.0f + 0.01f && projectedPoint.getEntry(1) > 2.0f - 0.01f ) {
             // all fine

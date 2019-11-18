@@ -453,9 +453,8 @@ public class Solver {
      * stores all factory preset nodes in the ltm (standard node types, linked attributes, etc)
      */
     public void setupLtmFactoryDefault() {
-        ptrman.FargGeneral.network.Link link;
-        
-        
+
+
         networkHandles.objectPlatonicPrimitiveNode = new PlatonicPrimitiveNode("Object", null);
         networkHandles.lineStructureAbstractPrimitiveNode = new PlatonicPrimitiveNode("lineStructure", null);
         networkHandles.lineSegmentPlatonicPrimitiveNode = new PlatonicPrimitiveNode("LineSegment", null);
@@ -477,7 +476,7 @@ public class Solver {
         networkHandles.anglePointAngleValuePrimitiveNode = new PlatonicPrimitiveNode("AnglePointAngleValue", "Angle");
         
         networkHandles.lineStructureAbstractPrimitiveNode.isAbstract = true;
-        link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.endpointPlatonicPrimitiveNode);
+        ptrman.FargGeneral.network.Link link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.endpointPlatonicPrimitiveNode);
         networkHandles.lineStructureAbstractPrimitiveNode.outgoingLinks.add(link);
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.bayPlatonicPrimitiveNode);
         networkHandles.lineStructureAbstractPrimitiveNode.outgoingLinks.add(link);
@@ -553,13 +552,11 @@ public class Solver {
     }
     
     private void initializeCodeletLtmLookup() {
-        CodeletLtmLookup.RegisterEntry createdRegistryEntry;
-        SolverCodelet createdCodelet;
-        
+
         codeletLtmLookup = new CodeletLtmLookup();
-        
-        createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
-        createdCodelet = new LineSegmentLength(this);
+
+        CodeletLtmLookup.RegisterEntry createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
+        SolverCodelet createdCodelet = new LineSegmentLength(this);
         createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.5f));
         
         codeletLtmLookup.registry.put("LineSegmentLength", createdRegistryEntry);
@@ -605,9 +602,8 @@ public class Solver {
 
     // TODO< refactor out >
     private static List<Intersection> getAllLineIntersections(Iterable<RetinaPrimitive> lineDetectors) {
-        List<Intersection> uniqueIntersections;
 
-        uniqueIntersections = new ArrayList<>();
+        List<Intersection> uniqueIntersections = new ArrayList<>();
 
         for( RetinaPrimitive currentPrimitive : lineDetectors ) {
             if( currentPrimitive.type != RetinaPrimitive.EnumType.LINESEGMENT ) {
@@ -623,9 +619,8 @@ public class Solver {
     // modifies uniqueIntersections
     private static void findAndAddUniqueIntersections(Collection<Intersection> uniqueIntersections, Iterable<Intersection> intersections) {
         for( Intersection currentOuterIntersection : intersections ) {
-            boolean found;
 
-            found = false;
+            boolean found = false;
 
             for( Intersection currentUnqiueIntersection : uniqueIntersections ) {
                 if( currentUnqiueIntersection.equals(currentOuterIntersection) ) {

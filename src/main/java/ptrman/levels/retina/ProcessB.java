@@ -65,9 +65,8 @@ public class ProcessB extends AbstractProcessB {
         spatialAcceleratedMap2d.recalculateGridCellStateMap();
         
         for( ProcessA.Sample iterationSample : samples ) {
-            Tuple2<Vector2d<Integer>, Double> nearestResult;
-            
-            nearestResult = findNearestPositionWhereMapIs(false, arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN), map, MAXRADIUS);
+
+            Tuple2<Vector2d<Integer>, Double> nearestResult = findNearestPositionWhereMapIs(false, arrayRealVectorToInteger(iterationSample.position, ArrayRealVectorHelper.EnumRoundMode.DOWN), map, MAXRADIUS);
             if( nearestResult == null ) {
                 iterationSample.altitude = ((MAXRADIUS+1)*2)*((MAXRADIUS+1)*2);
                 continue;

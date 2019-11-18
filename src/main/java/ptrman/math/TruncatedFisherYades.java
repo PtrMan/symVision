@@ -38,11 +38,9 @@ public class TruncatedFisherYades<Type>
     
     public Type takeOne(Random random)
     {
-        int chosenIndex;
-        Type result;
-        
-        chosenIndex = random.nextInt(candidates.size());
-        result = candidates.get(chosenIndex);
+
+        int chosenIndex = random.nextInt(candidates.size());
+        Type result = candidates.get(chosenIndex);
         swapWithLast(chosenIndex);
         
         // remove last element
@@ -54,17 +52,15 @@ public class TruncatedFisherYades<Type>
     private void swapWithLast(int index)
     {
         Type element;
-        int lastIndex;
-        
-        lastIndex = candidates.size()-1;
+
+        int lastIndex = candidates.size() - 1;
         swap(index, lastIndex);
     }
     
     private void swap(int indexA, int indexB)
     {
-        Type element;
-        
-        element = candidates.get(indexA);
+
+        Type element = candidates.get(indexA);
         candidates.set(indexA, candidates.get(indexB));
         candidates.set(indexB, element);
     }

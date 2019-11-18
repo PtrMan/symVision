@@ -57,12 +57,9 @@ public class FeatureStatistics
     public float getVariance()
     {
         // TODO< running Variance and fusing of variances >
-        
-        float mean;
-        float runningSum;
-        
-        mean = getMean();
-        runningSum = 0.0f;
+
+        float mean = getMean();
+        float runningSum = 0.0f;
         
         for( float value : values )
         {
@@ -120,9 +117,8 @@ public class FeatureStatistics
     
     public static FeatureStatistics fuse(FeatureStatistics a, FeatureStatistics b)
     {
-        FeatureStatistics result;
-        
-        result = new FeatureStatistics();
+
+        FeatureStatistics result = new FeatureStatistics();
         result.min = Math.min(a.min, b.min);
         result.max = Math.max(a.max, b.max);
         result.mean = (a.mean*a.numberOfObservations + b.mean*b.numberOfObservations) / (a.numberOfObservations+b.numberOfObservations);

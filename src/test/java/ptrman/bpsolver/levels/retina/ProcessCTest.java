@@ -16,10 +16,8 @@ public class ProcessCTest {
     public void testProcessC() {
         List<ProcessA.Sample> samples = new ArrayList<>();
 
-        ProcessA.Sample createdSample;
 
-
-        createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{0, 0}));
+		ProcessA.Sample createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{0, 0}));
         createdSample.altitude = (float)Math.sqrt(0.0f);
         samples.add(createdSample);
 

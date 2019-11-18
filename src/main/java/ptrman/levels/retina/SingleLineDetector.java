@@ -38,9 +38,8 @@ public class SingleLineDetector {
     }
 
     public static SingleLineDetector createFromIntegerPositions(Vector2d<Integer> a, Vector2d<Integer> b) {
-        SingleLineDetector createdDetector;
 
-        createdDetector = new SingleLineDetector();
+        SingleLineDetector createdDetector = new SingleLineDetector();
         createdDetector.a = new ArrayRealVector(new double[]{(double)a.x, (double)a.y}, false);
         createdDetector.b = new ArrayRealVector(new double[]{(double)b.x, (double)b.y}, false);
         createdDetector.fullfillABInvariant();
@@ -57,9 +56,8 @@ public class SingleLineDetector {
     }
 
     public static SingleLineDetector createFromFloatPositions(ArrayRealVector a, ArrayRealVector b) {
-        SingleLineDetector createdDetector;
 
-        createdDetector = new SingleLineDetector();
+        SingleLineDetector createdDetector = new SingleLineDetector();
         createdDetector.a = a;
         createdDetector.b = b;
         createdDetector.fullfillABInvariant();
@@ -96,9 +94,8 @@ public class SingleLineDetector {
      */
     private void fullfillABInvariant() {
         if( a.getEntry(0) > b.getEntry(0) ) {
-            ArrayRealVector temp;
 
-            temp = a;
+            ArrayRealVector temp = a;
             a = b;
             b = temp;
         }
@@ -289,10 +286,9 @@ public class SingleLineDetector {
     //  * if the line is singularity we have to do the same with the y axis
     public Intersection.IntersectionPartner.EnumIntersectionEndpointType getIntersectionEndpoint(ArrayRealVector point) {
         //ArrayRealVector diff;
-        final double distanceBegin, distanceEnd;
 
-        distanceBegin = a.getDistance(point);
-        distanceEnd = b.getDistance(point);
+        final double distanceBegin = a.getDistance(point);
+        final double distanceEnd = b.getDistance(point);
 //        diff = a.subtract(point);
 //        distanceBegin = diff.getNorm();
 //

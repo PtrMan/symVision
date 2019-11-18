@@ -112,21 +112,15 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             InputDrawer imageDrawer = new InputDrawer();
 
-            BufferedImage image;
-            IMap2d<Boolean> mapBoolean;
-            IMap2d<ColorRgb> mapColor;
-
-
 
             // TODO< pull image from source >
             // for now imageDrawer does this
-            image = imageDrawer.apply(null);
+            BufferedImage image = imageDrawer.apply(null);
 
             Vector2d<Integer> imageSize = new Vector2d<>(image.getWidth(), image.getHeight());
 
 
-
-            mapColor = TestClustering.translateFromImageToMap(image);
+            IMap2d<ColorRgb> mapColor = TestClustering.translateFromImageToMap(image);
 
 
 
@@ -136,14 +130,12 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             VisualProcessor.ProcessingChain processingChain = new VisualProcessor.ProcessingChain();
 
-            Dag.Element newDagElement;
-
-            newDagElement = new Dag.Element(
-                    new VisualProcessor.ProcessingChain.ChainElementColorFloat(
-                            new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
-                            "convertRgbToGrayscale",
-                            imageSize
-                    )
+            Dag.Element newDagElement = new Dag.Element(
+                new VisualProcessor.ProcessingChain.ChainElementColorFloat(
+                    new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
+                    "convertRgbToGrayscale",
+                    imageSize
+                )
             );
             newDagElement.childIndices.add(1);
 
@@ -164,7 +156,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             processingChain.filterChain(mapColor);
 
-            mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement)processingChain.filterChainDag.elements.get(1).content).result;
+            IMap2d<Boolean> mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(1).content).result;
 
 
 
@@ -187,9 +179,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             processZFacade.processData();
             processZFacade.postProcessData();
 
-            IMap2d<Integer> notMagnifiedOutputObjectIdsMapDebug;
-
-            notMagnifiedOutputObjectIdsMapDebug = processZFacade.getNotMagnifiedOutputObjectIds();
+            IMap2d<Integer> notMagnifiedOutputObjectIdsMapDebug = processZFacade.getNotMagnifiedOutputObjectIds();
 
             ProcessA processA = new ProcessA();
             ProcessB processB = new ProcessB();

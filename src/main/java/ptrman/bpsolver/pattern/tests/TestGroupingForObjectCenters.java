@@ -37,13 +37,10 @@ public enum TestGroupingForObjectCenters
     private static void testClustering1()
     {
         // for testing we use the numerosity node as content to tell the elements apart
-        
-        ArrayList<Pattern> exemplars;
-        MatchingUpdateImplementationForObjectCenters matchingUpdateImplementation;
-        
-        exemplars = new ArrayList<>();
-        
-        matchingUpdateImplementation = new MatchingUpdateImplementationForObjectCenters(10.0f, 0.6f);
+
+        ArrayList<Pattern> exemplars = new ArrayList<>();
+
+        MatchingUpdateImplementationForObjectCenters matchingUpdateImplementation = new MatchingUpdateImplementationForObjectCenters(10.0f, 0.6f);
         
         MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass patternA = new MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass();
         patternA.clusterCenter = new Vector2d<>(5.0f, 0.0f);

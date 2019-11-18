@@ -40,13 +40,12 @@ public enum HelperFunctions {
         ArrayRealVector result = new ArrayRealVector(new double[]{0.0f, 0.0f});
         
         for( Link iterationLink : node.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
-            FeatureNode targetFeatureNode;
 
-            if( iterationLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() ) {
+			if( iterationLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() ) {
                 continue;
             }
 
-            targetFeatureNode = (FeatureNode)iterationLink.target;
+			FeatureNode targetFeatureNode = (FeatureNode) iterationLink.target;
 
             if( targetFeatureNode.featureTypeNode.equals(networkHandles.xCoordinatePlatonicPrimitiveNode) ) {
                 result.getDataRef()[0] = targetFeatureNode.getValueAsFloat();

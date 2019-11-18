@@ -15,8 +15,7 @@ public enum Util
 	/** dump solution to screen */
 	static public void printSolution(AnnealingScheme scheme)
 	{
-		double[] sol;
-		sol = scheme.getSolution();
+		double[] sol = scheme.getSolution();
 		System.out.println("Solution:");
 		for (double v : sol) {
 			System.out.println(v);

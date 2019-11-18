@@ -52,16 +52,14 @@ public class PlatonicPrimitiveDatabase
 
     private void calculateAndPutMaxValueForPlatonicPrimitiveNodeIntoMap(PlatonicPrimitiveNode platonicPrimitiveNode)
     {
-        float maxValue;
-        IMaxValueCalculator maxValueCalculator;
 
         if( !calculatorsForMaxValueOfPlatonicPrimitiveNode.containsKey(platonicPrimitiveNode) )
         {
             throw new RuntimeException("Unknown IMaxValueCalculator for PlatonicPrimitiveNode " + platonicPrimitiveNode.platonicType);
         }
 
-        maxValueCalculator = calculatorsForMaxValueOfPlatonicPrimitiveNode.get(platonicPrimitiveNode);
-        maxValue = maxValueCalculator.getMaxValue();
+        IMaxValueCalculator maxValueCalculator = calculatorsForMaxValueOfPlatonicPrimitiveNode.get(platonicPrimitiveNode);
+        float maxValue = maxValueCalculator.getMaxValue();
 
         mapForMaxValueOfPlatonicPrimitiveNode.put(platonicPrimitiveNode, maxValue);
     }

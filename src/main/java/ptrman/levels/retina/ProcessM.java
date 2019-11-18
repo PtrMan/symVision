@@ -67,18 +67,15 @@ public class ProcessM {
     }
 
     private void selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(List<RetinaPrimitive> lineDetectors) {
-        int startLineIndex;
-        SingleLineDetector startLineDetector;
-        ArrayList<SingleLineDetector> lineParsing;
-        
+
         // TODO< lock >
         
         Assert.Assert(!lineDetectors.isEmpty(), "");
-        
-        startLineIndex = random.nextInt(lineDetectors.size());
-        startLineDetector = lineDetectors.get(startLineIndex).line;
-        
-        lineParsing = findLineParsingForStartLine(startLineDetector);
+
+        int startLineIndex = random.nextInt(lineDetectors.size());
+        SingleLineDetector startLineDetector = lineDetectors.get(startLineIndex).line;
+
+        ArrayList<SingleLineDetector> lineParsing = findLineParsingForStartLine(startLineDetector);
         lineParsings.add(new LineParsing(lineParsing));
         
         // TODO< unlock >
@@ -91,22 +88,17 @@ public class ProcessM {
      * --- the lines are locked
      */
     private ArrayList<SingleLineDetector> findLineParsingForStartLine(SingleLineDetector startLineDetector) {
-        SingleLineDetector currentLineDetector;
-        ArrayList<SingleLineDetector> resultLineParsing;
-        
-        resultLineParsing = new ArrayList<>();
-        currentLineDetector = startLineDetector;
+
+        ArrayList<SingleLineDetector> resultLineParsing = new ArrayList<>();
+        SingleLineDetector currentLineDetector = startLineDetector;
         
         for(;;) {
-            List<Intersection> remainingIntersections;
-            
-            remainingIntersections = deepCopyIntersections(currentLineDetector.intersections);
+
+            List<Intersection> remainingIntersections = deepCopyIntersections(currentLineDetector.intersections);
             
             // choose from the remaining intersections one and check it if it leads to a nonmarked edge
             for(;;) {
-                int indexOfChosenRemainingIntersections;
-                Intersection currentIntersection;
-                
+
                 if( remainingIntersections.isEmpty() ) {
                     // if we don't have any edges we can't go to any other edge/line, so the "search" is terminated
                     
@@ -114,8 +106,8 @@ public class ProcessM {
                 }
                 
                 // take out
-                indexOfChosenRemainingIntersections = random.nextInt(remainingIntersections.size());
-                currentIntersection = remainingIntersections.get(indexOfChosenRemainingIntersections);
+                int indexOfChosenRemainingIntersections = random.nextInt(remainingIntersections.size());
+                Intersection currentIntersection = remainingIntersections.get(indexOfChosenRemainingIntersections);
                 remainingIntersections.remove(indexOfChosenRemainingIntersections);
                 
                 Assert.Assert(currentIntersection.p0.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "is not line");
@@ -147,9 +139,8 @@ public class ProcessM {
     }
     
     private static List<Intersection> deepCopyIntersections(List<Intersection> intersections) {
-        List<Intersection> copyed;
 
-        copyed = new ArrayList<>(intersections);
+        List<Intersection> copyed = new ArrayList<>(intersections);
         
         return copyed;
     }

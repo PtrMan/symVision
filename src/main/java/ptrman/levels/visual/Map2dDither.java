@@ -60,10 +60,9 @@ public class Map2dDither {
 
 
         private static IMap2d<IValue> calculate(IMap2d<IValue> input, IValue[] palette) {
-            IMap2d<IValue> d;
             int x, y;
 
-            d = input.copy();
+            IMap2d<IValue> d = input.copy();
 
             for (y = 0; y < input.getLength(); y++) {
                 for (x = 0; x < input.getWidth(); x++) {
@@ -109,14 +108,11 @@ public class Map2dDither {
         }
 
         public static void floydSteinbergDitheringFloatToBoolean(IMap2d<Float> input, IMap2d<Boolean> resultAboveThreshold) {
-            IMap2d<IValue> temporaryResult;
-            IMap2d<IValue> temporaryInput;
-            IMap2d<Float> result;
             final ValueFloat[] palette = new ValueFloat[]{new ValueFloat(0.0f), new ValueFloat(1.0f)};
 
-            temporaryInput = covertFromFloatToValueFloat(input);
-            temporaryResult = calculate(temporaryInput, palette);
-            result = convertFromValueFromToFloat(temporaryResult);
+            IMap2d<IValue> temporaryInput = covertFromFloatToValueFloat(input);
+            IMap2d<IValue> temporaryResult = calculate(temporaryInput, palette);
+            IMap2d<Float> result = convertFromValueFromToFloat(temporaryResult);
             convertFromFloatToBooleanNotEqualZeroInPlace(result, resultAboveThreshold);
         }
 
@@ -133,10 +129,9 @@ public class Map2dDither {
         }
 
         private static IMap2d<Float> convertFromValueFromToFloat(IMap2d<IValue> input) {
-            IMap2d<Float> result;
             int x, y;
 
-            result = new Map2d<>(input.getWidth(), input.getLength());
+            IMap2d<Float> result = new Map2d<>(input.getWidth(), input.getLength());
 
             for( y = 0; y < input.getLength(); y++ )
             {
@@ -150,10 +145,9 @@ public class Map2dDither {
         }
 
         private static IMap2d<IValue> covertFromFloatToValueFloat(IMap2d<Float> input) {
-            IMap2d<IValue> result;
             int x, y;
 
-            result = new Map2d<>(input.getWidth(), input.getLength());
+            IMap2d<IValue> result = new Map2d<>(input.getWidth(), input.getLength());
 
             for( y = 0; y < input.getLength(); y++ )
             {

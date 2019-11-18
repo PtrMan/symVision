@@ -34,9 +34,8 @@ public class EndPoint extends SolverCodelet {
 
     @Override
     public SolverCodelet cloneObject() {
-        EndPoint cloned;
-        
-        cloned = new EndPoint(bpSolver);
+
+		EndPoint cloned = new EndPoint(bpSolver);
         
         return cloned;
     }

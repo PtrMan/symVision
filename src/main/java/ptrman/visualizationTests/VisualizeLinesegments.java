@@ -66,10 +66,6 @@ public class VisualizeLinesegments extends PApplet {
         {
             InputDrawer imageDrawer = new InputDrawer();
 
-            BufferedImage image;
-            IMap2d<Boolean> mapBoolean;
-            IMap2d<ColorRgb> mapColor;
-
 
             Solver bpSolver = new Solver();
             bpSolver.setImageSize(new Vector2d<>(RETINA_WIDTH, RETINA_HEIGHT));
@@ -79,11 +75,10 @@ public class VisualizeLinesegments extends PApplet {
 
             // TODO< pull image from source >
             // for now imageDrawer does this
-            image = imageDrawer.apply(bpSolver);
+            BufferedImage image = imageDrawer.apply(bpSolver);
 
 
-
-            mapColor = TestClustering.translateFromImageToMap(image);
+            IMap2d<ColorRgb> mapColor = TestClustering.translateFromImageToMap(image);
 
 
 
@@ -93,14 +88,12 @@ public class VisualizeLinesegments extends PApplet {
 
             VisualProcessor.ProcessingChain processingChain = new VisualProcessor.ProcessingChain();
 
-            Dag.Element newDagElement;
-
-            newDagElement = new Dag.Element(
-                    new VisualProcessor.ProcessingChain.ChainElementColorFloat(
-                            new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
-                            "convertRgbToGrayscale",
-                            bpSolver.getImageSize()
-                    )
+            Dag.Element newDagElement = new Dag.Element(
+                new VisualProcessor.ProcessingChain.ChainElementColorFloat(
+                    new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
+                    "convertRgbToGrayscale",
+                    bpSolver.getImageSize()
+                )
             );
             newDagElement.childIndices.add(1);
 
@@ -121,7 +114,7 @@ public class VisualizeLinesegments extends PApplet {
 
             processingChain.filterChain(mapColor);
 
-            mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement)processingChain.filterChainDag.elements.get(1).content).result;
+            IMap2d<Boolean> mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(1).content).result;
 
             bpSolver.recalculate(mapBoolean);
 

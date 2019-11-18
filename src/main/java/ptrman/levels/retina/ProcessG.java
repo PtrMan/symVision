@@ -48,10 +48,8 @@ public class ProcessG {
         
         public Intersection.IntersectionPartner.EnumIntersectionEndpointType getIntersectionEndpoint(ArrayRealVector point) {
             // TODO< other strategy for figuring out if the point is *at* the line and not lear the endpoints >
-            
-            ArrayRealVector diff;
-            
-            diff = calcPosition(0.0f).subtract(point);
+
+            ArrayRealVector diff = calcPosition(0.0f).subtract(point);
             double distToBegin = diff.getNorm();
             
             diff = calcPosition(1.0f).subtract(point);
@@ -66,14 +64,11 @@ public class ProcessG {
         }
         
         public ArrayRealVector calcPosition(float t) {
-            float t2;
-            float rem;
-            int index;
-            
-            t2 = t * (float)curveElements.size();
-            
-            rem = t2 % 1.0f;
-            index = Math.round(t2);
+
+            float t2 = t * (float) curveElements.size();
+
+            float rem = t2 % 1.0f;
+            int index = Math.round(t2);
             
             return curveElements.get(index).calcPosition(rem);
         }
@@ -82,17 +77,14 @@ public class ProcessG {
     
     // test, works
     public static void testPoints() {
-        List<ArrayRealVector> testPoints;
-        
-        testPoints = new ArrayList<>();
+
+        List<ArrayRealVector> testPoints = new ArrayList<>();
         testPoints.add(new ArrayRealVector(new double[]{1.0f, 5.0f}));
         testPoints.add(new ArrayRealVector(new double[]{1.8f, 4.0f}));
         testPoints.add(new ArrayRealVector(new double[]{2.0f, 7.0f}));
-        
-        Curve resultCurve;
-        
+
         // works fine
-        resultCurve = calculatePolynominalsAndReturnCurve(testPoints);
+        Curve resultCurve = calculatePolynominalsAndReturnCurve(testPoints);
     }
     
     
@@ -158,18 +150,14 @@ public class ProcessG {
         // TODO< select by random >
 
         for (ProcessM.LineParsing lineParsing : lineParsings) {
-            ProcessM.LineParsing currentLineParsing;
 
-            currentLineParsing = lineParsing;
+            ProcessM.LineParsing currentLineParsing = lineParsing;
 
 
             // try to covert (at least) a part of the lineParsing to a curve
 
-            List<List<ArrayRealVector>> protocurves;
-            List<ArrayRealVector> currentProtocurve;
-
-            protocurves = new ArrayList<>();
-            currentProtocurve = null;
+            List<List<ArrayRealVector>> protocurves = new ArrayList<>();
+            List<ArrayRealVector> currentProtocurve = null;
 
             for (int pointIndex = 1; pointIndex < currentLineParsing.lineParsing.size() - 1; pointIndex++) {
                 boolean atLeastOneSampleNotNearAdjacentLines = examineVincityOfSegmentPoint(pointIndex, currentLineParsing, samples);
@@ -212,9 +200,8 @@ public class ProcessG {
             // convert protocurves to real curves
 
             for (List<ArrayRealVector> iterationProtoCurve : protocurves) {
-                Curve createdCurve;
 
-                createdCurve = calculatePolynominalsAndReturnCurve(iterationProtoCurve);
+                Curve createdCurve = calculatePolynominalsAndReturnCurve(iterationProtoCurve);
                 resultCurves.add(createdCurve);
             }
         }
@@ -234,15 +221,13 @@ public class ProcessG {
         // intersections between curves and lines
         
         for( Curve iterationCurve : curves ) {
-            CurveElement beginCurveElement, endCurveElement;
-            SingleLineDetector tempBeginCurveTangentLine, tempEndCurveTangentLine;
-            
-            beginCurveElement = iterationCurve.curveElements.get(0);
-            endCurveElement = iterationCurve.curveElements.get(iterationCurve.curveElements.size()-1);
+
+            CurveElement beginCurveElement = iterationCurve.curveElements.get(0);
+            CurveElement endCurveElement = iterationCurve.curveElements.get(iterationCurve.curveElements.size() - 1);
             
             // TODO ASK< maybe we have to search the ending with the minimal x position? >
-            tempBeginCurveTangentLine = SingleLineDetector.createFromFloatPositions(beginCurveElement.calcPosition(0.0f), beginCurveElement.calcPosition(0.0f).add(beginCurveElement.calcTangent(0.0f)));
-            tempEndCurveTangentLine = SingleLineDetector.createFromFloatPositions(endCurveElement.calcPosition(1.0f), endCurveElement.calcPosition(1.0f).add(endCurveElement.calcTangent(1.0f)));
+            SingleLineDetector tempBeginCurveTangentLine = SingleLineDetector.createFromFloatPositions(beginCurveElement.calcPosition(0.0f), beginCurveElement.calcPosition(0.0f).add(beginCurveElement.calcTangent(0.0f)));
+            SingleLineDetector tempEndCurveTangentLine = SingleLineDetector.createFromFloatPositions(endCurveElement.calcPosition(1.0f), endCurveElement.calcPosition(1.0f).add(endCurveElement.calcTangent(1.0f)));
             
             final double curveBeginM = tempBeginCurveTangentLine.getM();
             final double curveBeginN = tempBeginCurveTangentLine.getN();
@@ -260,12 +245,11 @@ public class ProcessG {
                     image.inBounds(arrayRealVectorToInteger(intersectionPositionBegin, ArrayRealVectorHelper.EnumRoundMode.DOWN)) &&
                     isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPositionBegin, ArrayRealVectorHelper.EnumRoundMode.DOWN), image)
                 ) {
-                    Intersection createdIntersection;
 
-                    createdIntersection = new Intersection(intersectionPositionBegin,
-                            new Intersection.IntersectionPartner(RetinaPrimitive.makeCurve(iterationCurve), iterationCurve.getIntersectionEndpoint(intersectionPositionBegin)),
-                            new Intersection.IntersectionPartner(RetinaPrimitive.makeLine(iterationLineDetector), iterationLineDetector.getIntersectionEndpoint(intersectionPositionBegin))
-                            );
+                    Intersection createdIntersection = new Intersection(intersectionPositionBegin,
+                        new Intersection.IntersectionPartner(RetinaPrimitive.makeCurve(iterationCurve), iterationCurve.getIntersectionEndpoint(intersectionPositionBegin)),
+                        new Intersection.IntersectionPartner(RetinaPrimitive.makeLine(iterationLineDetector), iterationLineDetector.getIntersectionEndpoint(intersectionPositionBegin))
+                    );
 
                     iterationLineDetector.intersections.add(createdIntersection);
                 }
@@ -274,11 +258,10 @@ public class ProcessG {
                         image.inBounds(arrayRealVectorToInteger(intersectionPositionEnd, ArrayRealVectorHelper.EnumRoundMode.DOWN)) &&
                                 isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPositionEnd, ArrayRealVectorHelper.EnumRoundMode.DOWN), image)
                 ) {
-                    Intersection createdIntersection;
 
-                    createdIntersection = new Intersection(intersectionPositionEnd,
-                            new Intersection.IntersectionPartner(RetinaPrimitive.makeCurve(iterationCurve), iterationCurve.getIntersectionEndpoint(intersectionPositionEnd)),
-                            new Intersection.IntersectionPartner(RetinaPrimitive.makeLine(iterationLineDetector), iterationLineDetector.getIntersectionEndpoint(intersectionPositionEnd))
+                    Intersection createdIntersection = new Intersection(intersectionPositionEnd,
+                        new Intersection.IntersectionPartner(RetinaPrimitive.makeCurve(iterationCurve), iterationCurve.getIntersectionEndpoint(intersectionPositionEnd)),
+                        new Intersection.IntersectionPartner(RetinaPrimitive.makeLine(iterationLineDetector), iterationLineDetector.getIntersectionEndpoint(intersectionPositionEnd))
                     );
 
                     iterationLineDetector.intersections.add(createdIntersection);
@@ -305,9 +288,8 @@ public class ProcessG {
     
     private static void removeLinedetectorsWhichWereUsedInCurves(ArrayList<SingleLineDetector> lineDetectors) {
         for( int lineDetectorI = 0; lineDetectorI < lineDetectors.size(); lineDetectorI++ ) {
-            SingleLineDetector currentLineDetector;
-            
-            currentLineDetector = lineDetectors.get(lineDetectorI);
+
+            SingleLineDetector currentLineDetector = lineDetectors.get(lineDetectorI);
             
             if( currentLineDetector.markedPartOfCurve ) {
                 // before we remove it we have to make sure it doesn't get referenced in intersections
@@ -336,9 +318,8 @@ public class ProcessG {
 
     private static void removeIntersectionBetweenLines(SingleLineDetector lineA, SingleLineDetector lineB) {
         for( int intersectionI = 0; intersectionI < lineA.intersections.size(); intersectionI++ ) {
-            Intersection iterationIntersection;
-            
-            iterationIntersection = lineA.intersections.get(intersectionI);
+
+            Intersection iterationIntersection = lineA.intersections.get(intersectionI);
             
             Assert.Assert(iterationIntersection.p0.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
             Assert.Assert(iterationIntersection.p1.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
@@ -355,9 +336,8 @@ public class ProcessG {
         
         
         for( int intersectionI = 0; intersectionI < lineB.intersections.size(); intersectionI++ ) {
-            Intersection iterationIntersection;
-            
-            iterationIntersection = lineB.intersections.get(intersectionI);
+
+            Intersection iterationIntersection = lineB.intersections.get(intersectionI);
             
             Assert.Assert(iterationIntersection.p0.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
             Assert.Assert(iterationIntersection.p1.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
@@ -389,12 +369,10 @@ public class ProcessG {
         lineParsing.processGInterestRating = 0.0f;
         
         for( lineDetectorI = 0; lineDetectorI < lineParsing.lineParsing.size()-1; lineDetectorI++ ) {
-            SingleLineDetector iterationLineDetector;
-            SingleLineDetector nextLineDetector;
             float endToEndRating;
-            
-            iterationLineDetector = lineParsing.lineParsing.get(lineDetectorI);
-            nextLineDetector = lineParsing.lineParsing.get(lineDetectorI+1);
+
+            SingleLineDetector iterationLineDetector = lineParsing.lineParsing.get(lineDetectorI);
+            SingleLineDetector nextLineDetector = lineParsing.lineParsing.get(lineDetectorI + 1);
             
             // length criteria
             
@@ -439,9 +417,8 @@ public class ProcessG {
     }
     
     private static List<ProcessA.Sample> queryPointsInRadius(List<ProcessA.Sample> samples, ArrayRealVector centerPoint, double radius, ProcessA.Sample.EnumType[] typeFilterCriteria) {
-        List<ProcessA.Sample> samplesInRadius;
-        
-        samplesInRadius = new ArrayList<>();
+
+        List<ProcessA.Sample> samplesInRadius = new ArrayList<>();
         
         // TODO< query the points in the radius with a optimized spartial scheme >
         for( ProcessA.Sample iterationSample : samples ) {
@@ -456,9 +433,8 @@ public class ProcessG {
     }
     
     private static List<SingleLineDetector> getNeightborLinesOfPoint(int pointIndex, ProcessM.LineParsing lineParsing) {
-        List<SingleLineDetector> resultLines;
-        
-        resultLines = new ArrayList<>();
+
+        List<SingleLineDetector> resultLines = new ArrayList<>();
         
         resultLines.add(lineParsing.lineParsing.get(pointIndex-1));
         resultLines.add(lineParsing.lineParsing.get(pointIndex));
@@ -508,25 +484,16 @@ public class ProcessG {
     
     
     private static Curve calculatePolynominalsAndReturnCurve(List<ArrayRealVector> points) {
-        RealVector solvedA_2_i;
-        RealVector solvedA_1_i;
-        RealVector solvedA_3_i;
-        RealVector solvedA_0_i;
-        
-        RealVector solvedB_2_i;
-        RealVector solvedB_1_i;
-        RealVector solvedB_3_i;
-        RealVector solvedB_0_i;
-        
-        solvedA_2_i = ProcessG.solveLinearEquationFor2ForPoints(points, EnumAxis.X);
-        solvedA_1_i = ProcessG.calculate_1_i(points, solvedA_2_i, EnumAxis.X);
-        solvedA_3_i = ProcessG.calculate_2_i(points, solvedA_2_i);
-        solvedA_0_i = ProcessG.calculate_0_i(points, EnumAxis.X);
-        
-        solvedB_2_i = ProcessG.solveLinearEquationFor2ForPoints(points, EnumAxis.Y);
-        solvedB_1_i = ProcessG.calculate_1_i(points, solvedB_2_i, EnumAxis.Y);
-        solvedB_3_i = ProcessG.calculate_2_i(points, solvedB_2_i);
-        solvedB_0_i = ProcessG.calculate_0_i(points, EnumAxis.Y);
+
+        RealVector solvedA_2_i = ProcessG.solveLinearEquationFor2ForPoints(points, EnumAxis.X);
+        RealVector solvedA_1_i = ProcessG.calculate_1_i(points, solvedA_2_i, EnumAxis.X);
+        RealVector solvedA_3_i = ProcessG.calculate_2_i(points, solvedA_2_i);
+        RealVector solvedA_0_i = ProcessG.calculate_0_i(points, EnumAxis.X);
+
+        RealVector solvedB_2_i = ProcessG.solveLinearEquationFor2ForPoints(points, EnumAxis.Y);
+        RealVector solvedB_1_i = ProcessG.calculate_1_i(points, solvedB_2_i, EnumAxis.Y);
+        RealVector solvedB_3_i = ProcessG.calculate_2_i(points, solvedB_2_i);
+        RealVector solvedB_0_i = ProcessG.calculate_0_i(points, EnumAxis.Y);
         
         return new Curve(createCurves(solvedA_0_i, solvedA_1_i, solvedA_2_i, solvedA_3_i, solvedB_0_i, solvedB_1_i, solvedB_2_i, solvedB_3_i));
     }
@@ -534,13 +501,11 @@ public class ProcessG {
     // builds a linear equation for the a|b_2,i values and returns the coefficients
     // NOTE< points must be for sure sorted by x axis? >
     private static RealVector solveLinearEquationFor2ForPoints(List<ArrayRealVector> points, EnumAxis axis) {
-        Array2DRowRealMatrix matrix;
-        RealVector constants;
         int i;
         
         // math libary usage see http://commons.apache.org/proper/commons-math/userguide/linear.html
-        
-        matrix = new Array2DRowRealMatrix(points.size(), points.size());
+
+        Array2DRowRealMatrix matrix = new Array2DRowRealMatrix(points.size(), points.size());
         
         // populate matrix
         
@@ -556,15 +521,14 @@ public class ProcessG {
         }
         
         // populate constants
-        
-        constants = new ArrayRealVector(points.size());
+
+        RealVector constants = new ArrayRealVector(points.size());
         constants.setEntry(0, 0.0);
         constants.setEntry(points.size()-1, 0.0);
         
         for( i = 0; i < points.size()-2; i++ ) {
-            double value;
-            
-            value = 3.0*getAxisValueForPointOfArray(points, i, axis) - 6.0*getAxisValueForPointOfArray(points, i+1, axis) + 3.0*getAxisValueForPointOfArray(points, i+2, axis);
+
+            double value = 3.0 * getAxisValueForPointOfArray(points, i, axis) - 6.0 * getAxisValueForPointOfArray(points, i + 1, axis) + 3.0 * getAxisValueForPointOfArray(points, i + 2, axis);
             constants.setEntry(i+1, value);
         }
         
@@ -579,13 +543,11 @@ public class ProcessG {
     // calculates the (A|B)_1_i after Formula (9a) (foundalis dissertation page 422)
     // note that the result vector is one shorter than the input vector
     private static RealVector calculate_1_i(List<ArrayRealVector> points, RealVector a_2_i, EnumAxis axis) {
-        RealVector result;
-        
-        result = new ArrayRealVector(a_2_i.getDimension()-1);
+
+        RealVector result = new ArrayRealVector(a_2_i.getDimension() - 1);
         for( int i = 0; i < a_2_i.getDimension()-1; i++ ) {
-            double result_1_i;
-            
-            result_1_i = getAxisValueForPointOfArray(points, i+1, axis) - getAxisValueForPointOfArray(points, i, axis) - (1.0/3.0)*(2.0*a_2_i.getEntry(i) + a_2_i.getEntry(i+1));
+
+            double result_1_i = getAxisValueForPointOfArray(points, i + 1, axis) - getAxisValueForPointOfArray(points, i, axis) - (1.0 / 3.0) * (2.0 * a_2_i.getEntry(i) + a_2_i.getEntry(i + 1));
             result.setEntry(i, result_1_i);
         }
         
@@ -594,9 +556,8 @@ public class ProcessG {
     
     // calculate the (A|B)_3_i after formula (7)
     private static RealVector calculate_2_i(List<ArrayRealVector> points, RealVector solved_2_i) {
-        RealVector result;
-        
-        result = new ArrayRealVector(solved_2_i.getDimension()-1);
+
+        RealVector result = new ArrayRealVector(solved_2_i.getDimension() - 1);
         for( int i = 0; i < solved_2_i.getDimension()-1; i++ ) {
             double result_3_i = (solved_2_i.getEntry(i+1)-solved_2_i.getEntry(i))*0.3333333333333333333333333;
             result.setEntry(i, result_3_i);
@@ -607,13 +568,11 @@ public class ProcessG {
     
     // "calculate" the (A|B)_0_i after formula (4)
     private static RealVector calculate_0_i(List<ArrayRealVector> points, EnumAxis axis) {
-        RealVector result;
-        
-        result = new ArrayRealVector(points.size());
+
+        RealVector result = new ArrayRealVector(points.size());
         
         for( int i = 0; i < points.size(); i++ ) {
-            double result_0_i;
-            result_0_i = getAxisValueForPointOfArray(points, i, axis);
+            double result_0_i = getAxisValueForPointOfArray(points, i, axis);
             result.setEntry(i, result_0_i);
         }
         
@@ -622,13 +581,11 @@ public class ProcessG {
     
     
     private static List<CurveElement> createCurves(RealVector solvedA_0_i, RealVector solvedA_1_i, RealVector solvedA_2_i, RealVector solvedA_3_i, RealVector solvedB_0_i, RealVector solvedB_1_i, RealVector solvedB_2_i, RealVector solvedB_3_i) {
-        List<CurveElement> resultCurves;
-        int numberOfPoints;
         int curveI;
-        
-        numberOfPoints = solvedA_0_i.getDimension();
-        
-        resultCurves = new ArrayList<>();
+
+        int numberOfPoints = solvedA_0_i.getDimension();
+
+        List<CurveElement> resultCurves = new ArrayList<>();
         
         for( curveI = 0; curveI < numberOfPoints-1; curveI++ ) {
             resultCurves.add(new CurveElement(

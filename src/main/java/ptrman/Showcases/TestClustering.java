@@ -119,21 +119,17 @@ public class TestClustering {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            BufferedImage image;
-            IMap2d<Boolean> mapBoolean;
-            IMap2d<ColorRgb> mapColor;
 
             // TODO< pull image from source >
             // for now imageDrawer does this
-            image = imageDrawer.apply(bpSolver);
+            BufferedImage image = imageDrawer.apply(bpSolver);
 
 
-
-            mapColor = TestClustering.translateFromImageToMap(image);
+            IMap2d<ColorRgb> mapColor = TestClustering.translateFromImageToMap(image);
 
             processingChain.filterChain(mapColor);
 
-            mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement)processingChain.filterChainDag.elements.get(1).content).result;
+            IMap2d<Boolean> mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(1).content).result;
 
             bpSolver.recalculate(mapBoolean);
 
@@ -144,9 +140,7 @@ public class TestClustering {
 
             dualCanvas.leftCanvas.setImage(translateFromMapToImage(mapBoolean));
 
-            BufferedImage detectorImage;
-
-            detectorImage = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
+            BufferedImage detectorImage = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
 
             Graphics2D graphics = (Graphics2D)detectorImage.getGraphics();
 
@@ -186,20 +180,16 @@ public class TestClustering {
         Parameters.init();
 
 
-        VisualProcessor.ProcessingChain processingChain;
-
         // setup the processing chain
 
-        processingChain = new VisualProcessor.ProcessingChain();
+        VisualProcessor.ProcessingChain processingChain = new VisualProcessor.ProcessingChain();
 
-        Dag.Element newDagElement;
-
-        newDagElement = new Dag.Element(
-                new VisualProcessor.ProcessingChain.ChainElementColorFloat(
-                        new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
-                        "convertRgbToGrayscale",
-                        bpSolver.getImageSize()
-                )
+        Dag.Element newDagElement = new Dag.Element(
+            new VisualProcessor.ProcessingChain.ChainElementColorFloat(
+                new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
+                "convertRgbToGrayscale",
+                bpSolver.getImageSize()
+            )
         );
         newDagElement.childIndices.add(1);
 
@@ -234,9 +224,7 @@ public class TestClustering {
         GraphWindow graphWindow = new GraphWindow();
 
 
-        IntrospectControlPanel introspectControlPanel;
-
-        introspectControlPanel = new IntrospectControlPanel();
+        IntrospectControlPanel introspectControlPanel = new IntrospectControlPanel();
 
         DualConvas dualCanvas = new DualConvas();
 
@@ -295,16 +283,14 @@ public class TestClustering {
         DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
 
         int bufferI;
-        IMap2d<ColorRgb> convertedToMap;
 
-        convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
+        IMap2d<ColorRgb> convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
 
         int imgSize = imageBuffer.getSize();
         for(bufferI = 0; bufferI < imgSize; bufferI++ )
         {
-            int pixelValue;
 
-            pixelValue = javaImage.getRGB(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth());
+            int pixelValue = javaImage.getRGB(bufferI % convertedToMap.getWidth(), bufferI / convertedToMap.getWidth());
 
             Color c = new Color(pixelValue);
 
@@ -319,16 +305,14 @@ public class TestClustering {
     }
 
     private static BufferedImage translateFromMapToImage(IMap2d<Boolean> map) {
-        BufferedImage result;
         int x, y;
 
-        result = new BufferedImage(map.getWidth(), map.getLength(), BufferedImage.TYPE_INT_ARGB);
+        BufferedImage result = new BufferedImage(map.getWidth(), map.getLength(), BufferedImage.TYPE_INT_ARGB);
 
         for( y = 0; y < map.getLength(); y++ ) {
             for( x = 0; x < map.getWidth(); x++ ) {
-                boolean booleanValue;
 
-                booleanValue = map.readAt(x, y);
+                boolean booleanValue = map.readAt(x, y);
 
                 if( booleanValue ) {
                     result.setRGB(x, y, 0xffffffff);

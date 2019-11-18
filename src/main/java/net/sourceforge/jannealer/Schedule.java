@@ -346,12 +346,11 @@ class Schedule
 		double[] ptry = new double[ndim + 1];
 		double fac1 = (1.0 - fac) / ndim;
 		double fac2 = fac1 - fac;
-		double ytry = 0;
 		for (int j = 1; j <= ndim; j++)
 		{
 			ptry[j] = psum[j] * fac1 - p[ihi][j] * fac2;
 		}
-		ytry = invokeDist(ptry);
+		double ytry = invokeDist(ptry);
 		if (ytry <= yb)
 		{
 			if (ndim >= 0) System.arraycopy(ptry, 1, pb, 1, ndim);
@@ -379,10 +378,9 @@ class Schedule
 	 */
 	private double invokeDist(double[] ptry)
 	{
-		double ytry;
 		double[] t = new double[ptry.length - 1];
 		System.arraycopy(ptry, 1, t, 0, t.length);
-		ytry = function.distance(t);
+		double ytry = function.distance(t);
 		return ytry;
 	}
 	/**

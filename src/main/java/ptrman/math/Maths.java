@@ -34,7 +34,6 @@ public enum Maths {
     // SUPERCOMPILATION candidate
     public static double squaredDistance(double[] data)
     {
-        double result;
         int i;
 
         // we play supercompiler
@@ -44,7 +43,7 @@ public enum Maths {
             return power2(data[0]) + power2(data[1]);
         }
 
-        result = 0.0;
+        double result = 0.0;
 
         for( i = 0; i < data.length; i++ )
         {
@@ -56,9 +55,9 @@ public enum Maths {
     
     public static int faculty(int value)
     {
-        int result, i;
-        
-        result = 1;
+        int i;
+
+        int result = 1;
         
         for( i = 1; i < value; i++ )
         {

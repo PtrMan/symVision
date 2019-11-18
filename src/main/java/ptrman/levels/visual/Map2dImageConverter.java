@@ -22,19 +22,16 @@ public enum Map2dImageConverter
 
 	public static IMap2d<ColorRgb> convertImageToMap(BufferedImage image)
     {
-        IMap2d<ColorRgb> result;
 
-        result = new Map2d<>(image.getWidth(), image.getHeight());
+		IMap2d<ColorRgb> result = new Map2d<>(image.getWidth(), image.getHeight());
 
         for (int i = 0; i < image.getHeight(); i++)
         {
             for (int j = 0; j < image.getWidth(); j++)
             {
-                ColorRgb colorRgb;
-                int pixel;
 
-                pixel = image.getRGB(j, i);
-                colorRgb = convertPixelToColor(pixel);
+				int pixel = image.getRGB(j, i);
+				ColorRgb colorRgb = convertPixelToColor(pixel);
                 result.setAt(j, i, colorRgb);
             }
         }
@@ -44,18 +41,16 @@ public enum Map2dImageConverter
 
     public static BufferedImage convertBooleanMapToImage(IMap2d<Boolean> map)
     {
-        BufferedImage resultImage;
-        int x, y;
+		int x, y;
 
-        resultImage = new BufferedImage(map.getWidth(), map.getLength(), TYPE_INT_ARGB);
+		BufferedImage resultImage = new BufferedImage(map.getWidth(), map.getLength(), TYPE_INT_ARGB);
 
         for( y = 0; y < resultImage.getHeight(); y++ )
         {
             for( x = 0; x < resultImage.getWidth(); x++ )
             {
-                boolean value;
 
-                value = map.readAt(x, y);
+				boolean value = map.readAt(x, y);
 
                 if( value )
                 {
@@ -77,11 +72,9 @@ public enum Map2dImageConverter
         int greenInt = (pixelValue >> 8) & 0xff;
         int blueInt = (pixelValue) & 0xff;
 
-        float red, green, blue;
-
-        red = (float)redInt/255.0f;
-        green = (float)greenInt/255.0f;
-        blue = (float)blueInt/255.0f;
+		float red = (float) redInt / 255.0f;
+		float green = (float) greenInt / 255.0f;
+		float blue = (float) blueInt / 255.0f;
 
         return new ColorRgb(red, green, blue);
     }

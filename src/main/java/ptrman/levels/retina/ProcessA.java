@@ -213,10 +213,9 @@ public class ProcessA implements IProcess {
     }
 
     private static boolean sampleMaskAtPosition(int px, int py, boolean[] mask4by4) {
-        int modX, modY;
 
-        modX = px % 4;
-        modY = py % 4;
+        int modX = px % 4;
+        int modY = py % 4;
 
         return mask4by4[modX + modY * 4];
     }

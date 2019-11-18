@@ -138,9 +138,8 @@ public class ProcessH implements IProcess {
                 boolean fused = false;
 
                 if( canDetectorsBeFusedOverlap(detectorLow, detectorHigh) ) {
-                    SingleLineDetector fusedLineDetector;
 
-                    fusedLineDetector = fuseLineDetectorsOverlap(detectorLow, detectorHigh);
+                    SingleLineDetector fusedLineDetector = fuseLineDetectorsOverlap(detectorLow, detectorHigh);
 
                     addNewLine(workingDetectors, objectId, fusedLineDetector);
 
@@ -148,9 +147,8 @@ public class ProcessH implements IProcess {
                     fused = true;
                 }
                 else if( canDetectorsBeFusedInside(detectorLow, detectorHigh) ) {
-                    SingleLineDetector fusedLineDetector;
 
-                    fusedLineDetector = fuseLineDetectorsInside(detectorLow, detectorHigh);
+                    SingleLineDetector fusedLineDetector = fuseLineDetectorsInside(detectorLow, detectorHigh);
 
                     addNewLine(workingDetectors, objectId, fusedLineDetector);
 
@@ -200,32 +198,28 @@ public class ProcessH implements IProcess {
     private static boolean canDetectorsBeFusedOverlap(SingleLineDetector detectorA, SingleLineDetector detectorB) {
         // TODO< vertical special case >
 
-        SingleLineDetector inplaceDetectorA, inplaceDetectorB;
-
         ArrayRealVector projectedABegin = detectorA.getAProjected();
         ArrayRealVector projectedAEnd = detectorA.getBProjected();
         ArrayRealVector projectedBBegin = detectorB.getAProjected();
         ArrayRealVector projectedBEnd = detectorB.getBProjected();
 
-        inplaceDetectorA = detectorA;
-        inplaceDetectorB = detectorB;
+        SingleLineDetector inplaceDetectorA = detectorA;
+        SingleLineDetector inplaceDetectorB = detectorB;
 
         // we need to sort them after the x of the begin, so ABegin.x is always the lowest
         if( projectedBBegin.getDataRef()[0] < projectedABegin.getDataRef()[0] ) {
-            ArrayRealVector tempBegin, tempEnd;
-            SingleLineDetector tempDetector;
 
 
-            tempBegin = projectedABegin;
+            ArrayRealVector tempBegin = projectedABegin;
             projectedABegin = projectedBBegin;
             projectedBBegin = tempBegin;
 
-            tempEnd = projectedAEnd;
+            ArrayRealVector tempEnd = projectedAEnd;
             projectedAEnd = projectedBEnd;
             projectedBEnd = tempEnd;
 
 
-            tempDetector = inplaceDetectorA;
+            SingleLineDetector tempDetector = inplaceDetectorA;
             inplaceDetectorA = inplaceDetectorB;
             inplaceDetectorB = tempDetector;
         }
@@ -250,8 +244,6 @@ public class ProcessH implements IProcess {
     private static SingleLineDetector fuseLineDetectorsOverlap(SingleLineDetector detectorA, SingleLineDetector detectorB) {
         // TODO< vertical special case >
 
-        SingleLineDetector fusedLineDetector;
-
         // we fuse them with taking the lowest begin-x as the begin and the other as the end
 
         ArrayRealVector projectedABegin = detectorA.getAProjected();
@@ -262,18 +254,17 @@ public class ProcessH implements IProcess {
         // we need to sort them after the x of the begin, so ABegin.x is always the lowest
         // TODO BUG FIXME< the variables after the switching are not used >
         if( projectedBBegin.getDataRef()[0] < projectedABegin.getDataRef()[0] ) {
-            ArrayRealVector /*tempBegin, */tempEnd;
 
             //tempBegin = projectedABegin;
             projectedABegin = projectedBBegin;
             //projectedBBegin = tempBegin;
 
-            tempEnd = projectedAEnd;
+            ArrayRealVector /*tempBegin, */tempEnd = projectedAEnd;
             //projectedAEnd = projectedBEnd;
             projectedBEnd = tempEnd;
         }
 
-        fusedLineDetector = SingleLineDetector.createFromFloatPositions(projectedABegin, projectedBEnd);
+        SingleLineDetector fusedLineDetector = SingleLineDetector.createFromFloatPositions(projectedABegin, projectedBEnd);
         fusedLineDetector.resultOfCombination = true;
         return fusedLineDetector;
     }

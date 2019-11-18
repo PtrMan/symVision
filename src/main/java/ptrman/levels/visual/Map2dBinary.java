@@ -66,7 +66,6 @@ public enum Map2dBinary {
 
         for( int y = 1; y < input.getLength() - 1; y++ ) {
             for( int x = 1; x < input.getWidth() - 1; x++ ) {
-                boolean deletePixel;
 
                 neightbors[0] = input.readAt(x-1,y-1);
                 neightbors[1] = input.readAt(x,y-1);
@@ -98,7 +97,7 @@ public enum Map2dBinary {
                     }
                 }
 
-                deletePixel = setPixels == 0 ||
+                boolean deletePixel = setPixels == 0 ||
                     setPixels == 1 ||
                     setPixels == 7 ||
                     setPixels == 8 ||
@@ -140,8 +139,6 @@ public enum Map2dBinary {
 
             for( y = 1; y < input.getLength() - 1; y++ ) {
                 for( x = 1; x < input.getWidth() - 1; x++ ) {
-                    int min;
-                    int newValue;
 
                     if( counterMap.readAt(x, y) != k ) {
                         continue;
@@ -163,8 +160,8 @@ public enum Map2dBinary {
                     minArray[4] = counterMap.readAt(x, y+1);
                     //minArray[8] = counterMap.readAt(x+1, y+1);
 
-                    min = minOfArray(minArray);
-                    newValue = min + 1;
+                    int min = minOfArray(minArray);
+                    int newValue = min + 1;
 
                     counterMap.setAt(x, y, newValue);
 
@@ -179,9 +176,8 @@ public enum Map2dBinary {
 
         for (y = 1; y < input.getLength()-1; y++) {
             for (x = 1; x < input.getWidth()-1; x++) {
-                int compare;
 
-                compare = counterMap.readAt(x, y);
+                int compare = counterMap.readAt(x, y);
 
                 if( compare == 0 ) {
                     continue;

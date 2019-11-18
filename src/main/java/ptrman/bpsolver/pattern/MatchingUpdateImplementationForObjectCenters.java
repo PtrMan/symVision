@@ -49,19 +49,16 @@ public class MatchingUpdateImplementationForObjectCenters implements IMatchingUp
     @Override
     public Pattern updateCore(Pattern orginal, Pattern additional, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
     {
-        PatternWithCenterAndMass createdPattern;
-        PatternWithCenterAndMass orginalWithCenterAndMass;
-        PatternWithCenterAndMass additionalWithCenterAndMass;
         Vector2d<Float> newCenter;
         
         Assert.Assert(orginal instanceof PatternWithCenterAndMass, "");
         Assert.Assert(additional instanceof PatternWithCenterAndMass, "");
-        
-        orginalWithCenterAndMass = (PatternWithCenterAndMass)orginal;
-        additionalWithCenterAndMass = (PatternWithCenterAndMass)additional;
+
+        PatternWithCenterAndMass orginalWithCenterAndMass = (PatternWithCenterAndMass) orginal;
+        PatternWithCenterAndMass additionalWithCenterAndMass = (PatternWithCenterAndMass) additional;
         
         // deep copy exemplars from orginal and additional
-        createdPattern = new PatternWithCenterAndMass();
+        PatternWithCenterAndMass createdPattern = new PatternWithCenterAndMass();
         createdPattern.exemplars = new ArrayList<>();
 		createdPattern.exemplars.addAll(orginal.exemplars);
 		createdPattern.exemplars.addAll(additional.exemplars);
@@ -77,27 +74,22 @@ public class MatchingUpdateImplementationForObjectCenters implements IMatchingUp
     @Override
     public float match(Pattern a, Pattern b, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
     {
-        PatternWithCenterAndMass aWithCenterAndMass;
-        PatternWithCenterAndMass bWithCenterAndMass;
-        Vector2d<Float> diff;
-        float distance;
-        float absoluteMaximalDistanceForNullRating;
-        
+
         Assert.Assert(a instanceof PatternWithCenterAndMass, "");
         Assert.Assert(b instanceof PatternWithCenterAndMass, "");
-        
-        aWithCenterAndMass = (PatternWithCenterAndMass)a;
-        bWithCenterAndMass = (PatternWithCenterAndMass)b;
-        
-        diff = sub(aWithCenterAndMass.clusterCenter, bWithCenterAndMass.clusterCenter);
-        distance = (float)Math.sqrt(diff.x*diff.x + diff.y*diff.y);
+
+        PatternWithCenterAndMass aWithCenterAndMass = (PatternWithCenterAndMass) a;
+        PatternWithCenterAndMass bWithCenterAndMass = (PatternWithCenterAndMass) b;
+
+        Vector2d<Float> diff = sub(aWithCenterAndMass.clusterCenter, bWithCenterAndMass.clusterCenter);
+        float distance = (float) Math.sqrt(diff.x * diff.x + diff.y * diff.y);
         
         if( distance > absoluteClusteringDistance )
         {
             return 0.0f;
         }
-        
-        absoluteMaximalDistanceForNullRating = absoluteClusteringDistance*(1.0f/clusteringThreshold);
+
+        float absoluteMaximalDistanceForNullRating = absoluteClusteringDistance * (1.0f / clusteringThreshold);
         return 1.0f - (distance / absoluteMaximalDistanceForNullRating);
     }
     

@@ -123,9 +123,8 @@ public enum DebugDrawingHelper {
         @Override
         public void drawRetinaPrimitives(Graphics2D graphics2D, RetinaPrimitive[] primitives) {
             for( RetinaPrimitive iterationRetinaPrimitive : primitives ) {
-                SingleLineDetector iterationDetector;
 
-                iterationDetector = iterationRetinaPrimitive.line;
+                SingleLineDetector iterationDetector = iterationRetinaPrimitive.line;
 
                 final ArrayRealVector aProjectedFloat = iterationDetector.a;
                 final ArrayRealVector bProjectedFloat = iterationDetector.b;
@@ -175,13 +174,12 @@ public enum DebugDrawingHelper {
 
         for( Node iterationNode : objectNodes ) {
             for( Link iterationLink : iterationNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
-                PlatonicPrimitiveInstanceNode platonicPrimitiveInstance;
 
                 if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
                     continue;
                 }
 
-                platonicPrimitiveInstance = (PlatonicPrimitiveInstanceNode)iterationLink.target;
+                PlatonicPrimitiveInstanceNode platonicPrimitiveInstance = (PlatonicPrimitiveInstanceNode) iterationLink.target;
 
                 if( !platonicPrimitiveInstance.primitiveNode.equals(networkHandles.barycenterPlatonicPrimitiveNode) ) {
                     continue;
@@ -192,13 +190,12 @@ public enum DebugDrawingHelper {
                 double barycenterY = 0.0f;
 
                 for( Link iterationLink2 : platonicPrimitiveInstance.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
-                    FeatureNode featureNode;
 
                     if( iterationLink2.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() ) {
                         continue;
                     }
 
-                    featureNode = (FeatureNode)iterationLink2.target;
+                    FeatureNode featureNode = (FeatureNode) iterationLink2.target;
 
                     if( featureNode.featureTypeNode.equals(networkHandles.xCoordinatePlatonicPrimitiveNode) ) {
                         barycenterX = featureNode.getValueAsFloat();

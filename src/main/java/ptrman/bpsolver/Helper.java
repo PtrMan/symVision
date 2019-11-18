@@ -47,12 +47,11 @@ public enum Helper {
     }
 
     public static boolean isNeightborhoodPixelSet(Vector2d<Integer> position, IMap2d<Boolean> image) {
-        Vector2d<Integer> min, max;
 
-        final int SEARCHRADIUS = HardParameters.ProcessE.NEIGHTBORHOODSEARCHRADIUS;
+		final int SEARCHRADIUS = HardParameters.ProcessE.NEIGHTBORHOODSEARCHRADIUS;
 
-        min = new Vector2d<>(Math.max(0, position.x - SEARCHRADIUS), Math.max(0, position.y - SEARCHRADIUS));
-        max = new Vector2d<>(Math.min(image.getWidth()-1, position.x + SEARCHRADIUS), Math.min(image.getLength()-1, position.y + SEARCHRADIUS));
+		Vector2d<Integer> min = new Vector2d<>(Math.max(0, position.x - SEARCHRADIUS), Math.max(0, position.y - SEARCHRADIUS));
+		Vector2d<Integer> max = new Vector2d<>(Math.min(image.getWidth() - 1, position.x + SEARCHRADIUS), Math.min(image.getLength() - 1, position.y + SEARCHRADIUS));
 
         final int miny = min.y;
         final int minx = min.x;

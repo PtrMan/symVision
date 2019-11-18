@@ -16,10 +16,8 @@ public enum Gaussian
 	public static float calculateGaussianDistribution(float x, float mu, float delta)
     {
         final float ONEDIVSQRTTWO = 0.707107f; // 1.0 / Sqrt(2.0)
-        
-        float distToMean;
 
-        distToMean = x - mu;
+		float distToMean = x - mu;
         return ONEDIVSQRTTWO * delta * gaussianExponentTerm(distToMean,delta);
     }
 
@@ -31,15 +29,11 @@ public enum Gaussian
      */
     public static float calculateMarrWavelet(float x, float y, float delta)
     {
-        float distToMean;
-        float factorA;
-        float factorB;
-        float gaussianTerm;
 
-        distToMean = x * x + y * y;
-        factorA = -1.0f / ((float)java.lang.Math.PI * delta * delta * delta * delta);
-        factorB = 1.0f - distToMean / (2.0f * delta * delta);
-        gaussianTerm = gaussianExponentTerm(distToMean,delta);
+		float distToMean = x * x + y * y;
+		float factorA = -1.0f / ((float) Math.PI * delta * delta * delta * delta);
+		float factorB = 1.0f - distToMean / (2.0f * delta * delta);
+		float gaussianTerm = gaussianExponentTerm(distToMean, delta);
         return factorA * factorB * gaussianTerm;
     }
 

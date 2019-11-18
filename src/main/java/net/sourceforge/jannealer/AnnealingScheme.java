@@ -181,7 +181,6 @@ public class AnnealingScheme
 		
 		Schedule schedule = new Schedule(this);
 		SimplexList simplexList = new SimplexList(ITOL);
-		Simplex simplex;
 		schedule.initializeP();
 		
 		schedule.setPDiagonal();
@@ -200,11 +199,10 @@ public class AnnealingScheme
 			}
 		}
 
-		simplex =
-			new Simplex(
-				schedule.getPb(),
-				schedule.getYb(),
-				function.getNdim());
+		Simplex simplex = new Simplex(
+			schedule.getPb(),
+			schedule.getYb(),
+			function.getNdim());
 		simplexList.add(simplex);
 		setOffsetFromSimplex(simplexList.getMinSimplex().getVertex());
 	}

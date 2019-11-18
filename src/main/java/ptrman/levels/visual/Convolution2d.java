@@ -21,15 +21,13 @@ public enum Convolution2d
 
 	public static IMap2d<Float> convolution(IMap2d<Float> input, IMap2d<Float> inputKernel)
     {
-        float[][] inputAsMatrix, kernelAsMatrix;
-        IMap2d<Float> resultMap;
-        int x, y;
+		int x, y;
         int i;
 
-        inputAsMatrix = convertMapToArray(input);
-        kernelAsMatrix = convertMapToArray(inputKernel);
+		float[][] inputAsMatrix = convertMapToArray(input);
+		float[][] kernelAsMatrix = convertMapToArray(inputKernel);
 
-        resultMap = new Map2d<>(input.getWidth(), input.getLength());
+		IMap2d<Float> resultMap = new Map2d<>(input.getWidth(), input.getLength());
 
         // TODO optimize for cpu? (opencl is senseless)
         for( i = 0; i < input.getWidth()*input.getLength(); i++ )
@@ -41,9 +39,8 @@ public enum Convolution2d
         {
             for( x = 0; x < input.getWidth() - inputKernel.getWidth(); x++ )
             {
-                float value;
 
-                value = convolutionAt(inputAsMatrix, kernelAsMatrix, x, y);
+				float value = convolutionAt(inputAsMatrix, kernelAsMatrix, x, y);
                 resultMap.setAt(x, y, value);
             }
         }
@@ -53,10 +50,9 @@ public enum Convolution2d
 
     private static float convolutionAt(float[][] input, float[][] kernel, int startX, int startY)
     {
-        float result;
-        int x, y;
+		int x, y;
 
-        result = 0.0f;
+		float result = 0.0f;
 
         for( y = 0; y < kernel.length; y++ )
         {
@@ -71,10 +67,9 @@ public enum Convolution2d
 
     private static float[][] convertMapToArray(IMap2d<Float> map)
     {
-        float[][] result;
-        int x, y;
+		int x, y;
 
-        result = new float[map.getWidth()][map.getLength()];
+		float[][] result = new float[map.getWidth()][map.getLength()];
 
         for( y = 0; y < map.getWidth(); y++ )
         {

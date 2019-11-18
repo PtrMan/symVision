@@ -358,18 +358,13 @@ public class ProcessD implements IProcess {
      * works by counting the "overlapping" pixel coordinates, chooses the axis with the less overlappings
      */
     private static RegressionForLineResult calcRegressionForPoints(List<ArrayRealVector> positions) {
-        SimpleRegression regression;
 
-        int overlappingPixelsOnX, overlappingPixelsOnY;
+        int overlappingPixelsOnX = calcCountOfOverlappingPixelsForAxis(positions, EnumAxis.X);
+        int overlappingPixelsOnY = calcCountOfOverlappingPixelsForAxis(positions, EnumAxis.Y);
 
-        RegressionForLineResult regressionResultForLine;
+        SimpleRegression regression = new SimpleRegression();
 
-        overlappingPixelsOnX = calcCountOfOverlappingPixelsForAxis(positions, EnumAxis.X);
-        overlappingPixelsOnY = calcCountOfOverlappingPixelsForAxis(positions, EnumAxis.Y);
-
-        regression = new SimpleRegression();
-
-        regressionResultForLine = new RegressionForLineResult();
+        RegressionForLineResult regressionResultForLine = new RegressionForLineResult();
 
         if (overlappingPixelsOnX <= overlappingPixelsOnY) {
             // regression on x axis

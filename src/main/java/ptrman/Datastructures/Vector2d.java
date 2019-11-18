@@ -100,10 +100,9 @@ public class Vector2d<Type extends Number>
         
         public static Vector2d<Float> normalize(Vector2d<Float> vector)
         {
-            float length, invLength;
-            
-            length = getLength(vector);
-            invLength = 1.0f/length;
+
+            float length = getLength(vector);
+            float invLength = 1.0f / length;
             return new Vector2d<>(vector.xFloat() * invLength, vector.yFloat() * invLength);
         }
         

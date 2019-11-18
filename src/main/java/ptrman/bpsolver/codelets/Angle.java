@@ -61,9 +61,8 @@ public class Angle extends SolverCodelet {
 
     @Override
     public SolverCodelet cloneObject() {
-        Angle cloned;
-        
-        cloned = new Angle(bpSolver);
+
+        Angle cloned = new Angle(bpSolver);
         return cloned;
     }
 
@@ -131,13 +130,12 @@ public class Angle extends SolverCodelet {
     
     private PointProximityStrategy.Crosspoint.EnumAnglePointType getAnglePointType(final PlatonicPrimitiveInstanceNode anglePointNode) {
         for( Link iterationLink : anglePointNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
-            AttributeNode targetAttributeNode;
-            
+
             if( iterationLink.target.type != NodeTypes.EnumType.ATTRIBUTENODE.ordinal() ) {
                 continue;
             }
-            
-            targetAttributeNode = (AttributeNode)iterationLink.target;
+
+            AttributeNode targetAttributeNode = (AttributeNode) iterationLink.target;
             
             if( !targetAttributeNode.attributeTypeNode.equals(getNetworkHandles().anglePointFeatureTypePrimitiveNode) ) {
                 continue;
@@ -152,13 +150,12 @@ public class Angle extends SolverCodelet {
     
     private ArrayRealVector getAnglePosition(final PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode) {
         for( Link iterationLink : platonicPrimitiveInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
-            PlatonicPrimitiveInstanceNode targetNode;
-            
+
             if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
                 continue;
             }
-            
-            targetNode = (PlatonicPrimitiveInstanceNode)iterationLink.target;
+
+            PlatonicPrimitiveInstanceNode targetNode = (PlatonicPrimitiveInstanceNode) iterationLink.target;
             
             if( !targetNode.primitiveNode.equals(getNetworkHandles().anglePointPositionPlatonicPrimitiveNode) ) {
                 continue;
@@ -216,9 +213,8 @@ public class Angle extends SolverCodelet {
             }
             
             if( !similarAngleWasFound ) {
-                AngleInformation createdAngleInformation;
-                
-                createdAngleInformation = new AngleInformation(angle, 1);
+
+                AngleInformation createdAngleInformation = new AngleInformation(angle, 1);
                 resultAngleInformation.add(createdAngleInformation);
             }
         }
@@ -234,10 +230,8 @@ public class Angle extends SolverCodelet {
         if( isKpoint == EnumIsKPoint.YES && numberOfCombinations > KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE ) {
             // NOTE PERFORMANCE< the Fisher yades algorithm is maybe too slow, future will tell >
             // NOTE< selection policy could be better, we measure only one angle per partner, could be many >
-            
-            TruncatedFisherYades truncatedFisherYades;
-            
-            truncatedFisherYades = new TruncatedFisherYades((anglePartners.size()*anglePartners.size() - anglePartners.size()) / 2, new GeneratorImplementation());
+
+            TruncatedFisherYades truncatedFisherYades = new TruncatedFisherYades((anglePartners.size() * anglePartners.size() - anglePartners.size()) / 2, new GeneratorImplementation());
             
             for( int i = 0; i < KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE; i++) {
                 final Tuple<Integer> indices = (Tuple<Integer>)truncatedFisherYades.takeOne(random);

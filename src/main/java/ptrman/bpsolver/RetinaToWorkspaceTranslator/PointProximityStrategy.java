@@ -47,11 +47,9 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
      */
     @Override
     public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver) {
-        ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints;
         HashMap<Integer, PlatonicPrimitiveInstanceNode> objectNodesByGroupId;
-        ArrayList<Node> resultNodes;
-        
-        retinaObjectsWithAssociatedPoints = new ArrayList<>();
+
+        ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints = new ArrayList<>();
         
         for( RetinaPrimitive iterationPrimitive : primitives ) {
             retinaObjectsWithAssociatedPoints.add(associatePointsToRetinaPrimitive(iterationPrimitive));
@@ -59,16 +57,15 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         
         ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints = createAndPropagateRetinaLevelObjects(retinaObjectsWithAssociatedPoints);
         ArrayList<ObjectNodeWithGroup> objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints = createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(groupsOfRetinaObjectsWithAssociatedPoints, bpSolver.coderack, bpSolver.network, bpSolver.networkHandles, bpSolver.codeletLtmLookup, bpSolver, bpSolver.getImageSizeAsFloat());
-        resultNodes = getNodesOfNodeAndGroupOfRetinaObject(objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints);
+        ArrayList<Node> resultNodes = getNodesOfNodeAndGroupOfRetinaObject(objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints);
         return resultNodes;
     }
     
     
     
     private static ArrayList<Node> getNodesOfNodeAndGroupOfRetinaObject(Iterable<ObjectNodeWithGroup> objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints) {
-        ArrayList<Node> resultArray;
-        
-        resultArray = new ArrayList<>();
+
+        ArrayList<Node> resultArray = new ArrayList<>();
         
         for( ObjectNodeWithGroup iterationObjectNodeWithGroup : objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints ) {
             resultArray.add(iterationObjectNodeWithGroup.objectNode);
@@ -78,19 +75,16 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     }
     
     private ArrayList<ObjectNodeWithGroup> createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(Iterable<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Solver bpSolver, Vector2d<Float> imageSize) {
-        ArrayList<ObjectNodeWithGroup> resultObjectNodesWithGroup;
-        
-        resultObjectNodesWithGroup = new ArrayList<>();
+
+        ArrayList<ObjectNodeWithGroup> resultObjectNodesWithGroup = new ArrayList<>();
         
         for( GroupOfRetinaObjectWithAssociatedPoints iterationGroupOfRetinaObjectWithAssociatedPoints : groupsOfRetinaObjectsWithAssociatedPoints ) {
-            PlatonicPrimitiveInstanceNode objectNode;
-            ObjectNodeWithGroup objectNodeWithGroup;
-            
-            objectNode = new PlatonicPrimitiveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
+
+            PlatonicPrimitiveInstanceNode objectNode = new PlatonicPrimitiveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
             createPlatonicInstanceNodeForRetinaObjectsAndLinkToParent(iterationGroupOfRetinaObjectWithAssociatedPoints.arrayOfRetinaObjectWithAssociatedPoints, objectNode, coderack, network, networkHandles, codeletLtmLookup);
             createAndLinkAnglePointsAndLink(iterationGroupOfRetinaObjectWithAssociatedPoints.arrayOfRetinaObjectWithAssociatedPoints, coderack, network, networkHandles, codeletLtmLookup, bpSolver, imageSize);
-            
-            objectNodeWithGroup = new ObjectNodeWithGroup();
+
+            ObjectNodeWithGroup objectNodeWithGroup = new ObjectNodeWithGroup();
             objectNodeWithGroup.groupOfRetinaObjects = iterationGroupOfRetinaObjectWithAssociatedPoints;
             objectNodeWithGroup.objectNode = objectNode;
             
@@ -102,13 +96,12 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     
     
     private void createAndLinkAnglePointsAndLink(List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Solver bpSolver, Vector2d<Float> imageSize) {
-        SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects;
-        
+
         // TODO< hard parameters >
         final int GRIDCOUNTX = 10;
         final int GRIDCOUNTY = 10;
-        
-        spatialAccelerationForCrosspointsWithMappingOfRetinaObjects = new SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects();
+
+        SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects = new SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects();
         spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints = new SpatialAcceleration<>(GRIDCOUNTX, GRIDCOUNTY, imageSize.x, imageSize.y);
         
         storeRetinaObjectWithAssocIntoMap(arrayOfRetinaObjectWithAssociatedPoints, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
@@ -118,9 +111,8 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     }
     
     private static List<RetinaPrimitive> getRetinaPrimitivesOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints) {
-        List<RetinaPrimitive> resultRetinaPrimitives;
-        
-        resultRetinaPrimitives = new ArrayList<>();
+
+        List<RetinaPrimitive> resultRetinaPrimitives = new ArrayList<>();
         
         for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject : arrayOfRetinaObjectWithAssociatedPoints ) {
             resultRetinaPrimitives.add(iterationRetinaObject.primitive);
@@ -140,9 +132,8 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     
     private void bundleAllIntersections(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, Iterable<RetinaPrimitive> listOfRetinaPrimitives) {
         for( RetinaPrimitive iterationRetinaPrimitive : listOfRetinaPrimitives ) {
-            List<Intersection> intersections;
-            
-            intersections = iterationRetinaPrimitive.getIntersections();
+
+            List<Intersection> intersections = iterationRetinaPrimitive.getIntersections();
             
             // we store the intersectionposition and the intersectionpartners
             
@@ -150,10 +141,8 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
                 final List<SpatialAcceleration<Crosspoint>.Element> crosspointsAtPosition = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getElementsNearPoint(iterationIntersection.intersectionPosition, 1000.0f /* TODO const */);
                 
                 if( crosspointsAtPosition.isEmpty() ) {
-                    SpatialAcceleration<Crosspoint>.Element createdCrosspointElement;
-                    RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssoc;
-                    
-                    createdCrosspointElement = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.new Element();
+
+                    SpatialAcceleration<Crosspoint>.Element createdCrosspointElement = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.new Element();
                     createdCrosspointElement.data = new Crosspoint();
                     createdCrosspointElement.data.position = iterationIntersection.intersectionPosition;
                     createdCrosspointElement.position = iterationIntersection.intersectionPosition;
@@ -169,8 +158,8 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
                     
                     
                     System.out.println("searched " + System.identityHashCode(iterationIntersection.p0.primitive));
-                    
-                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p0.primitive);
+
+                    RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p0.primitive);
                     // we can have intersectionpartners which are not inside
                     // seems to be a bug in clustering or something fishy is going on
                     // TODO< investigate and add here a assert that the assoc can't be null >
@@ -193,12 +182,10 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
                     spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.addElement(createdCrosspointElement);
                 }
                 else {
-                    RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssoc;
-                    SpatialAcceleration<Crosspoint>.Element nearestCrosspointElement;
-                    
-                    nearestCrosspointElement = getNearestCrosspointElement(crosspointsAtPosition, iterationIntersection.intersectionPosition);
-                    
-                    retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p0.primitive);
+
+                    SpatialAcceleration<Crosspoint>.Element nearestCrosspointElement = getNearestCrosspointElement(crosspointsAtPosition, iterationIntersection.intersectionPosition);
+
+                    RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p0.primitive);
                     // TODO SAME
                     // relates propably to BUG 0001
                     if( retinaObjectWithAssoc != null ) {
@@ -242,17 +229,15 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     }
     
     private static void createPlatonicInstanceNodeForRetinaObjectAndLinkToParent(RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject, PlatonicPrimitiveInstanceNode objectNode, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup) {
-        PlatonicPrimitiveInstanceNode createdPlatonicInstanceNodeForRetinaObject;
-        Link createdForwardLink, createdBackwardLink;
-        
-        createdPlatonicInstanceNodeForRetinaObject = createPlatonicInstanceNodeForRetinaObject(iterationRetinaObject.primitive, networkHandles);
+
+        PlatonicPrimitiveInstanceNode createdPlatonicInstanceNodeForRetinaObject = createPlatonicInstanceNodeForRetinaObject(iterationRetinaObject.primitive, networkHandles);
         iterationRetinaObject.workspaceNode = createdPlatonicInstanceNodeForRetinaObject;
         
         // linkage
-        createdForwardLink = network.linkCreator.createLink(Link.EnumType.CONTAINS, createdPlatonicInstanceNodeForRetinaObject);
+        Link createdForwardLink = network.linkCreator.createLink(Link.EnumType.CONTAINS, createdPlatonicInstanceNodeForRetinaObject);
         objectNode.outgoingLinks.add(createdForwardLink);
 
-        createdBackwardLink = network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
+        Link createdBackwardLink = network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
         createdPlatonicInstanceNodeForRetinaObject.outgoingLinks.add(createdBackwardLink);
 
         // add all codelet's of it
@@ -261,24 +246,21 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     }
     
     private ArrayList<GroupOfRetinaObjectWithAssociatedPoints> createAndPropagateRetinaLevelObjects(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints) {
-        ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groups;
         int retinaObjectI;
-        
-        groups = new ArrayList<>();
+
+        ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groups = new ArrayList<>();
         
         groups.add(GroupOfRetinaObjectWithAssociatedPoints.createFromSingleRetinaObject(retinaObjectsWithAssociatedPoints.get(0)));
         
         // we first try to cluster as many RetinaObjects in a lear fashion, after this we try to combine these "mini clusters" to final large clusters
         
         for( retinaObjectI = 1; retinaObjectI < retinaObjectsWithAssociatedPoints.size(); retinaObjectI++ ) {
-            RetinaObjectWithAssociatedPointsAndWorkspaceNode currentRetinaObject;
-            boolean wasIncludedInCluster;
-            
-            
-            currentRetinaObject = retinaObjectsWithAssociatedPoints.get(retinaObjectI);
-            
-            
-            wasIncludedInCluster = false;
+
+
+            RetinaObjectWithAssociatedPointsAndWorkspaceNode currentRetinaObject = retinaObjectsWithAssociatedPoints.get(retinaObjectI);
+
+
+            boolean wasIncludedInCluster = false;
             
             for( GroupOfRetinaObjectWithAssociatedPoints iterationGroup : groups ) {
                 if( iterationGroup.canBeIncludedInCluster(currentRetinaObject) ) {
@@ -302,10 +284,9 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         repeatSearch:
         for( lowerI = 0; lowerI < groups.size(); lowerI++ ) {
             for( upperI = lowerI+1; upperI < groups.size(); upperI++ ) {
-                GroupOfRetinaObjectWithAssociatedPoints lower, upper;
 
-                lower = groups.get(lowerI);
-                upper = groups.get(upperI);
+                GroupOfRetinaObjectWithAssociatedPoints lower = groups.get(lowerI);
+                GroupOfRetinaObjectWithAssociatedPoints upper = groups.get(upperI);
 
                 if( GroupOfRetinaObjectWithAssociatedPoints.shareCommonPoint(lower, upper) ) {
                     lower.append(upper);
@@ -325,14 +306,13 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     }
     
     private static ArrayList<IndexTuple> getRetinaObjectSharedPoints(RetinaObjectWithAssociatedPointsAndWorkspaceNode a, RetinaObjectWithAssociatedPointsAndWorkspaceNode b, float maximalDistance) {
-        ArrayList<IndexTuple> resultIndexTuples;
-        int Ia, Ib;
+        int Ib;
         
         Assert.Assert(!a.equals(b), "must be not the same");
-        
-        resultIndexTuples = new ArrayList<>();
-        
-        Ia = 0;
+
+        ArrayList<IndexTuple> resultIndexTuples = new ArrayList<>();
+
+        int Ia = 0;
         
         for( ArrayRealVector pointFromA : a.pointPositions ) {
             Ib = 0;
@@ -374,9 +354,8 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         }
         
         public static GroupOfRetinaObjectWithAssociatedPoints createFromSingleRetinaObject(RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObject) {
-            GroupOfRetinaObjectWithAssociatedPoints result;
-            
-            result = new GroupOfRetinaObjectWithAssociatedPoints();
+
+            GroupOfRetinaObjectWithAssociatedPoints result = new GroupOfRetinaObjectWithAssociatedPoints();
             result.arrayOfRetinaObjectWithAssociatedPoints.add(retinaObject);
             return result;
         }

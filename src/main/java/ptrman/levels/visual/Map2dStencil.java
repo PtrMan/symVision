@@ -24,9 +24,8 @@ public enum Map2dStencil
         {
             for( ix = 0; ix < input.getLength(); ix++ )
             {
-                int valueAtPosition;
 
-                valueAtPosition = input.readAt(ix, iy);
+                int valueAtPosition = input.readAt(ix, iy);
                 result.setAt(ix, iy, valueAtPosition == value);
             }
         }
@@ -34,17 +33,15 @@ public enum Map2dStencil
 
     static public void stencilValues(Map2d<Integer> input, Map2d<Boolean> result, List<Integer> values, int maxValue)
     {
-        boolean[] stencilBooleanArray;
 
-        stencilBooleanArray = convertValuesToBooleanArray(values, maxValue);
+        boolean[] stencilBooleanArray = convertValuesToBooleanArray(values, maxValue);
         stencilWithBooleanArray(input, result, stencilBooleanArray);
     }
 
     static private boolean[] convertValuesToBooleanArray(List<Integer> values, int maxValue)
     {
-        boolean[] resultArray;
 
-        resultArray = new boolean[maxValue+1];
+        boolean[] resultArray = new boolean[maxValue + 1];
 
         for( int iterationValue : values )
         {
@@ -62,9 +59,8 @@ public enum Map2dStencil
         {
             for( ix = 0; ix < input.getLength(); ix++ )
             {
-                int valueAtPosition;
 
-                valueAtPosition = input.readAt(ix, iy);
+                int valueAtPosition = input.readAt(ix, iy);
                 result.setAt(ix, iy, booleanArray[valueAtPosition]);
             }
         }

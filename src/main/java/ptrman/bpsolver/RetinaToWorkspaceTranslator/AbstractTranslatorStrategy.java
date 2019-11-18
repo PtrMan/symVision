@@ -73,11 +73,10 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
     }
     
     protected RetinaObjectWithAssociatedPointsAndWorkspaceNode associatePointsToRetinaPrimitive(RetinaPrimitive primitive) {
-        RetinaObjectWithAssociatedPointsAndWorkspaceNode resultAssosciation;
-        
+
         Assert.Assert(primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "only implemented for linesegment");
-        
-        resultAssosciation = new RetinaObjectWithAssociatedPointsAndWorkspaceNode(primitive);
+
+        RetinaObjectWithAssociatedPointsAndWorkspaceNode resultAssosciation = new RetinaObjectWithAssociatedPointsAndWorkspaceNode(primitive);
         resultAssosciation.pointPositions = new ArrayList<>();
         resultAssosciation.pointPositions.add(primitive.line.getAProjected());
         resultAssosciation.pointPositions.add(primitive.line.getBProjected());
@@ -210,42 +209,32 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
     
     protected static void createLinksAndNodesForAnglePoints(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, Solver bpSolver) {
         for( SpatialAcceleration<Crosspoint>.Element currentElement : spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getContentOfAllCells() ) {
-            Crosspoint crosspoint;
-            
-            crosspoint = currentElement.data;
-            
-            PlatonicPrimitiveInstanceNode createdAnglePointNode;
-            AttributeNode createdAnglePointAttributeNode;
-            Link createdFeatureTypeNodeLink;
-            Link createdPositionLink;
-            PlatonicPrimitiveInstanceNode createdAnglePointPosition;
-            
-            createdAnglePointNode = new PlatonicPrimitiveInstanceNode(bpSolver.networkHandles.anglePointNodePlatonicPrimitiveNode);
+
+            Crosspoint crosspoint = currentElement.data;
+
+            PlatonicPrimitiveInstanceNode createdAnglePointNode = new PlatonicPrimitiveInstanceNode(bpSolver.networkHandles.anglePointNodePlatonicPrimitiveNode);
             // add codelets
             bpSolver.codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdAnglePointNode, bpSolver.coderack, bpSolver.network, bpSolver.networkHandles);
             
             // linkage
             for(  Crosspoint.RetinaObjectWithAssocWithIntersectionType iterationRetinaObjectWithAssoc : crosspoint.adjacentRetinaObjects ) {
-                Node workspaceNode;
-                Link createdBackwardLink, createdForwardLink;
-                
-                workspaceNode = iterationRetinaObjectWithAssoc.retinaObjectWithAssociatedPointsAndWorkspaceNode.workspaceNode;
-                
-                createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, workspaceNode);
+
+                Node workspaceNode = iterationRetinaObjectWithAssoc.retinaObjectWithAssociatedPointsAndWorkspaceNode.workspaceNode;
+
+                Link createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, workspaceNode);
                 createdAnglePointNode.outgoingLinks.add(createdForwardLink);
 
-                createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASNODE, createdAnglePointNode);
+                Link createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASNODE, createdAnglePointNode);
                 workspaceNode.outgoingLinks.add(createdBackwardLink);
             }
-            
-            
-            
-            createdAnglePointAttributeNode = AttributeNode.createIntegerNode(bpSolver.networkHandles.anglePointFeatureTypePrimitiveNode, crosspoint.type.ordinal());
-            createdFeatureTypeNodeLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointAttributeNode);
+
+
+            AttributeNode createdAnglePointAttributeNode = AttributeNode.createIntegerNode(bpSolver.networkHandles.anglePointFeatureTypePrimitiveNode, crosspoint.type.ordinal());
+            Link createdFeatureTypeNodeLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointAttributeNode);
             createdAnglePointNode.outgoingLinks.add(createdFeatureTypeNodeLink);
-            
-            createdAnglePointPosition = HelperFunctions.createVectorAttributeNode(crosspoint.position, bpSolver.networkHandles.anglePointPositionPlatonicPrimitiveNode, bpSolver);
-            createdPositionLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointPosition);
+
+            PlatonicPrimitiveInstanceNode createdAnglePointPosition = HelperFunctions.createVectorAttributeNode(crosspoint.position, bpSolver.networkHandles.anglePointPositionPlatonicPrimitiveNode, bpSolver);
+            Link createdPositionLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointPosition);
             createdAnglePointNode.outgoingLinks.add(createdPositionLink);
         }
     }
@@ -258,9 +247,8 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
     
     protected static PlatonicPrimitiveInstanceNode createPlatonicInstanceNodeForRetinaObject(RetinaPrimitive primitive, NetworkHandles networkHandles) {
         if( primitive.type == ptrman.levels.retina.RetinaPrimitive.EnumType.LINESEGMENT ) {
-            PlatonicPrimitiveInstanceNode createdLineNode;
-            
-            createdLineNode = new PlatonicPrimitiveInstanceNode(networkHandles.lineSegmentPlatonicPrimitiveNode);
+
+            PlatonicPrimitiveInstanceNode createdLineNode = new PlatonicPrimitiveInstanceNode(networkHandles.lineSegmentPlatonicPrimitiveNode);
             createdLineNode.p1 = primitive.line.getAProjected();
             createdLineNode.p2 = primitive.line.getBProjected();
             

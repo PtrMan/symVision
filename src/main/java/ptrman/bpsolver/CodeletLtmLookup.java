@@ -47,27 +47,22 @@ public class CodeletLtmLookup
     
     public void lookupAndPutCodeletsAtCoderackForPrimitiveNode(Node node, Coderack coderack, Network ltm, NetworkHandles networkHandles)
     {
-        PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode;
-        PlatonicPrimitiveNode currentLtmNodeForPrimitiveNode;
-        
+
         // lookup ltmNodeForNode
         Assert.Assert(node.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "Must be a PLATONICPRIMITIVEINSTANCENODE node");
-        
-        platonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode)node;
-        currentLtmNodeForPrimitiveNode = platonicPrimitiveInstanceNode.primitiveNode;
+
+        PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode) node;
+        PlatonicPrimitiveNode currentLtmNodeForPrimitiveNode = platonicPrimitiveInstanceNode.primitiveNode;
         
 
         
         for(;;)
         {
-            boolean continueIsaRelationshipWalk;
-            
+
             // we search for all "HAS" nodes and instantiate the codelets
             
             for( Link iterationLink : currentLtmNodeForPrimitiveNode.outgoingLinks )
             {
-                PlatonicPrimitiveNode currentAttributePrimitiveNode;
-                RegisterEntry registerEntry;
 
                 if( iterationLink.type != ptrman.FargGeneral.network.Link.EnumType.HASFEATURE )
                 {
@@ -80,7 +75,7 @@ public class CodeletLtmLookup
                 }
                 // we are here if the link is HAS and the type of the linked node is PLATONICPRIMITIVENODE
 
-                currentAttributePrimitiveNode = (PlatonicPrimitiveNode)iterationLink.target;
+                PlatonicPrimitiveNode currentAttributePrimitiveNode = (PlatonicPrimitiveNode) iterationLink.target;
                 
                 // try to lookup the codelet
                 if( currentAttributePrimitiveNode.codeletKey == null )
@@ -88,12 +83,12 @@ public class CodeletLtmLookup
                     continue;
                 }
 
-                registerEntry = registry.get(currentAttributePrimitiveNode.codeletKey);
+                RegisterEntry registerEntry = registry.get(currentAttributePrimitiveNode.codeletKey);
 
                 instantiateAllCodeletsForWorkspaceNode(node, coderack, registerEntry.codeletInformations);
             }
-            
-            continueIsaRelationshipWalk = false;
+
+            boolean continueIsaRelationshipWalk = false;
             
             // search for a ISA node
             for( Link iterationLink : currentLtmNodeForPrimitiveNode.outgoingLinks )
@@ -119,9 +114,8 @@ public class CodeletLtmLookup
     {
         for( RegisterEntry.CodeletInformation iterationCodeletInformation : codeletInformations )
         {
-            SolverCodelet clonedCodelet;
-            
-            clonedCodelet = iterationCodeletInformation.templateCodelet.cloneObject();
+
+            SolverCodelet clonedCodelet = iterationCodeletInformation.templateCodelet.cloneObject();
             clonedCodelet.setStartNode(workspaceNode);
             
             coderack.enqueue(clonedCodelet, iterationCodeletInformation.priority);

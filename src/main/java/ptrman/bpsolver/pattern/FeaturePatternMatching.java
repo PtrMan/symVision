@@ -57,9 +57,8 @@ public class FeaturePatternMatching {
 
         @Override
         public float calculate(List<MatchingPathElement> matchingPathElements) {
-            float result;
 
-            result = 1.0f;
+            float result = 1.0f;
 
             for( MatchingPathElement iterationMatchingPathElement : matchingPathElements ) {
                 result *= iterationMatchingPathElement.similarityValue;
@@ -132,9 +131,8 @@ public class FeaturePatternMatching {
     // see foundalis disertation 8.2.3 to see how it is compared
     public float matchAnyNonRecursive(Node nodeA, Node nodeB, NetworkHandles networkHandles) {
         // the type is FeatureNode.featureTypeNode
-        // only if two elements are in the array the type is 
-        Map<Node, ArrayList<FeatureNode>> featureNodesByType;
-        
+        // only if two elements are in the array the type is
+
         // check that the nodes are PlatonicOrimitiveInstanceNode's
         // this can be removed if we need functionality which isn't constrained that way
         // for now its enought
@@ -146,8 +144,8 @@ public class FeaturePatternMatching {
         if( !( ((PlatonicPrimitiveInstanceNode)nodeA).primitiveNode.equals(((PlatonicPrimitiveInstanceNode)nodeB).primitiveNode) ) ) {
             return 0.0f;
         }
-        
-        featureNodesByType = new HashMap<>();
+
+        Map<Node, ArrayList<FeatureNode>> featureNodesByType = new HashMap<>();
         
         getAllFeatureNodesAndAddToMap(nodeA, featureNodesByType);
         getAllFeatureNodesAndAddToMap(nodeB, featureNodesByType);
@@ -159,9 +157,8 @@ public class FeaturePatternMatching {
     // TODO< recurse until reach of lower bound >
     // recursive until lower bound
     public List<MatchingPathElement> matchAnyRecursive(Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist, int maxDepth) {
-        List<MatchingPathElement> resultMatchingPath;
 
-        resultMatchingPath = new ArrayList<>();
+        List<MatchingPathElement> resultMatchingPath = new ArrayList<>();
 
         matchAnyRecursiveInternal(resultMatchingPath, nodeA, nodeB, networkHandles, linkWhitelist, maxDepth, 1);
 
@@ -170,9 +167,8 @@ public class FeaturePatternMatching {
 
     // helper for calculate rating with strategy
     public static float calculateRatingWithDefaultStrategy(List<MatchingPathElement> matchingPathElements) {
-        IMatchingPathRatingStrategy strategy;
 
-        strategy = new MultiplyMatchingPathRatingStrategy();
+        IMatchingPathRatingStrategy strategy = new MultiplyMatchingPathRatingStrategy();
 
         return strategy.calculate(matchingPathElements);
     }
@@ -180,32 +176,28 @@ public class FeaturePatternMatching {
 
     private void matchAnyRecursiveInternal(List<MatchingPathElement> resultMatchingPath, Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist, int maxDepth, int currentDepth) {
         int linkIndexA, linkIndexB;
-        MatchingPathElement bestMatchingPathElement;
 
         if( currentDepth >= maxDepth ) {
             return;
         }
 
-        bestMatchingPathElement = new MatchingPathElement();
+        MatchingPathElement bestMatchingPathElement = new MatchingPathElement();
         bestMatchingPathElement.bestMatchNodeAIndex = -1;
         bestMatchingPathElement.bestMatchNodeBIndex = -1;
         bestMatchingPathElement.similarityValue = 0.0f;
 
         for( linkIndexA = 0; linkIndexA < nodeA.outgoingLinks.size(); linkIndexA++ ) {
             for( linkIndexB = 0; linkIndexB < nodeB.outgoingLinks.size(); linkIndexB++ ) {
-                Link linkA, linkB;
-                float currentDistance;
-                float currentSimilarity;
 
-                linkA = nodeA.outgoingLinks.get(linkIndexA);
-                linkB = nodeB.outgoingLinks.get(linkIndexB);
+                Link linkA = nodeA.outgoingLinks.get(linkIndexA);
+                Link linkB = nodeB.outgoingLinks.get(linkIndexB);
 
                 if( !doesLinkTypeListContainType(linkWhitelist, linkA.type) || !doesLinkTypeListContainType(linkWhitelist, linkB.type) ) {
                     continue;
                 }
 
-                currentDistance = matchAnyNonRecursive(linkA.target, linkB.target, networkHandles);
-                currentSimilarity = FeaturePatternMatching.Converter.distanceToSimilarity(currentDistance);
+                float currentDistance = matchAnyNonRecursive(linkA.target, linkB.target, networkHandles);
+                float currentSimilarity = Converter.distanceToSimilarity(currentDistance);
 
                 if( currentSimilarity > bestMatchingPathElement.similarityValue) {
                     bestMatchingPathElement.similarityValue = currentSimilarity;
@@ -236,10 +228,9 @@ public class FeaturePatternMatching {
      * 
      */
     private float matchAndWeightFeatureNodesByType(Map<Node, ArrayList<FeatureNode>> featureNodesByType,  NetworkHandles networkHandles) {
-        float weightSum, upperSum;
-        
-        weightSum = 0.0f;
-        upperSum = 0.0f;
+
+        float weightSum = 0.0f;
+        float upperSum = 0.0f;
         
         if( featureNodesByType.keySet().isEmpty() ) {
             return 0.0f;
@@ -247,9 +238,8 @@ public class FeaturePatternMatching {
         
         for(Map.Entry<Node, ArrayList<FeatureNode>> nodeArrayListEntry : featureNodesByType.entrySet()) {
             double featureDistance;
-            ArrayList<FeatureNode> featureNodesForType;
-            
-            featureNodesForType = nodeArrayListEntry.getValue();
+
+            ArrayList<FeatureNode> featureNodesForType = nodeArrayListEntry.getValue();
             
             if( featureNodesForType.size() == 2 ) {
                 featureDistance = matchSameTypeNonNumerosity(featureNodesForType.get(0).statistics, featureNodesForType.get(1).statistics);
@@ -280,21 +270,19 @@ public class FeaturePatternMatching {
         final List<Link> attributeLinksFromNode = node.getLinksByType(Link.EnumType.HASATTRIBUTE);
         
         for( Link iterationAttributeLink : attributeLinksFromNode ) {
-            FeatureNode targetFeatureNode;
 
             if( iterationAttributeLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() ) {
                 continue;
             }
-            
-            targetFeatureNode = (FeatureNode)iterationAttributeLink.target;
+
+            FeatureNode targetFeatureNode = (FeatureNode) iterationAttributeLink.target;
             
             if( featureNodesByType.containsKey(targetFeatureNode.featureTypeNode) ) {
                 featureNodesByType.get(targetFeatureNode.featureTypeNode).add(targetFeatureNode);
             }
             else {
-                ArrayList<FeatureNode> createdFeatureNodeList;
-                
-                createdFeatureNodeList = new ArrayList<>(1);
+
+                ArrayList<FeatureNode> createdFeatureNodeList = new ArrayList<>(1);
                 createdFeatureNodeList.add(targetFeatureNode);
                 featureNodesByType.put(targetFeatureNode.featureTypeNode, createdFeatureNodeList);
             }
@@ -313,34 +301,28 @@ public class FeaturePatternMatching {
     }
     
     private float matchSameTypeNumerosityWithBothNumberOfObservationsEquals1(FeatureStatistics f1, int numeriosity1, FeatureStatistics f2, int numeriosity2) {
-        float z;
-        float l, s;
-        
-        l = Math.max(numeriosity1, numeriosity2);
-        s = Math.min(numeriosity1, numeriosity2);
-        
-        z = Math.abs(l-s)/(SIGMAZERO*(float)Math.sqrt(l+s));
+
+        float l = Math.max(numeriosity1, numeriosity2);
+        float s = Math.min(numeriosity1, numeriosity2);
+
+        float z = Math.abs(l - s) / (SIGMAZERO * (float) Math.sqrt(l + s));
         
         return calcNumeriosityD(z);
     }
     
     // maybe this is wrong implemented
     private float matchSameTypeNumerosityWithF1Equals1(FeatureStatistics f1, int numeriosity1, FeatureStatistics f2, int numeriosity2) {
-        float z;
-        double insideSqrt;
-        
-        insideSqrt = SIGMAZERO*SIGMAZERO*f1.getMean() + Maths.power2(f2.getStandardDeviation())/ Maths.power2(f2.numberOfObservations);
-        z = (float)(Math.abs(f1.getMean() - f2.getMean())/Math.sqrt(insideSqrt));
+
+        double insideSqrt = SIGMAZERO * SIGMAZERO * f1.getMean() + Maths.power2(f2.getStandardDeviation()) / Maths.power2(f2.numberOfObservations);
+        float z = (float) (Math.abs(f1.getMean() - f2.getMean()) / Math.sqrt(insideSqrt));
         
         return calcNumeriosityD(z);
     }
     
     private float matchSameTypeNumeroistyWithF1AndF2NotEqual1(FeatureStatistics f1, int numeriosity1, FeatureStatistics f2, int numeriosity2) {
-        float z;
-        double insideSqrt;
-        
-        insideSqrt = Maths.power2(f1.getStandardDeviation())/f1.numberOfObservations + Maths.power2(f2.getStandardDeviation())/f2.numberOfObservations;
-        z = (float)(Math.abs(f1.getMean() - f2.getMean())/Math.sqrt(insideSqrt));
+
+        double insideSqrt = Maths.power2(f1.getStandardDeviation()) / f1.numberOfObservations + Maths.power2(f2.getStandardDeviation()) / f2.numberOfObservations;
+        float z = (float) (Math.abs(f1.getMean() - f2.getMean()) / Math.sqrt(insideSqrt));
         
         return calcNumeriosityD(z);
     }
@@ -378,15 +360,13 @@ public class FeaturePatternMatching {
     }
     
     private double calcStudentTDistribution(double n, double t) {
-        
-        
-        float upperIntegral, lowerIntegral;
+
 
         integrateTDistributionUpperIntegral.n = n;
         integrateTDistributionLowerIntegral.n = n;
-        
-        upperIntegral = (float)integrator.integrate(INTEGRATEMAXEVAL, integrateTDistributionUpperIntegral, -t, t);
-        lowerIntegral = (float)integrator.integrate(INTEGRATEMAXEVAL, integrateTDistributionLowerIntegral, 0, 2.0f*Math.PI);
+
+        float upperIntegral = (float) integrator.integrate(INTEGRATEMAXEVAL, integrateTDistributionUpperIntegral, -t, t);
+        float lowerIntegral = (float) integrator.integrate(INTEGRATEMAXEVAL, integrateTDistributionLowerIntegral, 0, 2.0f * Math.PI);
         
         return (upperIntegral)/((float)Math.sqrt(n-1.0f)*lowerIntegral);
     }

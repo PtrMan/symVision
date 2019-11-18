@@ -31,11 +31,9 @@ public class Map2dMapper
             {
                 for( x = 0; x < inputMap.getWidth(); x++ )
                 {
-                    InputType tempInput;
-                    ResultType tempResult;
 
-                    tempInput = inputMap.readAt(x, y);
-                    tempResult = mapperImplementation.calculate(tempInput);
+					InputType tempInput = inputMap.readAt(x, y);
+					ResultType tempResult = mapperImplementation.calculate(tempInput);
                     resultMap.setAt(x, y, tempResult);
                 }
             }

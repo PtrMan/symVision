@@ -26,27 +26,22 @@ public enum Grouping
 
 	public static Set<Pattern> group(Iterable<Pattern> exemplarsSet, float clusteringThreshold, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
     {
-        Set<Pattern> patterns;
-        Set<Pattern> knownExemplars;
-        
-        patterns = new LinkedHashSet<>();
-        knownExemplars = new LinkedHashSet<>();
+
+        Set<Pattern> patterns = new LinkedHashSet<>();
+        Set<Pattern> knownExemplars = new LinkedHashSet<>();
         
         for( Pattern iterationExemplarI : exemplarsSet )
         {
             if( !exemplarIsSimilarToAPattern(iterationExemplarI, patterns, clusteringThreshold, networkHandles, matchingUpdateImplementation, featurePatternMatching) )
             {
-                float maxSimilarity;
-                Pattern closest;
-                
-                maxSimilarity = 0.0f;
-                closest = null;
+
+                float maxSimilarity = 0.0f;
+                Pattern closest = null;
                 
                 for( Pattern iterationExemplarJ : knownExemplars )
                 {
-                    float similarity;
-                    
-                    similarity = match(iterationExemplarJ, iterationExemplarI, matchingUpdateImplementation, networkHandles, featurePatternMatching);
+
+                    float similarity = match(iterationExemplarJ, iterationExemplarI, matchingUpdateImplementation, networkHandles, featurePatternMatching);
                     
                     if( similarity > maxSimilarity )
                     {
@@ -57,9 +52,8 @@ public enum Grouping
                 
                 if( maxSimilarity > clusteringThreshold )
                 {
-                    Pattern createdPattern;
-                    
-                    createdPattern = formPattern(closest, iterationExemplarI, networkHandles, matchingUpdateImplementation, featurePatternMatching);
+
+                    Pattern createdPattern = formPattern(closest, iterationExemplarI, networkHandles, matchingUpdateImplementation, featurePatternMatching);
                     
                     if( !resemblesOneOf(createdPattern, patterns, clusteringThreshold, matchingUpdateImplementation, networkHandles, featurePatternMatching) )
                     {
@@ -80,25 +74,22 @@ public enum Grouping
     
     private static boolean exemplarIsSimilarToAPattern(Pattern exemplar, Collection<Pattern> patterns, float clusteringThreshold, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
     {
-        float maxSimilarity;
-        Pattern closestPattern;
-        
+
         if( patterns.isEmpty() )
         {
             return false;
         }
         // else here
-        
-        maxSimilarity = 0.0f;
-        closestPattern = null; // null means there is none
-        
+
+        float maxSimilarity = 0.0f;
+        Pattern closestPattern = null; // null means there is none
+
         for( Pattern iterationPattern : patterns )
         {
             if( resembles(iterationPattern, exemplar, clusteringThreshold, matchingUpdateImplementation, networkHandles, featurePatternMatching) )
             {
-                float similarity;
-                
-                similarity = match(iterationPattern, exemplar, matchingUpdateImplementation, networkHandles, featurePatternMatching);
+
+                float similarity = match(iterationPattern, exemplar, matchingUpdateImplementation, networkHandles, featurePatternMatching);
                 if( similarity > maxSimilarity )
                 {
                     maxSimilarity = similarity;
@@ -117,9 +108,8 @@ public enum Grouping
     
     private static void update(Pattern orginal, Pattern additional, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
     {
-        Pattern resultPattern;
-        
-        resultPattern = updateCore(orginal, additional, networkHandles, matchingUpdateImplementation, featurePatternMatching);
+
+        Pattern resultPattern = updateCore(orginal, additional, networkHandles, matchingUpdateImplementation, featurePatternMatching);
         orginal.exemplars = resultPattern.exemplars;
     }
     

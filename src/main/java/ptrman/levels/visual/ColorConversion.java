@@ -26,13 +26,10 @@ public enum ColorConversion
         float r;
         float g;
         float b;
-        float c;
-        float x;
-        float m;
-        ptrman.misc.Assert.Assert(input.h >= 0.0f, "");
-        c = 1.0f - Math.abs(2.0f * input.l - 1.0f) * input.s;
-        x = c * (1.0f - (float)Math.abs(((input.h / 0.25f) % 2.0f) - 1.0));
-        m = input.l - c * 0.5f;
+		ptrman.misc.Assert.Assert(input.h >= 0.0f, "");
+		float c = 1.0f - Math.abs(2.0f * input.l - 1.0f) * input.s;
+		float x = c * (1.0f - (float) Math.abs(((input.h / 0.25f) % 2.0f) - 1.0));
+		float m = input.l - c * 0.5f;
         if (input.h < 60.0f / 360.0f)
         {
             r = c;
@@ -77,14 +74,9 @@ public enum ColorConversion
 
     static public ColorHsl rgbToHsl(ColorRgb rgb)
     {
-        ColorHsl result;
-        float min;
-        EnumRgb rgbMin = EnumRgb.R;
-        float max;
-        EnumRgb rgbMax = EnumRgb.R;
-        result = new ColorHsl();
-        rgbMax = EnumRgb.R;
-        max = rgb.r;
+		ColorHsl result = new ColorHsl();
+		EnumRgb rgbMax = EnumRgb.R;
+		float max = rgb.r;
         if (rgb.g > max)
         {
             rgbMax = EnumRgb.G;
@@ -96,9 +88,9 @@ public enum ColorConversion
             rgbMax = EnumRgb.B;
             max = rgb.b;
         }
-         
-        rgbMin = EnumRgb.R;
-        min = rgb.r;
+
+		EnumRgb rgbMin = EnumRgb.R;
+		float min = rgb.r;
         if (rgb.g < min)
         {
             rgbMin = EnumRgb.G;
@@ -119,8 +111,7 @@ public enum ColorConversion
         }
         else
         {
-            float d;
-            d = max - min;
+			float d = max - min;
             result.s = (result.l > 0.5f) ? d / (2.0f - max - min) : d / (max + min);
             if (rgbMax == EnumRgb.R)
             {
