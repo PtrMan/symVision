@@ -242,15 +242,34 @@ public class ProcessD implements IProcess {
         }
 
         /* TODO 16.11.2019 activate this code again because it is necessary as the last step
+        commitLineDetectors();
+         */
+    }
+
+    /**
+     * splits and pushes lines into the output connector
+     *
+     * is the last step when processing a frame
+     */
+    public void commitLineDetectors() {
         // split the detectors into one or many lines
-        final List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(multiplePointsLineDetector);
+        final List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(annealedCandidates);
 
         for (final RetinaPrimitive iterationPrimitive : resultSingleDetectors) {
             outputLineDetectorConnector.add(iterationPrimitive);
         }
+    }
 
-         */
+    private static List<RetinaPrimitive> splitDetectorsIntoLines(List<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints) {
+        List<RetinaPrimitive> result;
 
+        result = new ArrayList<>();
+
+        for (LineDetectorWithMultiplePoints iterationDetector : lineDetectorsWithMultiplePoints) {
+            result.addAll(splitDetectorIntoLines(iterationDetector));
+        }
+
+        return result;
     }
 
     /**

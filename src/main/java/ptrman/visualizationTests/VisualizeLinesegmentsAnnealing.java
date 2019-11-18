@@ -16,6 +16,8 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.IImageDrawer;
 import ptrman.Showcases.TestClustering;
+import ptrman.bindingNars.NarsBinding;
+import ptrman.bindingNars.OpenNarsNarseseConsumer;
 import ptrman.bpsolver.Solver;
 import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
@@ -95,11 +97,17 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
         processD.onlyEndoskeleton = true;
 
         connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+
+        { // create NARS-binding
+            narsBinding = new NarsBinding(new OpenNarsNarseseConsumer());
+        }
     }
 
     final ProcessD processD;
     ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
     ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
+
+    public NarsBinding narsBinding;
 
     int frameCounter = 0;
 
@@ -208,6 +216,8 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             processC.setImageSize(imageSize);
             processC.setup();
 
+            connectorDetectorsEndosceletonFromProcessD = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+
             processD.setImageSize(imageSize);
             connectorSamplesForEndosceleton = conntrSamplesFromProcessC0;
             processD.set(connectorSamplesForEndosceleton, connectorDetectorsEndosceletonFromProcessD);
@@ -239,6 +249,14 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             if (annealingStep >= 20) { // remove only in later phases
                 processD.removeCandidatesBelowActivation(1.1);
+            }
+
+            if (annealingStep == 30-1-1) {// is last step?
+                // then emit narsese to narsese consumer
+
+                processD.commitLineDetectors(); // split line detectors into "real" primitives
+
+                narsBinding.emitRetinaPrimitives(connectorDetectorsEndosceletonFromProcessD.workspace); // emit all collected primitives from process D
             }
 
             annealingStep++;
