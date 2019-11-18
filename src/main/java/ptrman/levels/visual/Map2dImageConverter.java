@@ -20,21 +20,15 @@ public enum Map2dImageConverter
 {
 	;
 
-	public static IMap2d<ColorRgb> convertImageToMap(BufferedImage image)
-    {
+	public static IMap2d<ColorRgb> convertImageToMap(BufferedImage image) {
 
-		IMap2d<ColorRgb> result = new Map2d<>(image.getWidth(), image.getHeight());
+		int h = image.getHeight();
+		int w = image.getWidth();
+		IMap2d<ColorRgb> result = new Map2d<>(w, h);
 
-        for (int i = 0; i < image.getHeight(); i++)
-        {
-            for (int j = 0; j < image.getWidth(); j++)
-            {
-
-				int pixel = image.getRGB(j, i);
-				ColorRgb colorRgb = convertPixelToColor(pixel);
-                result.setAt(j, i, colorRgb);
-            }
-        }
+        for (int y = 0; y < h; y++)
+            for (int x = 0; x < w; x++)
+				result.setAt(x, y, new ColorRgb(image.getRGB(x, y)));
 
         return result;
     }

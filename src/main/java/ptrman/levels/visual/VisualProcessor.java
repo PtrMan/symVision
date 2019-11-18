@@ -21,14 +21,13 @@ import java.util.Deque;
  */
 public class VisualProcessor
 {
-    public static class ThresholdMap2dMapperFunction implements Map2dMapper.IMap2dMapper<Float, Boolean>
-    {
+    public static class ThresholdMap2dMapperFunction implements java.util.function.Function<Float, Boolean> {
         public ThresholdMap2dMapperFunction(float threshold) {
             this.threshold = threshold;
         }
 
         @Override
-        public Boolean calculate(Float value)
+        public Boolean apply(Float value)
         {
             return value > threshold;
         }
@@ -36,8 +35,7 @@ public class VisualProcessor
         private final float threshold;
     }
 
-    public static class ConvertToGrayImageMap2dMapperFunction implements Map2dMapper.IMap2dMapper<ColorRgb, Float>
-    {
+    public static class ConvertToGrayImageMap2dMapperFunction implements java.util.function.Function<ColorRgb, Float> {
         private final ColorRgb colorScale;
 
         public ConvertToGrayImageMap2dMapperFunction(ColorRgb colorScale)
@@ -46,29 +44,29 @@ public class VisualProcessor
         }
 
         @Override
-        public Float calculate(ColorRgb value)
+        public Float apply(ColorRgb value)
         {
             return value.getScaledNormalizedMagnitude(colorScale);
         }
     }
 
-    public static class FunctionMapperFunction implements Map2dMapper.IMap2dMapper<Float, Float> {
-        public interface IFunction {
-            float calculate(float value);
-        }
-
-        @Override
-        public Float calculate(Float value) {
-            return function.calculate(value);
-        }
-
-        public FunctionMapperFunction(IFunction function) {
-            this.function = function;
-        }
-
-        private final IFunction function;
-
-    }
+//    public static class FunctionMapperFunction implements java.util.function.Function<Float, Float> {
+//        public interface IFunction {
+//            float calculate(float value);
+//        }
+//
+//        @Override
+//        public Float apply(Float value) {
+//            return function.calculate(value);
+//        }
+//
+//        public FunctionMapperFunction(IFunction function) {
+//            this.function = function;
+//        }
+//
+//        private final IFunction function;
+//
+//    }
 
     public static class ProcessingChain
     {
@@ -106,17 +104,9 @@ public class VisualProcessor
                 this.threshold = threshold;
             }
 
-
-
             @Override
             public void apply(IMap2d<Float> input, IMap2d<Boolean> output) {
-
-                ThresholdMap2dMapperFunction imageMapper = new ThresholdMap2dMapperFunction(threshold);
-
-
-                Map2dMapper.Mapper<Float, Boolean> mapper = new Map2dMapper.Mapper<>();
-
-                mapper.map(imageMapper, input, output);
+                Map2dMapper.map(new ThresholdMap2dMapperFunction(threshold), input, output);
             }
 
             private final float threshold;
@@ -130,11 +120,7 @@ public class VisualProcessor
 
             @Override
             public void apply(IMap2d<ColorRgb> input, IMap2d<Float> output) {
-
-                ConvertToGrayImageMap2dMapperFunction mapperFunction = new ConvertToGrayImageMap2dMapperFunction(colorToGrayColorScale);
-                Map2dMapper.Mapper<ColorRgb, Float> mapper = new Map2dMapper.Mapper<>();
-
-                mapper.map(mapperFunction, input, output);
+                Map2dMapper.map(new ConvertToGrayImageMap2dMapperFunction(colorToGrayColorScale), input, output);
             }
 
             private final ColorRgb colorToGrayColorScale;

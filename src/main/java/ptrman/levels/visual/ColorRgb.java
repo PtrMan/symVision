@@ -16,7 +16,11 @@ public class ColorRgb
     public final float r;
     public final float g;
     public final float b;
-    
+
+    public ColorRgb(int rgb) {
+        this((float)((rgb >> 16) & 255) / 255.0f, (float)((rgb >> 8) & 255) / 255.0f, (float)(rgb & 255) / 255.0f);
+    }
+
     public ColorRgb(float r, float g, float b)
     {
         this.r = r;
@@ -26,7 +30,7 @@ public class ColorRgb
 
     public float getScaledNormalizedMagnitude(ColorRgb scale)
     {
-        return (r*scale.r + g*scale.g + b*scale.b) * (1.0f/(scale.r+scale.g+scale.b));
+        return (r*scale.r + g*scale.g + b*scale.b) / (scale.r+scale.g+scale.b);
     }
 
     public ColorRgb add(ColorRgb other)

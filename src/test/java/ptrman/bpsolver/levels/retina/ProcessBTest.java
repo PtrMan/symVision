@@ -199,13 +199,11 @@ public class ProcessBTest {
 
             int pixelValue = javaImage.getRGB(bufferI % convertedToMap.getWidth(), bufferI / convertedToMap.getWidth());
 
-            Color c = new Color(pixelValue);
 
-            int r = c.getRed();
-            int g = c.getGreen();
-            int b = c.getBlue();
-
-            convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(), new ColorRgb((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f));
+            convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(),
+                //new ColorRgb((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f)
+                new ColorRgb(pixelValue)
+            );
         }
 
         return convertedToMap;

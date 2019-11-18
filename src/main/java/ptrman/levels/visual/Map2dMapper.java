@@ -11,32 +11,26 @@ package ptrman.levels.visual;
 
 import ptrman.Datastructures.IMap2d;
 
+import java.util.function.Function;
+
 /**
  *
  */
 public class Map2dMapper
 {
-    public interface IMap2dMapper<InputType, ResultType>
-    {
-        ResultType calculate(InputType value);
-    }
 
-    public static class Mapper<InputType, ResultType>
-    {
-        public void map(IMap2dMapper<InputType, ResultType> mapperImplementation, IMap2d<InputType> inputMap, IMap2d<ResultType> resultMap)
-        {
+
+        public static <X,Y> void map(Function<X, Y> f, IMap2d<X> m, IMap2d<Y> resultMap) {
             int x, y;
 
-            for( y = 0; y < inputMap.getLength(); y++ )
-            {
-                for( x = 0; x < inputMap.getWidth(); x++ )
-                {
+            int h = m.getLength();
+            int w = m.getWidth();
 
-					InputType tempInput = inputMap.readAt(x, y);
-					ResultType tempResult = mapperImplementation.calculate(tempInput);
-                    resultMap.setAt(x, y, tempResult);
+            for(y = 0; y < h; y++ ) {
+                for(x = 0; x < w; x++ ) {
+                    resultMap.setAt(x, y, f.apply(m.readAt(x, y)));
                 }
             }
         }
-    }
+
 }

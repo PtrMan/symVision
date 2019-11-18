@@ -301,18 +301,7 @@ public class AnimatedShowcase {
         DataBuffer xx = x.getData().getDataBuffer();
         int s = xx.getSize();
         for(int i = 0; i < s; i++ ) {
-            int bx = i % w;
-            int by = i / w;
-
-            int p = x.getRGB(bx, by); //24-bit RGB int
-
-            //Color c = new Color(pixelValue);
-            int r = p >> 16 & 255;
-            int g = p >> 8 & 255;
-            int b = p & 255;
-
-            y.setAt(bx, by,
-                new ColorRgb((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f));
+            y.setAt(i % w, i / w, new ColorRgb(x.getRGB(i % w, i / w)));
         }
 
         return y;

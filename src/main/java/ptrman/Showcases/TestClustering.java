@@ -279,26 +279,18 @@ public class TestClustering {
 
 
     // TODO< move this into the functionality of the visual processor >
-    public static IMap2d<ColorRgb> translateFromImageToMap(BufferedImage javaImage) {
-        DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
+    public static IMap2d<ColorRgb> translateFromImageToMap(BufferedImage img) {
+        DataBuffer imageBuffer = img.getData().getDataBuffer();
 
         int bufferI;
 
-        IMap2d<ColorRgb> convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
+        IMap2d<ColorRgb> convertedToMap = new Map2d<>(img.getWidth(), img.getHeight());
 
         int imgSize = imageBuffer.getSize();
-        for(bufferI = 0; bufferI < imgSize; bufferI++ )
-        {
-
-            int pixelValue = javaImage.getRGB(bufferI % convertedToMap.getWidth(), bufferI / convertedToMap.getWidth());
-
-            Color c = new Color(pixelValue);
-
-            int r = c.getRed();
-            int g = c.getGreen();
-            int b = c.getBlue();
-
-            convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(), new ColorRgb((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f));
+        for(bufferI = 0; bufferI < imgSize; bufferI++ ) {
+            convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(),
+                new ColorRgb(img.getRGB(bufferI % convertedToMap.getWidth(), bufferI / convertedToMap.getWidth()))
+            );
         }
 
         return convertedToMap;

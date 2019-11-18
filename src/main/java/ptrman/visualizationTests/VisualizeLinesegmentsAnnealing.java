@@ -16,8 +16,8 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.IImageDrawer;
 import ptrman.Showcases.TestClustering;
-import ptrman.bindingNars.NarsBinding;
-import ptrman.bindingNars.OpenNarsNarseseConsumer;
+//import ptrman.bindingNars.NarsBinding;
+//import ptrman.bindingNars.OpenNarsNarseseConsumer;
 import ptrman.bpsolver.Solver;
 import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
@@ -98,16 +98,16 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
         connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
 
-        { // create NARS-binding
-            narsBinding = new NarsBinding(new OpenNarsNarseseConsumer());
-        }
+//        { // create NARS-binding
+//            narsBinding = new NarsBinding(new OpenNarsNarseseConsumer());
+//        }
     }
 
     final ProcessD processD;
     ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
     ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
 
-    public NarsBinding narsBinding;
+//    public NarsBinding narsBinding;
 
     int frameCounter = 0;
 
@@ -256,7 +256,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
                 processD.commitLineDetectors(); // split line detectors into "real" primitives
 
-                narsBinding.emitRetinaPrimitives(connectorDetectorsEndosceletonFromProcessD.workspace); // emit all collected primitives from process D
+//                narsBinding.emitRetinaPrimitives(connectorDetectorsEndosceletonFromProcessD.workspace); // emit all collected primitives from process D
             }
 
             annealingStep++;
