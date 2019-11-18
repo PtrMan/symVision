@@ -11,8 +11,8 @@ package ptrman.Datastructures;
 
 public class Tuple2<Type0, Type1>
 {
-    public Type0 e0;
-    public Type1 e1;
+    public final Type0 e0;
+    public final Type1 e1;
 
     
     public Tuple2(Type0 e0, Type1 e1)

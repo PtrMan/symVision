@@ -277,8 +277,8 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
      */
     public static class Crosspoint {
         public static class RetinaObjectWithAssocWithIntersectionType {
-            public RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssociatedPointsAndWorkspaceNode;
-            public Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType;
+            public final RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssociatedPointsAndWorkspaceNode;
+            public final Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType;
             
             public RetinaObjectWithAssocWithIntersectionType(RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssociatedPointsAndWorkspaceNode, Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType) {
                 this.retinaObjectWithAssociatedPointsAndWorkspaceNode = retinaObjectWithAssociatedPointsAndWorkspaceNode;
@@ -286,7 +286,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
             }
         }
         
-        public List<RetinaObjectWithAssocWithIntersectionType> adjacentRetinaObjects = new ArrayList<>();
+        public final List<RetinaObjectWithAssocWithIntersectionType> adjacentRetinaObjects = new ArrayList<>();
         public ArrayRealVector position;
         
         public enum EnumAnglePointType {

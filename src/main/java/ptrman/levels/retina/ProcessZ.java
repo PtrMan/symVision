@@ -90,7 +90,7 @@ public class ProcessZ implements IProcess {
 
     private IMap2d<Boolean> magnifiedOutput;
 
-    private Map2dTransform<Float> map2dTranform = new Map2dTransform<>();
+    private final Map2dTransform<Float> map2dTranform = new Map2dTransform<>();
 
     private final float FLOATTOBOOLEANTHRESHOLD = 0.6f;
 }

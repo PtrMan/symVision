@@ -57,5 +57,5 @@ public class ProcessSampleFilter implements IProcess {
     private ProcessConnector<ProcessA.Sample> outputSampleConnector;
     private ProcessConnector<ProcessA.Sample> inputSampleConnector;
 
-    private ProcessA.Sample.EnumType filterType;
+    private final ProcessA.Sample.EnumType filterType;
 }

@@ -52,7 +52,7 @@ public class AttributeNode extends Node
         this.attributeTypeNode = attributeTypeNode;
     }
     
-    public Node attributeTypeNode;
+    public final Node attributeTypeNode;
     
     
     public float getValueAsFloat()
@@ -75,7 +75,7 @@ public class AttributeNode extends Node
         return valueInt;
     }
     
-    private float valueFloat;
-    private int valueInt;
-    private AttributeNode.EnumValueType valueType;
+    private final float valueFloat;
+    private final int valueInt;
+    private final AttributeNode.EnumValueType valueType;
 }

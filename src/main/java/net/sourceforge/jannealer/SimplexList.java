@@ -10,7 +10,7 @@ import java.util.ArrayList;
  */
 class SimplexList
 {
-	private ArrayList list;
+	private final ArrayList list;
 	private final static double MAXVALUE = -1.0e100;
 	/**
 	 *  Constructor for the SimplexList object
@@ -51,12 +51,10 @@ class SimplexList
 	{
 		double min = -MAXVALUE;
 		Simplex minSimplex = null;
-		for (int ii = 0; ii < list.size(); ii++)
-		{
-			if (((Simplex) list.get(ii)).getValue() < min)
-			{
-				minSimplex = (Simplex) list.get(ii);
-				min = ((Simplex) list.get(ii)).getValue();
+		for (Object o : list) {
+			if (((Simplex) o).getValue() < min) {
+				minSimplex = (Simplex) o;
+				min = ((Simplex) o).getValue();
 			}
 		}
 		return minSimplex;

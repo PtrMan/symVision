@@ -55,7 +55,7 @@ public class Map2dDither {
                 return Maths.squaredDistance(new double[]{value - ((ValueFloat) other).value});
             }
 
-            private float value;
+            private final float value;
         }
 
 

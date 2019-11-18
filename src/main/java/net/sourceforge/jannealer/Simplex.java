@@ -8,9 +8,9 @@ package net.sourceforge.jannealer;
  */
 class Simplex
 {
-	private double[] vertex;
-	private double value;
-	private int ndim;
+	private final double[] vertex;
+	private final double value;
+	private final int ndim;
 	/**
 	 *  Constructor for the Simplex object
 	 *

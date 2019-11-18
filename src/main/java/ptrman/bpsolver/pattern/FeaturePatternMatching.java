@@ -392,10 +392,10 @@ public class FeaturePatternMatching {
     }
 
     // this integrator just for getting started
-    public BaseAbstractUnivariateIntegrator integrator = new SimpsonIntegrator();
-    private IntegrateTDistributionUpperIntegral integrateTDistributionUpperIntegral = new IntegrateTDistributionUpperIntegral();
-    private IntegrateTDistributionLowerIntegral integrateTDistributionLowerIntegral = new IntegrateTDistributionLowerIntegral();
-    private IntegrateEquation8Dot4 integrateEquation8Dot4 = new IntegrateEquation8Dot4();
+    public final BaseAbstractUnivariateIntegrator integrator = new SimpsonIntegrator();
+    private final IntegrateTDistributionUpperIntegral integrateTDistributionUpperIntegral = new IntegrateTDistributionUpperIntegral();
+    private final IntegrateTDistributionLowerIntegral integrateTDistributionLowerIntegral = new IntegrateTDistributionLowerIntegral();
+    private final IntegrateEquation8Dot4 integrateEquation8Dot4 = new IntegrateEquation8Dot4();
     
     private final static float SIGMAZERO = 1.0f; // used in the comparison of numerosity nodes
     

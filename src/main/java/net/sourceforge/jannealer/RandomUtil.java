@@ -16,7 +16,7 @@ enum RandomUtil
 	private static final double EPS = 1.2e-7;
 	private static final double RNMX = (1.0 - EPS);
 	private static long iy = 0;
-	private static long[] iv = new long[NTAB];
+	private static final long[] iv = new long[NTAB];
 	/** Adapted from Numerical Recipes in C
 	 *  'Minimal' random number generator
 	 *  Call with idum negative to initialize

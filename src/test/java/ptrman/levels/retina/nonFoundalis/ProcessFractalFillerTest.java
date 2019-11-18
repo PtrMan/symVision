@@ -2,7 +2,6 @@ package ptrman.levels.retina.nonFoundalis;
 
 
 import boofcv.io.image.ConvertBufferedImage;
-import boofcv.struct.image.ImageInterleaved;
 import boofcv.struct.image.InterleavedF32;
 import org.junit.Test;
 import ptrman.Datastructures.Vector2d;

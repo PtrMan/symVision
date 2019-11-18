@@ -14,8 +14,10 @@ import processing.core.PImage;
 
 import java.awt.image.BufferedImage;
 
-public class ImageConverter {
-    public static PImage convBufferedImageToPImage(BufferedImage bimg) {
+public enum ImageConverter {
+	;
+
+	public static PImage convBufferedImageToPImage(BufferedImage bimg) {
         // code is inspired by https://forum.processing.org/one/topic/converting-bufferedimage-to-pimage.html
         PImage img=new PImage(bimg.getWidth(),bimg.getHeight(), PConstants.ARGB);
         bimg.getRGB(0, 0, img.width, img.height, img.pixels, 0, img.width);

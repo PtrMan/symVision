@@ -10,6 +10,7 @@
 package ptrman.math;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Random;
 
@@ -32,7 +33,7 @@ public enum DistinctUtility
         return temporaryList;
     }
     
-    public static List<Integer> getDisjuctNumbersTo(Random random, List<Integer> numbers, int count, int max)
+    public static List<Integer> getDisjuctNumbersTo(Random random, Collection<Integer> numbers, int count, int max)
     {
         int counter;
         List<Integer> disjunctNumbers;

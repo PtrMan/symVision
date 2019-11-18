@@ -80,7 +80,7 @@ public class Map2d<Type> implements IMap2d<Type>
         return cloned;
     }
     
-    private int width;
-    private int length;
-    private Type[] array;
+    private final int width;
+    private final int length;
+    private final Type[] array;
 }

@@ -22,7 +22,7 @@ public class DurationStartMeter extends DoubleMeter {
     private final double window;
     //private double prev;
     private final boolean frequency;
-    private boolean strict = false;
+    private final boolean strict = false;
 
     public DurationStartMeter(String id, boolean nanoSeconds, double windowSec, boolean asFrequency) {
         super(id);

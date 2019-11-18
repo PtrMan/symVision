@@ -68,8 +68,8 @@ public class PlatonicPrimitiveDatabase
 
 
     // NOTE ASK< is Haskmap ok? >
-    private Map<PlatonicPrimitiveNode, Float> mapForMaxValueOfPlatonicPrimitiveNode = new HashMap<>();
+    private final Map<PlatonicPrimitiveNode, Float> mapForMaxValueOfPlatonicPrimitiveNode = new HashMap<>();
 
     // NOTE ASK< is Haskmap ok? >
-    public Map<PlatonicPrimitiveNode, IMaxValueCalculator> calculatorsForMaxValueOfPlatonicPrimitiveNode = new HashMap<>();
+    public final Map<PlatonicPrimitiveNode, IMaxValueCalculator> calculatorsForMaxValueOfPlatonicPrimitiveNode = new HashMap<>();
 }

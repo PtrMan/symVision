@@ -35,7 +35,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
     final static int RETINA_HEIGHT = 128;
 
 
-    public class InputDrawer implements IImageDrawer {
+    public static class InputDrawer implements IImageDrawer {
 
         BufferedImage off_Image;
 
@@ -92,7 +92,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
         connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
     }
 
-    ProcessD processD;
+    final ProcessD processD;
     ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
     ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
 

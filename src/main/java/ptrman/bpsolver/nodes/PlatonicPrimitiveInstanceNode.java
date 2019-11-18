@@ -26,7 +26,7 @@ public class PlatonicPrimitiveInstanceNode extends Node
         this.primitiveNode = primitiveNode;
     }
     
-    public PlatonicPrimitiveNode primitiveNode;
+    public final PlatonicPrimitiveNode primitiveNode;
     
     // used to store data
     // linesegment : uses p1 and p2

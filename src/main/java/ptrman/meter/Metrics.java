@@ -194,7 +194,7 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
     int numColumns;
     
     /** capacity */
-    int history;
+	final int history;
 
     /** unlimited size */
     public Metrics() {

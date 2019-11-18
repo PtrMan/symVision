@@ -110,14 +110,12 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
     private void removeParticlesOutOfImage() {
         List<ParticleType> particlesToBeRemoved = new ArrayList<>();
 
-        for( int particleI = 0; particleI < trackingParticles.size(); particleI++ ) {
-            ParticleType iterationTrackingParticle = trackingParticles.get(particleI);
-
-            if(
+        for (ParticleType iterationTrackingParticle : trackingParticles) {
+            if (
                 iterationTrackingParticle.getPosition().getDataRef()[0] < 0.0 ||
-                iterationTrackingParticle.getPosition().getDataRef()[0] > imageSize.x ||
-                iterationTrackingParticle.getPosition().getDataRef()[1] < 0.0 ||
-                iterationTrackingParticle.getPosition().getDataRef()[1] > imageSize.y
+                    iterationTrackingParticle.getPosition().getDataRef()[0] > imageSize.x ||
+                    iterationTrackingParticle.getPosition().getDataRef()[1] < 0.0 ||
+                    iterationTrackingParticle.getPosition().getDataRef()[1] > imageSize.y
             ) {
                 particlesToBeRemoved.add(iterationTrackingParticle);
 
@@ -183,23 +181,23 @@ public class ParticleFlowTracker<ParticleType extends ParticleFlowTracker.ITrack
 
     }
 
-    public List<ParticleType> trackingParticles = new ArrayList<>();
+    public final List<ParticleType> trackingParticles = new ArrayList<>();
 
 
     private ArrayRealVector[] samplePositions;
 
-    private DenseOpticalFlow<GrayF32> denseFlow;
-    private ImageFlow flow;
+    private final DenseOpticalFlow<GrayF32> denseFlow;
+    private final ImageFlow flow;
 
-    private GrayF32 previous;
-    private GrayF32 current;
+    private final GrayF32 previous;
+    private final GrayF32 current;
 
-    private SpatialAcceleration<ParticleType> trackingParticleAcceleration;
+    private final SpatialAcceleration<ParticleType> trackingParticleAcceleration;
 
     private final Vector2d<Integer> imageSize;
     private final int imageDownscaleFactor;
 
     private final IParticleConstructorDestructor<ParticleType> particleConstructorDestructor;
 
-    private Semaphore particleMutex;
+    private final Semaphore particleMutex;
 }

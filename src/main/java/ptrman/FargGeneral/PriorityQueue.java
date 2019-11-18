@@ -113,10 +113,10 @@ public class PriorityQueue<Type> {
     }
 
     // the queue is sorted by priority
-    private List<QueueElement> queue = new ArrayList<>();
+    private final List<QueueElement> queue = new ArrayList<>();
 
     
-    private Random random;
+    private final Random random;
     private float prioritySum = 0.0f;
 
     private final float PRIORITYGRANULARITY = 0.02f;

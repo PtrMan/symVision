@@ -42,5 +42,5 @@ public class Coderack {
         }
     }
     
-    private PriorityQueue queue = new PriorityQueue(new Random());
+    private final PriorityQueue queue = new PriorityQueue(new Random());
 }

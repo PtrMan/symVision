@@ -11,7 +11,7 @@ package ptrman.FargGeneral;
 
 public abstract class Codelet {
     public static class RunResult {
-        public boolean putback;
+        public final boolean putback;
         
         public RunResult(boolean putback) {
             this.putback = putback;

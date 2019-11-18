@@ -56,7 +56,7 @@ public class ProcessA implements IProcess {
 
     int cycle = 0;
 
-    Random rng = new RandomAdaptor( new MersenneTwister() );
+    final Random rng = new RandomAdaptor( new MersenneTwister() );
 
     public void processData(float throttle) {
 
@@ -128,7 +128,7 @@ public class ProcessA implements IProcess {
 
     }
 
-    public double defaultSampleConf = 0.1; // confidence of one sample
+    public final double defaultSampleConf = 0.1; // confidence of one sample
 
     public static class Sample {
 

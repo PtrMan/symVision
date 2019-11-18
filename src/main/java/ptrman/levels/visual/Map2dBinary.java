@@ -98,18 +98,11 @@ public enum Map2dBinary {
                     }
                 }
 
-                if(
-                        setPixels == 0 ||
-                                setPixels == 1 ||
-                                setPixels == 7 ||
-                                setPixels == 8 ||
-                                zeroCrossing >= 2
-                        ) {
-                    deletePixel = true;
-                }
-                else {
-                    deletePixel = false;
-                }
+                deletePixel = setPixels == 0 ||
+                    setPixels == 1 ||
+                    setPixels == 7 ||
+                    setPixels == 8 ||
+                    zeroCrossing >= 2;
 
                 if( !deletePixel ) {
                     result.setAt(x, y, true);

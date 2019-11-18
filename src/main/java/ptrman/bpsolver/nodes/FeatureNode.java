@@ -95,16 +95,16 @@ public class FeatureNode extends Node {
         return weight;
     }
     
-    public Node featureTypeNode; // node in ltm, which is either a platonic primitive node (with the type of a feature) or a node which is a learned type (triangle, etc)
+    public final Node featureTypeNode; // node in ltm, which is either a platonic primitive node (with the type of a feature) or a node which is a learned type (triangle, etc)
     // is compared by reference (isEqual), because the node can be of any valid type
     
     private double valueFloat;
     private int valueInt;
     private EnumValueType valueType;
     
-    private int weight; // used for fair fusing of nodes
+    private final int weight; // used for fair fusing of nodes
 
-    public FeatureStatistics statistics = new FeatureStatistics();
+    public final FeatureStatistics statistics = new FeatureStatistics();
 
     public enum EnumValueType
     {

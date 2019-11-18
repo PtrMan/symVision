@@ -12,8 +12,9 @@ package ptrman.math;
 /**
  * Non-axiomatic logic  truth value computations
  */
-public class NalTv {
-    public static double HORIZON = 1.0;
+public enum NalTv {
+    ;
+    public static final double HORIZON = 1.0;
 
     public final static double w2c(final double w) {
         return w / (w + HORIZON);

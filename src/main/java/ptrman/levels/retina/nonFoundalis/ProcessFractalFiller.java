@@ -11,7 +11,6 @@ package ptrman.levels.retina.nonFoundalis;
 
 
 //import com.gs.collections.impl.list.mutable.FastList;
-import boofcv.struct.image.GrayF32;
 import boofcv.struct.image.InterleavedF32;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -39,7 +38,7 @@ public class ProcessFractalFiller implements IProcess {
     */
 
     private static class GaussianContext {
-        public SummaryStatistics statistics = new SummaryStatistics();
+        public final SummaryStatistics statistics = new SummaryStatistics();
 
         public boolean isValueInsideVariance(final float value, final float varianceMultiplier) {
             final float variance = (float)Math.sqrt(statistics.getPopulationVariance());
@@ -53,7 +52,7 @@ public class ProcessFractalFiller implements IProcess {
         // for each channel one context
         public GaussianContext[] gaussianContext;
 
-        public List<ProcessA.Sample> samples = new FastList<>();
+        public final List<ProcessA.Sample> samples = new FastList<>();
 
         public float[] varianceMultiplier;
     }
@@ -193,10 +192,10 @@ public class ProcessFractalFiller implements IProcess {
     }
 
     private void addSamples(final Vector2d<Integer> gridCellPosition, final Vector2d<Integer> entryDirection, int scanFrontCounter, final boolean[] frontWhereSamplesShouldBeTakes, List<ProcessA.Sample> samples) {
-        for( int i = 0; i < frontWhereSamplesShouldBeTakes.length; i++ ) {
+        for (boolean frontWhereSamplesShouldBeTake : frontWhereSamplesShouldBeTakes) {
             final Vector2d<Integer> sample1Position = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, 0);
 
-            if( frontWhereSamplesShouldBeTakes[i] ) {
+            if (frontWhereSamplesShouldBeTake) {
                 samples.add(new ProcessA.Sample(ArrayRealVectorHelper.integerToArrayRealVector(sample1Position)));
             }
         }

@@ -45,6 +45,6 @@ public abstract class SolverCodelet extends Codelet
         return bpSolver.networkHandles;
     }
 
-    protected Solver bpSolver;
+    protected final Solver bpSolver;
     protected Node startNode;
 }

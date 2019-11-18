@@ -126,9 +126,9 @@ public class SpatialAcceleratedMap2d {
         return new Vector2d<>(x, y);
     }
 
-    private IMap2d<Boolean> map;
+    private final IMap2d<Boolean> map;
     private final int gridsize;
     private final Vector2d<Integer> gridBoundary;
 
-    public IMap2d<EnumGridCellState> gridCellStateMap;
+    public final IMap2d<EnumGridCellState> gridCellStateMap;
 }

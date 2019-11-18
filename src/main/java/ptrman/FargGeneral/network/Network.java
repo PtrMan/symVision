@@ -14,7 +14,6 @@ package ptrman.FargGeneral.network;
 import org.eclipse.collections.impl.list.mutable.FastList;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  *
@@ -33,7 +32,7 @@ public class Network
         Link createLink(Link.EnumType type, Node target);
     }
     
-    public Collection<Node> nodes = new FastList<>();
+    public final Collection<Node> nodes = new FastList<>();
     public IDepthToDecay depthToDecay;
     
     public void spreadActivation()

@@ -27,8 +27,8 @@ public class Dag<Type> {
             this.content = content;
         }
 
-        public IntArrayList childIndices = new IntArrayList();
-        public ElementType content;
+        public final IntArrayList childIndices = new IntArrayList();
+        public final ElementType content;
     }
 
     public void addElement(Element<Type> element)
@@ -36,5 +36,5 @@ public class Dag<Type> {
         elements.add(element);
     }
 
-    public List<Element<Type>> elements = new FastList<>();
+    public final List<Element<Type>> elements = new FastList<>();
 }

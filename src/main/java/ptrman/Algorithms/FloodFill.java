@@ -40,11 +40,7 @@ public enum FloodFill {
                 return false;
             }
 
-            if( !(map.readAt(position.x, position.y).equals(targetColor)) ) {
-                return false;
-            }
-
-            return true;
+            return map.readAt(position.x, position.y).equals(targetColor);
         }
 
         @Override

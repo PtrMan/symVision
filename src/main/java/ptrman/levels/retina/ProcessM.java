@@ -24,7 +24,7 @@ public class ProcessM {
             this.lineParsing = lineParsing;
         }
         
-        public List<SingleLineDetector> lineParsing;
+        public final List<SingleLineDetector> lineParsing;
         
         public float processGInterestRating = 0.0f; // rating or interest of the parsing for processG to be a candidate of a curve
         public boolean processGRated = false; // used to check for invalidated curves and rerate them if necessary
@@ -154,7 +154,7 @@ public class ProcessM {
         return copyed;
     }
 
-    private Random random = new Random();
+    private final Random random = new Random();
     
-    private List<LineParsing> lineParsings = new ArrayList<>();
+    private final List<LineParsing> lineParsings = new ArrayList<>();
 }

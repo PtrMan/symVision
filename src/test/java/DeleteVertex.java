@@ -16,7 +16,7 @@ public class DeleteVertex {
             this.strength = strength;
         }
 
-        public float strength;
+        public final float strength;
     }
 
     public static void main(String[] args) {
@@ -46,5 +46,5 @@ public class DeleteVertex {
         graph.remove(vertexA);
     }
 
-    public MutableBidirectedGraph<Vertex, Edge> graph = new MutableDirectedAdjacencyGraph<>();
+    public final MutableBidirectedGraph<Vertex, Edge> graph = new MutableDirectedAdjacencyGraph<>();
 }

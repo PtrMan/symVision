@@ -13,6 +13,7 @@ import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomAdaptor;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
+import org.eclipse.collections.api.IntIterable;
 import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import ptrman.Datastructures.Vector2d;
@@ -38,15 +39,15 @@ import static ptrman.math.Maths.squaredDistance;
  */
 public class ProcessD implements IProcess {
     // candidates which are annealed
-    public List<LineDetectorWithMultiplePoints> annealedCandidates = new ArrayList<>();
+    public final List<LineDetectorWithMultiplePoints> annealedCandidates = new ArrayList<>();
 
     // 5 for testing
-    public int anealedCandidatesMaxCount = 40; // maximal number of line segments which are considered
+    public final int anealedCandidatesMaxCount = 40; // maximal number of line segments which are considered
 
 
     private Vector2d<Integer> imageSize;
 
-    private Random random = new RandomAdaptor(new MersenneTwister()); // new Random();
+    private final Random random = new RandomAdaptor(new MersenneTwister()); // new Random();
 
     public double maximalDistanceOfPositions;
 
@@ -54,12 +55,12 @@ public class ProcessD implements IProcess {
     private ProcessConnector<RetinaPrimitive> outputLineDetectorConnector;
 
 
-    public int widenSamplesPerTrial = 10; // how many points are considered when doing a widening step?
-    public double widenSampleMaxDistance = 4.0; // maximal distance of projected position to line to actual position
+    public final int widenSamplesPerTrial = 10; // how many points are considered when doing a widening step?
+    public final double widenSampleMaxDistance = 4.0; // maximal distance of projected position to line to actual position
 
     public boolean onlyEndoskeleton = false; // only work with samples which belong to endoskeleton?
 
-    public Random rng = new Random();
+    public final Random rng = new Random();
 
 
     public void set(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<RetinaPrimitive> outputLineDetectorConnector) {
@@ -221,7 +222,7 @@ public class ProcessD implements IProcess {
                 iSample.refCount++;
             }
 
-            annealedCandidates.addAll(Arrays.asList(new LineDetectorWithMultiplePoints[]{createdLineDetector}));
+            annealedCandidates.addAll(Collections.singletonList(createdLineDetector));
         }
     }
 
@@ -300,7 +301,7 @@ public class ProcessD implements IProcess {
 
     }
 
-    private static boolean doAllSamplesHaveObjectId(final List<ProcessA.Sample> samples) {
+    private static boolean doAllSamplesHaveObjectId(final Iterable<ProcessA.Sample> samples) {
         for (final ProcessA.Sample iterationSamples : samples) {
             if (!iterationSamples.isObjectIdValid()) {
                 return false;
@@ -326,7 +327,7 @@ public class ProcessD implements IProcess {
         return true;
     }
 
-    private static List<ArrayRealVector> getPositionsOfSamples(final List<ProcessA.Sample> samples) {
+    private static List<ArrayRealVector> getPositionsOfSamples(final Iterable<ProcessA.Sample> samples) {
         List<ArrayRealVector> resultPositions = new ArrayList<>();
 
         for (final ProcessA.Sample iterationSample : samples) {
@@ -336,7 +337,7 @@ public class ProcessD implements IProcess {
         return resultPositions;
     }
 
-    private static double getMaximalDistanceOfPositionsTo(final List<ArrayRealVector> positions, final ArrayRealVector comparePosition) {
+    private static double getMaximalDistanceOfPositionsTo(final Iterable<ArrayRealVector> positions, final ArrayRealVector comparePosition) {
         double maxDistance = 0.0;
 
         for (final ArrayRealVector iterationPosition : positions) {
@@ -347,7 +348,7 @@ public class ProcessD implements IProcess {
         return maxDistance;
     }
 
-    private static List<ProcessA.Sample> getSamplesByIndices(final List<ProcessA.Sample> samples, final IntList indices) {
+    private static List<ProcessA.Sample> getSamplesByIndices(final List<ProcessA.Sample> samples, final IntIterable indices) {
         List<ProcessA.Sample> resultPositions = new ArrayList<>(indices.size());
         indices.forEach(index -> resultPositions.add(samples.get(index)));
         return resultPositions;
@@ -418,8 +419,8 @@ public class ProcessD implements IProcess {
         // count the "rows" where the count is greater than 1
         int overlappingCounter = 0;
 
-        for (int arrayI = 0; arrayI < dimensionCounter.length; arrayI++) {
-            if (dimensionCounter[arrayI] > 1) {
+        for (int i : dimensionCounter) {
+            if (i > 1) {
                 overlappingCounter++;
             }
         }
@@ -428,7 +429,7 @@ public class ProcessD implements IProcess {
     }
 
     // used to calculate the arraysize
-    private static double getMaximalCoordinateForPoints(List<ArrayRealVector> positions, EnumAxis axis) {
+    private static double getMaximalCoordinateForPoints(Iterable<ArrayRealVector> positions, EnumAxis axis) {
         double max = 0;
 
         for (ArrayRealVector iterationPosition : positions) {
@@ -534,15 +535,8 @@ public class ProcessD implements IProcess {
 
         @Override
         public int compare(ArrayRealVector a, ArrayRealVector b) {
-            if (Helper.getAxis(a, axis) > Helper.getAxis(b, axis)) {
-                return 1;
-            }
+            return Double.compare(Helper.getAxis(a, axis), Helper.getAxis(b, axis));
 
-            if (Helper.getAxis(a, axis) == Helper.getAxis(b, axis)) {
-                return 0;
-            }
-
-            return -1;
         }
 
         private final EnumAxis axis;

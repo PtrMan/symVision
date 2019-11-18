@@ -55,5 +55,5 @@ public class HashableIntegerList {
         return true;
     }
 
-    private List<Integer> list;
+    private final List<Integer> list;
 }

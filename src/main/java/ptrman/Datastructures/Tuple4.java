@@ -11,10 +11,10 @@ package ptrman.Datastructures;
 
 public class Tuple4<Type0, Type1, Type2, Type3>
 {
-    public Type0 e0;
-    public Type1 e1;
-    public Type2 e2;
-    public Type3 e3;
+    public final Type0 e0;
+    public final Type1 e1;
+    public final Type2 e2;
+    public final Type3 e3;
     
     public Tuple4(Type0 e0, Type1 e1, Type2 e2, Type3 e3)
     {

@@ -55,7 +55,7 @@ public class TuningWindow extends JPanel
             label.setText(getTextFromInt("Process D max mse", value));
         }
         
-        private JLabel label;
+        private final JLabel label;
     }
     
     private static class ChangeListenerForProcessdLockingActivationOffset implements ChangeListener
@@ -81,7 +81,7 @@ public class TuningWindow extends JPanel
             label.setText(getTextFromInt("Process D locking activation offset", value));
         }
         
-        private JLabel label;
+        private final JLabel label;
     }
     
     private static class ChangeListenerForProcessdLockingActivationScale implements ChangeListener
@@ -107,7 +107,7 @@ public class TuningWindow extends JPanel
             label.setText(getTextFromInt("Process D locking activation scale", value));
         }
         
-        private JLabel label;
+        private final JLabel label;
     }
     
     private void buildGui()

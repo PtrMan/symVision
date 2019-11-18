@@ -38,11 +38,11 @@ public class CodeletLtmLookup
                 this.priority = priority;
             }
             
-            public SolverCodelet templateCodelet; // codelet which is cloned and then placed on the coderack with the priority
-            public float priority; // priority of the codelet 
+            public final SolverCodelet templateCodelet; // codelet which is cloned and then placed on the coderack with the priority
+            public final float priority; // priority of the codelet
         }
         
-        public ArrayList<CodeletInformation> codeletInformations = new ArrayList<>();
+        public final ArrayList<CodeletInformation> codeletInformations = new ArrayList<>();
     }
     
     public void lookupAndPutCodeletsAtCoderackForPrimitiveNode(Node node, Coderack coderack, Network ltm, NetworkHandles networkHandles)
@@ -128,7 +128,7 @@ public class CodeletLtmLookup
         }
     }
     
-    public AbstractMap<String, RegisterEntry> registry = new HashMap<>();
+    public final AbstractMap<String, RegisterEntry> registry = new HashMap<>();
     
     /*
     // NOTE< should be moved maybe into its own class >

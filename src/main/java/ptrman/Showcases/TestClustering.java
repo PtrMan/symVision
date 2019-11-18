@@ -166,11 +166,11 @@ public class TestClustering {
             dualCanvas.rightCanvas.setImage(detectorImage);
         }
 
-        private Solver bpSolver;
+        private final Solver bpSolver;
         private final Function<Solver, BufferedImage> imageDrawer;
-        private IntrospectControlPanel introspectControlPanel;
-        private NodeGraph nodeGraph;
-        private DualConvas dualCanvas;
+        private final IntrospectControlPanel introspectControlPanel;
+        private final NodeGraph nodeGraph;
+        private final DualConvas dualCanvas;
         private final VisualProcessor.ProcessingChain processingChain;
     }
 

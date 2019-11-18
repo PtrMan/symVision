@@ -209,8 +209,8 @@ public class TestMotion extends AnimatedShowcase {
 
     private int framecounter = 0;
 
-    private ParticleFlowTracker<CohesionParticleTracker.Particle> particleFlowTracker;
-    private CohesionParticleTracker cohesionParticleTracker;
+    private final ParticleFlowTracker<CohesionParticleTracker.Particle> particleFlowTracker;
+    private final CohesionParticleTracker cohesionParticleTracker;
 
-    private Semaphore particleMutex = new Semaphore(1);
+    private final Semaphore particleMutex = new Semaphore(1);
 }

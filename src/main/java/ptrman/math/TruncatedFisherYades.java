@@ -69,5 +69,5 @@ public class TruncatedFisherYades<Type>
         candidates.set(indexB, element);
     }
     
-    private ArrayList<Type> candidates = new ArrayList<>();
+    private final ArrayList<Type> candidates = new ArrayList<>();
 }

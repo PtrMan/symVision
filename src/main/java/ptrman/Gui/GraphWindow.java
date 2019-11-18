@@ -40,5 +40,5 @@ public class GraphWindow //extends JPanel
         return nodeGraph;
     }
     
-    private NodeGraph nodeGraph = new NodeGraph();
+    private final NodeGraph nodeGraph = new NodeGraph();
 }

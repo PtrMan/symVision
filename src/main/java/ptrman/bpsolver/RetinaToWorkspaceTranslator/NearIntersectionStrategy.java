@@ -301,5 +301,5 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
         return nearestElement;
     }
     
-    private Random random = new Random();
+    private final Random random = new Random();
 }

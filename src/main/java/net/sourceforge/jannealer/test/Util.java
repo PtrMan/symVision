@@ -18,9 +18,8 @@ public enum Util
 		double[] sol;
 		sol = scheme.getSolution();
 		System.out.println("Solution:");
-		for (int i = 0; i < sol.length; i++)
-		{
-			System.out.println(sol[i]);
+		for (double v : sol) {
+			System.out.println(v);
 		}
 	}
 }

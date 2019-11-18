@@ -11,14 +11,15 @@ package net.sourceforge.jannealer;
  */
 class Schedule
 {
-	private ObjectiveFunction function;
+	private final ObjectiveFunction function;
 	private int iter;
 	private double yb;
 	private double[][] p;
 	private double[] y;
-	private double[] pb;
+	private final double[] pb;
 	private double[] psum;
-	private int mp, np;
+	private final int mp;
+	private final int np;
 	/**
 	 *  Constructor for the Schedule object
 	 *

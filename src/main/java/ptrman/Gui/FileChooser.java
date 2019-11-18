@@ -69,7 +69,7 @@ public class FileChooser {
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             File f = new File(System.getProperty("user.home"));
-            FileChooser fl = new FileChooser();
+//            FileChooser fl = new FileChooser();
             Component c1 = newComponent(f, new TextFileFilter(), true, null);
 
             //f = new File(System.getProperty("user.home"));
@@ -105,8 +105,8 @@ class TextFileFilter implements FileFilter {
 
 class FileRenderer extends DefaultListCellRenderer {
 
-    private boolean pad;
-    private Border padBorder = new EmptyBorder(3,3,3,3);
+    private final boolean pad;
+    private final Border padBorder = new EmptyBorder(3,3,3,3);
 
     FileRenderer(boolean pad) {
         this.pad = pad;

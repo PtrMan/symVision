@@ -243,11 +243,7 @@ public class ProcessH implements IProcess {
             return false;
         }
 
-        if( !isProjectedPointOntoLineBelowDistanceLimit(projectedAEnd, inplaceDetectorB) ) {
-            return false;
-        }
-
-        return true;
+        return isProjectedPointOntoLineBelowDistanceLimit(projectedAEnd, inplaceDetectorB);
     }
 
     // fusing for overlap case
@@ -289,21 +285,11 @@ public class ProcessH implements IProcess {
         // which case?
         if( vectorXBetweenInclusive(detectorA.a, detectorA.b, detectorB.a) && vectorXBetweenInclusive(detectorA.a, detectorA.b, detectorB.b)  ) {
             // detectorB inside detectorA ?
-            if( isProjectedPointOntoLineBelowDistanceLimit(detectorB.a, detectorA) && isProjectedPointOntoLineBelowDistanceLimit(detectorB.b, detectorA)  ) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return isProjectedPointOntoLineBelowDistanceLimit(detectorB.a, detectorA) && isProjectedPointOntoLineBelowDistanceLimit(detectorB.b, detectorA);
         }
         else if( vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.a) && vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.b) ) {
             // detectorA inside detectorB ?
-            if( isProjectedPointOntoLineBelowDistanceLimit(detectorA.a, detectorB) && isProjectedPointOntoLineBelowDistanceLimit(detectorA.b, detectorB)  ) {
-                return true;
-            }
-            else {
-                return false;
-            }
+            return isProjectedPointOntoLineBelowDistanceLimit(detectorA.a, detectorB) && isProjectedPointOntoLineBelowDistanceLimit(detectorA.b, detectorB);
         }
         else {
             return false;

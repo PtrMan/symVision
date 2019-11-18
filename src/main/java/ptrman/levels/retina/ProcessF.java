@@ -150,7 +150,7 @@ public class ProcessF implements IProcess {
         }
 
         public ArrayRealVector position;
-        public ArrayRealVector direction;
+        public final ArrayRealVector direction;
         public boolean isActive = true;
     }
 

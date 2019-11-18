@@ -27,8 +27,8 @@ public class PlatonicPrimitiveNode extends Node
         this.codeletKey = codeletKey;
     }
     
-    public String platonicType; // human readable text of type, is not used for comparision
-    public String codeletKey; // key of the codelet to put on the coderack and run to calculate the feature of a node, can be null if there is no feature for it
+    public final String platonicType; // human readable text of type, is not used for comparision
+    public final String codeletKey; // key of the codelet to put on the coderack and run to calculate the feature of a node, can be null if there is no feature for it
     
     public boolean isAbstract = false; // abstract nodes are used for common properties/connections in the LTM, in LTM and STM can't appear nodes of abstract PlantonicPrimitiveNOde
 }

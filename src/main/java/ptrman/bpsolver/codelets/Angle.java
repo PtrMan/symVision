@@ -308,8 +308,8 @@ public class Angle extends SolverCodelet {
     }
 
     private static class Tuple<T> {
-        public T left;
-        public T right;
+        public final T left;
+        public final T right;
         
         public Tuple(T left, T right) {
             this.left = left;
@@ -322,7 +322,7 @@ public class Angle extends SolverCodelet {
         YES
     }
     
-    private Random random = new Random();
+    private final Random random = new Random();
     
-    private static float ANGLEMAXDIFFERENCE = 5.0f;
+    private static final float ANGLEMAXDIFFERENCE = 5.0f;
 }

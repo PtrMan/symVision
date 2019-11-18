@@ -205,9 +205,9 @@ public class CohesionParticleTracker {
         iterationEdge.strength = Maths.clamp01(iterationEdge.strength);
     }
 
-    public MutableBidirectedGraph<Particle, CohesionEdge> graph = new MutableDirectedAdjacencyGraph<>();
+    public final MutableBidirectedGraph<Particle, CohesionEdge> graph = new MutableDirectedAdjacencyGraph<>();
 
-    private SpatialAcceleration<Particle> spatialAcceleration;
+    private final SpatialAcceleration<Particle> spatialAcceleration;
 
     private final double COHESION_VELOCITYDIFFERENCE_MULTIPLIER = 0.1; // TODO< tune >
     private final double COMMULATEVELOCITY_FACTOR = 0.9; // TODO< tune >

@@ -650,11 +650,11 @@ public class Solver {
 
     // both ltm and workspace
     // the difference is that the nodes of the workspace may all be deleted
-    public Network network = new Network();
-    public NetworkHandles networkHandles = new NetworkHandles();
-    public Coderack coderack = new Coderack();
+    public final Network network = new Network();
+    public final NetworkHandles networkHandles = new NetworkHandles();
+    public final Coderack coderack = new Coderack();
     public CodeletLtmLookup codeletLtmLookup;
-    public PlatonicPrimitiveDatabase platonicPrimitiveDatabase = new PlatonicPrimitiveDatabase();
+    public final PlatonicPrimitiveDatabase platonicPrimitiveDatabase = new PlatonicPrimitiveDatabase();
 
     // all stored patterns
     public List<Node> patternRootNodes = new ArrayList<>();
@@ -706,5 +706,5 @@ public class Solver {
     private ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessF;
     private ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessH;
 
-    private Collection<ProcessConnector> allConnectors = new ArrayList<>();
+    private final Collection<ProcessConnector> allConnectors = new ArrayList<>();
 }

@@ -28,7 +28,7 @@ public class Link
         return this.source != null;
     }*/
     
-    public EnumType type;
+    public final EnumType type;
     
     public enum EnumType
     {
@@ -39,7 +39,7 @@ public class Link
         ISA("ISA"), // "is a"
         HASNODE("HASNODE"); // inverse of ISPARTOF, weaker than HAS
         
-        private String string;
+        private final String string;
         
         EnumType(String name){string = name;}
 

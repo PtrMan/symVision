@@ -86,8 +86,8 @@ public class VisualProcessor
                 this.sigma = sigma;
             }
 
-            public int filterSize;
-            public float sigma;
+            public final int filterSize;
+            public final float sigma;
         }
 
         public interface IFilter<TypeInput, TypeOutput> {
@@ -155,8 +155,9 @@ public class VisualProcessor
 
             public abstract void apply();
 
-            public EnumMapType inputType, outputType;
-            public DurationStartMeter durationMeters;
+            public final EnumMapType inputType;
+            public final EnumMapType outputType;
+            public final DurationStartMeter durationMeters;
         }
 
         public abstract static class ApplyChainElement<InputType, ResultType> extends ChainElement {
@@ -178,8 +179,8 @@ public class VisualProcessor
             }
 
             public IMap2d<InputType> input;
-            public IMap2d<ResultType> result;
-            private IFilter<InputType, ResultType> filter;
+            public final IMap2d<ResultType> result;
+            private final IFilter<InputType, ResultType> filter;
         }
 
         public static class ChainElementFloatFloat extends ApplyChainElement<Float, Float> {
@@ -280,7 +281,7 @@ public class VisualProcessor
         }
 
         // entry is [0]
-        public Dag<ChainElement> filterChainDag = new Dag<>();
+        public final Dag<ChainElement> filterChainDag = new Dag<>();
 
     }
 

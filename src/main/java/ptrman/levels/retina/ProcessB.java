@@ -9,8 +9,8 @@
  */
 package ptrman.levels.retina;
 
-import com.google.common.collect.Streams;
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Datastructures.*;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.ArrayRealVectorHelper;
@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import static java.lang.Boolean.FALSE;
 import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 
 
@@ -126,20 +125,20 @@ public class ProcessB extends AbstractProcessB {
 
         final Vector2d<Integer> gridCenterPosition = spatialAcceleratedMap2d.getGridPositionOfPosition(position);
 
-        final int gridMaxSearchRadius = 2 + radius / spatialAcceleratedMap2d.getGridsize();
+        float gridMaxSearchRadius = 2f + ((float)radius) / spatialAcceleratedMap2d.getGridsize();
 
         // set this to int.max when the radius is not limited
-        int radiusToScan = gridMaxSearchRadius;
 
         final Vector2d<Integer>[] nearestPixelCandidate = new Vector2d[]{null};
         final double[] nearestPixelCandidateDistanceSquared = {Double.MAX_VALUE};
 
+        int radiusToScan = (int) Math.ceil(gridMaxSearchRadius);
         for( int currentGridRadius = 0; currentGridRadius < radiusToScan; currentGridRadius++ ) {
             final List<Vector2d<Integer>> gridCellsToScan;
 
             // if we are at the center we need to scan only the center
             if( currentGridRadius == 0 ) {
-                gridCellsToScan = new ArrayList<>();
+                gridCellsToScan = new FastList<>();
                 gridCellsToScan.add(gridCenterPosition);
             }
             else {

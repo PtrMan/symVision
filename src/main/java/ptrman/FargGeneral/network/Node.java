@@ -14,14 +14,14 @@ import java.util.List;
 
 public abstract class Node
 {
-    public int type; // int because we don't know what types there can be in the specific impl., in the iml its a enum which gets casted to int
+    public final int type; // int because we don't know what types there can be in the specific impl., in the iml its a enum which gets casted to int
     
     public float activiation; // [0.0, 1.0)
     public float activationDelta;
     
     public int conceptualDepth; // control decayrate
     
-    public List<Link> outgoingLinks = new ArrayList<>();
+    public final List<Link> outgoingLinks = new ArrayList<>();
     //public ArrayList<Link> incommingLinks = new ArrayList<Link>(); // only bidirection links are in here
     
     public Node(int type)

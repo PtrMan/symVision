@@ -22,7 +22,6 @@ import ptrman.bpsolver.Solver;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * http://boofcv.org/index.php?title=Example_Webcam_Capture

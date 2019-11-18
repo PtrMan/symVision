@@ -13,9 +13,9 @@ import ptrman.math.Maths;
 
 public class ColorRgb
 {
-    public float r;
-    public float g;
-    public float b;
+    public final float r;
+    public final float g;
+    public final float b;
     
     public ColorRgb(float r, float g, float b)
     {

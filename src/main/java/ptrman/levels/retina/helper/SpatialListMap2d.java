@@ -61,7 +61,7 @@ public class SpatialListMap2d<Type> {
     }
 
 
-    private IMap2d<List<Type>> map;
+    private final IMap2d<List<Type>> map;
     private final int gridsize;
 
     public void setAt(final int x, final int y, final List<Type> data) {

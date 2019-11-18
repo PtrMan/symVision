@@ -180,12 +180,12 @@ public class AnimatedShowcase {
     private static class FrameTask implements Runnable {
 
         float throttle = 1f;
-        float throttleMin = 0.15f;
-        float throttleMax = 1f;
+        final float throttleMin = 0.15f;
+        final float throttleMax = 1f;
 
-        float targetFPS =15f;
+        final float targetFPS =15f;
 
-        DescriptiveStatistics frameTimes = new DescriptiveStatistics(32);
+        final DescriptiveStatistics frameTimes = new DescriptiveStatistics(32);
 
         public FrameTask(DualConvas dualCanvas, RefreshAction refreshAction) {
             this.dualCanvas = dualCanvas;
@@ -217,8 +217,8 @@ public class AnimatedShowcase {
             dualCanvas.rightCanvas.setImage(refreshAction.resultRightCanvasImage);
         }
 
-        private DualConvas dualCanvas;
-        private RefreshAction refreshAction;
+        private final DualConvas dualCanvas;
+        private final RefreshAction refreshAction;
     }
 
     static class ImageFileFilter implements FileFilter {

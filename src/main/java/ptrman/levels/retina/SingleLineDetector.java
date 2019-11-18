@@ -115,7 +115,7 @@ public class SingleLineDetector {
     public boolean marked = false; // used for marking in other (multithreading syncronous) processes
     public boolean markedPartOfCurve = false; // used for processG
     
-    public List<Intersection> intersections = new ArrayList<>();
+    public final List<Intersection> intersections = new ArrayList<>();
     
     public boolean isBetweenOrginalStartAndEnd(ArrayRealVector position) {
         Assert.Assert(!isYAxisSingularity(), "is singular!");

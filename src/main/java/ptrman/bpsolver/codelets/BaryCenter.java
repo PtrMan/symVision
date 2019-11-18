@@ -172,5 +172,5 @@ public class BaryCenter extends SolverCodelet {
         return baryCenter;
     }
     
-    private EnumRecalculate recalculate;
+    private final EnumRecalculate recalculate;
 }

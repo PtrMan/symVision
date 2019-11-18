@@ -58,7 +58,7 @@ public class ProcessZFacade implements IProcess {
             setPixelPositions.add(position);
         }
 
-        public List<Vector2d<Integer>> setPixelPositions = new ArrayList<>();
+        public final List<Vector2d<Integer>> setPixelPositions = new ArrayList<>();
     }
 
     public void preSetupSet(final int accelerationGridsize, int numberOfPixelsManificationThreshold) {
@@ -283,7 +283,7 @@ public class ProcessZFacade implements IProcess {
     // map which contains all pixels which are not processed
     private IMap2d<Boolean> unprocessedPixelsMap;
     // map which stores the adresses of the cells in unprocessedPixelsCellCount which are non-zero
-    private Map<HashableVector2dInteger, Boolean> notCompletlyProcessedCells = new HashMap<>();
+    private final Map<HashableVector2dInteger, Boolean> notCompletlyProcessedCells = new HashMap<>();
 
     private int accelerationGridsize;
 
@@ -296,12 +296,12 @@ public class ProcessZFacade implements IProcess {
 
     private IMap2d<Boolean> toMagnify;
 
-    private ProcessZ processZ = new ProcessZ();
+    private final ProcessZ processZ = new ProcessZ();
 
-    private Random random = new Random();
+    private final Random random = new Random();
 
     private IMap2d<Boolean> alreadyCopiedImage;
 
     // stores all rectangles of the filled regions
-    public List<Rect> rects = new ArrayList<>();
+    public final List<Rect> rects = new ArrayList<>();
 }

@@ -102,6 +102,6 @@ public class MatchingUpdateImplementationForObjectCenters implements IMatchingUp
     }
     
     
-    private float absoluteClusteringDistance;
-    private float clusteringThreshold;
+    private final float absoluteClusteringDistance;
+    private final float clusteringThreshold;
 }

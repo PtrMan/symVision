@@ -123,7 +123,7 @@ public enum Maths {
         return result.toList();
     }
 
-    public static<Type> List<Type> getRandomElements(final List<Type> source, final int numberOfSamples, Random random) {
+    public static<Type extends Comparable<?>> List<Type> getRandomElements(final List<Type> source, final int numberOfSamples, Random random) {
         if (source.size() <= numberOfSamples)
             return source;
 
@@ -135,12 +135,10 @@ public enum Maths {
 //        }
 
         while( result.size() < numberOfSamples ) {
-            final int sampleIndex = random.nextInt(source.size());
-            result.add(source.get(sampleIndex));
+            result.add(source.get(random.nextInt(source.size())));
         }
 
-        List<Type> resultList = new ArrayList<>(result);
-        return resultList;
+        return new ArrayList<>(result);
     }
 
     public static int nextPowerOfTwo(final int value) {

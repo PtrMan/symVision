@@ -11,8 +11,8 @@ package ptrman.bpsolver.pattern;
 
 import ptrman.bpsolver.NetworkHandles;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Set;
 
 /**
@@ -24,7 +24,7 @@ public enum Grouping
 {
 	;
 
-	public static Set<Pattern> group(List<Pattern> exemplarsSet, float clusteringThreshold, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
+	public static Set<Pattern> group(Iterable<Pattern> exemplarsSet, float clusteringThreshold, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
     {
         Set<Pattern> patterns;
         Set<Pattern> knownExemplars;
@@ -78,7 +78,7 @@ public enum Grouping
         return patterns;
     }
     
-    private static boolean exemplarIsSimilarToAPattern(Pattern exemplar, Set<Pattern> patterns, float clusteringThreshold, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
+    private static boolean exemplarIsSimilarToAPattern(Pattern exemplar, Collection<Pattern> patterns, float clusteringThreshold, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
     {
         float maxSimilarity;
         Pattern closestPattern;
@@ -140,7 +140,7 @@ public enum Grouping
         return matchingUpdateImplementation.updateCore(orginal, additional, networkHandles, featurePatternMatching);
     }
     
-    private static boolean resemblesOneOf(Pattern a, Set<Pattern> set, float clusteringThreshold, IMatchingUpdate matchingUpdateImplementation, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
+    private static boolean resemblesOneOf(Pattern a, Iterable<Pattern> set, float clusteringThreshold, IMatchingUpdate matchingUpdateImplementation, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
     {
         for( Pattern iterationPattern : set )
         {

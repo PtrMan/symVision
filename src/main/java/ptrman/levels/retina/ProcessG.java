@@ -33,7 +33,7 @@ public class ProcessG {
             this.curveElements = curveElements;
         }
         
-        public List<CurveElement> curveElements;
+        public final List<CurveElement> curveElements;
         
         public ArrayRealVector getNormalizedTangentAtEndpoint(int index) {
             Assert.Assert(index >= 0 && index <= 1, "");
@@ -103,8 +103,8 @@ public class ProcessG {
         }
         
         // parametric curve parameters
-        private float[] a;
-        private float[] b;
+        private final float[] a;
+        private final float[] b;
         
         /**
          * 
@@ -157,66 +157,63 @@ public class ProcessG {
         // for now we do this for *all* curves
         // TODO< select by random >
 
-        for( int currentLineParsingIndex = 0; currentLineParsingIndex < lineParsings.size(); currentLineParsingIndex++ ) {
+        for (ProcessM.LineParsing lineParsing : lineParsings) {
             ProcessM.LineParsing currentLineParsing;
-            
-            currentLineParsing = lineParsings.get(currentLineParsingIndex);
-            
-            
+
+            currentLineParsing = lineParsing;
+
+
             // try to covert (at least) a part of the lineParsing to a curve
-            
+
             List<List<ArrayRealVector>> protocurves;
             List<ArrayRealVector> currentProtocurve;
-            
+
             protocurves = new ArrayList<>();
             currentProtocurve = null;
-            
-            for( int pointIndex = 1; pointIndex < currentLineParsing.lineParsing.size()-1; pointIndex++ ) {
+
+            for (int pointIndex = 1; pointIndex < currentLineParsing.lineParsing.size() - 1; pointIndex++) {
                 boolean atLeastOneSampleNotNearAdjacentLines = examineVincityOfSegmentPoint(pointIndex, currentLineParsing, samples);
-                
+
                 boolean IsParsingACurve = currentProtocurve != null;
-                
-                if( IsParsingACurve ) {
-                    if( atLeastOneSampleNotNearAdjacentLines ) {
+
+                if (IsParsingACurve) {
+                    if (atLeastOneSampleNotNearAdjacentLines) {
                         // add segment to curve and mark last segment as in a curve
-                        currentProtocurve.add(currentLineParsing.lineParsing.get(pointIndex-1).getBProjected());
-                        
-                        currentLineParsing.lineParsing.get(pointIndex-1).markedPartOfCurve = true;
-                    }
-                    else {
+                        currentProtocurve.add(currentLineParsing.lineParsing.get(pointIndex - 1).getBProjected());
+
+                        currentLineParsing.lineParsing.get(pointIndex - 1).markedPartOfCurve = true;
+                    } else {
                         // finish lineparsing
                         protocurves.add(currentProtocurve);
                         currentProtocurve = null;
                     }
-                }
-                else {
-                    if( atLeastOneSampleNotNearAdjacentLines ) {
+                } else {
+                    if (atLeastOneSampleNotNearAdjacentLines) {
                         // begin a new lineparsing
                         currentProtocurve = new ArrayList<>();
-                        
-                        currentProtocurve.add(currentLineParsing.lineParsing.get(pointIndex-1).getBProjected());
-                        
-                        currentLineParsing.lineParsing.get(pointIndex-1).markedPartOfCurve = true;
-                    }
-                    else {
+
+                        currentProtocurve.add(currentLineParsing.lineParsing.get(pointIndex - 1).getBProjected());
+
+                        currentLineParsing.lineParsing.get(pointIndex - 1).markedPartOfCurve = true;
+                    } else {
                         // do nothing
                     }
                 }
             }
-            
+
             boolean IsParsingACurve = currentProtocurve != null;
-            
-            if( IsParsingACurve ) {
+
+            if (IsParsingACurve) {
                 protocurves.add(currentProtocurve);
                 currentProtocurve = null;
                 IsParsingACurve = false;
             }
-            
+
             // convert protocurves to real curves
-            
-            for( List<ArrayRealVector> iterationProtoCurve : protocurves ) {
+
+            for (List<ArrayRealVector> iterationProtoCurve : protocurves) {
                 Curve createdCurve;
-                
+
                 createdCurve = calculatePolynominalsAndReturnCurve(iterationProtoCurve);
                 resultCurves.add(createdCurve);
             }
@@ -670,5 +667,5 @@ public class ProcessG {
         Y
     }
     
-    private List<Curve> resultCurves = new ArrayList<>();
+    private final List<Curve> resultCurves = new ArrayList<>();
 }

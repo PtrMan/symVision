@@ -15,12 +15,12 @@ import javax.swing.*;
  *
  */
 public class IntrospectControlPanel {
-	public Runnable handlerIntrospectionChanged = () -> { };
-	public Runnable handlerPauseContinue = () -> { };
-	private JPanel controlAreaPanel;
-	private JTextField frameTextfield = new JTextField();
-	private JButton pauseResumeButton = new JButton("||");
-	private JCheckBox introspectButton = new JCheckBox("introspect");
+	public final Runnable handlerIntrospectionChanged = () -> { };
+	public final Runnable handlerPauseContinue = () -> { };
+	private final JPanel controlAreaPanel;
+	private final JTextField frameTextfield = new JTextField();
+	private final JButton pauseResumeButton = new JButton("||");
+	private final JCheckBox introspectButton = new JCheckBox("introspect");
 	private boolean runningState = true;
 	public IntrospectControlPanel() {
 		controlAreaPanel = new JPanel();
