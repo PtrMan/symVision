@@ -93,7 +93,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
     public VisualizeLinesegmentsAnnealing() {
         processD = new ProcessD();
-        processD.maximalDistanceOfPositions = 500.0;
+        processD.maximalDistanceOfPositions = 5000.0;
         processD.onlyEndoskeleton = true;
 
         connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
@@ -103,9 +103,13 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
         }
     }
 
-    final ProcessD processD;
-    ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
-    ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
+    public ProcessD processD;
+    public ProcessD[] processDEdge;
+    public ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
+    public ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
+
+    public ProcessConnector<ProcessA.Sample>[] connectorSamplesFromProcessAForEdge;
+    public ProcessConnector<RetinaPrimitive>[] connectorDetectorsFromProcessDForEdge;
 
     public NarsBinding narsBinding;
 
@@ -171,15 +175,58 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             IMap2d<Float> mapGrayscale = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(processingChain.filterChainDag.elements.size()-1).content).result; // get from last element in the chain
 
+            int numberOfEdgeDetectorDirections = 8;
 
             // convolution
-            Map2dApplyConvolution[] edgeDetectors = new Map2dApplyConvolution[1];
-            edgeDetectors[0] = new Map2dApplyConvolution(Convolution2dHelper.calcGaborKernel(8, 0.0f, 10.0f/64.0f, (float)Math.PI*0.5f, 0.4f));
+            Map2dApplyConvolution[] edgeDetectors = new Map2dApplyConvolution[numberOfEdgeDetectorDirections];
+            for(int i=0; i<numberOfEdgeDetectorDirections;i++) {
+                edgeDetectors[i] = new Map2dApplyConvolution(Convolution2dHelper.calcGaborKernel(8, (float)i/(float)numberOfEdgeDetectorDirections * 2.0f * (float)Math.PI, 10.0f/64.0f, (float)Math.PI*0.5f, 0.4f));
+            }
 
-            IMap2d<Float>[] edges = new IMap2d[1];
-            edges[0] = edgeDetectors[0].process(mapGrayscale);
+            IMap2d<Float>[] edges = new IMap2d[numberOfEdgeDetectorDirections];
+            for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // detect edges with filters
+                edges[i] = edgeDetectors[i].process(mapGrayscale);
+            }
 
-            IMap2d<Boolean> mapBoolean = Map2dBinary.threshold(edges[0], 0.01f); // convert from edges[0]
+            ProcessA[] processAEdge = new ProcessA[numberOfEdgeDetectorDirections];
+            processDEdge = new ProcessD[numberOfEdgeDetectorDirections];
+            for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // create processors for edges
+                processAEdge[i] = new ProcessA();
+                processDEdge[i] = new ProcessD();
+                processDEdge[i].maximalDistanceOfPositions = 5000.0;
+            }
+
+            connectorDetectorsFromProcessDForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
+            connectorSamplesFromProcessAForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
+            for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // create connectors for edges
+                connectorDetectorsFromProcessDForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+                connectorSamplesFromProcessAForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+            }
+
+            for(int i=0; i<numberOfEdgeDetectorDirections;i++) {
+                // copy image because processA changes the image
+
+                IMap2d<Boolean> mapBoolean = Map2dBinary.threshold(edges[i], 0.01f); // convert from edges[0]
+
+                ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+                processAEdge[i].set(mapBoolean.copy(), null, connectorSamplesFromProcessAForEdge[i]);
+
+                processAEdge[i].setImageSize(imageSize);
+                processAEdge[i].setup();
+
+                processDEdge[i].setImageSize(imageSize);
+                processDEdge[i].set(connectorSamplesFromProcessAForEdge[i], connectorDetectorsFromProcessDForEdge[i]);
+
+                processAEdge[i].preProcessData();
+                processAEdge[i].processData(0.03f);
+                processAEdge[i].postProcessData();
+
+                processDEdge[i].preProcessData();
+                processDEdge[i].processData(1.0f);
+                processDEdge[i].postProcessData();
+            }
+
+            IMap2d<Boolean> mapBoolean = Map2dBinary.threshold(mapGrayscale, 0.1f); // convert from edges[0]
 
             ProcessZFacade processZFacade = new ProcessZFacade();
 
@@ -255,14 +302,28 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             processD.tryWiden();
             processD.sortByActivationAndThrowAway();
 
+            for(int idx=0;idx<processDEdge.length;idx++) {
+                processDEdge[idx].sampleNew();
+                processDEdge[idx].tryWiden();
+                processDEdge[idx].sortByActivationAndThrowAway();
+            }
+
             if (annealingStep >= 20) { // remove only in later phases
                 processD.removeCandidatesBelowActivation(1.1);
+
+                for(int idx=0;idx<processDEdge.length;idx++) {
+                    processDEdge[idx].removeCandidatesBelowActivation(1.1);
+                }
             }
 
             if (annealingStep == 30-1-1) {// is last step?
                 // then emit narsese to narsese consumer
 
                 processD.commitLineDetectors(); // split line detectors into "real" primitives
+
+                for(int idx=0;idx<processDEdge.length;idx++) {
+                    processDEdge[idx].commitLineDetectors();
+                }
 
                 narsBinding.emitRetinaPrimitives(connectorDetectorsEndosceletonFromProcessD.workspace); // emit all collected primitives from process D
             }
@@ -279,9 +340,10 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             tint(255.0f, 255.0f); // reset tint
         }
 
-        boolean drawVisualizationOfAltitude = true;
-        boolean drawVisualizationOfEndoSceletons = true; // do we visualize all samples of endo/exo -sceleton
+        boolean drawVisualizationOfAltitude = false;
+        boolean drawVisualizationOfEndoSceletons = false; // do we visualize all samples of endo/exo -sceleton
         boolean drawVisualizationOfLineDetectors = true;
+        boolean drawVisualizationOfEdgeLineDetectors = true;
 
 
         if(drawVisualizationOfAltitude) {
@@ -304,6 +366,36 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
                 }
             }
         }
+
+
+        if(drawVisualizationOfEdgeLineDetectors) { // draw visualization of line detectors
+            for (ProcessD iProcessDEdge : processDEdge) {
+                for(LineDetectorWithMultiplePoints iLineDetector : iProcessDEdge.annealedCandidates) {
+                    // iLineDetector.cachedSamplePositions
+
+
+                    stroke(128.0f, 128, 255);
+                    for (RetinaPrimitive iLine : ProcessD.splitDetectorIntoLines(iLineDetector)) {
+                        double x0 = iLine.line.a.getDataRef()[0];
+                        double y0 = iLine.line.a.getDataRef()[1];
+                        double x1 = iLine.line.b.getDataRef()[0];
+                        double y1 = iLine.line.b.getDataRef()[1];
+                        line((float)x0, (float)y0, (float)x1, (float)y1);
+                    }
+
+                    if (false) {
+                        stroke(255.0f, 0.0f, 0.0f);
+                        for( ProcessA.Sample iSample : iLineDetector.samples) {
+                            rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
+                        }
+                    }
+                }
+            }
+
+
+            int here = 5;
+        }
+
 
         if(drawVisualizationOfLineDetectors) { // draw visualization of line detectors
             for(LineDetectorWithMultiplePoints iLineDetector : processD.annealedCandidates) {
@@ -328,6 +420,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             int here = 5;
         }
+
 
         // mouse cursor
         ellipse(mouseX, mouseY, 4, 4);

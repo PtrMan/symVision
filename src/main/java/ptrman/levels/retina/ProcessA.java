@@ -82,7 +82,7 @@ public class ProcessA implements IProcess {
                                 hitCount++;
                                 workingImage.setAt(x, y, false);
 
-                                final int objectId = idMap.readAt(x, y);
+                                final int objectId = idMap != null ? idMap.readAt(x, y) : -1;
                                 //Assert.Assert(objectId  != -1, "");
                                 /*if( objectId != -1 ) {
                                     int d = 0;
@@ -111,7 +111,7 @@ public class ProcessA implements IProcess {
                                 hitCount++;
                                 workingImage.setAt(x, y, false);
 
-                                final int objectId = idMap.readAt(x, y);
+                                final int objectId = idMap != null ? idMap.readAt(x, y) : -1;
                                 //Assert.Assert(objectId  != -1, "");
                                 /*if( objectId != -1 ) {
                                     int d = 0;

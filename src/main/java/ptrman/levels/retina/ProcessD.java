@@ -144,10 +144,11 @@ public class ProcessD implements IProcess {
     private void tryCreateMultiLineDetector(
             double maxLength,
             IntList chosenCandidateSampleIndices, List<ProcessA.Sample> selectedSamples) {
-        final boolean doAllSamplesHaveId = doAllSamplesHaveObjectId(selectedSamples);
-        if (!doAllSamplesHaveId) {
-            return;
-        }
+        // commented check because we don't assume object id's anymore (because it was from Phaeaco for solving BP's)
+        //final boolean doAllSamplesHaveId = doAllSamplesHaveObjectId(selectedSamples);
+        //if (!doAllSamplesHaveId) {
+        //    return;
+        //}
 
         if (selectedSamples.size() == 0) {
             return; // special case
@@ -331,6 +332,8 @@ public class ProcessD implements IProcess {
     }
 
     private static boolean areObjectIdsTheSameOfSamples(final List<ProcessA.Sample> samples) {
+        return true;
+        /*
         Assert.Assert(samples.get(0).isObjectIdValid(), "");
 
         final int objectId = samples.get(0).objectId;
@@ -344,6 +347,8 @@ public class ProcessD implements IProcess {
         }
 
         return true;
+
+         */
     }
 
     /** TODO stream */
