@@ -145,30 +145,16 @@ public enum Maths {
 
         int bitsFromLeft;
         for( bitsFromLeft = 0; bitsFromLeft < 32; bitsFromLeft++ ) {
-            if( (value & (1 << (32-bitsFromLeft))) != 0 ) {
+            if( (value & (1 << (32-bitsFromLeft))) != 0 )
                 break;
-            }
         }
 
-        int result;
-
-        if( bitsFromLeft == 0 ) {
-            result = 1 << 31;
-
-        }
-        else {
-            result = 1 << (31+1+1-bitsFromLeft);
-
-        }
-        return result;
+        return bitsFromLeft == 0 ? 1 << 31 : 1 << (31 + 1 + 1 - bitsFromLeft);
     }
 
     public static boolean equals(final double a, final double b, final double epsilon) {
-        if (a >= b) {
-            return (a - b <= epsilon);
-        }
-        else //if (b > a) {
-            return (b - a <= epsilon);
+        //if (b > a) {
+        return a >= b ? a - b <= epsilon : b - a <= epsilon;
     }
 
 }

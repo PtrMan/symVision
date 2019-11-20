@@ -56,26 +56,18 @@ public class ProcessA implements IProcess {
         processData(1f);
     }
 
-
-    int cycle = 0;
-
     final Random rng = new RandomAdaptor( new MersenneTwister() );
 
     public void processData(float throttle) {
-
-        cycle++;
-
-
-        for( int blockY = 0; blockY < workingImage.getLength()/4; blockY++ ) {
-            for( int blockX = 0; blockX < workingImage.getWidth()/4; blockX++ ) {
+        int H = workingImage.getLength() / 4;
+        int W = workingImage.getWidth() / 4;
+        for(int blockY = 0; blockY < H; blockY++ ) {
+            for(int blockX = 0; blockX < W; blockX++ ) {
                 int hitCount = 0;
 
                 for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
                     for (int x = blockX; x < (blockX+1)*4; x++) {
-                        if (throttle < 1f) {
-                            if (rng.nextDouble() > throttle)
-                                continue;
-                        }
+                        if (throttle < 1f && rng.nextDouble() > throttle) continue;
 
                         if( sampleMaskAtPosition(x, y, MaskDetail0) ) {
                             if( workingImage.readAt(x, y) ) {
@@ -88,23 +80,19 @@ public class ProcessA implements IProcess {
                                     int d = 0;
                                 }*/
 
-                                addSampleToOutput(x, y, objectId);
+                                output(x, y, objectId);
                             }
                         }
                     }
                 }
 
-                if( hitCount == 8 ) {
+                if( hitCount == 8 )
                     continue;
-                }
 
                 // sample it a second time for nearly all of the missing pixels
                 for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
                     for (int x = blockX; x < (blockX+1)*4; x++) {
-                        if (throttle < 1f) {
-                            if (rng.nextDouble() > throttle)
-                                continue;
-                        }
+                        if (throttle < 1f && rng.nextDouble() > throttle) continue;
 
                         if( sampleMaskAtPosition(x, y, MaskDetail1) ) {
                             if( workingImage.readAt(x, y) ) {
@@ -117,7 +105,7 @@ public class ProcessA implements IProcess {
                                     int d = 0;
                                 }*/
 
-                                addSampleToOutput(x, y, objectId);
+                                output(x, y, objectId);
                             }
                         }
                     }
@@ -222,7 +210,7 @@ public class ProcessA implements IProcess {
         this.outputSampleConnector = outputSampleConnector;
     }
 
-    private void addSampleToOutput(final int x, final int y, final int objectId) {
+    private void output(final int x, final int y, final int objectId) {
         Sample createdSample = new Sample(x, y);
         createdSample.objectId = objectId;
         createdSample.conf = defaultSampleConf;

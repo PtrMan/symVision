@@ -20,7 +20,7 @@ public class NarsBinding {
         this.consumer = consumer;
     }
 
-    public void emitRetinaPrimitives(List<RetinaPrimitive> primitives) {
+    public void emitRetinaPrimitives(Iterable<RetinaPrimitive> primitives) {
         int primnitiveIdCntr = 0;
 
         for (RetinaPrimitive iPrimitive : primitives) {
@@ -29,7 +29,7 @@ public class NarsBinding {
             int bx = (int)iPrimitive.line.b.getDataRef()[0];
             int by = (int)iPrimitive.line.b.getDataRef()[1];
 
-            consumer.emitLineSegment(""+primnitiveIdCntr, ax,ay,bx,by, iPrimitive.conf);
+            consumer.emitLineSegment(String.valueOf(primnitiveIdCntr), ax,ay,bx,by, iPrimitive.conf);
             primnitiveIdCntr++;
         }
     }

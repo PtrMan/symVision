@@ -230,8 +230,8 @@ public class Solver2 {
 
         processD.step();
 
-        for(int idx=0;idx<processDEdge.length;idx++) {
-            processDEdge[idx].step();
+        for (ProcessD d : processDEdge) {
+            d.step();
         }
 
         /*
@@ -255,8 +255,8 @@ public class Solver2 {
 
         processD.commitLineDetectors(); // split line detectors into "real" primitives
 
-        for(int idx=0;idx<processDEdge.length;idx++) {
-            processDEdge[idx].commitLineDetectors();
+        for (ProcessD d : processDEdge) {
+            d.commitLineDetectors();
         }
 
         narsBinding.emitRetinaPrimitives(connectorDetectorsEndosceletonFromProcessD.workspace); // emit all collected primitives from process D

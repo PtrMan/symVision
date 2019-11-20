@@ -231,13 +231,8 @@ public class FeaturePatternMatching {
             double featureDistance;
 
             ArrayList<FeatureNode> featureNodesForType = nodeArrayListEntry.getValue();
-            
-            if( featureNodesForType.size() == 2 ) {
-                featureDistance = matchSameTypeNonNumerosity(featureNodesForType.get(0).statistics, featureNodesForType.get(1).statistics);
-            }
-            else {
-                featureDistance = 0.0;
-            }
+
+            featureDistance = featureNodesForType.size() == 2 ? matchSameTypeNonNumerosity(featureNodesForType.get(0).statistics, featureNodesForType.get(1).statistics) : 0.0;
             
             float weight = (nodeArrayListEntry.getKey().activation + getSystemWeightOfPlatonicFeatureType(nodeArrayListEntry.getKey(), networkHandles)) * 0.5f;
             

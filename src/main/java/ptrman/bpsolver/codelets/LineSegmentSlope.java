@@ -39,21 +39,15 @@ public class LineSegmentSlope extends SolverCodelet {
 
     @Override
     public RunResult run() {
-        double lineSegmentSlope;
-        
+
         Assert.Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "startNode node type is wrong!");
         Assert.Assert(((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode), "startNode is not a line!");
 
         PlatonicPrimitiveInstanceNode thisLine = (PlatonicPrimitiveInstanceNode)startNode;
         
         ArrayRealVector diff = thisLine.p1.subtract(thisLine.p2);
-        
-        if( diff.getDataRef()[0] == 0.0f ) {
-            lineSegmentSlope = Float.POSITIVE_INFINITY;
-        }
-        else {
-            lineSegmentSlope = diff.getDataRef()[1] / diff.getDataRef()[0];
-        }
+
+        double lineSegmentSlope = diff.getDataRef()[0] == 0.0f ? Float.POSITIVE_INFINITY : diff.getDataRef()[1] / diff.getDataRef()[0];
 
         FeatureNode createdLineSlope = FeatureNode.createFloatNode(getNetworkHandles().lineSegmentFeatureLineSlopePrimitiveNode, lineSegmentSlope, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().lineSegmentFeatureLineSlopePrimitiveNode));
         

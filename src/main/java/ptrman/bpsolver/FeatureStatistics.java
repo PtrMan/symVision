@@ -44,13 +44,7 @@ public class FeatureStatistics
     public float getStandardDeviation()
     {
         // from commons math
-        if (numberOfObservations > 1)
-        {
-            return (float)Math.sqrt(getVariance());
-        } else
-        {
-            return 0.0f;
-        }
+        return numberOfObservations > 1 ? (float) Math.sqrt(getVariance()) : 0.0f;
     }
     
     

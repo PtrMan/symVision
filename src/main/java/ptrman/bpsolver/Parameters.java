@@ -24,50 +24,22 @@ public enum Parameters
     
     public static float getProcessdMaxMse()
     {
-        if( ALLOWTUNINGPROCESSDMAXMSE )
-        {
-            return currentProcessdMaxMse;
-        }
-        else
-        {
-            return HardParameters.ProcessD.MAXMSE;
-        }
+        return ALLOWTUNINGPROCESSDMAXMSE ? currentProcessdMaxMse : HardParameters.ProcessD.MAXMSE;
     }
     
     public static float getProcessdLockingActivationOffset()
     {
-        if( ALLOWTUNINGPROCESSDLOCKINGACTIVATIONOFFSET )
-        {
-            return currentProcessdLockingActivationOffset;
-        }
-        else
-        {
-            return HardParameters.ProcessD.LOCKINGACTIVATIONOFFSET;
-        }
+        return ALLOWTUNINGPROCESSDLOCKINGACTIVATIONOFFSET ? currentProcessdLockingActivationOffset : HardParameters.ProcessD.LOCKINGACTIVATIONOFFSET;
     }
     
     public static float getProcessdLockingActivationScale()
     {
-        if( ALLOWTUNINGPROCESSDLOCKINGACTIVATIONSCALE )
-        {
-            return currentProcessdLockingActivationScale;
-        }
-        else
-        {
-            return HardParameters.ProcessD.LOCKINGACTIVATIONMSESCALE;
-        }
+        return ALLOWTUNINGPROCESSDLOCKINGACTIVATIONSCALE ? currentProcessdLockingActivationScale : HardParameters.ProcessD.LOCKINGACTIVATIONMSESCALE;
     }
 
     public static float getPatternMatchingMinSimilarity()
     {
-        if( ALLOWPATTERNMATCHINGMINSIMILARITY )
-        {
-            return currentPatternMatchingMinSimilarity;
-        }
-        else
-        {
-            return HardParameters.PatternMatching.MINSIMILARITY;
-        }
+        return ALLOWPATTERNMATCHINGMINSIMILARITY ? currentPatternMatchingMinSimilarity : HardParameters.PatternMatching.MINSIMILARITY;
     }
 
     public static void init()

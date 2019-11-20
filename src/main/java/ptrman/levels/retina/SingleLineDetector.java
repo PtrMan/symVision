@@ -145,12 +145,7 @@ public class SingleLineDetector {
     }
     
     public ArrayRealVector projectPointOntoLine(ArrayRealVector point, ArrayRealVector result) {
-        if( isYAxisSingularity() ) {
-            return projectPointOntoLineForSignular(point, result);
-        }
-        else {
-            return projectPointOntoLineForNonsignular(point, result);
-        }
+        return isYAxisSingularity() ? projectPointOntoLineForSignular(point, result) : projectPointOntoLineForNonsignular(point, result);
     }
     
     protected final ArrayRealVector projectPointOntoLineForSignular(ArrayRealVector point, ArrayRealVector result) {
@@ -241,12 +236,7 @@ public class SingleLineDetector {
     }
     
     public static ArrayRealVector intersectLineWithMN(SingleLineDetector line, double am, double an) {
-        if( line.isYAxisSingularity() ) {
-            return intersectSingularLineWithMN(line, am, an);
-        }
-        else {
-            return intersectLinesMN(line.getM(), line.getN(), am, an);
-        }
+        return line.isYAxisSingularity() ? intersectSingularLineWithMN(line, am, an) : intersectLinesMN(line.getM(), line.getN(), am, an);
     }
     
     private static ArrayRealVector intersectSingularLineWithMN(SingleLineDetector line, double am, double an) {
@@ -270,13 +260,8 @@ public class SingleLineDetector {
 
     public ArrayRealVector getPositionOfEndpoint(int index) {
         Assert.Assert(index == 0 || index == 1, "index must be 0 or 1");
-        
-        if( index == 0 ) {
-            return a;
-        }
-        else {
-            return b;
-        }
+
+        return index == 0 ? a : b;
     }
     
     // TODO< figure out if it is the middle >
@@ -294,12 +279,7 @@ public class SingleLineDetector {
 //
 //        diff = b.subtract(point);
 //        distanceEnd = diff.getNorm();
-        
-        if( distanceBegin < distanceEnd ) {
-            return Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN;
-        }
-        else {
-            return Intersection.IntersectionPartner.EnumIntersectionEndpointType.END;
-        }
+
+        return distanceBegin < distanceEnd ? Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN : Intersection.IntersectionPartner.EnumIntersectionEndpointType.END;
     }
 }

@@ -43,12 +43,7 @@ public class Intersection  {
 
     public IntersectionPartner getOtherPartner(RetinaPrimitive primary) {
 
-        if( primary.equals(p0.primitive) ) {
-            return p1;
-        }
-        else {
-            return p0;
-        }
+        return primary.equals(p0.primitive) ? p1 : p0;
     }
 
 }

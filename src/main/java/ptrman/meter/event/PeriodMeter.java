@@ -41,12 +41,7 @@ public class PeriodMeter extends FunctionMeter<Double> {
     }
     
      public static double now(boolean nanoSeconds /* TODO use a Resolution enum */) {
-        if (nanoSeconds) {
-            return (double)System.nanoTime();
-        }
-        else {
-            return System.currentTimeMillis() * 1.0E6;
-        }
+         return nanoSeconds ? (double) System.nanoTime() : System.currentTimeMillis() * 1.0E6;
     }
 
     public double sinceStart() {
@@ -62,12 +57,7 @@ public class PeriodMeter extends FunctionMeter<Double> {
     
     public DescriptiveStatistics hit() {
         double now;
-        if (sinceStart() > window) {
-            now = reset();
-        }
-        else {
-            now = now(nanoSeconds);
-        }
+        now = sinceStart() > window ? reset() : now(nanoSeconds);
         if (Double.isFinite(this.prev)) {
             double dt = now - this.prev;
             stat.addValue(dt);

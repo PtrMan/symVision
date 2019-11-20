@@ -168,12 +168,8 @@ public class NodeGraph {
 			// so we can add the text of the type
             PlatonicPrimitiveNode featureTypeNodeAsPlatonicPrimitiveNode = (PlatonicPrimitiveNode) featureNode.featureTypeNode;
 
-			if (featureTypeNodeAsPlatonicPrimitiveNode != null) {
-				featureName = featureTypeNodeAsPlatonicPrimitiveNode.platonicType;
-			} else {
-				// type was learned by the system
-				featureName = "?(learned)";
-			}
+			// type was learned by the system?
+			featureName = featureTypeNodeAsPlatonicPrimitiveNode != null ? featureTypeNodeAsPlatonicPrimitiveNode.platonicType : "?(learned)";
 
 			return graph.insertVertex(graphParent, null, "FeatureNode" + "<br>" + featureName, 20, 20, 80, 30);
 		} else if (node.type == NodeTypes.EnumType.NUMEROSITYNODE.ordinal()) {
@@ -201,12 +197,8 @@ public class NodeGraph {
 			// so we can add the text of the type
             PlatonicPrimitiveNode attributeTypeNodeAsPlatinicPrimitiveNode = (PlatonicPrimitiveNode) attributeNode.attributeTypeNode;
 
-			if (attributeTypeNodeAsPlatinicPrimitiveNode != null) {
-				attributeName = attributeTypeNodeAsPlatinicPrimitiveNode.platonicType;
-			} else {
-				// type was learned by the system
-				attributeName = "?(learned)";
-			}
+			// type was learned by the system
+			attributeName = attributeTypeNodeAsPlatinicPrimitiveNode != null ? attributeTypeNodeAsPlatinicPrimitiveNode.platonicType : "?(learned)";
 
 			return graph.insertVertex(graphParent, null, "AttributeNode" + "<br>" + attributeName, 20, 20, 80, 30);
 		} else {

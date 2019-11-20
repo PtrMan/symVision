@@ -122,13 +122,9 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
                     // its either V or T
                     
                     double angleInDegree = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[1]);
-                    
-                    if( angleInDegree < 45.0 ) {
-                        crosspoint.type = Crosspoint.EnumAnglePointType.T;
-                    }
-                    else {
-                        crosspoint.type = Crosspoint.EnumAnglePointType.V;
-                    }
+
+                    crosspoint.type = angleInDegree < 45.0 ?
+                        Crosspoint.EnumAnglePointType.T : Crosspoint.EnumAnglePointType.V;
                 }
             }
             else if( crosspoint.adjacentRetinaObjects.size() == 3 ) {
@@ -182,20 +178,14 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
                 final double angleInDegreeBetween12 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[1], tangents[2]);
                 final double angleInDegreeBetween13 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[1], tangents[3]);
                 final double angleInDegreeBetween23 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[2], tangents[3]);
-                
-                if(
-                    angleInDegreeBetween01 > 90.0 - ANGLEEPSILONINDEGREE &&
+
+                crosspoint.type = angleInDegreeBetween01 > 90.0 - ANGLEEPSILONINDEGREE &&
                     angleInDegreeBetween02 > 90.0 - ANGLEEPSILONINDEGREE &&
                     angleInDegreeBetween03 > 90.0 - ANGLEEPSILONINDEGREE &&
                     angleInDegreeBetween12 > 90.0 - ANGLEEPSILONINDEGREE &&
                     angleInDegreeBetween13 > 90.0 - ANGLEEPSILONINDEGREE &&
-                    angleInDegreeBetween23 > 90.0 - ANGLEEPSILONINDEGREE
-                ) {
-                    crosspoint.type = Crosspoint.EnumAnglePointType.X;
-                }
-                else {
-                    crosspoint.type = Crosspoint.EnumAnglePointType.K;
-                }
+                    angleInDegreeBetween23 > 90.0 - ANGLEEPSILONINDEGREE ?
+                        Crosspoint.EnumAnglePointType.X : Crosspoint.EnumAnglePointType.K;
             }
             else {
                 Assert.Assert(crosspoint.adjacentRetinaObjects.size() > 4, "");
