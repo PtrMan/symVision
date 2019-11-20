@@ -12,7 +12,7 @@ package ptrman.visualizationTests;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import processing.core.PApplet;
 import processing.core.PImage;
-import ptrman.Gui.IImageDrawer;
+import ptrman.bpsolver.IImageDrawer;
 import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Solver2;
 import ptrman.levels.retina.*;
@@ -76,6 +76,11 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
                 g2.fillRect(10, 50, 70, 20);
             }
+            else if(chosenImage == 4) { // chinese symbol
+                // text
+                g2.setFont(new Font("TimesRoman", Font.PLAIN, 90));
+                g2.drawString("不", 2, 100);
+            }
 
 
             return off_Image;
@@ -104,7 +109,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
 
         if ((frameCounter % (framesPerStep*steps)) == 0 ) {
-            chosenImage = new Random().nextInt(4);
+            chosenImage = new Random().nextInt(5);
 
 
             solver2.imageDrawer = new VisualizeLinesegmentsAnnealing.InputDrawer();

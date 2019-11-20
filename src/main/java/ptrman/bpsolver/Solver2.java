@@ -12,14 +12,11 @@ package ptrman.bpsolver;
 import ptrman.Datastructures.Dag;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
-import ptrman.Gui.IImageDrawer;
-import ptrman.Showcases.TestClustering;
 import ptrman.bindingNars.NarsBinding;
 import ptrman.bindingNars.OpenNarsNarseseConsumer;
 import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.levels.visual.*;
-import ptrman.visualizationTests.VisualizeLinesegmentsAnnealing;
 
 import java.awt.image.BufferedImage;
 
@@ -65,7 +62,7 @@ public class Solver2 {
         Vector2d<Integer> imageSize = new Vector2d<>(image.getWidth(), image.getHeight());
 
 
-        IMap2d<ColorRgb> mapColor = TestClustering.translateFromImageToMap(image);
+        IMap2d<ColorRgb> mapColor = Map2dImageConverter.convertImageToMap(image);
 
 
 
