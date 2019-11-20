@@ -19,8 +19,6 @@ import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.misc.Assert;
 
-import java.util.List;
-
 import static ptrman.math.ArrayRealVectorHelper.getScaled;
 
 // NOTE< a problem could be that the endpoint positions of the line segments are handled per line, and not as a whole >

@@ -169,8 +169,11 @@ public class ProcessA implements IProcess {
 
             if (isAltitudeValid()) {
                 detectorImageGraphics.setColor(Color.RED);
-                final int a = (int)(altitude * 4);
-                detectorImageGraphics.drawOval(positionX-a/2, positionY-a/2, a, a);
+                float a = (float) (
+                    //altitude * 4
+                    altitude/4f
+                );
+                detectorImageGraphics.drawOval(Math.round(positionX-a/2), Math.round(positionY-a/2), Math.round(a), Math.round(a));
             }
 
         }
