@@ -49,8 +49,6 @@ public class ProcessD implements IProcess {
 
     private Vector2d<Integer> imageSize;
 
-    private final Random random = new RandomAdaptor(new MersenneTwister()); // new Random();
-
     public double maximalDistanceOfPositions;
 
     private ProcessConnector<ProcessA.Sample> inputSampleConnector;
@@ -64,7 +62,7 @@ public class ProcessD implements IProcess {
 
     public double lineDetectorInitialXStep = 1.0 / 10.0; // initial step size of a line detector along the activation function
 
-    public final Random rng = new Random();
+    public final Random rng = new RandomAdaptor(new MersenneTwister());
 
 
     public void set(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<RetinaPrimitive> outputLineDetectorConnector) {
@@ -136,7 +134,7 @@ public class ProcessD implements IProcess {
         }
 
 
-        IntList chosenCandidateSampleIndices = getRandomElements(allCandidateSampleIndices, 3, random);
+        IntList chosenCandidateSampleIndices = getRandomElements(allCandidateSampleIndices, 3, rng);
         List<ProcessA.Sample> selectedSamples = getSamplesByIndices(workingSamples, chosenCandidateSampleIndices);
 
         tryCreateMultiLineDetector(maxLength, chosenCandidateSampleIndices, selectedSamples);
