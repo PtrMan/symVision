@@ -29,7 +29,7 @@ public class NarsBinding {
             int bx = (int)iPrimitive.line.b.getDataRef()[0];
             int by = (int)iPrimitive.line.b.getDataRef()[1];
 
-            consumer.emitLineSegment(""+primnitiveIdCntr, ax,ay,bx,by);
+            consumer.emitLineSegment(""+primnitiveIdCntr, ax,ay,bx,by, iPrimitive.conf);
             primnitiveIdCntr++;
         }
     }

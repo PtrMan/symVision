@@ -54,6 +54,8 @@ public class RetinaPrimitive {
 
     public int objectId = -1;
 
+    public double conf = 0.0; // NAL confidence
+
     public boolean hasValidObjectId() {
         return objectId != -1;
     }

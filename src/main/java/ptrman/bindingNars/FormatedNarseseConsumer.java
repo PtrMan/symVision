@@ -13,5 +13,5 @@ package ptrman.bindingNars;
  * consumer of narsese which is independent on the exact narsese-grammar
  */
 public interface FormatedNarseseConsumer {
-    void emitLineSegment(String name, int posAX, int posAY, int posBX, int posBY);
+    void emitLineSegment(String name, int posAX, int posAY, int posBX, int posBY, double conf);
 }

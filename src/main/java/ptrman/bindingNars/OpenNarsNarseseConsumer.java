@@ -11,7 +11,7 @@ package ptrman.bindingNars;
 
 public class OpenNarsNarseseConsumer implements FormatedNarseseConsumer {
     @Override
-    public void emitLineSegment(String name, int posAX, int posAY, int posBX, int posBY) {
-        System.out.println("<(*,"+name+","+posAX+"_"+posAY+"," +posBX+"_" +posBY+") --> line>.");
+    public void emitLineSegment(String name, int posAX, int posAY, int posBX, int posBY, double conf) {
+        System.out.println("<(*,"+name+","+posAX+"_"+posAY+"," +posBX+"_" +posBY+") --> line>. %1.0;"+conf+"%");
     }
 }

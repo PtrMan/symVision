@@ -483,14 +483,14 @@ public class ProcessD implements IProcess {
         List<ArrayRealVector> sortedSamplePositions = getSortedSamplePositions(lineDetectorWithMultiplePoints);
 
         if (lineDetectorWithMultiplePoints.isYAxisSingularity()) {
-            return clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, sortedSamplePositions, EnumAxis.Y);
+            return clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, lineDetectorWithMultiplePoints.cachedConf, sortedSamplePositions, EnumAxis.Y);
         } else {
-            return clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, sortedSamplePositions, EnumAxis.X);
+            return clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, lineDetectorWithMultiplePoints.cachedConf, sortedSamplePositions, EnumAxis.X);
         }
     }
 
 
-    private static List<RetinaPrimitive> clusterPointsFromLinedetectorToLinedetectors(final int objectId, final List<ArrayRealVector> pointPositions, final EnumAxis axis) {
+    private static List<RetinaPrimitive> clusterPointsFromLinedetectorToLinedetectors(final int objectId, final double conf, final List<ArrayRealVector> pointPositions, final EnumAxis axis) {
         List<RetinaPrimitive> resultSingleLineDetectors = new ArrayList<>();
 
         boolean nextIsNewLineStart = true;
@@ -527,6 +527,7 @@ public class ProcessD implements IProcess {
         if (!nextIsNewLineStart && Helper.getAxis(lastPoint, axis) - lastAxisPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE) {
             RetinaPrimitive newPrimitive = RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, lastPoint));
             newPrimitive.objectId = objectId;
+            newPrimitive.conf = conf;
             resultSingleLineDetectors.add(newPrimitive);
         }
 
