@@ -29,19 +29,62 @@ public class LineDetectorWithMultiplePoints {
 
     public double mse = 0.0f;
 
-    public boolean isLocked = false; // has the detector received enough activation so it stays?
+    //public boolean isLocked = false; // has the detector received enough activation so it stays?
+
+    public boolean isHardened = false; // has the detector received enough activation so it got hardened?
 
     public int commonObjectId = -1;
+
+    public double x = 0.0; // used to compute the activation function
+    public double xStep = 0.0; // current stepsize of x
+    public double xDecayDelta = 0.0; // how much is added or subtracted from x when computing the activation function - used for decay
+
+
+    public LineDetectorWithMultiplePoints(double xStep) {
+        this.xStep = xStep;
+    }
 
     public boolean doesContainSampleIndex(int index) {
         return integratedSampleIndices.contains(index);
     }
 
-    public double getActivation() {
-        return
-            samples.size() * 0.1 +
-            cachedConf * 1.8 +
-            (Parameters.getProcessdMaxMse() - mse) * Parameters.getProcessdLockingActivationScale();
+    /** compute sigmoid like activation function as described in
+     * https://www.foundalis.com/res/Generalization_of_Hebbian_Learning_and_Categorization.pdf
+     */
+    public static double calcActivation(double x) {
+        x = Math.max(x, 0.0);
+        x = Math.min(x, 1.0);
+
+        double pointAX = 0.15; // from begin of quadratic shape to line segment
+        double pointAY = 0.2;
+
+        double pointBX = 1.0; // from linear segment to other quadratic shape
+        double pointBY = 1.0;
+
+        if (x < pointAX) { // are we in the region of the quadratic shape?
+            double relX = x / pointAX;
+            return relX*relX * pointAY;
+        }
+        else if (x < pointBX) { // linear shape
+            double relX = (x - pointAX) / (pointBX-pointAX);
+            return relX * (pointBY - pointAY) + pointAY;
+        }
+        else { //
+            return 1.0; // TODO< implement computation >
+        }
+    }
+
+
+    public double calcActivationX() {
+        double x = this.x+xDecayDelta; // compute "real" x for activation function
+        x = Math.max(x, 0.0);
+        x = Math.min(x, 1.0);
+        return x;
+    }
+
+    public double calcActivation() {
+        double x = calcActivationX();
+        return calcActivation(x);
     }
 
     public boolean isCommonObjectIdValid() {

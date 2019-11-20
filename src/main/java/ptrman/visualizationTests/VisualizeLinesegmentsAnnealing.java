@@ -98,9 +98,15 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
     public void draw(){
         background(64);
 
-        animationFrameNumber = (frameCounter / (5*30));
 
-        if ((frameCounter % (5*30)) == 0 ) {
+        int framesPerStep = 10; // how many frames do we visualize one step?
+
+        int steps = 50; // how many steps are done?
+
+        animationFrameNumber = (frameCounter / (framesPerStep*steps));
+
+
+        if ((frameCounter % (framesPerStep*steps)) == 0 ) {
             chosenImage = new Random().nextInt(3);
 
 
@@ -109,10 +115,10 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             solver2.preFrame(); // do all processing and setup before the actual processing of the frame
 
         }
-        else if( (frameCounter % 5) == 0 ) {
+        else if( (frameCounter % framesPerStep) == 0 ) {
             solver2.frameStep(); // step of a frame
 
-            if (solver2.annealingStep == 30-1-1) {// is last step?
+            if (solver2.annealingStep == steps-1-1) {// is last step?
                 solver2.postFrame(); // finish off frame processing
             }
         }
@@ -129,7 +135,8 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
         boolean drawVisualizationOfAltitude = false;
         boolean drawVisualizationOfEndoSceletons = false; // do we visualize all samples of endo/exo -sceleton
         boolean drawVisualizationOfLineDetectors = true;
-        boolean drawVisualizationOfEdgeLineDetectors = true;
+        boolean drawVisualizationOfLineDetectorsEnableAct = true; // do we draw activation of line detectors?
+        boolean drawVisualizationOfEdgeLineDetectors = false;
 
 
         if(drawVisualizationOfAltitude) {
@@ -187,7 +194,10 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             for(LineDetectorWithMultiplePoints iLineDetector : solver2.processD.annealedCandidates) {
                 // iLineDetector.cachedSamplePositions
 
-                stroke(255.0f, 255.0f, 255.0f);
+                float act = drawVisualizationOfLineDetectorsEnableAct ? (float)iLineDetector.calcActivation() : 1.0f;
+                stroke(act*255.0f, act*255.0f, act*255.0f);
+
+
                 for (RetinaPrimitive iLine : ProcessD.splitDetectorIntoLines(iLineDetector)) {
                     double x0 = iLine.line.a.getDataRef()[0];
                     double y0 = iLine.line.a.getDataRef()[1];

@@ -62,6 +62,8 @@ public class ProcessD implements IProcess {
 
     public boolean onlyEndoskeleton = false; // only work with samples which belong to endoskeleton?
 
+    public double lineDetectorInitialXStep = 1.0 / 10.0; // initial step size of a line detector along the activation function
+
     public final Random rng = new Random();
 
 
@@ -91,7 +93,7 @@ public class ProcessD implements IProcess {
 
     // sorts annealedCandidates by activation and throws items with to low activation away
     public void sortByActivationAndThrowAway() {
-        annealedCandidates.sort((a, b) -> (a==b) ? 0 : a.getActivation() < b.getActivation() ? 1 : -1);
+        annealedCandidates.sort((a, b) -> (a==b) ? 0 : a.calcActivation() < b.calcActivation() ? 1 : -1);
 
         // limit size
         while(annealedCandidates.size() > anealedCandidatesMaxCount) {
@@ -102,7 +104,7 @@ public class ProcessD implements IProcess {
 
     public void removeCandidatesBelowActivation(double threshold) {
         for(int idx=annealedCandidates.size()-1;idx >= 0;idx--) {
-            double activation = annealedCandidates.get(idx).getActivation();
+            double activation = annealedCandidates.get(idx).calcActivation();
             if (activation < threshold) {
                 annealedCandidates.remove(idx);
             }
@@ -140,6 +142,8 @@ public class ProcessD implements IProcess {
         tryCreateMultiLineDetector(maxLength, chosenCandidateSampleIndices, selectedSamples);
 
     }
+
+    public double processDNumberOfPointsToActivationScale = 0.15; // how much does a point improve the scaling
 
     private void tryCreateMultiLineDetector(
             double maxLength,
@@ -184,7 +188,7 @@ public class ProcessD implements IProcess {
 
 
         // create new line detector
-        LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints();
+        LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints(lineDetectorInitialXStep);
         createdLineDetector.integratedSampleIndices = chosenCandidateSampleIndices;
         createdLineDetector.samples = selectedSamples;
 
@@ -220,6 +224,9 @@ public class ProcessD implements IProcess {
         }
         // else we are here
 
+        createdLineDetector.x += createdLineDetector.samples.size() * processDNumberOfPointsToActivationScale; // more fitting points -> better activation
+        createdLineDetector.x += (Parameters.getProcessdMaxMse() - createdLineDetector.mse) * Parameters.getProcessdLockingActivationScale(); // better mse -> better activation
+
         if (addCreatedLineDetector) {
             for(ProcessA.Sample iSample : createdLineDetector.samples) {
                 iSample.refCount++;
@@ -236,9 +243,7 @@ public class ProcessD implements IProcess {
     public void processData(float throttle) {
 
         for(int i = 0; i < 9; i++) {
-            sampleNew();
-            tryWiden();
-            sortByActivationAndThrowAway();
+            step();
         }
 
         /* TODO 16.11.2019 activate this code again because it is necessary as the last step
@@ -270,6 +275,52 @@ public class ProcessD implements IProcess {
         }
 
         return result;
+    }
+
+    /**
+     * processing step
+     */
+    public void step() {
+        sampleNew();
+        tryWiden();
+        detectorsHarden();
+        detectorsFadeActivation();
+        //sortByActivationAndThrowAway();
+        removeCandidatesBelowActivation(0.05);
+    }
+
+    public double processDHardenDetectorThreshold = 0.6;
+    public double processDHardenDetectorFactor = 0.1;
+
+    public void detectorsHarden() {
+        // make fading harden when the x value of the activation exceeds a threshold
+        // this is done to prefer to keep good detectors
+        // https://www.foundalis.com/res/Generalization_of_Hebbian_Learning_and_Categorization.pdf
+        // "
+        //    However, when x exceeds a threshold that is just before the maximum value 1,
+        //    the number of discrete steps along the x-axis  is  increased  somewhat
+        //    (the  resolution  of  segmenting  the x-axis grows). This implies that the subsequent
+        //    fading of the activation will become slower, because x will have more backward steps to
+        //    traverse along the x-axis. The meaning of this  change  is  that  associations  that  are
+        //    well  established  should  become  progressively  harder  to  fade,  after  repeated
+        //    confirmations of their correctness. The amount by which the number of steps is increased
+        //    is a parameter of the system.
+        // "
+        for (LineDetectorWithMultiplePoints iDetector : annealedCandidates) {
+            if (!iDetector.isHardened && iDetector.calcActivationX() > processDHardenDetectorThreshold) {
+                iDetector.isHardened = true;
+                iDetector.xStep *= processDHardenDetectorFactor; // make it harder to decay
+            }
+        }
+    }
+
+    /**
+     * fades the activation of all detectors as described in https://www.foundalis.com/res/Generalization_of_Hebbian_Learning_and_Categorization.pdf page 4
+     */
+    public void detectorsFadeActivation() {
+        for (LineDetectorWithMultiplePoints iDetector : annealedCandidates) {
+            iDetector.xDecayDelta -= iDetector.xStep;
+        }
     }
 
     /**
@@ -309,6 +360,10 @@ public class ProcessD implements IProcess {
                 iLinedetector.m = regressionResult.m;
                 iLinedetector.n = regressionResult.n;
                 iLinedetector.mse = regressionResult.mse;
+
+                iLinedetector.x = 0.0;
+                iLinedetector.x += iLinedetector.samples.size() * processDNumberOfPointsToActivationScale; // more fitting points -> better activation
+                iLinedetector.x += (Parameters.getProcessdMaxMse() - iLinedetector.mse) * Parameters.getProcessdLockingActivationScale(); // better mse -> better activation
 
                 // * recompute conf
                 iLinedetector.recalcConf();

@@ -228,16 +228,13 @@ public class Solver2 {
     public void frameStep() {
         // do annealing step of process D
 
-        processD.sampleNew();
-        processD.tryWiden();
-        processD.sortByActivationAndThrowAway();
+        processD.step();
 
         for(int idx=0;idx<processDEdge.length;idx++) {
-            processDEdge[idx].sampleNew();
-            processDEdge[idx].tryWiden();
-            processDEdge[idx].sortByActivationAndThrowAway();
+            processDEdge[idx].step();
         }
 
+        /*
         if (annealingStep >= 20) { // remove only in later phases
             processD.removeCandidatesBelowActivation(1.1);
 
@@ -245,6 +242,7 @@ public class Solver2 {
                 processDEdge[idx].removeCandidatesBelowActivation(1.1);
             }
         }
+         */
 
         annealingStep++;
     }
