@@ -12,29 +12,25 @@ package ptrman.visualizationTests;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import processing.core.PApplet;
 import processing.core.PImage;
-import ptrman.Datastructures.Dag;
-import ptrman.Datastructures.IMap2d;
-import ptrman.Datastructures.Vector2d;
 import ptrman.Gui.IImageDrawer;
-import ptrman.Showcases.TestClustering;
-import ptrman.bindingNars.NarsBinding;
-import ptrman.bindingNars.OpenNarsNarseseConsumer;
 import ptrman.bpsolver.Solver;
+import ptrman.bpsolver.Solver2;
 import ptrman.levels.retina.*;
-import ptrman.levels.retina.helper.ProcessConnector;
-import ptrman.levels.visual.*;
 import ptrman.misc.ImageConverter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
-import java.util.function.Function;
 
-// visualize line-segments of endosceleton
+/** visualize line-segments of endosceleton
+ *
+ */
 public class VisualizeLinesegmentsAnnealing extends PApplet {
 
     final static int RETINA_WIDTH = 128;
     final static int RETINA_HEIGHT = 128;
+
+    public Solver2 solver2 = new Solver2();
 
 
     public static class InputDrawer implements IImageDrawer {
@@ -91,33 +87,13 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
     static int chosenImage = 0; // chosen image
 
-    public VisualizeLinesegmentsAnnealing() {
-        processD = new ProcessD();
-        processD.maximalDistanceOfPositions = 5000.0;
-        processD.onlyEndoskeleton = true;
 
-        connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
 
-        { // create NARS-binding
-            narsBinding = new NarsBinding(new OpenNarsNarseseConsumer());
-        }
-    }
-
-    public ProcessD processD;
-    public ProcessD[] processDEdge;
-    public ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
-    public ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
-
-    public ProcessConnector<ProcessA.Sample>[] connectorSamplesFromProcessAForEdge;
-    public ProcessConnector<RetinaPrimitive>[] connectorDetectorsFromProcessDForEdge;
-
-    public NarsBinding narsBinding;
 
     int frameCounter = 0;
 
     static int animationFrameNumber = 0;
 
-    static int annealingStep = 0;
 
     public void draw(){
         background(64);
@@ -127,208 +103,18 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
         if ((frameCounter % (5*30)) == 0 ) {
             chosenImage = new Random().nextInt(3);
 
-            InputDrawer imageDrawer = new InputDrawer();
 
+            solver2.imageDrawer = new VisualizeLinesegmentsAnnealing.InputDrawer();
 
-            // TODO< pull image from source >
-            // for now imageDrawer does this
-            BufferedImage image = imageDrawer.apply(null);
+            solver2.preFrame(); // do all processing and setup before the actual processing of the frame
 
-            Vector2d<Integer> imageSize = new Vector2d<>(image.getWidth(), image.getHeight());
-
-
-            IMap2d<ColorRgb> mapColor = TestClustering.translateFromImageToMap(image);
-
-
-
-
-
-            // setup the processing chain
-
-            VisualProcessor.ProcessingChain processingChain = new VisualProcessor.ProcessingChain();
-
-            Dag.Element newDagElement = new Dag.Element(
-                new VisualProcessor.ProcessingChain.ChainElementColorFloat(
-                    new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
-                    "convertRgbToGrayscale",
-                    imageSize
-                )
-            );
-            //newDagElement.childIndices.add(1);
-
-            processingChain.filterChainDag.elements.add(newDagElement);
-
-            /* commented because we don't dither
-            newDagElement = new Dag.Element(
-                    new VisualProcessor.ProcessingChain.ChainElementFloatBoolean(
-                            new VisualProcessor.ProcessingChain.DitheringFilter(),
-                            "dither",
-                            imageSize
-                    )
-            );
-
-            processingChain.filterChainDag.elements.add(newDagElement);
-             */
-
-
-            processingChain.filterChain(mapColor);
-
-            IMap2d<Float> mapGrayscale = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(processingChain.filterChainDag.elements.size()-1).content).result; // get from last element in the chain
-
-            int numberOfEdgeDetectorDirections = 8;
-
-            // convolution
-            Map2dApplyConvolution[] edgeDetectors = new Map2dApplyConvolution[numberOfEdgeDetectorDirections];
-            for(int i=0; i<numberOfEdgeDetectorDirections;i++) {
-                edgeDetectors[i] = new Map2dApplyConvolution(Convolution2dHelper.calcGaborKernel(8, (float)i/(float)numberOfEdgeDetectorDirections * 2.0f * (float)Math.PI, 10.0f/64.0f, (float)Math.PI*0.5f, 0.4f));
-            }
-
-            IMap2d<Float>[] edges = new IMap2d[numberOfEdgeDetectorDirections];
-            for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // detect edges with filters
-                edges[i] = edgeDetectors[i].process(mapGrayscale);
-            }
-
-            ProcessA[] processAEdge = new ProcessA[numberOfEdgeDetectorDirections];
-            processDEdge = new ProcessD[numberOfEdgeDetectorDirections];
-            for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // create processors for edges
-                processAEdge[i] = new ProcessA();
-                processDEdge[i] = new ProcessD();
-                processDEdge[i].maximalDistanceOfPositions = 5000.0;
-            }
-
-            connectorDetectorsFromProcessDForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
-            connectorSamplesFromProcessAForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
-            for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // create connectors for edges
-                connectorDetectorsFromProcessDForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
-                connectorSamplesFromProcessAForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
-            }
-
-            for(int i=0; i<numberOfEdgeDetectorDirections;i++) {
-                // copy image because processA changes the image
-
-                IMap2d<Boolean> mapBoolean = Map2dBinary.threshold(edges[i], 0.01f); // convert from edges[0]
-
-                ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
-                processAEdge[i].set(mapBoolean.copy(), null, connectorSamplesFromProcessAForEdge[i]);
-
-                processAEdge[i].setImageSize(imageSize);
-                processAEdge[i].setup();
-
-                processDEdge[i].setImageSize(imageSize);
-                processDEdge[i].set(connectorSamplesFromProcessAForEdge[i], connectorDetectorsFromProcessDForEdge[i]);
-
-                processAEdge[i].preProcessData();
-                processAEdge[i].processData(0.03f);
-                processAEdge[i].postProcessData();
-
-                processDEdge[i].preProcessData();
-                processDEdge[i].processData(1.0f);
-                processDEdge[i].postProcessData();
-            }
-
-            IMap2d<Boolean> mapBoolean = Map2dBinary.threshold(mapGrayscale, 0.1f); // convert from edges[0]
-
-            ProcessZFacade processZFacade = new ProcessZFacade();
-
-            final int processzNumberOfPixelsToMagnifyThreshold = 8;
-
-            final int processZGridsize = 8;
-
-            connectorSamplesForEndosceleton.workspace.clear();
-            processD.annealedCandidates.clear(); // TODO< cleanup in process with method >
-
-            processZFacade.setImageSize(imageSize);
-            processZFacade.preSetupSet(processZGridsize, processzNumberOfPixelsToMagnifyThreshold);
-            processZFacade.setup();
-
-            processZFacade.set(mapBoolean); // image doesn't need to be copied
-
-            processZFacade.preProcessData();
-            processZFacade.processData();
-            processZFacade.postProcessData();
-
-            IMap2d<Integer> notMagnifiedOutputObjectIdsMapDebug = processZFacade.getNotMagnifiedOutputObjectIds();
-
-            ProcessA processA = new ProcessA();
-            ProcessB processB = new ProcessB();
-            ProcessC processC = new ProcessC();
-
-            // copy image because processA changes the image
-            ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
-            processA.set(mapBoolean.copy(), processZFacade.getNotMagnifiedOutputObjectIds(), connectorSamplesFromProcessA);
-            processA.setImageSize(imageSize);
-            processA.setup();
-
-            ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessB = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
-            processB.set(mapBoolean.copy(), connectorSamplesFromProcessA, conntrSamplesFromProcessB);
-            processB.setImageSize(imageSize);
-            processB.setup();
-
-
-            ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessC0 = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
-            ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessC1 = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
-            processC.set(conntrSamplesFromProcessB, conntrSamplesFromProcessC0, conntrSamplesFromProcessC1);
-            processC.setImageSize(imageSize);
-            processC.setup();
-
-            connectorDetectorsEndosceletonFromProcessD = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
-
-            processD.setImageSize(imageSize);
-            connectorSamplesForEndosceleton = conntrSamplesFromProcessC0;
-            processD.set(connectorSamplesForEndosceleton, connectorDetectorsEndosceletonFromProcessD);
-
-            processA.preProcessData();
-            processA.processData(0.03f);
-            processA.postProcessData();
-
-            processB.preProcessData();
-            processB.processData();
-            processB.postProcessData();
-
-            processC.preProcessData();
-            processC.processData();
-            processC.postProcessData();
-
-            processD.preProcessData();
-            processD.processData(1.0f);
-            processD.postProcessData();
-
-            annealingStep = 0;
         }
         else if( (frameCounter % 5) == 0 ) {
-            // do annealing step of process D
+            solver2.frameStep(); // step of a frame
 
-            processD.sampleNew();
-            processD.tryWiden();
-            processD.sortByActivationAndThrowAway();
-
-            for(int idx=0;idx<processDEdge.length;idx++) {
-                processDEdge[idx].sampleNew();
-                processDEdge[idx].tryWiden();
-                processDEdge[idx].sortByActivationAndThrowAway();
+            if (solver2.annealingStep == 30-1-1) {// is last step?
+                solver2.postFrame(); // finish off frame processing
             }
-
-            if (annealingStep >= 20) { // remove only in later phases
-                processD.removeCandidatesBelowActivation(1.1);
-
-                for(int idx=0;idx<processDEdge.length;idx++) {
-                    processDEdge[idx].removeCandidatesBelowActivation(1.1);
-                }
-            }
-
-            if (annealingStep == 30-1-1) {// is last step?
-                // then emit narsese to narsese consumer
-
-                processD.commitLineDetectors(); // split line detectors into "real" primitives
-
-                for(int idx=0;idx<processDEdge.length;idx++) {
-                    processDEdge[idx].commitLineDetectors();
-                }
-
-                narsBinding.emitRetinaPrimitives(connectorDetectorsEndosceletonFromProcessD.workspace); // emit all collected primitives from process D
-            }
-
-            annealingStep++;
         }
 
         frameCounter++;
@@ -347,7 +133,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
 
         if(drawVisualizationOfAltitude) {
-            for (ProcessA.Sample iSample : connectorSamplesForEndosceleton.workspace) {
+            for (ProcessA.Sample iSample : solver2.connectorSamplesForEndosceleton.workspace) {
                 float color = Math.min((float)iSample.altitude / 20.0f, 1.0f);
 
                 stroke(color*255.0f);
@@ -359,7 +145,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             stroke(200.0f, 255.0f, 200.0f);
 
-            for (ProcessA.Sample s : connectorSamplesForEndosceleton.workspace) {
+            for (ProcessA.Sample s : solver2.connectorSamplesForEndosceleton.workspace) {
                 if (s.type == ProcessA.Sample.EnumType.ENDOSCELETON) {
                     IntIntPair p = s.position;
                     rect(p.getOne(), p.getTwo(), 1, 1);
@@ -369,7 +155,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
 
         if(drawVisualizationOfEdgeLineDetectors) { // draw visualization of line detectors
-            for (ProcessD iProcessDEdge : processDEdge) {
+            for (ProcessD iProcessDEdge : solver2.processDEdge) {
                 for(LineDetectorWithMultiplePoints iLineDetector : iProcessDEdge.annealedCandidates) {
                     // iLineDetector.cachedSamplePositions
 
@@ -398,7 +184,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
 
         if(drawVisualizationOfLineDetectors) { // draw visualization of line detectors
-            for(LineDetectorWithMultiplePoints iLineDetector : processD.annealedCandidates) {
+            for(LineDetectorWithMultiplePoints iLineDetector : solver2.processD.annealedCandidates) {
                 // iLineDetector.cachedSamplePositions
 
                 stroke(255.0f, 255.0f, 255.0f);
