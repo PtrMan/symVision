@@ -51,23 +51,14 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             g2.setColor(Color.WHITE);
 
             if (chosenImage == 0) {
-                // draw big boxes
-                if(false) {
-                    g2.fillRect(10, 10, 70, 20);
+                // draw "A"
+                int endpointADeltaX = (int)(Math.cos(animationFrameNumber * 0.1) * 10);
+                int endpointADeltaY = (int)(Math.sin(animationFrameNumber * 0.1) * 10);
 
-                    g2.fillRect(10, 50, 70, 20);
-                }
-
-                if(true) {// draw "A"
-                    int endpointADeltaX = (int)(Math.cos(animationFrameNumber * 0.1) * 10);
-                    int endpointADeltaY = (int)(Math.sin(animationFrameNumber * 0.1) * 10);
-
-
-                    g2.setStroke(new BasicStroke(12));
-                    g2.drawLine(10+endpointADeltaX, 80+endpointADeltaY, 40, 10);
-                    g2.drawLine(90+endpointADeltaX, 80+endpointADeltaY, 40, 10);
-                    g2.drawLine(30, 40, 70, 40);
-                }
+                g2.setStroke(new BasicStroke(12));
+                g2.drawLine(10+endpointADeltaX, 80+endpointADeltaY, 40, 10);
+                g2.drawLine(90+endpointADeltaX, 80+endpointADeltaY, 40, 10);
+                g2.drawLine(30, 40, 70, 40);
             }
             else if(chosenImage == 1){
                 // draw star
@@ -78,6 +69,12 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
                 // text
                 g2.setFont(new Font("TimesRoman", Font.PLAIN, 90));
                 g2.drawString("/en-", 2, 100);
+            }
+            else if(chosenImage == 3) {
+                // draw big boxes
+                g2.fillRect(10, 10, 70, 20);
+
+                g2.fillRect(10, 50, 70, 20);
             }
 
 
@@ -107,7 +104,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
 
         if ((frameCounter % (framesPerStep*steps)) == 0 ) {
-            chosenImage = new Random().nextInt(3);
+            chosenImage = new Random().nextInt(4);
 
 
             solver2.imageDrawer = new VisualizeLinesegmentsAnnealing.InputDrawer();
@@ -132,7 +129,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             tint(255.0f, 255.0f); // reset tint
         }
 
-        boolean drawVisualizationOfAltitude = false;
+        boolean drawVisualizationOfAltitude = true;
         boolean drawVisualizationOfEndoSceletons = false; // do we visualize all samples of endo/exo -sceleton
         boolean drawVisualizationOfLineDetectors = true;
         boolean drawVisualizationOfLineDetectorsEnableAct = true; // do we draw activation of line detectors?
