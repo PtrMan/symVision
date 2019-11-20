@@ -69,16 +69,16 @@ public class ProcessB extends AbstractProcessB {
 
             Tuple2<IntIntPair, Double> nearestResult = findNearestPositionWhereMapIs(false, iterationSample.position, map, MAXRADIUS);
             if( nearestResult == null ) {
-                iterationSample.altitude = ((MAXRADIUS+1)*2)*((MAXRADIUS+1)*2);
-                continue;
+                iterationSample.altitude =
+                    //TODO CHECK
+                    //((MAXRADIUS+1)*2)*((MAXRADIUS+1)*2);
+                    Math.sqrt( Math.pow(((MAXRADIUS+1)*2),2) + Math.pow(((MAXRADIUS+1)*2),2 ));
+            } else {
+                // create a new sample to the output connector
+                ProcessA.Sample outputSample = iterationSample.getClone();
+                outputSample.altitude = nearestResult.e1;
+                outputSampleConnector.add(outputSample);
             }
-            // else here
-
-            // create a new sample to the output connector
-            ProcessA.Sample outputSample = iterationSample.getClone();
-            outputSample.altitude =  nearestResult.e1;
-
-            outputSampleConnector.add(outputSample);
         }
 
         System.out.println("cell acceleration (positive cases): " + ((float) counterCellPositiveCandidates / (float) counterCellCandidates) * 100.0f + "%" );
