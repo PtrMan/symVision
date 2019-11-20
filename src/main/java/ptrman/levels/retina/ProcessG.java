@@ -39,13 +39,8 @@ public class ProcessG {
         
         public ArrayRealVector getNormalizedTangentAtEndpoint(int index) {
             Assert.Assert(index >= 0 && index <= 1, "");
-            
-            if( index == 0 ) {
-                return curveElements.get(0).calcTangent(0.0f);
-            }
-            else {
-                return curveElements.get(curveElements.size()-1).calcTangent(1.0f);
-            }
+
+            return index == 0 ? curveElements.get(0).calcTangent(0.0f) : curveElements.get(curveElements.size() - 1).calcTangent(1.0f);
         }
         
         public Intersection.IntersectionPartner.EnumIntersectionEndpointType getIntersectionEndpoint(ArrayRealVector point) {
@@ -56,13 +51,8 @@ public class ProcessG {
             
             diff = calcPosition(1.0f).subtract(point);
             double distToEnd = diff.getNorm();
-            
-            if( distToBegin < distToEnd ) {
-                return Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN;
-            }
-            else {
-                return Intersection.IntersectionPartner.EnumIntersectionEndpointType.END;
-            }
+
+            return distToBegin < distToEnd ? Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN : Intersection.IntersectionPartner.EnumIntersectionEndpointType.END;
         }
         
         public ArrayRealVector calcPosition(float t) {
@@ -113,13 +103,8 @@ public class ProcessG {
             final double TEPSILON = 0.0001;
             
             Assert.Assert(t >= 0.0 && t <= 1.0, "t not in range");
-            
-            if( t > 0.5 ) {
-                t2 = t - TEPSILON;
-            }
-            else {
-                t2 = t + TEPSILON;
-            }
+
+            t2 = t > 0.5 ? t - TEPSILON : t + TEPSILON;
 
             ArrayRealVector p1 = calcPosition(t);
             ArrayRealVector p2 = calcPosition(t2);
@@ -615,12 +600,7 @@ public class ProcessG {
     }
     
     private static double getAxisValueForPoint(ArrayRealVector point, EnumAxis axis) {
-        if( axis == EnumAxis.X ) {
-            return point.getDataRef()[0];
-        }
-        else {
-            return point.getDataRef()[1];
-        }
+        return axis == EnumAxis.X ? point.getDataRef()[0] : point.getDataRef()[1];
     }
 
     private enum EnumAxis {

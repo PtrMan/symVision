@@ -90,12 +90,9 @@ public enum ArrayRealVectorHelper {
 
     public static Vector2d<Integer> arrayRealVectorToInteger(ArrayRealVector vector, EnumRoundMode roundMode) {
         final double[] vectorData = vector.getDataRef();
-        if( roundMode == EnumRoundMode.NEAREST ) {
-            return new Vector2d<>((int)(vectorData[0]), (int)(vectorData[1]));
-        }
-        else {
-            return new Vector2d<>((int)java.lang.Math.floor(vectorData[0]), (int)java.lang.Math.floor(vectorData[1]));
-        }
+        return roundMode == EnumRoundMode.NEAREST ?
+            new Vector2d<>((int) (vectorData[0]), (int) (vectorData[1])) :
+            new Vector2d<>((int) Math.floor(vectorData[0]), (int) Math.floor(vectorData[1]));
 
     }
 

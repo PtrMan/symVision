@@ -47,7 +47,7 @@ public enum DebugDrawingHelper {
             return drawType;
         }
 
-        public abstract void drawSamples(Graphics2D graphics, final List<ProcessA.Sample> samples);
+        public abstract void drawSamples(Graphics2D graphics, final Iterable<ProcessA.Sample> samples);
         public abstract void drawRetinaPrimitives(Graphics2D graphics2D, final RetinaPrimitive... primitives);
         public abstract void drawCustom(Graphics2D graphics2D);
 
@@ -58,35 +58,21 @@ public enum DebugDrawingHelper {
     public static final class SampleDrawingEntity extends DrawingEntity {
         public SampleDrawingEntity(final int dataSourceIndex, final boolean showAltitude, final double maxAltitude) {
             super(dataSourceIndex, EnumDrawType.SAMPLES);
-
             this.showAltitude = showAltitude;
             this.maxAltitude = maxAltitude;
         }
 
         @Override
-        public void drawSamples(Graphics2D graphics, final List<ProcessA.Sample> samples) {
+        public void drawSamples(Graphics2D graphics, final Iterable<ProcessA.Sample> samples) {
             for( ProcessA.Sample iterationSample : samples ) {
                 if( showAltitude ) {
-                    double altitudeAsGreen;
-
-                    if( !iterationSample.isAltitudeValid()) {
-                        altitudeAsGreen = 0.5;
-                    }
-                    else {
-                        altitudeAsGreen = 0.5 + (1.0 - 0.5) * java.lang.Math.min(1.0, iterationSample.altitude / maxAltitude);
-                    }
-
-                    graphics.setColor(new Color(0.0f, (float)altitudeAsGreen, 0.0f));
+                    graphics.setColor(new Color(0.0f, (float)
+                        (iterationSample.isAltitudeValid() ? 0.5 + (1.0 - 0.5) * Math.min(1.0, iterationSample.altitude / maxAltitude) : 0.5),
+                        0.0f));
                 }
                 else {
                     // show if it is a endosceleton point or not
-
-                    if( iterationSample.type == ProcessA.Sample.EnumType.ENDOSCELETON ) {
-                        graphics.setColor(Color.GREEN);
-                    }
-                    else {
-                        graphics.setColor(Color.RED);
-                    }
+                    graphics.setColor(iterationSample.type == ProcessA.Sample.EnumType.ENDOSCELETON ? Color.GREEN : Color.RED);
                 }
 
 
@@ -115,33 +101,26 @@ public enum DebugDrawingHelper {
         }
 
         @Override
-        public void drawSamples(Graphics2D graphics, List<ProcessA.Sample> samples) {
+        public void drawSamples(Graphics2D graphics, Iterable<ProcessA.Sample> samples) {
             throw new RuntimeException("Not Implemented!");
         }
 
         @Override
         public void drawRetinaPrimitives(Graphics2D graphics2D, RetinaPrimitive[] primitives) {
-            for( RetinaPrimitive iterationRetinaPrimitive : primitives ) {
+            for( RetinaPrimitive p : primitives ) {
 
-                SingleLineDetector iterationDetector = iterationRetinaPrimitive.line;
+                SingleLineDetector iterationDetector = p.line;
 
-                final ArrayRealVector aProjectedFloat = iterationDetector.a;
-                final ArrayRealVector bProjectedFloat = iterationDetector.b;
+                double[] aa = iterationDetector.a.getDataRef(), bb = iterationDetector.b.getDataRef();
 
-                if(iterationDetector.resultOfCombination) {
-                    graphics2D.setColor(Color.RED);
-                }
-                else {
-                    graphics2D.setColor(Color.BLUE);
-                }
-
+                graphics2D.setColor(iterationDetector.resultOfCombination ? Color.RED : Color.BLUE);
                 graphics2D.setStroke(new BasicStroke(2));
-                graphics2D.drawLine(Math.round((float)aProjectedFloat.getDataRef()[0]), Math.round((float)aProjectedFloat.getDataRef()[1]), Math.round((float) bProjectedFloat.getDataRef()[0]), Math.round((float) bProjectedFloat.getDataRef()[1]));
-
-                // for old code
-                // TODO< overwork old code so the stroke is set at the beginning >
-                graphics2D.setStroke(new BasicStroke(1));
+                graphics2D.drawLine(Math.round((float) aa[0]), Math.round((float) aa[1]), Math.round((float) bb[0]), Math.round((float) bb[1]));
             }
+
+            // for old code
+            // TODO< overwork old code so the stroke is set at the beginning >
+            graphics2D.setStroke(new BasicStroke(1));
         }
 
         @Override
@@ -222,7 +201,7 @@ public enum DebugDrawingHelper {
     public static void drawDetectors(Graphics2D graphics,
                                      List<RetinaPrimitive> retinaPrimitivesArray,
                                      Iterable<Intersection> intersections,
-                                     List<ProcessA.Sample> samplesArray, List<DrawingEntity> drawingEntities) {
+                                     Iterable<ProcessA.Sample> samplesArray, Iterable<DrawingEntity> drawingEntities) {
 
         for( Intersection iterationIntersection : intersections ) {
             graphics.setColor(Color.BLUE);
@@ -232,22 +211,23 @@ public enum DebugDrawingHelper {
         }
 
 
-//        for( DrawingEntity iterationDrawingEntity : drawingEntities ) {
-//            switch( iterationDrawingEntity.getDrawType() ) {
-//                case SAMPLES:
-//                iterationDrawingEntity.drawSamples(graphics, samplesArray.get(iterationDrawingEntity.getDataSourceIndex()));
-//                break;
-//
-//                case RETINA_PRIMITIVE:
-//                iterationDrawingEntity.drawRetinaPrimitives(graphics,
-//                        retinaPrimitivesArray[iterationDrawingEntity.getDataSourceIndex()]
-//                    );
-//                break;
-//
-//                case CUSTOM:
-//                iterationDrawingEntity.drawCustom(graphics);
-//                break;
-//            }
-//        }
+        for( DrawingEntity iterationDrawingEntity : drawingEntities ) {
+            switch( iterationDrawingEntity.getDrawType() ) {
+                case SAMPLES:
+                //iterationDrawingEntity.drawSamples(graphics, samplesArray.get(iterationDrawingEntity.getDataSourceIndex()));
+                    iterationDrawingEntity.drawSamples(graphics, samplesArray);
+                break;
+
+                case RETINA_PRIMITIVE:
+                iterationDrawingEntity.drawRetinaPrimitives(graphics,
+                        retinaPrimitivesArray.get(iterationDrawingEntity.getDataSourceIndex())
+                    );
+                break;
+
+                case CUSTOM:
+                iterationDrawingEntity.drawCustom(graphics);
+                break;
+            }
+        }
     }
 }

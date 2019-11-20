@@ -535,11 +535,7 @@ public class ProcessD implements IProcess {
     public static List<RetinaPrimitive> splitDetectorIntoLines(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints) {
         List<ArrayRealVector> sortedSamplePositions = getSortedSamplePositions(lineDetectorWithMultiplePoints);
 
-        if (lineDetectorWithMultiplePoints.isYAxisSingularity()) {
-            return clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, lineDetectorWithMultiplePoints.cachedConf, sortedSamplePositions, EnumAxis.Y);
-        } else {
-            return clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, lineDetectorWithMultiplePoints.cachedConf, sortedSamplePositions, EnumAxis.X);
-        }
+        return lineDetectorWithMultiplePoints.isYAxisSingularity() ? clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, lineDetectorWithMultiplePoints.cachedConf, sortedSamplePositions, EnumAxis.Y) : clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, lineDetectorWithMultiplePoints.cachedConf, sortedSamplePositions, EnumAxis.X);
     }
 
 
@@ -591,11 +587,7 @@ public class ProcessD implements IProcess {
     static private class Helper {
         private static double getAxis(ArrayRealVector vector, EnumAxis axis) {
             final double[] dr = vector.getDataRef();
-            if (axis == EnumAxis.X) {
-                return dr[0];
-            } else {
-                return dr[1];
-            }
+            return axis == EnumAxis.X ? dr[0] : dr[1];
         }
     }
 

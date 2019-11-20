@@ -33,12 +33,7 @@ public enum Map2dConverter {
     }
 
     private static float convertBooleanToFloat(final boolean value) {
-        if( value ) {
-            return 1.0f;
-        }
-        else {
-            return 0.0f;
-        }
+        return value ? 1.0f : 0.0f;
     }
 
     private static boolean floatAboveThreshold(final float value, final float threshold) {

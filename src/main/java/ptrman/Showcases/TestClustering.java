@@ -9,6 +9,8 @@
  */
 package ptrman.Showcases;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Iterators;
 import ptrman.Datastructures.Dag;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
@@ -148,15 +150,14 @@ public class TestClustering {
             // TODO create graphics and draw it to a created image and put the image into the canvas
             Collection<DebugDrawingHelper.DrawingEntity> drawingEntities = new ArrayList<>();
             drawingEntities.add(new DebugDrawingHelper.SampleDrawingEntity(2, true, 40.0));
-
-//            DebugDrawingHelper.drawDetectors(graphics,
-//                    bpSolver.lastFrameRetinaPrimitives,
-//                    bpSolver.lastFrameIntersections,
-//                    Iterators.concat(
-//                            bpSolver.lastFrameEndosceletonSamples,
-//                            bpSolver.lastFrameExosceletonSamples,
-//                            bpSolver.lastFrameSamplesWithAltitude),
-//                    drawingEntities);
+            DebugDrawingHelper.drawDetectors(graphics,
+                    bpSolver.lastFrameRetinaPrimitives,
+                    bpSolver.lastFrameIntersections,
+                    Iterables.concat(
+                            bpSolver.lastFrameEndosceletonSamples,
+                            bpSolver.lastFrameExosceletonSamples,
+                            bpSolver.lastFrameSamplesWithAltitude),
+                    drawingEntities);
 
             dualCanvas.rightCanvas.setImage(detectorImage);
         }
