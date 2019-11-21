@@ -28,14 +28,18 @@ public enum Convolution2d {
 		IMap2d<Float> resultMap = new Map2d<>(input.getWidth(), input.getLength());
 
         // TODO optimize for cpu? (opencl is senseless)
-        for( i = 0; i < input.getWidth()*input.getLength(); i++ ) {
+		int area = input.getWidth() * input.getLength();
+		for(i = 0; i < area; i++ ) {
             resultMap.setAt(i % input.getWidth(), i / input.getWidth(), 0.0f);
         }
 
-        for( y = 0; y < input.getLength() - inputKernel.getLength(); y++ ) {
-            for( x = 0; x < input.getWidth() - inputKernel.getWidth(); x++ ) {
-				float value = convolutionAt(inputAsMatrix, kernelAsMatrix, x, y);
-                resultMap.setAt(x+inputKernel.getWidth()/2, y+inputKernel.getLength()/2, value);
+		int H = input.getLength() - inputKernel.getLength();
+		int W = input.getWidth() - inputKernel.getWidth();
+		int wHalf = inputKernel.getWidth() / 2;
+		int hHalf = inputKernel.getLength() / 2;
+		for(y = 0; y < H; y++ ) {
+			for(x = 0; x < W; x++ ) {
+				resultMap.setAt(x+ wHalf, y+ hHalf, convolutionAt(inputAsMatrix, kernelAsMatrix, x, y));
             }
         }
 
@@ -45,32 +49,32 @@ public enum Convolution2d {
     private static float convolutionAt(float[][] input, float[][] kernel, int startX, int startY) {
 		int x, y;
 
-		float result = 0.0f;
+		double result = 0.0f;
 
-        for( y = 0; y < kernel.length; y++ ) {
-            for( x = 0; x < kernel[0].length; x++ ) {
+		int w = kernel.length;
+		int h = kernel[0].length;
+		for(y = 0; y < w; y++ ) {
+			for(x = 0; x < h; x++ )
                 result += (input[x + startX][ y + startY] * kernel[x][y]);
-            }
         }
 
-        return result;
+        return (float)result;
     }
 
     private static float[][] convertMapToArray(IMap2d<Float> map)
     {
 		int x, y;
 
-		float[][] result = new float[map.getWidth()][map.getLength()];
+		int W = map.getWidth();
+		int H = map.getLength();
+		float[][] result = new float[W][H];
 
-        for( y = 0; y < map.getWidth(); y++ ) {
-            result[y] = new float[map.getLength()];
-        }
+        for(y = 0; y < W; y++ )
+            result[y] = new float[H];
 
-        for( y = 0; y < map.getLength(); y++ ) {
-            for( x = 0; x < map.getWidth(); x++ ) {
+		for(x = 0; x < W; x++ )
+	        for(y = 0; y < H; y++ )
                 result[x][y] = map.readAt(x, y);
-            }
-        }
 
         return result;
     }
