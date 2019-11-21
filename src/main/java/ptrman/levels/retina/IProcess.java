@@ -16,6 +16,11 @@ public interface IProcess {
 
     void setup();
 
+    default void setup(Vector2d<Integer> imageSize) {
+        setImageSize(imageSize);
+        setup();
+    }
+
     void preProcessData(); // used for flushing datastructures, etc
     void processData();
     void postProcessData();

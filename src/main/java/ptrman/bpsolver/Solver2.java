@@ -150,8 +150,7 @@ public class Solver2 {
             ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
             processAEdge[i].set(mapBoolean.copy(), null, connectorSamplesFromProcessAForEdge[i]);
 
-            processAEdge[i].setImageSize(imageSize);
-            processAEdge[i].setup();
+            processAEdge[i].setup(imageSize);
 
             processDEdge[i].setImageSize(imageSize);
             processDEdge[i].set(connectorSamplesFromProcessAForEdge[i], connectorDetectorsFromProcessDForEdge[i]);
@@ -195,20 +194,17 @@ public class Solver2 {
         // copy image because processA changes the image
         ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
         processA.set(mapBoolean.copy(), processZFacade.getNotMagnifiedOutputObjectIds(), connectorSamplesFromProcessA);
-        processA.setImageSize(imageSize);
-        processA.setup();
+        processA.setup(imageSize);
 
         ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessB = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
         processB.set(mapBoolean.copy(), connectorSamplesFromProcessA, conntrSamplesFromProcessB);
-        processB.setImageSize(imageSize);
-        processB.setup();
+        processB.setup(imageSize);
 
 
         ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessC0 = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
         ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessC1 = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
         processC.set(conntrSamplesFromProcessB, conntrSamplesFromProcessC0, conntrSamplesFromProcessC1);
-        processC.setImageSize(imageSize);
-        processC.setup();
+        processC.setup(imageSize);
 
         connectorDetectorsEndosceletonFromProcessD = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
 
@@ -264,18 +260,16 @@ public class Solver2 {
         }
 
         // * process-H for edges
-        int idx = 0;
-        for (ProcessD iD : processDEdge) {
+        for (int i = 0, processDEdgeLength = processDEdge.length; i < processDEdgeLength; i++) {
+            //ProcessD iD = processDEdge[i];
             ProcessH processH = new ProcessH();
             processH.setImageSize(imageSize);
-            processH.set(connectorDetectorsFromProcessDForEdge[idx], connectorDetectorsFromProcessHForEdge[idx]);
+            processH.set(connectorDetectorsFromProcessDForEdge[i], connectorDetectorsFromProcessHForEdge[i]);
             processH.setup();
 
             processH.preProcessData();
             processH.processData();
             processH.postProcessData();
-
-            idx++;
         }
 
         // * process-H and process-E

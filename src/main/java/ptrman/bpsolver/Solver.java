@@ -139,7 +139,7 @@ public class Solver {
         // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
         coderack.flush();
 
-        Queue<ProcessA.Sample> queueToProcessF = new ArrayDeque<>();
+//        Queue<ProcessA.Sample> queueToProcessF = new ArrayDeque<>();
 
 
         /*
@@ -152,14 +152,7 @@ public class Solver {
         ProcessF processF = new ProcessF();
         */
 
-
-
-        for( ProcessConnector iterationConnector : allConnectors ) {
-            iterationConnector.flush();
-        }
-
-
-
+        allConnectors.forEach(ProcessConnector::flush);
 
 
         ProcessZFacade processZFacade = new ProcessZFacade();

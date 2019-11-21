@@ -40,28 +40,26 @@ public class PlatonicPrimitiveDatabase
         private final float value;
     }
 
-    public float getMaxValueByPrimitiveNode(PlatonicPrimitiveNode platonicPrimitiveNodeForSearch)
+    public float getMaxValueByPrimitiveNode(PlatonicPrimitiveNode n)
     {
-        if( !mapForMaxValueOfPlatonicPrimitiveNode.containsKey(platonicPrimitiveNodeForSearch) )
-        {
-            calculateAndPutMaxValueForPlatonicPrimitiveNodeIntoMap(platonicPrimitiveNodeForSearch);
-        }
-
-        return mapForMaxValueOfPlatonicPrimitiveNode.get(platonicPrimitiveNodeForSearch);
+        return mapForMaxValueOfPlatonicPrimitiveNode.computeIfAbsent(n, this::calculateMaxValueForPlatonicPrimitiveNode);
+//        if( !mapForMaxValueOfPlatonicPrimitiveNode.containsKey(n) )
+//            calculateAndPutMaxValueForPlatonicPrimitiveNodeIntoMap(n);
+//
+//        return mapForMaxValueOfPlatonicPrimitiveNode.get(n);
     }
 
-    private void calculateAndPutMaxValueForPlatonicPrimitiveNodeIntoMap(PlatonicPrimitiveNode platonicPrimitiveNode)
+    private float calculateMaxValueForPlatonicPrimitiveNode(PlatonicPrimitiveNode platonicPrimitiveNode)
     {
 
-        if( !calculatorsForMaxValueOfPlatonicPrimitiveNode.containsKey(platonicPrimitiveNode) )
-        {
-            throw new RuntimeException("Unknown IMaxValueCalculator for PlatonicPrimitiveNode " + platonicPrimitiveNode.platonicType);
-        }
+//        if( !calculatorsForMaxValueOfPlatonicPrimitiveNode.containsKey(platonicPrimitiveNode) )
+//        {
+//            throw new RuntimeException("Unknown IMaxValueCalculator for PlatonicPrimitiveNode " + platonicPrimitiveNode.platonicType);
+//        }
 
         IMaxValueCalculator maxValueCalculator = calculatorsForMaxValueOfPlatonicPrimitiveNode.get(platonicPrimitiveNode);
-        float maxValue = maxValueCalculator.getMaxValue();
-
-        mapForMaxValueOfPlatonicPrimitiveNode.put(platonicPrimitiveNode, maxValue);
+        return maxValueCalculator.getMaxValue();
+        //mapForMaxValueOfPlatonicPrimitiveNode.put(platonicPrimitiveNode, maxValue);
     }
 
 

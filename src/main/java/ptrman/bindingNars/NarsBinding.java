@@ -43,10 +43,12 @@ public class NarsBinding {
         int primnitiveIdCntr = 0;
 
         for (RetinaPrimitive iPrimitive : primitives) {
-            int ax = (int)iPrimitive.line.a.getDataRef()[0];
-            int ay = (int)iPrimitive.line.a.getDataRef()[1];
-            int bx = (int)iPrimitive.line.b.getDataRef()[0];
-            int by = (int)iPrimitive.line.b.getDataRef()[1];
+            double[] axy = iPrimitive.line.a.getDataRef();
+            int ax = (int) Math.round(axy[0]); //(int) axy[0];
+            int ay = (int) Math.round(axy[1]); //axy[1];
+            double[] bxy = iPrimitive.line.b.getDataRef();
+            int bx = (int) Math.round(bxy[0]); //bxy[0];
+            int by = (int) Math.round(bxy[1]); //bxy[1];
 
             consumer.emitLineSegment("line"+primnitiveIdCntr, ax,ay,bx,by, iPrimitive.retConf());
             primnitiveIdCntr++;
@@ -55,16 +57,17 @@ public class NarsBinding {
         // emit line intersections
         {
             for (RetinaPrimitive iPrimitive : primitives) {
-                if (iPrimitive.line == null) {
+                if (iPrimitive.line == null)
                     continue;
-                }
 
                 for(Intersection iIntersection :                 iPrimitive.line.intersections) {
                     int idxA = retIdxOf(primitives, iIntersection.p0.primitive);
-                    int idxB = retIdxOf(primitives, iIntersection.p1.primitive);
-
-                    if (primitives.get(idxA).line != null && primitives.get(idxB).line != null) { // we only care about line-line intersections
-                        consumer.emitLineIntersection("line"+idxA,"line"+idxB);
+                    if (primitives.get(idxA).line != null) {
+                        int idxB = retIdxOf(primitives, iIntersection.p1.primitive);
+                        if (primitives.get(idxB).line != null) {
+                            // we only care about line-line intersections
+                            consumer.emitLineIntersection("line" + idxA, "line" + idxB);
+                        }
                     }
                 }
             }
