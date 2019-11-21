@@ -33,12 +33,17 @@ public class Solver2 {
     public ProcessConnector<ProcessA.Sample>[] connectorSamplesFromProcessAForEdge;
     public ProcessConnector<RetinaPrimitive>[] connectorDetectorsFromProcessDForEdge;
 
+    // connector for final processing
+    public ProcessConnector<RetinaPrimitive> cntrFinalProcessing;
+
     public NarsBinding narsBinding;
 
     public int annealingStep = 0;
 
     // image drawer which is used as the source of the images, must be set to a image drawer before the solver is used!
     public IImageDrawer imageDrawer;
+
+    public IMap2d<Boolean> mapBoolean; // boolean "main" map
 
     private Vector2d<Integer> imageSize;
 
@@ -49,9 +54,10 @@ public class Solver2 {
 
         connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
 
-        { // create NARS-binding
-            narsBinding = new NarsBinding(new OpenNarsNarseseConsumer());
-        }
+        cntrFinalProcessing = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+
+        // create NARS-binding
+        narsBinding = new NarsBinding(new OpenNarsNarseseConsumer());
     }
 
     /**
@@ -154,7 +160,7 @@ public class Solver2 {
             processDEdge[i].postProcessData();
         }
 
-        IMap2d<Boolean> mapBoolean = Map2dBinary.threshold(mapGrayscale, 0.1f); // convert from edges[0]
+        mapBoolean = Map2dBinary.threshold(mapGrayscale, 0.1f); // convert from edges[0]
 
         ProcessZFacade processZFacade = new ProcessZFacade();
 
@@ -271,6 +277,11 @@ public class Solver2 {
         processH.processData();
         processH.postProcessData();
 
-        narsBinding.emitRetinaPrimitives(connectorDetectorsEndosceletonFromProcessH.workspace); // emit all collected primitives from process D
+        cntrFinalProcessing = connectorDetectorsEndosceletonFromProcessH; // connect the connector for final processing to output from process-H
+
+        // intersect line primitives
+        ProcessE.process(cntrFinalProcessing.workspace, mapBoolean);
+
+        narsBinding.emitRetinaPrimitives(cntrFinalProcessing.workspace); // emit all collected primitives from process D
     }
 }

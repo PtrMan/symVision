@@ -38,27 +38,29 @@ public class ProcessE {
 
         // detect line intersections only per object
         for( Deque<RetinaPrimitive> primitivesOfObject : objectIdToRetinaPrimitivesMap.values() ) {
-            FindIntersectionOfLineDetectorsWithDifferentObjectIds(primitivesOfObject, image);
+            findIntersectionOfLineDetectors(primitivesOfObject, image);
         }
     }
 
-    private static void FindIntersectionOfLineDetectorsWithDifferentObjectIds(Iterable<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
+    private static void findIntersectionOfLineDetectors(Iterable<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
         for (RetinaPrimitive lowLinePrimitive : lineDetectors) {
-            Assert.Assert(lowLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
+            //commented because we don't consider object id
+            //Assert.Assert(lowLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
 
             for (RetinaPrimitive highLinePrimitive : lineDetectors) {
 
                 Assert.Assert(lowLinePrimitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "");
                 Assert.Assert(highLinePrimitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "");
-                Assert.Assert(highLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
+                //commented because we don't consider object id
+                //Assert.Assert(highLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
 
                 if( highLinePrimitive == lowLinePrimitive ) {
                     continue;
                 }
-
-                if( lowLinePrimitive.objectId != highLinePrimitive.objectId ) {
-                    continue;
-                }
+                //commented because we don't consider object id
+                //if( lowLinePrimitive.objectId != highLinePrimitive.objectId ) {
+                //    continue;
+                //}
 
                 ArrayRealVector intersectionPosition = intersectLineDetectors(lowLinePrimitive.line, highLinePrimitive.line);
                 
@@ -88,7 +90,7 @@ public class ProcessE {
         }
     }
     
-    private static ArrayRealVector intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB) {
+    public static ArrayRealVector intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB) {
         ArrayRealVector intersectionPosition = SingleLineDetector.intersectLineDetectors(lineA, lineB);
         return intersectionPosition;
     }

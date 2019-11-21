@@ -92,40 +92,63 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
 
 
-    int frameCounter = 0;
 
     static int animationFrameNumber = 0;
+
+    int frameCountdown = 0;
+
+    int state = 0;
+    String stateName = "annealing";
 
 
     public void draw(){
         background(64);
+
+        frameCountdown--;
 
 
         int framesPerStep = 10; // how many frames do we visualize one step?
 
         int steps = 50; // how many steps are done?
 
-        animationFrameNumber = (frameCounter / (framesPerStep*steps));
+        if (frameCountdown < 0) { // do we need to visualize something new?
+            frameCountdown = framesPerStep;
 
+            if (stateName.equals("annealing") && state == 0) { // first frame of new animation
+                chosenImage = new Random().nextInt(5);
 
-        if ((frameCounter % (framesPerStep*steps)) == 0 ) {
-            chosenImage = new Random().nextInt(5);
+                solver2.imageDrawer = new VisualizeLinesegmentsAnnealing.InputDrawer();
 
+                solver2.preFrame(); // do all processing and setup before the actual processing of the frame
 
-            solver2.imageDrawer = new VisualizeLinesegmentsAnnealing.InputDrawer();
+                state++;
+            }
+            else if (stateName.equals("annealing")) {
+                solver2.frameStep(); // step of a frame
 
-            solver2.preFrame(); // do all processing and setup before the actual processing of the frame
+                state++;
 
-        }
-        else if( (frameCounter % framesPerStep) == 0 ) {
-            solver2.frameStep(); // step of a frame
+                if (solver2.annealingStep == steps-1-1) {// is last step?
+                    solver2.postFrame(); // finish off frame processing
 
-            if (solver2.annealingStep == steps-1-1) {// is last step?
-                solver2.postFrame(); // finish off frame processing
+                    {
+
+                    }
+
+                    stateName = "showPrimitives"; // we want to show the primitives
+                    frameCountdown = 60*3;
+                }
+            }
+            else if(stateName.equals("showPrimitives")) { // is the time over for the showing of the primitives?
+                // then reset state so we continue with new random image
+
+                frameCountdown = -1;
+                state = 0;
+                stateName = "annealing";
             }
         }
 
-        frameCounter++;
+
 
         { // draw processed image in the background
             PImage pimg = ImageConverter.convBufferedImageToPImage((new InputDrawer()).apply(null));
@@ -140,36 +163,66 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
         boolean drawVisualizationOfLineDetectorsEnableAct = true; // do we draw activation of line detectors?
         boolean drawVisualizationOfEdgeLineDetectors = false;
 
+        if (stateName.equals("annealing")) { // are we annealing the image?
+            if(drawVisualizationOfAltitude) {
+                for (ProcessA.Sample iSample : solver2.connectorSamplesForEndosceleton.workspace) {
+                    float color = Math.min((float)iSample.altitude / 20.0f, 1.0f);
 
-        if(drawVisualizationOfAltitude) {
-            for (ProcessA.Sample iSample : solver2.connectorSamplesForEndosceleton.workspace) {
-                float color = Math.min((float)iSample.altitude / 20.0f, 1.0f);
-
-                stroke(color*255.0f);
-                rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
-            }
-        }
-
-        if(drawVisualizationOfEndoSceletons) {
-
-            stroke(200.0f, 255.0f, 200.0f);
-
-            for (ProcessA.Sample s : solver2.connectorSamplesForEndosceleton.workspace) {
-                if (s.type == ProcessA.Sample.EnumType.ENDOSCELETON) {
-                    IntIntPair p = s.position;
-                    rect(p.getOne(), p.getTwo(), 1, 1);
+                    stroke(color*255.0f);
+                    rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
                 }
             }
-        }
+
+            if(drawVisualizationOfEndoSceletons) {
+
+                stroke(200.0f, 255.0f, 200.0f);
+
+                for (ProcessA.Sample s : solver2.connectorSamplesForEndosceleton.workspace) {
+                    if (s.type == ProcessA.Sample.EnumType.ENDOSCELETON) {
+                        IntIntPair p = s.position;
+                        rect(p.getOne(), p.getTwo(), 1, 1);
+                    }
+                }
+            }
 
 
-        if(drawVisualizationOfEdgeLineDetectors) { // draw visualization of line detectors
-            for (ProcessD iProcessDEdge : solver2.processDEdge) {
-                for(LineDetectorWithMultiplePoints iLineDetector : iProcessDEdge.annealedCandidates) {
+            if(drawVisualizationOfEdgeLineDetectors) { // draw visualization of line detectors
+                for (ProcessD iProcessDEdge : solver2.processDEdge) {
+                    for(LineDetectorWithMultiplePoints iLineDetector : iProcessDEdge.annealedCandidates) {
+                        // iLineDetector.cachedSamplePositions
+
+
+                        stroke(128.0f, 128, 255);
+                        for (RetinaPrimitive iLine : ProcessD.splitDetectorIntoLines(iLineDetector)) {
+                            double x0 = iLine.line.a.getDataRef()[0];
+                            double y0 = iLine.line.a.getDataRef()[1];
+                            double x1 = iLine.line.b.getDataRef()[0];
+                            double y1 = iLine.line.b.getDataRef()[1];
+                            line((float)x0, (float)y0, (float)x1, (float)y1);
+                        }
+
+                        if (false) {
+                            stroke(255.0f, 0.0f, 0.0f);
+                            for( ProcessA.Sample iSample : iLineDetector.samples) {
+                                rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
+                            }
+                        }
+                    }
+                }
+
+
+                int here = 5;
+            }
+
+
+            if(drawVisualizationOfLineDetectors) { // draw visualization of line detectors
+                for(LineDetectorWithMultiplePoints iLineDetector : solver2.processD.annealedCandidates) {
                     // iLineDetector.cachedSamplePositions
 
+                    float act = drawVisualizationOfLineDetectorsEnableAct ? (float)iLineDetector.calcActivation() : 1.0f;
+                    stroke(act*255.0f, act*255.0f, act*255.0f);
 
-                    stroke(128.0f, 128, 255);
+
                     for (RetinaPrimitive iLine : ProcessD.splitDetectorIntoLines(iLineDetector)) {
                         double x0 = iLine.line.a.getDataRef()[0];
                         double y0 = iLine.line.a.getDataRef()[1];
@@ -178,46 +231,44 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
                         line((float)x0, (float)y0, (float)x1, (float)y1);
                     }
 
-                    if (false) {
-                        stroke(255.0f, 0.0f, 0.0f);
-                        for( ProcessA.Sample iSample : iLineDetector.samples) {
-                            rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
-                        }
+                    stroke(255.0f, 0.0f, 0.0f);
+                    for( ProcessA.Sample iSample : iLineDetector.samples) {
+
+                        rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
                     }
+
                 }
+
+                int here = 5;
             }
-
-
-            int here = 5;
         }
+        else if(stateName.equals("showPrimitives")) { // are we shwoing the primitives?
 
 
-        if(drawVisualizationOfLineDetectors) { // draw visualization of line detectors
-            for(LineDetectorWithMultiplePoints iLineDetector : solver2.processD.annealedCandidates) {
-                // iLineDetector.cachedSamplePositions
+            for(RetinaPrimitive iLinePrimitive : solver2.cntrFinalProcessing.workspace) {
+                stroke(255.0f, 255.0f, 255.0f);
 
-                float act = drawVisualizationOfLineDetectorsEnableAct ? (float)iLineDetector.calcActivation() : 1.0f;
-                stroke(act*255.0f, act*255.0f, act*255.0f);
+                double x0 = iLinePrimitive.line.a.getDataRef()[0];
+                double y0 = iLinePrimitive.line.a.getDataRef()[1];
+                double x1 = iLinePrimitive.line.b.getDataRef()[0];
+                double y1 = iLinePrimitive.line.b.getDataRef()[1];
+                line((float)x0, (float)y0, (float)x1, (float)y1);
 
 
-                for (RetinaPrimitive iLine : ProcessD.splitDetectorIntoLines(iLineDetector)) {
-                    double x0 = iLine.line.a.getDataRef()[0];
-                    double y0 = iLine.line.a.getDataRef()[1];
-                    double x1 = iLine.line.b.getDataRef()[0];
-                    double y1 = iLine.line.b.getDataRef()[1];
-                    line((float)x0, (float)y0, (float)x1, (float)y1);
-                }
-
+                // draw intersections as small triangles
                 stroke(255.0f, 0.0f, 0.0f);
-                for( ProcessA.Sample iSample : iLineDetector.samples) {
 
-                    rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
+                for (Intersection iIntersection : iLinePrimitive.line.intersections) {
+                    int x = (int)iIntersection.intersectionPosition.getDataRef()[0];
+                    int y = (int)iIntersection.intersectionPosition.getDataRef()[1];
+
+                    line(x,y-1,x-1,y+1);
+                    line(x,y-1,x+1,y+1);
+                    line(x-1,y+1,x+1,y+1);
                 }
-
             }
-
-            int here = 5;
         }
+
 
 
         // mouse cursor

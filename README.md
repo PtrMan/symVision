@@ -36,7 +36,7 @@ Foundalis decided to not release his implementation due to ethical concerns. The
 | | | | | |
 | B      | computation of altitude of points                            | sufficient | none | visual test |
 | C      | identifies if a point is a point of the endo- or exoskeleton | sufficient | some samples are not endosceleton, minor issue | visual test |
-| E      | finds line intersections                                     | partial | none? | no |
+| E      | finds line intersections                                     | sufficient | none | visual test |
 | F      | Sends traces in imagespace for samples which are deeper than a threshold | partial | none? | no |
 | G      | curve detection                                              | partial, ~20%? | ? | no |
 | H      | tries to combine linedetectors                               | partial, is able to fuse lines | ? | no |
