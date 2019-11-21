@@ -91,7 +91,7 @@ public class BaryCenter extends SolverCodelet {
 
             PlatonicPrimitiveInstanceNode createdBaryCenterInstanceNode = HelperFunctions.createVectorAttributeNode(calculatedBaryCenter, getNetworkHandles().barycenterPlatonicPrimitiveNode, bpSolver);
             Link linkToBaryCenter = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdBaryCenterInstanceNode);
-            startNode.out.add(linkToBaryCenter);
+            startNode.out(linkToBaryCenter);
             
         }
         

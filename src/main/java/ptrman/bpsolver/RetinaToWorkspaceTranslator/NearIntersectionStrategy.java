@@ -114,12 +114,14 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
         
         for(;;) {
 
-            if( openList.size() == 0 ) {
-                break;
-            }
+            int os = openList.size();
 
-            RetinaPrimitive retinaPrimitiveFromOpenList = openList.get(openList.size() - 1);
-            openList.remove(openList.size()-1);
+            if( os == 0 )
+                break;
+
+
+            RetinaPrimitive retinaPrimitiveFromOpenList = openList.get(os - 1);
+            openList.remove(os -1);
             
             // we do this because we are "done" with it
             map.remove(retinaPrimitiveFromOpenList);
@@ -192,11 +194,10 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
                     Node nodeForRetinaPrimitive = primitveToRetinaObjectWithAssocMap.get(iterationPrimitive).workspaceNode;
 
                     // linkage
-                    Link createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.CONTAINS, nodeForRetinaPrimitive);
-                    objectNode.out.add(createdForwardLink);
-
-                    Link createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
-                    nodeForRetinaPrimitive.out.add(createdBackwardLink);
+                    //      forward
+                    objectNode.out(bpSolver.network.linkCreator.createLink(Link.EnumType.CONTAINS, nodeForRetinaPrimitive));
+                    //      reverse
+                    nodeForRetinaPrimitive.out(bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode));
                 }
             }
             
@@ -216,8 +217,7 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
 
             // we store the intersectionposition and the intersectionpartners
 
-            final List<Intersection> intersections = iterationRetinaPrimitive.getIntersections();
-            for( Intersection iterationIntersection : intersections ) {
+            for( Intersection iterationIntersection : iterationRetinaPrimitive.getIntersections()) {
                 List<SpatialAcceleration<Crosspoint>.Element> crosspointsAtPosition = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getElementsNearPoint(iterationIntersection.intersectionPosition, 1000.0f /* TODO const */);
                 
                 if( crosspointsAtPosition.isEmpty() ) {

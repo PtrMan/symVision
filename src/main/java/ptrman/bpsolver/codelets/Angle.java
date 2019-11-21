@@ -114,7 +114,7 @@ public class Angle extends SolverCodelet {
             for( int linkI = 0; linkI < iterationAngle.count; linkI++ ) {
                 Link createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASFEATURE, createdFeatureNode);
                 
-                anglePointPrimitiveInstanceNode.out.add(createdLink);
+                anglePointPrimitiveInstanceNode.out(createdLink);
             }
         }
     }
@@ -123,7 +123,7 @@ public class Angle extends SolverCodelet {
         final AttributeNode createAnglePointTypeNode = AttributeNode.createIntegerNode(getNetworkHandles().anglePointFeatureTypePrimitiveNode, anglePointType.ordinal());
         
         final Link createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createAnglePointTypeNode);
-        anglePointPrimitiveInstanceNode.out.add(createdLink);
+        anglePointPrimitiveInstanceNode.out(createdLink);
     }
     
     private AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType getAnglePointType(final PlatonicPrimitiveInstanceNode anglePointNode) {

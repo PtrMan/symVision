@@ -212,20 +212,20 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
                 Node workspaceNode = iterationRetinaObjectWithAssoc.retinaObjectWithAssociatedPointsAndWorkspaceNode.workspaceNode;
 
                 Link createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, workspaceNode);
-                createdAnglePointNode.out.add(createdForwardLink);
+                createdAnglePointNode.out(createdForwardLink);
 
                 Link createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASNODE, createdAnglePointNode);
-                workspaceNode.out.add(createdBackwardLink);
+                workspaceNode.out(createdBackwardLink);
             }
 
 
             AttributeNode createdAnglePointAttributeNode = AttributeNode.createIntegerNode(bpSolver.networkHandles.anglePointFeatureTypePrimitiveNode, crosspoint.type.ordinal());
             Link createdFeatureTypeNodeLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointAttributeNode);
-            createdAnglePointNode.out.add(createdFeatureTypeNodeLink);
+            createdAnglePointNode.out(createdFeatureTypeNodeLink);
 
             PlatonicPrimitiveInstanceNode createdAnglePointPosition = HelperFunctions.createVectorAttributeNode(crosspoint.position, bpSolver.networkHandles.anglePointPositionPlatonicPrimitiveNode, bpSolver);
             Link createdPositionLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointPosition);
-            createdAnglePointNode.out.add(createdPositionLink);
+            createdAnglePointNode.out(createdPositionLink);
         }
     }
     

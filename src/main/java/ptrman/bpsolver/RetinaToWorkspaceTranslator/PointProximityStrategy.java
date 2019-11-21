@@ -204,9 +204,9 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         }
     }
     
-    private static SpatialAcceleration<Crosspoint>.Element getNearestCrosspointElement(final List<SpatialAcceleration<Crosspoint>.Element> crosspointElements, final ArrayRealVector position) {
-        SpatialAcceleration<Crosspoint>.Element nearestElement = crosspointElements.get(0);
-        double nearestDistance = crosspointElements.get(0).position.getDistance(position);
+    private static SpatialAcceleration<Crosspoint>.Element getNearestCrosspointElement(final Iterable<SpatialAcceleration<Crosspoint>.Element> crosspointElements, final ArrayRealVector position) {
+        SpatialAcceleration<Crosspoint>.Element nearestElement = null;
+        double nearestDistance = Double.POSITIVE_INFINITY;
         
         for( SpatialAcceleration<Crosspoint>.Element iterationCrosspointElement : crosspointElements ) {
             final double distance = iterationCrosspointElement.position.getDistance(position);
@@ -232,10 +232,10 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         
         // linkage
         Link createdForwardLink = network.linkCreator.createLink(Link.EnumType.CONTAINS, createdPlatonicInstanceNodeForRetinaObject);
-        objectNode.out.add(createdForwardLink);
+        objectNode.out(createdForwardLink);
 
         Link createdBackwardLink = network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
-        createdPlatonicInstanceNodeForRetinaObject.out.add(createdBackwardLink);
+        createdPlatonicInstanceNodeForRetinaObject.out(createdBackwardLink);
 
         // add all codelet's of it
         codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdPlatonicInstanceNodeForRetinaObject, coderack, network, networkHandles);

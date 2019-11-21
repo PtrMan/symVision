@@ -63,7 +63,7 @@ public class CodeletLtmLookup
 
             // we search for all "HAS" nodes and instantiate the codelets
             
-            for( Link iterationLink : currentLtmNodeForPrimitiveNode.out)
+            for( Link iterationLink : currentLtmNodeForPrimitiveNode.out())
             {
 
                 if( iterationLink.type != ptrman.FargGeneral.network.Link.EnumType.HASFEATURE )
@@ -93,7 +93,7 @@ public class CodeletLtmLookup
             boolean continueIsaRelationshipWalk = false;
             
             // search for a ISA node
-            for( Link iterationLink : currentLtmNodeForPrimitiveNode.out)
+            for( Link iterationLink : currentLtmNodeForPrimitiveNode.out())
             {
                 if( iterationLink.type == Link.EnumType.ISA )
                 {

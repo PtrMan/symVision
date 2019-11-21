@@ -25,20 +25,17 @@ public class Coderack {
     
     public void cycle(int count) {
         int counter;
-        
+
         for( counter = 0; counter < count; counter++ ) {
-            if( queue.getSize() == 0 ) {
+            if( queue.getSize() == 0 )
                 break;
-            }
 
             PriorityQueue.QueueElement queueElement = queue.dequeueQueueElement();
             Codelet currentCodelet = (Codelet)queueElement.value;
             
             // execute codelet and examine result, enqueue it to the queue if it needs to be execute again
-            Codelet.RunResult runResult = currentCodelet.run();
-            if( runResult.putback ) {
+            if( currentCodelet.run().putback )
                 queue.add(currentCodelet, queueElement.priority);
-            }
         }
     }
     

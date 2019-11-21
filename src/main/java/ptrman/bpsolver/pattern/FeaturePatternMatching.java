@@ -50,18 +50,18 @@ public class FeaturePatternMatching {
 
     public interface IMatchingPathRatingStrategy
     {
-        float calculate(List<MatchingPathElement> matchingPathElements);
+        float calculate(List<MatchingPathElement<Link>> matchingPathElements);
     }
 
     public static class MultiplyMatchingPathRatingStrategy implements  IMatchingPathRatingStrategy {
 
         @Override
-        public float calculate(List<MatchingPathElement> matchingPathElements) {
+        public float calculate(List<MatchingPathElement<Link>> matchingPathElements) {
 
             double result = 1.0f;
 
             for( MatchingPathElement iterationMatchingPathElement : matchingPathElements )
-                result *= iterationMatchingPathElement.similarityValue;
+                result *= iterationMatchingPathElement.similarity;
 
             return (float)result;
         }
@@ -147,9 +147,9 @@ public class FeaturePatternMatching {
     // TODO< document source (chapter of foundalis disertation after the chapter about the nonrecursive version) >
     // TODO< recurse until reach of lower bound >
     // recursive until lower bound
-    public List<MatchingPathElement> matchAnyRecursive(Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist, int maxDepth) {
+    public List<MatchingPathElement<Link>> matchAnyRecursive(Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist, int maxDepth) {
 
-        List<MatchingPathElement> resultMatchingPath = new ArrayList<>();
+        List<MatchingPathElement<Link>> resultMatchingPath = new ArrayList<>();
 
         matchAnyRecursiveInternal(resultMatchingPath, nodeA, nodeB, networkHandles, linkWhitelist, maxDepth, 1);
 
@@ -157,7 +157,7 @@ public class FeaturePatternMatching {
     }
 
     // helper for calculate rating with strategy
-    public static float calculateRatingWithDefaultStrategy(List<MatchingPathElement> matchingPathElements) {
+    public static float calculateRatingWithDefaultStrategy(List<MatchingPathElement<Link>> matchingPathElements) {
 
         IMatchingPathRatingStrategy strategy = new MultiplyMatchingPathRatingStrategy();
 
@@ -165,51 +165,46 @@ public class FeaturePatternMatching {
     }
 
 
-    private void matchAnyRecursiveInternal(List<MatchingPathElement> resultMatchingPath, Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist, int maxDepth, int currentDepth) {
-        int linkIndexA, linkIndexB;
+    private void matchAnyRecursiveInternal(List<MatchingPathElement<Link>> resultMatchingPath, Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist, int maxDepth, int currentDepth) {
+
 
         if( currentDepth >= maxDepth ) {
             return;
         }
 
-        MatchingPathElement bestMatchingPathElement = new MatchingPathElement();
-        bestMatchingPathElement.bestMatchNodeAIndex = -1;
-        bestMatchingPathElement.bestMatchNodeBIndex = -1;
-        bestMatchingPathElement.similarityValue = 0.0f;
+        MatchingPathElement<Link> bestMatchingPathElement = new MatchingPathElement<>();
+        bestMatchingPathElement.similarity = 0.0f;
 
-        for(linkIndexA = 0; linkIndexA < nodeA.out.size(); linkIndexA++ ) {
-            for(linkIndexB = 0; linkIndexB < nodeB.out.size(); linkIndexB++ ) {
-
-                Link linkA = nodeA.out.get(linkIndexA);
-                Link linkB = nodeB.out.get(linkIndexB);
+        for (Link linkA : nodeA.out()) {
+            for (Link linkB : nodeB.out()) {
 
                 if( !doesLinkTypeListContainType(linkWhitelist, linkA.type) || !doesLinkTypeListContainType(linkWhitelist, linkB.type) )
                     continue;
 
-
                 float currentDistance = matchAnyNonRecursive(linkA.target, linkB.target, networkHandles);
                 float currentSimilarity = Converter.distanceToSimilarity(currentDistance);
 
-                if( currentSimilarity > bestMatchingPathElement.similarityValue) {
-                    bestMatchingPathElement.similarityValue = currentSimilarity;
-                    bestMatchingPathElement.bestMatchNodeAIndex = linkIndexA;
-                    bestMatchingPathElement.bestMatchNodeBIndex = linkIndexB;
+                if( currentSimilarity > bestMatchingPathElement.similarity) {
+                    bestMatchingPathElement.similarity = currentSimilarity;
+                    bestMatchingPathElement.bestMatchA = linkA;
+                    bestMatchingPathElement.bestMatchB = linkB;
                 }
+
             }
         }
 
-        if( bestMatchingPathElement.similarityValue != 0.0f ) {
+
+        if( bestMatchingPathElement.similarity != 0.0f ) {
             resultMatchingPath.add(bestMatchingPathElement);
 
-            matchAnyRecursiveInternal(resultMatchingPath, nodeA.out.get(bestMatchingPathElement.bestMatchNodeAIndex).target, nodeB.out.get(bestMatchingPathElement.bestMatchNodeBIndex).target, networkHandles, linkWhitelist, maxDepth, currentDepth+1);
+            matchAnyRecursiveInternal(resultMatchingPath, bestMatchingPathElement.bestMatchA.target, bestMatchingPathElement.bestMatchB.target, networkHandles, linkWhitelist, maxDepth, currentDepth+1);
         }
     }
 
-    public static class MatchingPathElement {
-        public int bestMatchNodeAIndex;
-        public int bestMatchNodeBIndex;
-
-        public float similarityValue;
+    public static class MatchingPathElement<X> {
+        public X bestMatchA;
+        public X bestMatchB;
+        public float similarity;
     }
 
     /** helper for matchAnyNonRecursive

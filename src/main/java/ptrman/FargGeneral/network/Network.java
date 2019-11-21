@@ -27,10 +27,10 @@ public class Network
     }
     
     // used to create links with the right type
-    public interface ILinkCreator
-    {
+    public interface ILinkCreator {
         Link createLink(Link.EnumType type, Node target);
     }
+    public ILinkCreator linkCreator;
     
     public final Collection<Node> nodes = new FastList<>();
     public IDepthToDecay depthToDecay;
@@ -63,33 +63,25 @@ public class Network
     
     private void spreadActivationInternal()
     {
-        for( Node iterationNode : nodes )
-        {
+        for( Node iterationNode : nodes ) {
 
             float sourceNodeActivation = iterationNode.activation;
             
-            for( Link iterationLink : iterationNode.out)
-            {
+            for( Link iterationLink : iterationNode.out())
                 iterationLink.target.activationDelta += (iterationLink.strength * sourceNodeActivation);
-            }
         }
     }
     
-    private void addActivationDelta()
-    {
-        for( Node iterationNode : nodes )
-        {
-            iterationNode.addActivationDelta();
-        }
+    private void addActivationDelta() {
+        for( Node n : nodes )
+            n.addActivationDelta();
     }
     
     private void limitActivation()
     {
-        for( Node iterationNode : nodes )
-        {
-            iterationNode.activation = Math.min(iterationNode.activation, 1.0f);
-        }
+        for( Node n : nodes )
+            n.activation = Math.min(n.activation, 1.0f);
     }
     
-    public ILinkCreator linkCreator;
+
 }

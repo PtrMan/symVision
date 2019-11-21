@@ -52,7 +52,7 @@ public class LineSegmentSlope extends SolverCodelet {
         FeatureNode createdLineSlope = FeatureNode.createFloatNode(getNetworkHandles().lineSegmentFeatureLineSlopePrimitiveNode, lineSegmentSlope, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().lineSegmentFeatureLineSlopePrimitiveNode));
         
         Link createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdLineSlope);
-        thisLine.out.add(createdLink);
+        thisLine.out(createdLink);
         
         return new RunResult(false);
     }

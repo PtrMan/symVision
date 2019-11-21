@@ -51,7 +51,7 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
         // * match it recursivly
         // * strengthen links
 
-		List<FeaturePatternMatching.MatchingPathElement> matchingPathElements = featurePatternMatching.matchAnyRecursive(orginal.exemplars.get(0), additional.exemplars.get(0), networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
+		List<FeaturePatternMatching.MatchingPathElement<Link>> matchingPathElements = featurePatternMatching.matchAnyRecursive(orginal.exemplars.get(0), additional.exemplars.get(0), networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
 
 		Node currentMatchNodeOrginal = orginal.exemplars.get(0);
 		Node currentMatchNodeAdditional = additional.exemplars.get(0);
@@ -59,25 +59,25 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
         for( currentMatchPathElementI = 0; currentMatchPathElementI < matchingPathElements.size()-1; currentMatchPathElementI++ )
         {
 
-			FeaturePatternMatching.MatchingPathElement currentMatchPathElement = matchingPathElements.get(currentMatchPathElementI);
+			FeaturePatternMatching.MatchingPathElement<Link> currentMatchPathElement = matchingPathElements.get(currentMatchPathElementI);
 
-            currentMatchNodeOrginal = currentMatchNodeOrginal.out.get(currentMatchPathElement.bestMatchNodeAIndex).target;
-            currentMatchNodeAdditional = currentMatchNodeAdditional.out.get(currentMatchPathElement.bestMatchNodeBIndex).target;
+            currentMatchNodeOrginal = currentMatchPathElement.bestMatchA.target;
+            currentMatchNodeAdditional = currentMatchPathElement.bestMatchB.target;
         }
 
         // strengthen links
 
-		FeaturePatternMatching.MatchingPathElement currentMatchLastPathElement = matchingPathElements.get(matchingPathElements.size() - 1);
+		FeaturePatternMatching.MatchingPathElement<Link> currentMatchLastPathElement = matchingPathElements.get(matchingPathElements.size() - 1);
 
-        currentMatchNodeOrginal.out.get(currentMatchLastPathElement.bestMatchNodeAIndex).strength += additionalStrength;
-        currentMatchNodeAdditional.out.get(currentMatchLastPathElement.bestMatchNodeBIndex).strength += additionalStrength;
+        currentMatchLastPathElement.bestMatchA.strength += additionalStrength;
+        currentMatchLastPathElement.bestMatchB.strength += additionalStrength;
         // TODO< limit it in some way? >
 
         // update the statistics
         // TODO< update the statistics of the other FeatureNodes along the way and at the bottom ? >
 
-		Node lastOrginalNode = orginal.exemplars.get(0).out.get(currentMatchLastPathElement.bestMatchNodeAIndex).target;
-		Node lastAdditionalNode = additional.exemplars.get(0).out.get(currentMatchLastPathElement.bestMatchNodeBIndex).target;
+		Node lastOrginalNode = currentMatchLastPathElement.bestMatchA.target;
+		Node lastAdditionalNode = currentMatchLastPathElement.bestMatchB.target;
 
         // NOTE< should we just build around this case with an if? >
         Assert.Assert(lastOrginalNode.type == NodeTypes.EnumType.FEATURENODE.ordinal(), "lastOrginalNode is not a featurenode as expected");
@@ -100,7 +100,7 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
         Assert.Assert(b.exemplars.size() == 1, "size expected to be 1");
         Assert.Assert(b.exemplars.get(0).type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "");
 
-		List<FeaturePatternMatching.MatchingPathElement> matchingPathElements = featurePatternMatching.matchAnyRecursive(a.exemplars.get(0), b.exemplars.get(0), networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
+		List<FeaturePatternMatching.MatchingPathElement<Link>> matchingPathElements = featurePatternMatching.matchAnyRecursive(a.exemplars.get(0), b.exemplars.get(0), networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
 		float matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
 
         return matchingSimilarityValue;
@@ -126,7 +126,7 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
             
             float matchingValue = featurePatternMatching.matchAnyNonRecursive(template, iterationOther, networkHandles);
 
-			List<FeaturePatternMatching.MatchingPathElement> matchingPathElements = featurePatternMatching.matchAnyRecursive(template, iterationOther, networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
+			List<FeaturePatternMatching.MatchingPathElement<Link>> matchingPathElements = featurePatternMatching.matchAnyRecursive(template, iterationOther, networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
 			float matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
 
             if( matchingSimilarityValue > bestMatchingSimilarity )

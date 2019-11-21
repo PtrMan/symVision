@@ -73,7 +73,7 @@ public class SolverTest {
             
             doneList.add(currentNode);
             
-            for( Link iterationLink : currentNode.out) {
+            for( Link iterationLink : currentNode.out()) {
                 nodeHeap.add(iterationLink.target);
             }
             

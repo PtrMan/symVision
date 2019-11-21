@@ -59,7 +59,7 @@ public enum TestPatternMatching {
 
 		FeaturePatternMatching featurePatternMatching = new FeaturePatternMatching();
 
-		List<FeaturePatternMatching.MatchingPathElement> matchingPathElements = featurePatternMatching.matchAnyRecursive(objectNodes.get(0), objectNodes.get(0), bpSolver.networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), MAXDEPTH);
+		List<FeaturePatternMatching.MatchingPathElement<Link>> matchingPathElements = featurePatternMatching.matchAnyRecursive(objectNodes.get(0), objectNodes.get(0), bpSolver.networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), MAXDEPTH);
 		float matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
 
         if( matchingSimilarityValue > 1.001f || matchingSimilarityValue < 0.999f ) {

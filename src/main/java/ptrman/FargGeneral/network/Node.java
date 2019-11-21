@@ -9,10 +9,9 @@
  */
 package ptrman.FargGeneral.network;
 
-import com.google.common.collect.Iterables;
+import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public abstract class Node
 {
@@ -23,7 +22,8 @@ public abstract class Node
     
     public int conceptualDepth; // control decayrate
     
-    public final List<Link> out = new ArrayList<>();
+    private final EnumMap<Link.EnumType, Set<Link>> out = new EnumMap(Link.EnumType.class);
+
     //public ArrayList<Link> incommingLinks = new ArrayList<Link>(); // only bidirection links are in here
     
     public Node(int type)
@@ -45,7 +45,10 @@ public abstract class Node
     public Iterable<Link> getLinksByType(Link.EnumType type)
     {
 
-        return Iterables.filter(out, x->x.type==type);
+        Set<Link> y = out.get(type);
+        return y == null ? Collections.emptyList() : y;
+
+        //return Iterables.filter(out, x->x.type==type);
 
 //        List<Link> result = new ArrayList<>();
 //
@@ -58,5 +61,13 @@ public abstract class Node
 //        }
 //
 //        return result;
+    }
+
+    public boolean out(Link l) {
+        return out.computeIfAbsent(l.type, (x)->new UnifiedSet()).add(l);
+    }
+
+    public Iterable<Link> out() {
+        return out.values().stream().flatMap(Collection::stream)::iterator;
     }
 }

@@ -21,7 +21,7 @@ public class Link
     
     //public Node source; // can be null for unidirectional edges
         
-    public Node[] hyperNodes;
+//    public Node[] hyperNodes;
     
     /*public boolean isBidirectional()
     {

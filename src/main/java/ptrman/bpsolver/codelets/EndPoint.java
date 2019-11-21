@@ -47,7 +47,7 @@ public class EndPoint extends SolverCodelet {
         for( int endpointI = 0; endpointI < 2; endpointI++ ) {
             final PlatonicPrimitiveInstanceNode createdEndpointInstanceNode = HelperFunctions.createVectorAttributeNode(endPoints[endpointI], getNetworkHandles().endpointPlatonicPrimitiveNode, bpSolver);
             final Link linkToEndpoint = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdEndpointInstanceNode);
-            startNode.out.add(linkToEndpoint);
+            startNode.out(linkToEndpoint);
         }
         
         return new RunResult(false);

@@ -46,10 +46,10 @@ public class IdStrategy extends AbstractTranslatorStrategy {
 
                 // linkage
                 Link createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.CONTAINS, nodeForRetinaPrimitive);
-                objectNode.out.add(createdForwardLink);
+                objectNode.out(createdForwardLink);
 
                 Link createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
-                nodeForRetinaPrimitive.out.add(createdBackwardLink);
+                nodeForRetinaPrimitive.out(createdBackwardLink);
             }
 
             resultNodes.add(objectNode);
