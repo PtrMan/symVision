@@ -140,8 +140,6 @@ public class ProcessD implements IProcess {
     public void sampleNewByRandom() {
         final double maxLength = Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y})); // max length of line
 
-        List<LineDetectorWithMultiplePoints> multiplePointsLineDetector = new ArrayList<>();
-
         final List<ProcessA.Sample> workingSamples = inputSampleConnector.getWorkspace();
 
         // filter valid points

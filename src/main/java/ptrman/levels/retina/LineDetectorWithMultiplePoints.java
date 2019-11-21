@@ -16,18 +16,11 @@ import static ptrman.math.ArrayRealVectorHelper.getScaled;
 public class LineDetectorWithMultiplePoints {
     public List<ProcessA.Sample> samples = new ArrayList<>(); // actual samples which are "included" in the line
 
-    // variable for the line drawing in the acceleration structure
-    //public ArrayRealVector spatialAccelerationLineDirection; // can be null
-    //public double spatialAccelerationLineLength; // can be null
-    //public Vector2d<Integer> spatialAccelerationCenterPosition;
-
     public double cachedConf = 0.0; // cached confidence of this line detector
 
     public double m, n;
 
     public double mse = 0.0f;
-
-    //public boolean isLocked = false; // has the detector received enough activation so it stays?
 
     public boolean isHardened = false; // has the detector received enough activation so it got hardened?
 
@@ -81,10 +74,6 @@ public class LineDetectorWithMultiplePoints {
         return calcActivation(x);
     }
 
-    public boolean isCommonObjectIdValid() {
-        return commonObjectId != -1;
-    }
-
     @Deprecated public ArrayRealVector projectPointOntoLine(IntIntPair point) {
         return projectPointOntoLine(real(point));
     }
@@ -129,13 +118,6 @@ public class LineDetectorWithMultiplePoints {
         return Double.isInfinite(m);
     }
 
-//    public double getHorizontalOffset(List<ProcessA.Sample> samples) {
-//        Assert.Assert(isYAxisSingularity(), "");
-//
-//        int sampleIndex = integratedSampleIndices.get(0);
-//        return samples.get(sampleIndex).position.getOne();
-//    }
-
     public double getLength() {
         List<ArrayRealVector> sortedSamplePositions = ProcessD.getSortedSamplePositions(this);
 
@@ -157,11 +139,9 @@ public class LineDetectorWithMultiplePoints {
         }
     }
 
-
     // must be called before removal in process-D
     public void cleanup() {
         for(ProcessA.Sample iSample : samples)
             iSample.refCount--;
     }
-
 }
