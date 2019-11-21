@@ -9,6 +9,7 @@
  */
 package ptrman.bindingNars;
 
+import ptrman.levels.retina.Intersection;
 import ptrman.levels.retina.RetinaPrimitive;
 
 import java.util.List;
@@ -20,7 +21,25 @@ public class NarsBinding {
         this.consumer = consumer;
     }
 
-    public void emitRetinaPrimitives(Iterable<RetinaPrimitive> primitives) {
+    /**
+     * returns -1 if not found
+     * @param primitives
+     * @param primitive
+     * @return
+     */
+    private static int retIdxOf(List<RetinaPrimitive> primitives, RetinaPrimitive primitive) {
+        int idx = 0;
+        for(RetinaPrimitive iPrim : primitives) {
+            if (iPrim.equals(primitive)) {
+                return idx;
+            }
+            idx++;
+        }
+
+        return -1;
+    }
+
+    public void emitRetinaPrimitives(List<RetinaPrimitive> primitives) {
         int primnitiveIdCntr = 0;
 
         for (RetinaPrimitive iPrimitive : primitives) {
@@ -29,8 +48,26 @@ public class NarsBinding {
             int bx = (int)iPrimitive.line.b.getDataRef()[0];
             int by = (int)iPrimitive.line.b.getDataRef()[1];
 
-            consumer.emitLineSegment(String.valueOf(primnitiveIdCntr), ax,ay,bx,by, iPrimitive.retConf());
+            consumer.emitLineSegment("line"+primnitiveIdCntr, ax,ay,bx,by, iPrimitive.retConf());
             primnitiveIdCntr++;
+        }
+
+        // emit line intersections
+        {
+            for (RetinaPrimitive iPrimitive : primitives) {
+                if (iPrimitive.line == null) {
+                    continue;
+                }
+
+                for(Intersection iIntersection :                 iPrimitive.line.intersections) {
+                    int idxA = retIdxOf(primitives, iIntersection.p0.primitive);
+                    int idxB = retIdxOf(primitives, iIntersection.p1.primitive);
+
+                    if (primitives.get(idxA).line != null && primitives.get(idxB).line != null) { // we only care about line-line intersections
+                        consumer.emitLineIntersection("line"+idxA,"line"+idxB);
+                    }
+                }
+            }
         }
     }
 }

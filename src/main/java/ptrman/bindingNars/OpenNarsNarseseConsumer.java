@@ -14,4 +14,9 @@ public class OpenNarsNarseseConsumer implements FormatedNarseseConsumer {
     public void emitLineSegment(String name, int posAX, int posAY, int posBX, int posBY, double conf) {
         System.out.println("<(*,"+name+","+posAX+"_"+posAY+"," +posBX+"_" +posBY+") --> line>. %1.0;"+conf+"%");
     }
+
+    @Override
+    public void emitLineIntersection(String nameA, String nameB) {
+        System.out.println("<(*,"+nameA+","+nameB+") --> lineIntrsctn>.");
+    }
 }
