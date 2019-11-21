@@ -51,6 +51,7 @@ public class Solver2 {
         processD = new ProcessD();
         processD.maximalDistanceOfPositions = 5000.0;
         processD.onlyEndoskeleton = true;
+        processD.processDLineSamplesForProximity = 2;
 
         connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
 
@@ -152,7 +153,7 @@ public class Solver2 {
             processDEdge[i].set(connectorSamplesFromProcessAForEdge[i], connectorDetectorsFromProcessDForEdge[i]);
 
             processAEdge[i].preProcessData();
-            processAEdge[i].processData(0.03f);
+            processAEdge[i].processData(0.12f);
             processAEdge[i].postProcessData();
 
             processDEdge[i].preProcessData();
@@ -243,16 +244,6 @@ public class Solver2 {
             d.step();
         }
 
-        /*
-        if (annealingStep >= 20) { // remove only in later phases
-            processD.removeCandidatesBelowActivation(1.1);
-
-            for(int idx=0;idx<processDEdge.length;idx++) {
-                processDEdge[idx].removeCandidatesBelowActivation(1.1);
-            }
-        }
-         */
-
         annealingStep++;
     }
 
@@ -260,13 +251,15 @@ public class Solver2 {
      * must be called to "finilize" the processing of a frame
      */
     public void postFrame() {
-        // then emit narsese to narsese consumer
+        // * emit narsese to narsese consumer
 
         processD.commitLineDetectors(); // split line detectors into "real" primitives
 
         for (ProcessD d : processDEdge) {
             d.commitLineDetectors();
         }
+
+        // * process-H and process-E
 
         ProcessH processH = new ProcessH();
         processH.setImageSize(imageSize);

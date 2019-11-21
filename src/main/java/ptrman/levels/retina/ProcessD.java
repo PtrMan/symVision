@@ -324,12 +324,16 @@ public class ProcessD implements IProcess {
         return result;
     }
 
+    public int processDLineSamplesForProximity = 1; // number of proximity sampling tries for proposal of line detectors
+
     /**
      * processing step
      */
     public void step() {
         sampleNewByRandom();
-        sampleNewByProximity();
+        for(int i=0;i<processDLineSamplesForProximity;i++) {
+            sampleNewByProximity();
+        }
         tryWiden();
         detectorsHarden();
         detectorsFadeActivation();
