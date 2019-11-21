@@ -16,8 +16,6 @@ import static ptrman.math.ArrayRealVectorHelper.getScaled;
 public class LineDetectorWithMultiplePoints {
     public List<ProcessA.Sample> samples = new ArrayList<>(); // actual samples which are "included" in the line
 
-    public IntList integratedSampleIndices;
-
     // variable for the line drawing in the acceleration structure
     //public ArrayRealVector spatialAccelerationLineDirection; // can be null
     //public double spatialAccelerationLineLength; // can be null
@@ -42,10 +40,6 @@ public class LineDetectorWithMultiplePoints {
 
     public LineDetectorWithMultiplePoints(double xStep) {
         this.xStep = xStep;
-    }
-
-    public boolean doesContainSampleIndex(int index) {
-        return integratedSampleIndices.contains(index);
     }
 
     /** compute sigmoid like activation function as described in

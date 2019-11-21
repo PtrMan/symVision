@@ -15,11 +15,13 @@ import org.apache.commons.math3.random.RandomAdaptor;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.eclipse.collections.api.IntIterable;
 import org.eclipse.collections.api.list.primitive.IntList;
+import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.Parameters;
 import ptrman.levels.retina.helper.ProcessConnector;
+import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
 import java.util.*;
@@ -109,51 +111,101 @@ public class ProcessD implements IProcess {
         }
     }
 
-    // tries to sample a new line candidate
-    public void sampleNew() {
+
+    /**
+     * selects random samples
+     * @param source
+     * @return
+     */
+    public List<ProcessA.Sample> selectRandomSamples(List<ProcessA.Sample> source) {
+        if (source.size() < 3) {
+            return new ArrayList<>();
+        }
+
+        // pick out random points
+        int sampleIndex = 0; // NOTE< index in endosceletonPoint / workingSamples >
+        IntArrayList allCandidateSampleIndices = new IntArrayList();
+        for (final ProcessA.Sample iterationSample : source) {
+            allCandidateSampleIndices.add(sampleIndex);
+            sampleIndex++;
+        }
+
+        IntList chosenCandidateSampleIndices = getRandomElements(allCandidateSampleIndices, 3, rng);
+        return getSamplesByIndices(source, chosenCandidateSampleIndices);
+    }
+
+    /**
+     * tries to sample a new line candidate by picking random points
+     */
+    public void sampleNewByRandom() {
         final double maxLength = Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y})); // max length of line
 
         List<LineDetectorWithMultiplePoints> multiplePointsLineDetector = new ArrayList<>();
 
         final List<ProcessA.Sample> workingSamples = inputSampleConnector.getWorkspace();
 
-        if (workingSamples.isEmpty()) {
-            return;
-        }
-
-        // pick out random points
-        int sampleIndex = 0; // NOTE< index in endosceletonPoint / workingSamples >
-        IntArrayList allCandidateSampleIndices = new IntArrayList();
+        // filter valid points
+        List<ProcessA.Sample> filteredSamples = new ArrayList<>();
         for (final ProcessA.Sample iterationSample : workingSamples) {
             boolean onlyAddEndoskeletonEnable = !(onlyEndoskeleton && iterationSample.type != ProcessA.Sample.EnumType.ENDOSCELETON);
             boolean isReferenced = iterationSample.refCount != 0;
             if(!isReferenced && onlyAddEndoskeletonEnable ) {
-                allCandidateSampleIndices.add(sampleIndex);
+                filteredSamples.add(iterationSample);
             }
-            sampleIndex++;
         }
 
+        List<ProcessA.Sample> selectedSamples = selectRandomSamples(filteredSamples);
+        tryCreateMultiLineDetector(maxLength, selectedSamples);
+    }
 
-        IntList chosenCandidateSampleIndices = getRandomElements(allCandidateSampleIndices, 3, rng);
-        List<ProcessA.Sample> selectedSamples = getSamplesByIndices(workingSamples, chosenCandidateSampleIndices);
+    public double processDSampleByProximityProximity = 20.0; // maximal proximity of points to get considered for sampling by proximity
 
-        tryCreateMultiLineDetector(maxLength, chosenCandidateSampleIndices, selectedSamples);
+    /**
+     * tries to sample a new detector by proximity of points
+     */
+    public void sampleNewByProximity() {
+        final double maxLength = Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y})); // max length of line
 
+        final List<ProcessA.Sample> workingSamples = inputSampleConnector.getWorkspace();
+
+        if (workingSamples.size() < 2) {
+            return;
+        }
+
+        int centerPointIdx = rng.nextInt(workingSamples.size());
+        IntIntPair centerPointPos = workingSamples.get(centerPointIdx).position;
+
+        // find all points in proximity
+        List<ProcessA.Sample> proximitySamples = new ArrayList<>();
+        for(ProcessA.Sample iSample : workingSamples) {
+            double dist = ArrayRealVectorHelper.distance(centerPointPos, iSample.position);
+            if (dist > processDSampleByProximityProximity) {
+                continue;
+            }
+
+            boolean onlyAddEndoskeletonEnable = !(onlyEndoskeleton && iSample.type != ProcessA.Sample.EnumType.ENDOSCELETON);
+            boolean isReferenced = iSample.refCount != 0;
+            if(!isReferenced && onlyAddEndoskeletonEnable ) {
+                proximitySamples.add(iSample);
+            }
+        }
+
+        // try to create line detector by selecting random points from candidates
+        List<ProcessA.Sample> selectedSamples = selectRandomSamples(proximitySamples);
+        tryCreateMultiLineDetector(maxLength, selectedSamples);
     }
 
     public double processDNumberOfPointsToActivationScale = 0.15; // how much does a point improve the scaling
 
-    private void tryCreateMultiLineDetector(
-            double maxLength,
-            IntList chosenCandidateSampleIndices, List<ProcessA.Sample> selectedSamples) {
+    private void tryCreateMultiLineDetector(double maxLength, List<ProcessA.Sample> selectedSamples) {
         // commented check because we don't assume object id's anymore (because it was from Phaeaco for solving BP's)
         //final boolean doAllSamplesHaveId = doAllSamplesHaveObjectId(selectedSamples);
         //if (!doAllSamplesHaveId) {
         //    return;
         //}
 
-        if (selectedSamples.size() == 0) {
-            return; // special case
+        if (selectedSamples.size() < 2) {
+            return; // line is not defined
         }
 
         // check if object ids are the same
@@ -180,14 +232,13 @@ public class ProcessD implements IProcess {
         }
         // else we are here
 
-        if(chosenCandidateSampleIndices.size() <= 2) { // the regression mse is not defined if it are only two points
+        if(selectedSamples.size() <= 2) { // the regression mse is not defined if it are only two points
             return; // only create detector if we have at least three samples
         }
 
 
         // create new line detector
         LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints(lineDetectorInitialXStep);
-        createdLineDetector.integratedSampleIndices = chosenCandidateSampleIndices;
         createdLineDetector.samples = selectedSamples;
 
         Assert.Assert(areObjectIdsTheSameOfSamples(selectedSamples), "");
@@ -198,7 +249,7 @@ public class ProcessD implements IProcess {
 
         boolean addCreatedLineDetector = false;
 
-        if (createdLineDetector.integratedSampleIndices.size() == 2) {
+        if (createdLineDetector.samples.size() == 2) {
             createdLineDetector.mse = 0.0f;
 
             createdLineDetector.n = regressionResult.n;
@@ -279,7 +330,8 @@ public class ProcessD implements IProcess {
      * processing step
      */
     public void step() {
-        sampleNew();
+        sampleNewByRandom();
+        sampleNewByProximity();
         tryWiden();
         detectorsHarden();
         detectorsFadeActivation();

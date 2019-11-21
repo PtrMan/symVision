@@ -123,4 +123,11 @@ public enum ArrayRealVectorHelper {
         double dy = b.getEntry(1) - a.getTwo();
         return Math.sqrt( dx*dx+dy*dy);
     }
+    // TODO< rename class >
+    /** cartesian distance */
+    public static double distance(IntIntPair a, IntIntPair b) {
+        double dx = b.getOne() - a.getOne();
+        double dy = b.getTwo() - a.getTwo();
+        return Math.sqrt( dx*dx+dy*dy);
+    }
 }
