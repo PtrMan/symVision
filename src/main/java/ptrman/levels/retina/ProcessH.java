@@ -9,7 +9,6 @@
  */
 package ptrman.levels.retina;
 
-//import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import ptrman.Datastructures.IMap2d;
@@ -34,15 +33,15 @@ import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimiti
  */
 public class ProcessH implements IProcess {
 
-    final float maxFusionsPerCycle = 0.15f; //adjustable
+    public float maxFusionsPerCycle = 0.15f; //adjustable
 
-    private ProcessConnector<RetinaPrimitive> resultPrimitiveConnector;
-    private ProcessConnector<RetinaPrimitive> inputPrimitiveConnection;
+    public ProcessConnector<RetinaPrimitive> resultPrimitiveConnector;
+    public ProcessConnector<RetinaPrimitive> inputPrimitiveConnection;
 
-    private Vector2d<Integer> imageSize;
+    public Vector2d<Integer> imageSize;
 
-    private final int GRIDSIZE = 8;
-    private IMap2d<Boolean> accelerationMap;
+    public int GRIDSIZE = 8;
+    public IMap2d<Boolean> accelerationMap;
 
     public void set(ProcessConnector<RetinaPrimitive> inputPrimitiveConnection, ProcessConnector<RetinaPrimitive> resultPrimitiveConnector) {
         this.inputPrimitiveConnection = inputPrimitiveConnection;
@@ -326,10 +325,6 @@ public class ProcessH implements IProcess {
     private static boolean isProjectedPointOntoLineBelowDistanceLimit(ArrayRealVector point, SingleLineDetector line) {
         ArrayRealVector projectedPoint = line.projectPointOntoLine(point);
         double distanceBetweenProjectedAndPoint = projectedPoint.getDistance(point);
-
-        //System.out.println("line A (" + line.aFloat.x.toString() + "," + line.aFloat.y.toString() + ") B (" + line.bFloat.x.toString() + "," + line.bFloat.y.toString() + ")");
-        //System.out.println("point (" + point.x.toString() + "," + point.y.toString() + ")");
-        //System.out.println("projectedpoint (" + projectedPoint.x.toString() + "," + projectedPoint.y.toString() + ")");
 
         return distanceBetweenProjectedAndPoint < HardParameters.ProcessH.MAXDISTANCEFORCANDIDATEPOINT;
     }

@@ -134,7 +134,7 @@ public class ProcessG {
         // it adds also new lineparsings because lineparsings can be divided into curves
         
         // for now we do this for *all* curves
-        // TODO< select by random >
+        // TODO< select by rng >
 
         for (ProcessM.LineParsing lineParsing : lineParsings) {
 

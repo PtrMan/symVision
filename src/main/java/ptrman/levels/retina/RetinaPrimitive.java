@@ -15,7 +15,7 @@ import ptrman.misc.Assert;
 import java.util.List;
 
 /**
- *
+ * primitive of the retina output
  * 
  */
 public class RetinaPrimitive {

@@ -26,6 +26,14 @@ import static ptrman.levels.retina.LineDetectorWithMultiplePoints.real;
  * * works only on rasterized input
  */
 public class ProcessF implements IProcess {
+    public IMap2d<Boolean> map;
+
+    public ProcessConnector<ProcessA.Sample> inputSampleConnector;
+    public ProcessConnector<ProcessA.Sample> outputSampleConnector;
+
+    public static int COUNTOFRAYDIRECTIONS = 16;
+    public static ArrayRealVector[] RAYDIRECTIONS;
+
     @Override
     public void setImageSize(Vector2d<Integer> imageSize) {
     }
@@ -136,14 +144,6 @@ public class ProcessF implements IProcess {
         public boolean isActive = true;
     }
 
-
-    private IMap2d<Boolean> map;
-
-    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
-    private ProcessConnector<ProcessA.Sample> outputSampleConnector;
-
-    private static final int COUNTOFRAYDIRECTIONS = 16;
-    private static final ArrayRealVector[] RAYDIRECTIONS;
     static {
         int divisions = COUNTOFRAYDIRECTIONS;
 
@@ -161,5 +161,4 @@ public class ProcessF implements IProcess {
 
         RAYDIRECTIONS = result;
     }
-
 }

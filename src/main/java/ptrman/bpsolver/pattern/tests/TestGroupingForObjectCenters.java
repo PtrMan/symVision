@@ -27,18 +27,15 @@ public enum TestGroupingForObjectCenters
 {
     ;
 
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) {
         test();
     }
     
-    public static void test()
-    {
+    public static void test() {
         testClustering1();
     }
     
-    private static void testClustering1()
-    {
+    private static void testClustering1() {
         // for testing we use the numerosity node as content to tell the elements apart
 
         Collection<Pattern> exemplars = new ArrayList<>();

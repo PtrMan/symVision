@@ -30,6 +30,15 @@ import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
  * computation of altitude of points
  */
 public class ProcessB extends AbstractProcessB {
+    private SpatialAcceleratedMap2d spatialAcceleratedMap2d;
+    private FastBooleanMap2d map;
+
+    private int counterCellPositiveCandidates;
+    private int counterCellCandidates;
+    public IMap2d<Boolean> inputMap;
+    public ProcessConnector<ProcessA.Sample> inputSampleConnector;
+    public ProcessConnector<ProcessA.Sample> outputSampleConnector;
+
     @Override
     public void set(IMap2d<Boolean> map, ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector) {
         this.inputMap = map;
@@ -251,12 +260,4 @@ public class ProcessB extends AbstractProcessB {
         return result;
     }
 
-    private SpatialAcceleratedMap2d spatialAcceleratedMap2d;
-    private FastBooleanMap2d map;
-
-    private int counterCellPositiveCandidates;
-    private int counterCellCandidates;
-    private IMap2d<Boolean> inputMap;
-    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
-    private ProcessConnector<ProcessA.Sample> outputSampleConnector;
 }

@@ -29,7 +29,11 @@ public class ProcessM {
         public float processGInterestRating = 0.0f; // rating or interest of the parsing for processG to be a candidate of a curve
         public boolean processGRated = false; // used to check for invalidated curves and rerate them if necessary
     }
-    
+
+    public Random rng = new Random();
+
+    public List<LineParsing> lineParsings = new ArrayList<>();
+
     public void process(List<RetinaPrimitive> lineDetectors) {
         if( lineDetectors.isEmpty() ) {
             return;
@@ -72,7 +76,7 @@ public class ProcessM {
         
         Assert.Assert(!lineDetectors.isEmpty(), "");
 
-        int startLineIndex = random.nextInt(lineDetectors.size());
+        int startLineIndex = rng.nextInt(lineDetectors.size());
         SingleLineDetector startLineDetector = lineDetectors.get(startLineIndex).line;
 
         ArrayList<SingleLineDetector> lineParsing = findLineParsingForStartLine(startLineDetector);
@@ -83,7 +87,7 @@ public class ProcessM {
     
     /**
      * 
-     * \result returns the (possible random) line parsing
+     * \result returns the (possible rng) line parsing
      * 
      * --- the lines are locked
      */
@@ -106,7 +110,7 @@ public class ProcessM {
                 }
                 
                 // take out
-                int indexOfChosenRemainingIntersections = random.nextInt(remainingIntersections.size());
+                int indexOfChosenRemainingIntersections = rng.nextInt(remainingIntersections.size());
                 Intersection currentIntersection = remainingIntersections.get(indexOfChosenRemainingIntersections);
                 remainingIntersections.remove(indexOfChosenRemainingIntersections);
                 
@@ -139,13 +143,6 @@ public class ProcessM {
     }
     
     private static List<Intersection> deepCopyIntersections(List<Intersection> intersections) {
-
-        List<Intersection> copyed = new ArrayList<>(intersections);
-        
-        return copyed;
+        return new ArrayList<>(intersections);
     }
-
-    private final Random random = new Random();
-    
-    private final List<LineParsing> lineParsings = new ArrayList<>();
 }

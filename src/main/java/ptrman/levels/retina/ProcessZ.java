@@ -22,21 +22,17 @@ import ptrman.misc.GaussianBlur;
  * zooms in to resolve small features
  */
 public class ProcessZ implements IProcess {
-    IMap2d<Float> floatNotMagnified;
-    IMap2d<Float> floatMagnified;
-    IMap2d<Float> floatMagnifiedBlured;
-    IMap2d<Boolean> tempResult;
+    public IMap2d<Float> floatNotMagnified;
+    public IMap2d<Float> floatMagnified;
+    public IMap2d<Float> floatMagnifiedBlured;
+    public IMap2d<Boolean> tempResult;
 
+    public IMap2d<Boolean> inputMap;
+    public Vector2d<Integer> imageSize;
+    public IMap2d<Boolean> magnifiedOutput;
+    public final Map2dTransform<Float> map2dTranform = new Map2dTransform<>();
 
-    public IMap2d<Boolean> getMagnifiedOutput() {
-        return magnifiedOutput;
-    }
-
-
-
-    public void set(IMap2d<Boolean> inputMap) {
-        this.inputMap = inputMap;
-    }
+    public float FLOATTOBOOLEANTHRESHOLD = 0.6f;
 
     @Override
     public void setImageSize(Vector2d<Integer> imageSize) {
@@ -45,12 +41,10 @@ public class ProcessZ implements IProcess {
 
     @Override
     public void setup() {
-
     }
 
     @Override
     public void preProcessData() {
-
     }
 
     @Override
@@ -81,16 +75,5 @@ public class ProcessZ implements IProcess {
 
     @Override
     public void postProcessData() {
-
     }
-
-    private IMap2d<Boolean> inputMap;
-
-    private Vector2d<Integer> imageSize;
-
-    private IMap2d<Boolean> magnifiedOutput;
-
-    private final Map2dTransform<Float> map2dTranform = new Map2dTransform<>();
-
-    private final float FLOATTOBOOLEANTHRESHOLD = 0.6f;
 }

@@ -21,7 +21,8 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * 
+ * line detector
+ *
  * Invariants:
  *    * a.x < b.x
  * 

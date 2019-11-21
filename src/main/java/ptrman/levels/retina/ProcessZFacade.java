@@ -269,9 +269,9 @@ public class ProcessZFacade implements IProcess {
     }
 
     private void magnify() {
-        processZ.set(toMagnify);
+        processZ.inputMap = toMagnify;
         processZ.processData();
-        magnifiedOutput = processZ.getMagnifiedOutput();
+        magnifiedOutput = processZ.magnifiedOutput;
     }
 
     private Vector2d<Integer> imageSize;

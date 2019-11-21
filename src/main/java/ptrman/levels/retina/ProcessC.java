@@ -33,16 +33,16 @@ public class ProcessC implements IProcess {
 
     private SpatialListMap2d<ProcessA.Sample> accelerationMap;
 
-    final int maxSortedSamples = 8;
+    public int maxSortedSamples = 8;
 
     public int gridsize = 8;
     private Vector2d<Integer> imageSize;
 
     private final Random random = new Random();
 
-    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
-    private ProcessConnector<ProcessA.Sample> resultSamplesToProcessF;
-    private ProcessConnector<ProcessA.Sample> resultSampleConnector;
+    public ProcessConnector<ProcessA.Sample> inputSampleConnector;
+    public ProcessConnector<ProcessA.Sample> resultSamplesToProcessF;
+    public ProcessConnector<ProcessA.Sample> resultSampleConnector;
     final FastList<SampleWithDistance> sortedSamples = new FastList();
 
     /** sort order: lowest distance first */

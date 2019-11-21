@@ -70,7 +70,7 @@ public class SearchAndFuseRoughtlyEqualElements extends SolverCodelet {
         
         
         // * select random key
-        // * retrive Tuple
+        // * retrieve Tuple
         // * look if the measurements are roughtly equal
         // * relink graph if they are
         PlatonicPrimitiveNode[] typeKeysAsArray = (PlatonicPrimitiveNode[])commonChildnodesOfNodes.keySet().toArray();

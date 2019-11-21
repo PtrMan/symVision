@@ -113,7 +113,7 @@ public class ProcessD implements IProcess {
 
 
     /**
-     * selects random samples
+     * selects rng samples
      * @param source
      * @return
      */
@@ -122,7 +122,7 @@ public class ProcessD implements IProcess {
             return new ArrayList<>();
         }
 
-        // pick out random points
+        // pick out rng points
         int sampleIndex = 0; // NOTE< index in endosceletonPoint / workingSamples >
         IntArrayList allCandidateSampleIndices = new IntArrayList();
         for (final ProcessA.Sample iterationSample : source) {
@@ -135,7 +135,7 @@ public class ProcessD implements IProcess {
     }
 
     /**
-     * tries to sample a new line candidate by picking random points
+     * tries to sample a new line candidate by picking rng points
      */
     public void sampleNewByRandom() {
         final double maxLength = Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y})); // max length of line
@@ -188,7 +188,7 @@ public class ProcessD implements IProcess {
             }
         }
 
-        // try to create line detector by selecting random points from candidates
+        // try to create line detector by selecting rng points from candidates
         List<ProcessA.Sample> selectedSamples = selectRandomSamples(proximitySamples);
         tryCreateMultiLineDetector(maxLength, selectedSamples);
     }
