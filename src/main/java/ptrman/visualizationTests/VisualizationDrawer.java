@@ -22,7 +22,7 @@ public class VisualizationDrawer {
     public boolean drawVisualizationOfEndoSceletons = false; // do we visualize all samples of endo/exo -sceleton
     public boolean drawVisualizationOfLineDetectors = true;
     public boolean drawVisualizationOfLineDetectorsEnableAct = true; // do we draw activation of line detectors?
-    public boolean drawVisualizationOfEdgeLineDetectors = false;
+    public boolean drawVisualizationOfEdgeLineDetectors = true;
 
     public void drawDetectors(Solver2 solver, PApplet applet) {
         if(drawVisualizationOfAltitude) {

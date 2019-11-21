@@ -48,8 +48,18 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
 
             g2.setColor(Color.WHITE);
 
-            if (chosenImage == 0) {
-                // draw "A"
+            if (chosenImage == 0) { // draw polygon
+                g2.setColor(new Color(1.0f, 0.0f, 0.0f));
+
+                Polygon poly = new Polygon();
+
+                poly.addPoint(10, 10);
+                poly.addPoint(70, 10);
+                poly.addPoint(40, 50);
+
+                g2.fillPolygon(poly);
+            }
+            if (chosenImage == 1) { // draw "A"
                 int endpointADeltaX = (int)(Math.cos(animationFrameNumber * 0.1) * 10);
                 int endpointADeltaY = (int)(Math.sin(animationFrameNumber * 0.1) * 10);
 
@@ -58,23 +68,23 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
                 g2.drawLine(90+endpointADeltaX, 80+endpointADeltaY, 40, 10);
                 g2.drawLine(30, 40, 70, 40);
             }
-            else if(chosenImage == 1){
+            else if(chosenImage == 2){
                 // draw star
                 g2.setFont(new Font("TimesRoman", Font.PLAIN, 230));
                 g2.drawString("*", 20, 170);
             }
-            else if(chosenImage == 2){
+            else if(chosenImage == 3){
                 // text
                 g2.setFont(new Font("TimesRoman", Font.PLAIN, 90));
                 g2.drawString("/en-", 2, 100);
             }
-            else if(chosenImage == 3) {
+            else if(chosenImage == 4) {
                 // draw big boxes
                 g2.fillRect(10, 10, 70, 20);
 
                 g2.fillRect(10, 50, 70, 20);
             }
-            else if(chosenImage == 4) { // chinese symbol
+            else if(chosenImage == 5) { // chinese symbol
                 // text
                 g2.setFont(new Font("TimesRoman", Font.PLAIN, 90));
                 g2.drawString("不", 2, 100);
@@ -115,7 +125,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             frameCountdown = framesPerStep;
 
             if (stateName.equals("annealing") && state == 0) { // first frame of new animation
-                chosenImage = new Random().nextInt(5);
+                chosenImage = new Random().nextInt(6);
 
                 solver2.imageDrawer = new VisualizeLinesegmentsAnnealing.InputDrawer();
 
