@@ -15,7 +15,7 @@ public class SingleLineDetectorTest  {
     @Test
     public void unittestProjectPoint() {
 
-		SingleLineDetector testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{1.0f, 2.0f}), new ArrayRealVector(new double[]{2.0f, 3.0f}));
+		SingleLineDetector testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{1.0f, 2.0f}), new ArrayRealVector(new double[]{2.0f, 3.0f}), 0.2);
 		ArrayRealVector point = new ArrayRealVector(new double[]{2.0f, 1.0f}, false);
 
 		ArrayRealVector projectedPoint = testLine.projectPointOntoLine(point);
@@ -29,7 +29,7 @@ public class SingleLineDetectorTest  {
         }
 
 
-        testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{1.0f, 2.0f}), new ArrayRealVector(new double[]{2.0f, 2.0f}));
+        testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{1.0f, 2.0f}), new ArrayRealVector(new double[]{2.0f, 2.0f}), 0.2);
         point = new ArrayRealVector(new double[]{2.0f, 1.0f});
 
         projectedPoint = testLine.projectPointOntoLine(point);
@@ -42,7 +42,7 @@ public class SingleLineDetectorTest  {
 			fail();
         }
 
-        testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{0.0f, 1.0f}), new ArrayRealVector(new double[]{1.0f, 0.0f}));
+        testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{0.0f, 1.0f}), new ArrayRealVector(new double[]{1.0f, 0.0f}), 0.2);
         point = new ArrayRealVector(new double[]{2.0f, 1.0f});
 
         projectedPoint = testLine.projectPointOntoLine(point);

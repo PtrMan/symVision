@@ -213,8 +213,9 @@ public class ProcessG {
             CurveElement endCurveElement = iterationCurve.curveElements.get(iterationCurve.curveElements.size() - 1);
             
             // TODO ASK< maybe we have to search the ending with the minimal x position? >
-            SingleLineDetector tempBeginCurveTangentLine = SingleLineDetector.createFromFloatPositions(beginCurveElement.calcPosition(0.0f), beginCurveElement.calcPosition(0.0f).add(beginCurveElement.calcTangent(0.0f)));
-            SingleLineDetector tempEndCurveTangentLine = SingleLineDetector.createFromFloatPositions(endCurveElement.calcPosition(1.0f), endCurveElement.calcPosition(1.0f).add(endCurveElement.calcTangent(1.0f)));
+            // TODO< compute confidence >
+            SingleLineDetector tempBeginCurveTangentLine = SingleLineDetector.createFromFloatPositions(beginCurveElement.calcPosition(0.0f), beginCurveElement.calcPosition(0.0f).add(beginCurveElement.calcTangent(0.0f)), 0.0);
+            SingleLineDetector tempEndCurveTangentLine = SingleLineDetector.createFromFloatPositions(endCurveElement.calcPosition(1.0f), endCurveElement.calcPosition(1.0f).add(endCurveElement.calcTangent(1.0f)), 0.0);
             
             final double curveBeginM = tempBeginCurveTangentLine.getM();
             final double curveBeginN = tempBeginCurveTangentLine.getN();

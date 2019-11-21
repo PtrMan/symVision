@@ -41,8 +41,8 @@ public enum ProcessH
 		ptrman.levels.retina.ProcessH processH = new ptrman.levels.retina.ProcessH();
 
 		Collection<RetinaPrimitive> detectors = new ArrayList<>();
-        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{7.0f, 5.0f+2.0f*7.0f}), new ArrayRealVector(new double[]{15.0f, 5.0f+2.0f*15.0f}))));
-        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f+2.0f}), new ArrayRealVector(new double[]{10.0f, 5.0f+2.0f*10.0f+2.0f}))));
+        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{7.0f, 5.0f+2.0f*7.0f}), new ArrayRealVector(new double[]{15.0f, 5.0f+2.0f*15.0f}), 0.2)));
+        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f+2.0f}), new ArrayRealVector(new double[]{10.0f, 5.0f+2.0f*10.0f+2.0f}), 0.2)));
         
         // TODO< modernize >
         //processH.process(detectors);
@@ -59,8 +59,8 @@ public enum ProcessH
 		ptrman.levels.retina.ProcessH processH = new ptrman.levels.retina.ProcessH();
 
 		Collection<RetinaPrimitive> detectors = new ArrayList<>();
-        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f}), new ArrayRealVector(new double[]{15.0f, 5.0f+2.0f*15.0f}))));
-        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f+2.0f}), new ArrayRealVector(new double[]{10.0f, 5.0f+2.0f*10.0f+2.0f}))));
+        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f}), new ArrayRealVector(new double[]{15.0f, 5.0f+2.0f*15.0f}), 0.2)));
+        detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f+2.0f}), new ArrayRealVector(new double[]{10.0f, 5.0f+2.0f*10.0f+2.0f}), 0.2)));
         
         // TODO< modernize >
         //processH.process(detectors);

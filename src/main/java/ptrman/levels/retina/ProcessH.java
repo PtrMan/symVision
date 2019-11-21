@@ -17,6 +17,7 @@ import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.levels.retina.helper.ProcessConnector;
+import ptrman.math.NalTv;
 import ptrman.misc.Assert;
 
 import java.util.Collection;
@@ -137,16 +138,13 @@ public class ProcessH implements IProcess {
                 if( canDetectorsBeFusedOverlap(detectorLow, detectorHigh) ) {
 
                     SingleLineDetector fusedLineDetector = fuseLineDetectorsOverlap(detectorLow, detectorHigh);
-
                     addNewLine(workingDetectors, objectId, fusedLineDetector);
-
 
                     fused = true;
                 }
                 else if( canDetectorsBeFusedInside(detectorLow, detectorHigh) ) {
 
                     SingleLineDetector fusedLineDetector = fuseLineDetectorsInside(detectorLow, detectorHigh);
-
                     addNewLine(workingDetectors, objectId, fusedLineDetector);
 
                     fused = true;
@@ -259,7 +257,9 @@ public class ProcessH implements IProcess {
             projectedBEnd = tempEnd;
         }
 
-        SingleLineDetector fusedLineDetector = SingleLineDetector.createFromFloatPositions(projectedABegin, projectedBEnd);
+
+        double conf = NalTv.calcRevConf(detectorA.conf, detectorB.conf);
+        SingleLineDetector fusedLineDetector = SingleLineDetector.createFromFloatPositions(projectedABegin, projectedBEnd, conf);
         fusedLineDetector.resultOfCombination = true;
         return fusedLineDetector;
     }
@@ -286,13 +286,15 @@ public class ProcessH implements IProcess {
     private static SingleLineDetector fuseLineDetectorsInside(SingleLineDetector detectorA, SingleLineDetector detectorB) {
         SingleLineDetector fusedLineDetector;
 
+        double conf = NalTv.calcRevConf(detectorA.conf, detectorB.conf);
+
         // TODO< vertical special case >
 
         // which case?
         if( vectorXBetweenInclusive(detectorA.a, detectorA.b, detectorB.a) && vectorXBetweenInclusive(detectorA.a, detectorA.b, detectorB.b)  ) {
             // detectorB inside detectorA
 
-            fusedLineDetector = SingleLineDetector.createFromFloatPositions(detectorA.a, detectorA.b);
+            fusedLineDetector = SingleLineDetector.createFromFloatPositions(detectorA.a, detectorA.b, conf);
             fusedLineDetector.resultOfCombination = true;
             return fusedLineDetector;
         }
@@ -301,7 +303,7 @@ public class ProcessH implements IProcess {
 
             // detectorA inside detectorB
 
-            fusedLineDetector = SingleLineDetector.createFromFloatPositions(detectorB.a, detectorB.b);
+            fusedLineDetector = SingleLineDetector.createFromFloatPositions(detectorB.a, detectorB.b, conf);
             fusedLineDetector.resultOfCombination = true;
             return fusedLineDetector;
         }

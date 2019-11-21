@@ -43,7 +43,7 @@ public enum TestPatternMatching {
 
 		List<RetinaPrimitive> lineDetectors = new ArrayList<>();
 
-        lineDetectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{0.0f, 0.0f}), new ArrayRealVector(new double[]{10.0f, 40.0f}))));
+        lineDetectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{0.0f, 0.0f}), new ArrayRealVector(new double[]{10.0f, 40.0f}), 0.2)));
 
 		ITranslatorStrategy retinaToWorkspaceTranslatorStrategy = new NearIntersectionStrategy();
 

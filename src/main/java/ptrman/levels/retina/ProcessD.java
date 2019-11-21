@@ -562,7 +562,7 @@ public class ProcessD implements IProcess {
                 lastAxisPosition = Helper.getAxis(iterationPoint, axis);
             } else {
                 // form a new line
-                RetinaPrimitive newPrimitive = RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, iterationPoint));
+                RetinaPrimitive newPrimitive = RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, iterationPoint, conf));
                 newPrimitive.objectId = objectId;
                 resultSingleLineDetectors.add(newPrimitive);
 
@@ -574,9 +574,8 @@ public class ProcessD implements IProcess {
         ArrayRealVector lastPoint = pointPositions.get(pointPositions.size() - 1);
 
         if (!nextIsNewLineStart && Helper.getAxis(lastPoint, axis) - lastAxisPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE) {
-            RetinaPrimitive newPrimitive = RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, lastPoint));
+            RetinaPrimitive newPrimitive = RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, lastPoint, conf));
             newPrimitive.objectId = objectId;
-            newPrimitive.conf = conf;
             resultSingleLineDetectors.add(newPrimitive);
         }
 

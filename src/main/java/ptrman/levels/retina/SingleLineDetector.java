@@ -33,40 +33,19 @@ public class SingleLineDetector {
     private ArrayRealVector normalizedDirection;
     public final int serial;
 
+    public double conf;
+
     private SingleLineDetector() {
         this.serial = nextSerial.addAndGet(1);
     }
 
-    public static SingleLineDetector createFromIntegerPositions(Vector2d<Integer> a, Vector2d<Integer> b) {
-
-        SingleLineDetector createdDetector = new SingleLineDetector();
-        createdDetector.a = new ArrayRealVector(new double[]{(double)a.x, (double)a.y}, false);
-        createdDetector.b = new ArrayRealVector(new double[]{(double)b.x, (double)b.y}, false);
-        createdDetector.fullfillABInvariant();
-        //createdDetector.integratedSampleIndices = integratedSampleIndices;
-
-        // calculate m, n
-        // bug outruling
-        //createdDetector.m = 0.0f; //(b.y-a.y)/(b.x-a.x);
-        //createdDetector.n = 0.0f; //a.y - a.y * createdDetector.m;
-
-        createdDetector.update();
-
-        return createdDetector;
-    }
-
-    public static SingleLineDetector createFromFloatPositions(ArrayRealVector a, ArrayRealVector b) {
+    public static SingleLineDetector createFromFloatPositions(ArrayRealVector a, ArrayRealVector b, double conf) {
 
         SingleLineDetector createdDetector = new SingleLineDetector();
         createdDetector.a = a;
         createdDetector.b = b;
+        createdDetector.conf = conf;
         createdDetector.fullfillABInvariant();
-        //createdDetector.integratedSampleIndices = integratedSampleIndices;
-
-        // calculate m, n
-        // bug outruling
-        //createdDetector.m = 0.0f; //(b.y-a.y)/(b.x-a.x);
-        //createdDetector.n = 0.0f; //a.y - a.y * createdDetector.m;
 
         createdDetector.update();
 
