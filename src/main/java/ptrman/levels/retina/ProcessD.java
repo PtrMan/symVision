@@ -312,7 +312,7 @@ public class ProcessD implements IProcess {
         }
     }
 
-    private static List<RetinaPrimitive> splitDetectorsIntoLines(Iterable<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints) {
+    public List<RetinaPrimitive> splitDetectorsIntoLines(Iterable<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints) {
         List<RetinaPrimitive> result;
 
         result = new ArrayList<>();
@@ -586,10 +586,19 @@ public class ProcessD implements IProcess {
         return samplePositions;
     }
 
-    public static List<RetinaPrimitive> splitDetectorIntoLines(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints) {
+    public int overwriteObjectId = -1; // overwrite the object-id? -1 if object id is not overwritten
+
+    public List<RetinaPrimitive> splitDetectorIntoLines(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints) {
         List<ArrayRealVector> sortedSamplePositions = getSortedSamplePositions(lineDetectorWithMultiplePoints);
 
-        return lineDetectorWithMultiplePoints.isYAxisSingularity() ? clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, lineDetectorWithMultiplePoints.cachedConf, sortedSamplePositions, EnumAxis.Y) : clusterPointsFromLinedetectorToLinedetectors(lineDetectorWithMultiplePoints.commonObjectId, lineDetectorWithMultiplePoints.cachedConf, sortedSamplePositions, EnumAxis.X);
+        int objectId = lineDetectorWithMultiplePoints.commonObjectId;
+        if (overwriteObjectId != -1) { // HACK< necessary because some parts still assume object id's >
+            objectId = overwriteObjectId;
+        }
+
+        return lineDetectorWithMultiplePoints.isYAxisSingularity() ?
+            clusterPointsFromLinedetectorToLinedetectors(objectId, lineDetectorWithMultiplePoints.cachedConf, sortedSamplePositions, EnumAxis.Y) :
+            clusterPointsFromLinedetectorToLinedetectors(objectId, lineDetectorWithMultiplePoints.cachedConf, sortedSamplePositions, EnumAxis.X);
     }
 
 

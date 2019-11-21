@@ -32,6 +32,7 @@ public class Solver2 {
 
     public ProcessConnector<ProcessA.Sample>[] connectorSamplesFromProcessAForEdge;
     public ProcessConnector<RetinaPrimitive>[] connectorDetectorsFromProcessDForEdge;
+    public ProcessConnector<RetinaPrimitive>[] connectorDetectorsFromProcessHForEdge;
 
     // connector for final processing
     public ProcessConnector<RetinaPrimitive> cntrFinalProcessing;
@@ -129,11 +130,14 @@ public class Solver2 {
             processAEdge[i] = new ProcessA();
             processDEdge[i] = new ProcessD();
             processDEdge[i].maximalDistanceOfPositions = 5000.0;
+            processDEdge[i].overwriteObjectId = 0; // we want to overwrite the id of the detectors, because some parts of the program still assume object id's and we can't provide it in general case
         }
 
         connectorDetectorsFromProcessDForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
         connectorSamplesFromProcessAForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
+        connectorDetectorsFromProcessHForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
         for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // create connectors for edges
+            connectorDetectorsFromProcessHForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
             connectorDetectorsFromProcessDForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
             connectorSamplesFromProcessAForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
         }
@@ -255,8 +259,23 @@ public class Solver2 {
 
         processD.commitLineDetectors(); // split line detectors into "real" primitives
 
-        for (ProcessD d : processDEdge) {
-            d.commitLineDetectors();
+        for (ProcessD iD : processDEdge) {
+            iD.commitLineDetectors();
+        }
+
+        // * process-H for edges
+        int idx = 0;
+        for (ProcessD iD : processDEdge) {
+            ProcessH processH = new ProcessH();
+            processH.setImageSize(imageSize);
+            processH.set(connectorDetectorsFromProcessDForEdge[idx], connectorDetectorsFromProcessHForEdge[idx]);
+            processH.setup();
+
+            processH.preProcessData();
+            processH.processData();
+            processH.postProcessData();
+
+            idx++;
         }
 
         // * process-H and process-E

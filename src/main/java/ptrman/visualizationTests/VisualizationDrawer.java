@@ -13,6 +13,7 @@ import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import processing.core.PApplet;
 import ptrman.bpsolver.Solver2;
 import ptrman.levels.retina.*;
+import ptrman.levels.retina.helper.ProcessConnector;
 
 /**
  * encapsulates functionality to draw visualizations for showcase and debugging
@@ -54,7 +55,7 @@ public class VisualizationDrawer {
 
 
                     applet.stroke(128.0f, 128, 255);
-                    for (RetinaPrimitive iLine : ProcessD.splitDetectorIntoLines(iLineDetector)) {
+                    for (RetinaPrimitive iLine : iProcessDEdge.splitDetectorIntoLines(iLineDetector)) {
                         double x0 = iLine.line.a.getDataRef()[0];
                         double y0 = iLine.line.a.getDataRef()[1];
                         double x1 = iLine.line.b.getDataRef()[0];
@@ -84,7 +85,7 @@ public class VisualizationDrawer {
                 applet.stroke(act*255.0f, act*255.0f, act*255.0f);
 
 
-                for (RetinaPrimitive iLine : ProcessD.splitDetectorIntoLines(iLineDetector)) {
+                for (RetinaPrimitive iLine : solver.processD.splitDetectorIntoLines(iLineDetector)) {
                     double x0 = iLine.line.a.getDataRef()[0];
                     double y0 = iLine.line.a.getDataRef()[1];
                     double x1 = iLine.line.b.getDataRef()[0];
@@ -105,6 +106,20 @@ public class VisualizationDrawer {
     }
 
     public void drawPrimitives(Solver2 solver, PApplet applet) {
+        // * draw primitives for edges
+        for (ProcessConnector<RetinaPrimitive> iCntr : solver.connectorDetectorsFromProcessHForEdge) {
+            for(RetinaPrimitive iLinePrimitive : iCntr.workspace) {
+                applet.stroke(0.0f, 255.0f, 0.0f);
+
+                double x0 = iLinePrimitive.line.a.getDataRef()[0];
+                double y0 = iLinePrimitive.line.a.getDataRef()[1];
+                double x1 = iLinePrimitive.line.b.getDataRef()[0];
+                double y1 = iLinePrimitive.line.b.getDataRef()[1];
+                applet.line((float)x0, (float)y0, (float)x1, (float)y1);
+            }
+        }
+
+        // * draw primitives for endoskeleton
         for(RetinaPrimitive iLinePrimitive : solver.cntrFinalProcessing.workspace) {
             applet.stroke(255.0f, 255.0f, 255.0f);
 
@@ -127,5 +142,6 @@ public class VisualizationDrawer {
                 applet.line(x-1,y+1,x+1,y+1);
             }
         }
+
     }
 }
