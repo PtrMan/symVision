@@ -56,7 +56,9 @@ public class ProcessA implements IProcess {
         processData(1f);
     }
 
-    final Random rng = new RandomAdaptor( new MersenneTwister() );
+    final Random rng =
+        //new RandomAdaptor( new MersenneTwister() ); //<- expensive
+        new Random();
 
     public void processData(float throttle) {
         int H = workingImage.getLength() / 4;

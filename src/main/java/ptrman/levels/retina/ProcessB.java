@@ -19,6 +19,7 @@ import ptrman.misc.Assert;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -144,7 +145,9 @@ public class ProcessB extends AbstractProcessB {
         int radiusToScan = (int) Math.ceil(gridMaxSearchRadius);
 
         /** grid cells to scan TODO use a LongHashSet storing the int pair into 64-bit long, or 32-bit int */
-        Collection<IntIntPair> toScan = new UnifiedSet((int)Math.ceil(radius * radius * Math.PI));
+        Collection<IntIntPair> toScan = new UnifiedSet(0); //(int)Math.ceil(radius * radius * Math.PI));
+
+        Function<IntIntPair, Stream<? extends IntIntPair>> getPositionsOfCandidatePixelsOfCellWhereFalse = this::getPositionsOfCandidatePixelsOfCellWhereFalse;
 
         for( int currentGridRadius = 0; currentGridRadius < radiusToScan; currentGridRadius++ ) {
 
@@ -198,7 +201,8 @@ public class ProcessB extends AbstractProcessB {
 
             // pixel scan logic
             //TODO use .collect or something
-            toScan.stream().flatMap(this::getPositionsOfCandidatePixelsOfCellWhereFalse).forEach(i -> {
+
+            toScan.stream().flatMap(getPositionsOfCandidatePixelsOfCellWhereFalse).forEach(i -> {
                 final double currentDistanceSquared = ArrayRealVectorHelper.diffDotProduct(position, i);
                 if( currentDistanceSquared < nearestPixelCandidateDistanceSquared[0]) {
                     nearestPixelCandidateDistanceSquared[0] = currentDistanceSquared;
