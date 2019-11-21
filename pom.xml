@@ -4,7 +4,7 @@
 
     <groupId>ptrman</groupId>
     <artifactId>symvision</artifactId>
-    <version>0.0.3</version>
+    <version>0.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>symvision</name>
@@ -40,7 +40,7 @@
                             -->
                             <classpathPrefix>lib/</classpathPrefix>
                             <!-- Configures the main class of the application -->
-                            <mainClass>ptrman.visualizationTests.VisualizeLinesegments</mainClass>
+                            <mainClass>ptrman.visualizationTests.VisualizeLinesegmentsAnnealing</mainClass>
                         </manifest>
                     </archive>
                 </configuration>
@@ -84,12 +84,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.github.monkeysintown</groupId>
-            <artifactId>jgraphx</artifactId>
-            <version>3.1.2.1</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.boofcv</groupId>
             <artifactId>boofcv-WebcamCapture</artifactId>
             <version>0.34</version>
@@ -107,13 +101,6 @@
             <version>10.0.0</version>
             <scope>compile</scope>
         </dependency>
-
-        <dependency>
-            <groupId>com.syncleus.dann</groupId>
-            <artifactId>dann-core</artifactId>
-            <version>2.1</version>
-        </dependency>
-
 
         <dependency>
             <groupId>junit</groupId>
