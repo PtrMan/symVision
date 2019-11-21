@@ -28,6 +28,7 @@ public class Solver2 {
     public ProcessD[] processDEdge;
     public ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
     public ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
+    public ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessH;
 
     public ProcessConnector<ProcessA.Sample>[] connectorSamplesFromProcessAForEdge;
     public ProcessConnector<RetinaPrimitive>[] connectorDetectorsFromProcessDForEdge;
@@ -38,6 +39,8 @@ public class Solver2 {
 
     // image drawer which is used as the source of the images, must be set to a image drawer before the solver is used!
     public IImageDrawer imageDrawer;
+
+    private Vector2d<Integer> imageSize;
 
     public Solver2() {
         processD = new ProcessD();
@@ -59,7 +62,7 @@ public class Solver2 {
 
         BufferedImage image = imageDrawer.apply(null);
 
-        Vector2d<Integer> imageSize = new Vector2d<>(image.getWidth(), image.getHeight());
+        imageSize = new Vector2d<>(image.getWidth(), image.getHeight());
 
 
         IMap2d<ColorRgb> mapColor = Map2dImageConverter.convertImageToMap(image);
@@ -198,6 +201,9 @@ public class Solver2 {
 
         connectorDetectorsEndosceletonFromProcessD = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
 
+        connectorDetectorsEndosceletonFromProcessH = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+
+
         processD.setImageSize(imageSize);
         connectorSamplesForEndosceleton = conntrSamplesFromProcessC0;
         processD.set(connectorSamplesForEndosceleton, connectorDetectorsEndosceletonFromProcessD);
@@ -256,6 +262,15 @@ public class Solver2 {
             d.commitLineDetectors();
         }
 
-        narsBinding.emitRetinaPrimitives(connectorDetectorsEndosceletonFromProcessD.workspace); // emit all collected primitives from process D
+        ProcessH processH = new ProcessH();
+        processH.setImageSize(imageSize);
+        processH.set(connectorDetectorsEndosceletonFromProcessD, connectorDetectorsEndosceletonFromProcessH);
+        processH.setup();
+
+        processH.preProcessData();
+        processH.processData();
+        processH.postProcessData();
+
+        narsBinding.emitRetinaPrimitives(connectorDetectorsEndosceletonFromProcessH.workspace); // emit all collected primitives from process D
     }
 }
