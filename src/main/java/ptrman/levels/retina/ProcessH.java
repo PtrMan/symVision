@@ -242,8 +242,10 @@ public class ProcessH implements IProcess {
         }
 
 
+      
         final var conf = NalTv.calcRevConf(detectorA.conf, detectorB.conf);
         final var fusedLineDetector = SingleLineDetector.createFromFloatPositions(projectedABegin, projectedBEnd, conf);
+
         fusedLineDetector.resultOfCombination = true;
         return fusedLineDetector;
     }
@@ -267,6 +269,7 @@ public class ProcessH implements IProcess {
         final SingleLineDetector fusedLineDetector;
 
         final var conf = NalTv.calcRevConf(detectorA.conf, detectorB.conf);
+
 
         // TODO< vertical special case >
 

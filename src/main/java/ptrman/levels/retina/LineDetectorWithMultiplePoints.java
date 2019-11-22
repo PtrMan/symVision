@@ -125,6 +125,7 @@ public class LineDetectorWithMultiplePoints {
         for(final var iSample : samples)
             if (idx++ > 0)
                 cachedConf = NalTv.calcRevConf(cachedConf, iSample.conf);
+
     }
 
     // must be called before removal in process-D
