@@ -12,7 +12,7 @@ package ptrman.math;
 /**
  * Non-axiomatic logic  truth value computations
  */
-public enum NalTv {
+public enum NalTvFunctions {
     ;
     public static final double HORIZON = 1.0;
 

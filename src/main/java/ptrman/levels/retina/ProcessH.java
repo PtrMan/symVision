@@ -16,7 +16,7 @@ import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.levels.retina.helper.ProcessConnector;
-import ptrman.math.NalTv;
+import ptrman.math.NalTvFunctions;
 import ptrman.misc.Assert;
 
 import java.util.Collection;
@@ -257,7 +257,7 @@ public class ProcessH implements IProcess {
         }
 
 
-        double conf = NalTv.calcRevConf(detectorA.conf, detectorB.conf);
+        double conf = NalTvFunctions.calcRevConf(detectorA.conf, detectorB.conf);
         SingleLineDetector fusedLineDetector = SingleLineDetector.createFromFloatPositions(projectedABegin, projectedBEnd, conf);
         fusedLineDetector.resultOfCombination = true;
         return fusedLineDetector;
@@ -285,7 +285,7 @@ public class ProcessH implements IProcess {
     private static SingleLineDetector fuseLineDetectorsInside(SingleLineDetector detectorA, SingleLineDetector detectorB) {
         SingleLineDetector fusedLineDetector;
 
-        double conf = NalTv.calcRevConf(detectorA.conf, detectorB.conf);
+        double conf = NalTvFunctions.calcRevConf(detectorA.conf, detectorB.conf);
 
         // TODO< vertical special case >
 

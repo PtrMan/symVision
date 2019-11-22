@@ -1,11 +1,9 @@
 package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
-import org.eclipse.collections.api.list.primitive.IntList;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
-import ptrman.bpsolver.Parameters;
 import ptrman.math.ArrayRealVectorHelper;
-import ptrman.math.NalTv;
+import ptrman.math.NalTvFunctions;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
@@ -135,7 +133,7 @@ public class LineDetectorWithMultiplePoints {
         int idx = 0;
         for(ProcessA.Sample iSample : samples) {
             if (idx++ > 0)
-                cachedConf = NalTv.calcRevConf(cachedConf, iSample.conf);
+                cachedConf = NalTvFunctions.calcRevConf(cachedConf, iSample.conf);
         }
     }
 
