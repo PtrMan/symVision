@@ -26,7 +26,7 @@ public class PlatonicPrimitiveDatabase
 
     public static class ConstantValueMaxValueCalculator implements IMaxValueCalculator
     {
-        public ConstantValueMaxValueCalculator(float value)
+        public ConstantValueMaxValueCalculator(final float value)
         {
             this.value = value;
         }
@@ -40,7 +40,7 @@ public class PlatonicPrimitiveDatabase
         private final float value;
     }
 
-    public float getMaxValueByPrimitiveNode(PlatonicPrimitiveNode n)
+    public float getMaxValueByPrimitiveNode(final PlatonicPrimitiveNode n)
     {
         return mapForMaxValueOfPlatonicPrimitiveNode.computeIfAbsent(n, this::calculateMaxValueForPlatonicPrimitiveNode);
 //        if( !mapForMaxValueOfPlatonicPrimitiveNode.containsKey(n) )
@@ -49,7 +49,7 @@ public class PlatonicPrimitiveDatabase
 //        return mapForMaxValueOfPlatonicPrimitiveNode.get(n);
     }
 
-    private float calculateMaxValueForPlatonicPrimitiveNode(PlatonicPrimitiveNode platonicPrimitiveNode)
+    private float calculateMaxValueForPlatonicPrimitiveNode(final PlatonicPrimitiveNode platonicPrimitiveNode)
     {
 
 //        if( !calculatorsForMaxValueOfPlatonicPrimitiveNode.containsKey(platonicPrimitiveNode) )
@@ -57,7 +57,7 @@ public class PlatonicPrimitiveDatabase
 //            throw new RuntimeException("Unknown IMaxValueCalculator for PlatonicPrimitiveNode " + platonicPrimitiveNode.platonicType);
 //        }
 
-        IMaxValueCalculator maxValueCalculator = calculatorsForMaxValueOfPlatonicPrimitiveNode.get(platonicPrimitiveNode);
+        final var maxValueCalculator = calculatorsForMaxValueOfPlatonicPrimitiveNode.get(platonicPrimitiveNode);
         return maxValueCalculator.getMaxValue();
         //mapForMaxValueOfPlatonicPrimitiveNode.put(platonicPrimitiveNode, maxValue);
     }

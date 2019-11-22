@@ -23,14 +23,14 @@ public class DoubleMeter extends SourceFunctionMeter<Double> {
     
     
     
-    public DoubleMeter(String id, boolean autoReset) {
+    public DoubleMeter(final String id, final boolean autoReset) {
         super(id);
         this.name = id;
         this.autoReset = autoReset;
     }
     
     
-    public DoubleMeter(String id) {
+    public DoubleMeter(final String id) {
         this(id, false);
     }    
 
@@ -41,8 +41,8 @@ public class DoubleMeter extends SourceFunctionMeter<Double> {
     }
     
     /** returns the previous value, or NaN if none were set  */
-    public double set(double newValue) {
-        double oldValue = val.get();
+    public double set(final double newValue) {
+        final var oldValue = val.get();
         val.set(newValue);
         return oldValue;
     }
@@ -52,16 +52,14 @@ public class DoubleMeter extends SourceFunctionMeter<Double> {
 
     
     @Override
-    protected Double getValue(Object key, int index) {
-        double c = val.get();
-        if (autoReset) {
-            reset();
-        }
+    protected Double getValue(final Object key, final int index) {
+        final var c = val.get();
+        if (autoReset) reset();
         return c;        
     }
 
     /** whether to reset to NaN after the count is next stored in the Metrics */
-    public void setAutoReset(boolean autoReset) {
+    public void setAutoReset(final boolean autoReset) {
         this.autoReset = autoReset;
     }
     

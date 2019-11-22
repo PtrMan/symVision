@@ -20,12 +20,12 @@ import ptrman.FargGeneral.network.Node;
  */
 public abstract class SolverCodelet extends Codelet
 {
-    public SolverCodelet(Solver bpSolver)
+    public SolverCodelet(final Solver bpSolver)
     {
         this.bpSolver = bpSolver;
     }
     
-    public void setStartNode(Node startNode)
+    public void setStartNode(final Node startNode)
     {
         this.startNode = startNode;
     }

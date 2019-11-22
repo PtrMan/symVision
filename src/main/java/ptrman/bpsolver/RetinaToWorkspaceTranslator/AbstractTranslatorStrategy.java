@@ -21,7 +21,6 @@ import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.levels.retina.Intersection;
 import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.misc.AngleHelper;
-import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.IdentityHashMap;
@@ -35,14 +34,13 @@ import java.util.Map;
 public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy {
     public abstract List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver);
     
-    protected static void storeRetinaObjectWithAssocIntoMap(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects) {
-        for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObjectWithAssoc : arrayOfRetinaObjectWithAssociatedPoints ) {
+    protected static void storeRetinaObjectWithAssocIntoMap(final Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, final SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects) {
+        for( final var iterationRetinaObjectWithAssoc : arrayOfRetinaObjectWithAssociatedPoints )
             spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.put(iterationRetinaObjectWithAssoc.primitive, iterationRetinaObjectWithAssoc);
-        }
     }
     
     protected static class RetinaObjectWithAssociatedPointsAndWorkspaceNode {
-        public RetinaObjectWithAssociatedPointsAndWorkspaceNode(ptrman.levels.retina.RetinaPrimitive primitive) {
+        public RetinaObjectWithAssociatedPointsAndWorkspaceNode(final ptrman.levels.retina.RetinaPrimitive primitive) {
             this.primitive = primitive;
         }
         
@@ -72,11 +70,11 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
 
     }
     
-    protected static RetinaObjectWithAssociatedPointsAndWorkspaceNode associatePointsToRetinaPrimitive(RetinaPrimitive primitive) {
+    protected static RetinaObjectWithAssociatedPointsAndWorkspaceNode associatePointsToRetinaPrimitive(final RetinaPrimitive primitive) {
 
-        Assert.Assert(primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "only implemented for linesegment");
+        assert primitive.type == RetinaPrimitive.EnumType.LINESEGMENT : "ASSERT: " + "only implemented for linesegment";
 
-        RetinaObjectWithAssociatedPointsAndWorkspaceNode resultAssosciation = new RetinaObjectWithAssociatedPointsAndWorkspaceNode(primitive);
+        final var resultAssosciation = new RetinaObjectWithAssociatedPointsAndWorkspaceNode(primitive);
         resultAssosciation.pointPositions = new ArrayList<>();
         resultAssosciation.pointPositions.add(primitive.line.getAProjected());
         resultAssosciation.pointPositions.add(primitive.line.getBProjected());
@@ -89,18 +87,15 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
      * figure out the types of the angle points (if its T, K, V, X)
      * 
      */
-    protected void calculateAnglePointType(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects) {
-        for( SpatialAcceleration<Crosspoint>.Element currentElement : spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getContentOfAllCells() ) {
-            final double ANGLEEPSILONINDEGREE = 5.0;
+    protected void calculateAnglePointType(final SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects) {
+        for( final var currentElement : spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getContentOfAllCells() ) {
+            final var ANGLEEPSILONINDEGREE = 5.0;
 
-            Crosspoint crosspoint = currentElement.data;
+            final var crosspoint = currentElement.data;
 
-            ArrayRealVector[] tangents = new ArrayRealVector[crosspoint.adjacentRetinaObjects.size()];
-            for( int crosspointI = 0; crosspointI < tangents.length; crosspointI++ ) {
-                // TODO< pass in T from the intersectioninfo >
-                tangents[crosspointI] = crosspoint.adjacentRetinaObjects.get(crosspointI).retinaObjectWithAssociatedPointsAndWorkspaceNode.primitive.getNormalizedTangentForIntersectionTypeAndT(crosspoint.adjacentRetinaObjects.get(crosspointI).intersectionPartnerType, 0.0f);
-            }
-                 
+            final var tangents = crosspoint.adjacentRetinaObjects.stream().map(retinaObjectWithAssocWithIntersectionType -> retinaObjectWithAssocWithIntersectionType.retinaObjectWithAssociatedPointsAndWorkspaceNode.primitive.getNormalizedTangentForIntersectionTypeAndT(retinaObjectWithAssocWithIntersectionType.intersectionPartnerType, 0.0f)).toArray(ArrayRealVector[]::new);
+            // TODO< pass in T from the intersectioninfo >
+
             // HACK TODO< after bugremoval uncomment this assert
             // relates propably to BUG 0001
             //Assert.Assert(crosspoint.adjacentRetinaObjects.size() >= 2, "");
@@ -111,28 +106,25 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
                 
                 // we just do nothing
             }
-            else if( crosspoint.adjacentRetinaObjects.size() == 2 ) {
-                // its either T, V, or X with two partners
-                
-                if( crosspoint.adjacentRetinaObjects.get(0).intersectionPartnerType ==Intersection.IntersectionPartner.EnumIntersectionEndpointType.MIDDLE || crosspoint.adjacentRetinaObjects.get(1).intersectionPartnerType ==Intersection.IntersectionPartner.EnumIntersectionEndpointType.MIDDLE ) {
-                    // its a X
-                    crosspoint.type = Crosspoint.EnumAnglePointType.X;
-                }
-                else {
-                    // its either V or T
-                    
-                    double angleInDegree = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[1]);
+            else // its either T, V, or X with two partners
+                // its a X
+                if( crosspoint.adjacentRetinaObjects.size() == 2 )
+                    if (crosspoint.adjacentRetinaObjects.get(0).intersectionPartnerType == Intersection.IntersectionPartner.EnumIntersectionEndpointType.MIDDLE || crosspoint.adjacentRetinaObjects.get(1).intersectionPartnerType == Intersection.IntersectionPartner.EnumIntersectionEndpointType.MIDDLE)
+                        crosspoint.type = Crosspoint.EnumAnglePointType.X;
+                    else {
+                        // its either V or T
 
-                    crosspoint.type = angleInDegree < 45.0 ?
-                        Crosspoint.EnumAnglePointType.T : Crosspoint.EnumAnglePointType.V;
-                }
-            }
+                        final var angleInDegree = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[1]);
+
+                        crosspoint.type = angleInDegree < 45.0 ?
+                                Crosspoint.EnumAnglePointType.T : Crosspoint.EnumAnglePointType.V;
+                    }
             else if( crosspoint.adjacentRetinaObjects.size() == 3 ) {
                 // its either T (with three partners), X, or K
                 
-                final double angleInDegreeBetween01 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[1]);
-                final double angleInDegreeBetween02 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[2]);
-                final double angleInDegreeBetween12 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[1], tangents[2]);
+                final var angleInDegreeBetween01 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[1]);
+                final var angleInDegreeBetween02 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[2]);
+                final var angleInDegreeBetween12 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[1], tangents[2]);
                 
                 // check for T
                 // (one angle must be close to 0, the others must be close to 90)
@@ -148,12 +140,11 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
                         continue;
                     }
                 }
-                else if( angleInDegreeBetween02 < ANGLEEPSILONINDEGREE ) {
-                    if( angleInDegreeBetween12 > 90.0 - ANGLEEPSILONINDEGREE && angleInDegreeBetween01 > 90.0 - ANGLEEPSILONINDEGREE ) {
+                else if( angleInDegreeBetween02 < ANGLEEPSILONINDEGREE )
+                    if (angleInDegreeBetween12 > 90.0 - ANGLEEPSILONINDEGREE && angleInDegreeBetween01 > 90.0 - ANGLEEPSILONINDEGREE) {
                         crosspoint.type = Crosspoint.EnumAnglePointType.T;
                         continue;
                     }
-                }
                 
                 // we are here if it is not a T
                 
@@ -172,12 +163,12 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
             else if( crosspoint.adjacentRetinaObjects.size() == 4 ) {
                 // either X or K
 
-                final double angleInDegreeBetween01 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[1]);
-                final double angleInDegreeBetween02 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[2]);
-                final double angleInDegreeBetween03 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[3]);
-                final double angleInDegreeBetween12 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[1], tangents[2]);
-                final double angleInDegreeBetween13 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[1], tangents[3]);
-                final double angleInDegreeBetween23 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[2], tangents[3]);
+                final var angleInDegreeBetween01 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[1]);
+                final var angleInDegreeBetween02 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[2]);
+                final var angleInDegreeBetween03 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[0], tangents[3]);
+                final var angleInDegreeBetween12 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[1], tangents[2]);
+                final var angleInDegreeBetween13 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[1], tangents[3]);
+                final var angleInDegreeBetween23 = AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangents[2], tangents[3]);
 
                 crosspoint.type = angleInDegreeBetween01 > 90.0 - ANGLEEPSILONINDEGREE &&
                     angleInDegreeBetween02 > 90.0 - ANGLEEPSILONINDEGREE &&
@@ -188,43 +179,43 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
                         Crosspoint.EnumAnglePointType.X : Crosspoint.EnumAnglePointType.K;
             }
             else {
-                Assert.Assert(crosspoint.adjacentRetinaObjects.size() > 4, "");
-                
-                // can only be a K
+                    assert crosspoint.adjacentRetinaObjects.size() > 4 : "ASSERT: " + "";
+
+                    // can only be a K
                 
                 crosspoint.type = Crosspoint.EnumAnglePointType.K;
             }
         }
     }
     
-    protected static void createLinksAndNodesForAnglePoints(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, Solver bpSolver) {
-        for( SpatialAcceleration<Crosspoint>.Element currentElement : spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getContentOfAllCells() ) {
+    protected static void createLinksAndNodesForAnglePoints(final SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, final Solver bpSolver) {
+        for( final var currentElement : spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getContentOfAllCells() ) {
 
-            Crosspoint crosspoint = currentElement.data;
+            final var crosspoint = currentElement.data;
 
-            PlatonicPrimitiveInstanceNode createdAnglePointNode = new PlatonicPrimitiveInstanceNode(bpSolver.networkHandles.anglePointNodePlatonicPrimitiveNode);
+            final var createdAnglePointNode = new PlatonicPrimitiveInstanceNode(bpSolver.networkHandles.anglePointNodePlatonicPrimitiveNode);
             // add codelets
             bpSolver.codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdAnglePointNode, bpSolver.coderack, bpSolver.network, bpSolver.networkHandles);
             
             // linkage
-            for(  Crosspoint.RetinaObjectWithAssocWithIntersectionType iterationRetinaObjectWithAssoc : crosspoint.adjacentRetinaObjects ) {
+            for(  final var iterationRetinaObjectWithAssoc : crosspoint.adjacentRetinaObjects ) {
 
-                Node workspaceNode = iterationRetinaObjectWithAssoc.retinaObjectWithAssociatedPointsAndWorkspaceNode.workspaceNode;
+                final var workspaceNode = iterationRetinaObjectWithAssoc.retinaObjectWithAssociatedPointsAndWorkspaceNode.workspaceNode;
 
-                Link createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, workspaceNode);
+                final var createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, workspaceNode);
                 createdAnglePointNode.out(createdForwardLink);
 
-                Link createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASNODE, createdAnglePointNode);
+                final var createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASNODE, createdAnglePointNode);
                 workspaceNode.out(createdBackwardLink);
             }
 
 
-            AttributeNode createdAnglePointAttributeNode = AttributeNode.createIntegerNode(bpSolver.networkHandles.anglePointFeatureTypePrimitiveNode, crosspoint.type.ordinal());
-            Link createdFeatureTypeNodeLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointAttributeNode);
+            final var createdAnglePointAttributeNode = AttributeNode.createIntegerNode(bpSolver.networkHandles.anglePointFeatureTypePrimitiveNode, crosspoint.type.ordinal());
+            final var createdFeatureTypeNodeLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointAttributeNode);
             createdAnglePointNode.out(createdFeatureTypeNodeLink);
 
-            PlatonicPrimitiveInstanceNode createdAnglePointPosition = HelperFunctions.createVectorAttributeNode(crosspoint.position, bpSolver.networkHandles.anglePointPositionPlatonicPrimitiveNode, bpSolver);
-            Link createdPositionLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointPosition);
+            final var createdAnglePointPosition = HelperFunctions.createVectorAttributeNode(crosspoint.position, bpSolver.networkHandles.anglePointPositionPlatonicPrimitiveNode, bpSolver);
+            final var createdPositionLink = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdAnglePointPosition);
             createdAnglePointNode.out(createdPositionLink);
         }
     }
@@ -235,10 +226,10 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
         public Map<RetinaPrimitive, RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitiveToRetinaObjectWithAssocMap = new IdentityHashMap<>();
     }
     
-    protected static PlatonicPrimitiveInstanceNode createPlatonicInstanceNodeForRetinaObject(RetinaPrimitive primitive, NetworkHandles networkHandles) {
+    protected static PlatonicPrimitiveInstanceNode createPlatonicInstanceNodeForRetinaObject(final RetinaPrimitive primitive, final NetworkHandles networkHandles) {
         if( primitive.type == ptrman.levels.retina.RetinaPrimitive.EnumType.LINESEGMENT ) {
 
-            PlatonicPrimitiveInstanceNode createdLineNode = new PlatonicPrimitiveInstanceNode(networkHandles.lineSegmentPlatonicPrimitiveNode);
+            final var createdLineNode = new PlatonicPrimitiveInstanceNode(networkHandles.lineSegmentPlatonicPrimitiveNode);
             createdLineNode.p1 = primitive.line.getAProjected();
             createdLineNode.p2 = primitive.line.getBProjected();
             
@@ -258,7 +249,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
             public final RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssociatedPointsAndWorkspaceNode;
             public final Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType;
             
-            public RetinaObjectWithAssocWithIntersectionType(RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssociatedPointsAndWorkspaceNode, Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType) {
+            public RetinaObjectWithAssocWithIntersectionType(final RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssociatedPointsAndWorkspaceNode, final Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType) {
                 this.retinaObjectWithAssociatedPointsAndWorkspaceNode = retinaObjectWithAssociatedPointsAndWorkspaceNode;
                 this.intersectionPartnerType = intersectionPartnerType;
             }
@@ -275,7 +266,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
             T;
             // TODO
 
-            public static EnumAnglePointType fromInteger(int valueAsInt)
+            public static EnumAnglePointType fromInteger(final int valueAsInt)
             {
                 switch( valueAsInt )
                 {
@@ -297,14 +288,9 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
         
         public EnumAnglePointType type = EnumAnglePointType.UNDEFINED;
         
-        public boolean doesAdjacentRetinaObjectsContain(RetinaObjectWithAssociatedPointsAndWorkspaceNode other) {
-            for( RetinaObjectWithAssocWithIntersectionType adjacentRetinaObject : adjacentRetinaObjects ) {
-                if( adjacentRetinaObject.retinaObjectWithAssociatedPointsAndWorkspaceNode.equals(other) ) {
-                    return true;
-                }
-            }
-            
-            return false;
+        public boolean doesAdjacentRetinaObjectsContain(final RetinaObjectWithAssociatedPointsAndWorkspaceNode other) {
+
+            return adjacentRetinaObjects.stream().anyMatch(adjacentRetinaObject -> adjacentRetinaObject.retinaObjectWithAssociatedPointsAndWorkspaceNode.equals(other));
         }
     }
     

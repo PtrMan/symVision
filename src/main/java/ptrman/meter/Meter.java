@@ -15,7 +15,7 @@ import java.util.List;
 public interface Meter<M> {
 
     
-    default void setActive(boolean active) {
+    default void setActive(final boolean active) {
     }
 
     /** the list of signals produced by this meter; this should not change
@@ -23,10 +23,10 @@ public interface Meter<M> {
      */
 	List<Signal> getSignals();
     
-    default Signal signal(int i) {
+    default Signal signal(final int i) {
         return getSignals().get(i);
     }
-    default String signalID(int i) {
+    default String signalID(final int i) {
         return getSignals().get(i).id;
     }
     

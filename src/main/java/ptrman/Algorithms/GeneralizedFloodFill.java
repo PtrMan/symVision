@@ -38,18 +38,16 @@ public enum GeneralizedFloodFill {
         final public Vector2d<Integer> fromDirection;
     }
 
-    public static void fill(Vector2d<Integer> centerPosition, final boolean cross, IFillExecutor fillExecutor) {
-        Deque<QueueElement> queue = new ArrayDeque<>();
+    public static void fill(final Vector2d<Integer> centerPosition, final boolean cross, final IFillExecutor fillExecutor) {
+        final Deque<QueueElement> queue = new ArrayDeque<>();
         queue.push(new QueueElement(centerPosition, new Vector2d<>(0, 0)));
 
         while (!queue.isEmpty()) {
 
-            final QueueElement currentQueueElement = queue.poll();
-            final Vector2d<Integer> currentPosition = currentQueueElement.position;
+            final var currentQueueElement = queue.poll();
+            final var currentPosition = currentQueueElement.position;
 
-            if (!fillExecutor.canAndShouldBeFilled(currentPosition)) {
-                continue;
-            }
+            if (!fillExecutor.canAndShouldBeFilled(currentPosition)) continue;
 
             fillExecutor.fillAt(currentPosition, currentQueueElement.fromDirection);
 
@@ -67,12 +65,10 @@ public enum GeneralizedFloodFill {
         }
     }
 
-    private static void fillRangeChecked(final Vector2d<Integer> currentPosition, final Vector2d<Integer> fromDirection, Deque<QueueElement> queue, IFillExecutor fillExecutor) {
-        final Vector2d<Integer> position = Vector2d.IntegerHelper.sub(currentPosition, fromDirection);
+    private static void fillRangeChecked(final Vector2d<Integer> currentPosition, final Vector2d<Integer> fromDirection, final Deque<QueueElement> queue, final IFillExecutor fillExecutor) {
+        final var position = Vector2d.IntegerHelper.sub(currentPosition, fromDirection);
 
-        if( !fillExecutor.inRange(position) ) {
-            return;
-        }
+        if( !fillExecutor.inRange(position) ) return;
 
         queue.push(new QueueElement(position, fromDirection));
     }

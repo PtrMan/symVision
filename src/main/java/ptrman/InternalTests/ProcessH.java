@@ -12,7 +12,6 @@ package ptrman.InternalTests;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.levels.retina.RetinaPrimitive;
 import ptrman.levels.retina.SingleLineDetector;
-import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -25,7 +24,7 @@ public enum ProcessH
 {
 	;
 
-	public static void main(String[] p)
+	public static void main(final String[] p)
     {
         test();
     }
@@ -38,17 +37,17 @@ public enum ProcessH
     
     private static void testOverlapA()
     {
-		ptrman.levels.retina.ProcessH processH = new ptrman.levels.retina.ProcessH();
+		final var processH = new ptrman.levels.retina.ProcessH();
 
-		Collection<RetinaPrimitive> detectors = new ArrayList<>();
+		final Collection<RetinaPrimitive> detectors = new ArrayList<>();
         detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{7.0f, 5.0f+2.0f*7.0f}), new ArrayRealVector(new double[]{15.0f, 5.0f+2.0f*15.0f}), 0.2)));
         detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f+2.0f}), new ArrayRealVector(new double[]{10.0f, 5.0f+2.0f*10.0f+2.0f}), 0.2)));
         
         // TODO< modernize >
         //processH.process(detectors);
-        
-        Assert.Assert(detectors.size() == 1, "");
-        
+
+        assert detectors.size() == 1 : "ASSERT: " + "";
+
         // TODO< test values for >
         // new Vector2d<>(5.0f, 5.0f+2.0f*5.0f+2.0f)
         // new Vector2d<>(15.0f, 5.0f+2.0f*15.0f)
@@ -56,15 +55,15 @@ public enum ProcessH
     
     private static void testOverlapAEqual()
     {
-		ptrman.levels.retina.ProcessH processH = new ptrman.levels.retina.ProcessH();
+		final var processH = new ptrman.levels.retina.ProcessH();
 
-		Collection<RetinaPrimitive> detectors = new ArrayList<>();
+		final Collection<RetinaPrimitive> detectors = new ArrayList<>();
         detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f}), new ArrayRealVector(new double[]{15.0f, 5.0f+2.0f*15.0f}), 0.2)));
         detectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{5.0f, 5.0f+2.0f*5.0f+2.0f}), new ArrayRealVector(new double[]{10.0f, 5.0f+2.0f*10.0f+2.0f}), 0.2)));
         
         // TODO< modernize >
         //processH.process(detectors);
-        
-        Assert.Assert(detectors.size() == 1, "");
+
+        assert detectors.size() == 1 : "ASSERT: " + "";
     }
 }

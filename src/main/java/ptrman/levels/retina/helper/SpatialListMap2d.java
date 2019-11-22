@@ -14,7 +14,6 @@ import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
-import ptrman.misc.Assert;
 
 import java.util.List;
 
@@ -25,10 +24,10 @@ import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
  */
 public class SpatialListMap2d<Type> {
     public SpatialListMap2d(final Vector2d<Integer> size, final int gridsize) {
-        Assert.Assert(gridsize != 0, "gridsize must be nonzero");
+        assert gridsize != 0 : "ASSERT: " + "gridsize must be nonzero";
 
-        Assert.Assert((size.x % gridsize) == 0, "size.x must be divisable by gridsize");
-        Assert.Assert((size.y % gridsize) == 0, "size.y must be divisable by gridsize");
+        assert (size.x % gridsize) == 0 : "ASSERT: " + "size.x must be divisable by gridsize";
+        assert (size.y % gridsize) == 0 : "ASSERT: " + "size.y must be divisable by gridsize";
 
         this.gridsize = gridsize;
         this.map = new Map2d<>(size.x / gridsize, size.y / gridsize);
@@ -44,15 +43,14 @@ public class SpatialListMap2d<Type> {
     }
 
     public void clear() {
-        int h = map.getLength();
-        int w = map.getWidth();
-        for(int y = 0; y < h; y++ ) {
-            for(int x = 0; x < w; x++ ) {
-                List<Type> l = map.readAt(x, y);
+        final var h = map.getLength();
+        final var w = map.getWidth();
+        for(var y = 0; y < h; y++ )
+            for (var x = 0; x < w; x++) {
+                final var l = map.readAt(x, y);
                 if (l != null)
                     l.clear();
             }
-        }
     }
 
     public int getWidth() {
@@ -78,9 +76,9 @@ public class SpatialListMap2d<Type> {
         return x >= 0 && y >=0 &&  x < map.getWidth() && y < map.getLength();
     }
 
-    public List<Type> addAt(int x, int y, Type t) {
-        List<Type> l = readAt(x, y);
-        if (l == null) { setAt(x, y, l = new FastList()); }
+    public List<Type> addAt(final int x, final int y, final Type t) {
+        var l = readAt(x, y);
+        if (l == null) setAt(x, y, l = new FastList());
         l.add(t);
         return l;
     }

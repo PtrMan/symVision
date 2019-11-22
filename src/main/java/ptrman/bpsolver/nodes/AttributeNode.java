@@ -24,12 +24,12 @@ public class AttributeNode extends Node
         FLOAT
     }
     
-    public static AttributeNode createFloatNode(Node attributeTypeNode, float value)
+    public static AttributeNode createFloatNode(final Node attributeTypeNode, final float value)
     {
         return new AttributeNode(attributeTypeNode, EnumValueType.FLOAT, value, 0);
     }
     
-    public static AttributeNode createIntegerNode(Node attributeTypeNode, int value)
+    public static AttributeNode createIntegerNode(final Node attributeTypeNode, final int value)
     {
         return new AttributeNode(attributeTypeNode, EnumValueType.INT, 0.0f, value);
     }
@@ -41,7 +41,7 @@ public class AttributeNode extends Node
      * \param valueFloat
      * \param valueInt 
      */
-    private AttributeNode(Node attributeTypeNode, EnumValueType valueType, float valueFloat, int valueInt)
+    private AttributeNode(final Node attributeTypeNode, final EnumValueType valueType, final float valueFloat, final int valueInt)
     {
         super(NodeTypes.EnumType.ATTRIBUTENODE.ordinal());
         
@@ -57,20 +57,14 @@ public class AttributeNode extends Node
     
     public float getValueAsFloat()
     {
-        if( valueType != AttributeNode.EnumValueType.FLOAT )
-        {
-            throw new RuntimeException("Non float queried!");
-        }
+        assert valueType == EnumValueType.FLOAT : "Non float queried!";
         
         return valueFloat;
     }
     
     public int getValueAsInt()
     {
-        if( valueType != AttributeNode.EnumValueType.INT )
-        {
-            throw new RuntimeException("Non int queried!");
-        }
+        assert valueType == EnumValueType.INT : "Non int queried!";
         
         return valueInt;
     }

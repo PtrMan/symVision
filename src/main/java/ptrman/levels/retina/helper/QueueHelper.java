@@ -13,23 +13,21 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Queue;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public enum QueueHelper {
 	;
 
-	public static <Type> List<Type> getAllElementsFromQueueAsList(Queue<Type> queue) {
-        final int size = queue.size();
+	public static <Type> List<Type> getAllElementsFromQueueAsList(final Queue<Type> queue) {
+        final var size = queue.size();
 
-        List<Type> result = new ArrayList<>();
-
-        for( int i = 0; i < size; i++ ) {
-            result.add(queue.poll());
-        }
+        final var result = IntStream.range(0, size).mapToObj(i -> queue.poll()).collect(Collectors.toList());
 
         return result;
     }
 
-    public static <Type> void transferAllElementsFromListToQueue(final Collection<Type> elements, Collection<Type> queue) {
+    public static <Type> void transferAllElementsFromListToQueue(final Collection<Type> elements, final Collection<Type> queue) {
         queue.addAll(elements);
     }
 }

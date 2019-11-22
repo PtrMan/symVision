@@ -31,27 +31,27 @@ public class Map2dDither {
         }
 
         private static class ValueFloat implements IValue {
-            public ValueFloat(float value) {
+            public ValueFloat(final float value) {
                 this.value = value;
             }
 
             @Override
-            public IValue add(IValue other) {
+            public IValue add(final IValue other) {
                 return new ValueFloat(value + ((ValueFloat)other).value);
             }
 
             @Override
-            public IValue sub(IValue other) {
+            public IValue sub(final IValue other) {
                 return new ValueFloat(value - ((ValueFloat)other).value);
             }
 
             @Override
-            public IValue mulScalar(float other) {
+            public IValue mulScalar(final float other) {
                 return new ValueFloat(value * other);
             }
 
             @Override
-            public double distanceSquared(IValue other) {
+            public double distanceSquared(final IValue other) {
                 return Maths.squaredDistance(new double[]{value - ((ValueFloat) other).value});
             }
 
@@ -59,103 +59,78 @@ public class Map2dDither {
         }
 
 
-        private static IMap2d<IValue> calculate(IMap2d<IValue> input, IValue[] palette) {
-            int x, y;
+        private static IMap2d<IValue> calculate(final IMap2d<IValue> input, final IValue[] palette) {
 
-            IMap2d<IValue> d = input.copy();
+            final var d = input.copy();
 
-            for (y = 0; y < input.getLength(); y++) {
-                for (x = 0; x < input.getWidth(); x++) {
+            for (int y = 0; y < input.getLength(); y++)
+                for (int x = 0; x < input.getWidth(); x++) {
 
-                    IValue oldValue = d.readAt(x, y);
-                    IValue newValue = findClosestPaletteColor(oldValue, palette);
+                    final var oldValue = d.readAt(x, y);
+                    final var newValue = findClosestPaletteColor(oldValue, palette);
 
                     input.setAt(x, y, newValue);
 
-                    IValue error = oldValue.sub(newValue);
+                    final var error = oldValue.sub(newValue);
 
-                    if (x + 1 < input.getWidth()) {
+                    if (x + 1 < input.getWidth())
                         d.setAt(x + 1, y, d.readAt(x + 1, y).add(error.mulScalar(7.0f / 16.0f)));
-                    }
 
-                    if (x - 1 >= 0 && y + 1 < input.getLength()) {
+                    if (x - 1 >= 0 && y + 1 < input.getLength())
                         d.setAt(x - 1, y + 1, d.readAt(x - 1, y + 1).add(error.mulScalar(3.0f / 16.0f)));
-                    }
 
-                    if (y + 1 < input.getLength()) {
+                    if (y + 1 < input.getLength())
                         d.setAt(x, y + 1, d.readAt(x, y + 1).add(error.mulScalar(5.0f / 16.0f)));
-                    }
 
-                    if (x + 1 < input.getWidth() && y + 1 < input.getLength()) {
+                    if (x + 1 < input.getWidth() && y + 1 < input.getLength())
                         d.setAt(x + 1, y + 1, d.readAt(x + 1, y + 1).add(error.mulScalar(1.0f / 16.0f)));
-                    }
                 }
-            }
 
             return input;
         }
 
-        private static IValue findClosestPaletteColor(IValue c, IValue[] palette) {
-            IValue closest = palette[0];
+        private static IValue findClosestPaletteColor(final IValue c, final IValue[] palette) {
+            var closest = palette[0];
 
-            for (IValue n : palette) {
-                if (n.distanceSquared(c) < closest.distanceSquared(c)) {
-                    closest = n;
-                }
-            }
+            for (final var n : palette) if (n.distanceSquared(c) < closest.distanceSquared(c)) closest = n;
 
             return closest;
         }
 
-        public static void floydSteinbergDitheringFloatToBoolean(IMap2d<Float> input, IMap2d<Boolean> resultAboveThreshold) {
-            final ValueFloat[] palette = new ValueFloat[]{new ValueFloat(0.0f), new ValueFloat(1.0f)};
+        public static void floydSteinbergDitheringFloatToBoolean(final IMap2d<Float> input, final IMap2d<Boolean> resultAboveThreshold) {
+            final var palette = new ValueFloat[]{new ValueFloat(0.0f), new ValueFloat(1.0f)};
 
-            IMap2d<IValue> temporaryInput = covertFromFloatToValueFloat(input);
-            IMap2d<IValue> temporaryResult = calculate(temporaryInput, palette);
-            IMap2d<Float> result = convertFromValueFromToFloat(temporaryResult);
+            final var temporaryInput = covertFromFloatToValueFloat(input);
+            final var temporaryResult = calculate(temporaryInput, palette);
+            final var result = convertFromValueFromToFloat(temporaryResult);
             convertFromFloatToBooleanNotEqualZeroInPlace(result, resultAboveThreshold);
         }
 
-        private static void convertFromFloatToBooleanNotEqualZeroInPlace(IMap2d<Float> input, IMap2d<Boolean> result) {
-            int x, y;
+        private static void convertFromFloatToBooleanNotEqualZeroInPlace(final IMap2d<Float> input, final IMap2d<Boolean> result) {
 
-            for( y = 0; y < input.getLength(); y++ )
-            {
-                for( x = 0; x < input.getWidth(); x++ )
-                {
+            for(int y = 0; y < input.getLength(); y++ )
+                for (int x = 0; x < input.getWidth(); x++)
                     result.setAt(x, y, input.readAt(x, y) != 0.0f);
-                }
-            }
         }
 
-        private static IMap2d<Float> convertFromValueFromToFloat(IMap2d<IValue> input) {
-            int x, y;
+        private static IMap2d<Float> convertFromValueFromToFloat(final IMap2d<IValue> input) {
 
-            IMap2d<Float> result = new Map2d<>(input.getWidth(), input.getLength());
+            final IMap2d<Float> result = new Map2d<>(input.getWidth(), input.getLength());
 
-            for( y = 0; y < input.getLength(); y++ )
-            {
-                for( x = 0; x < input.getWidth(); x++ )
-                {
-                    result.setAt(x, y, ((ValueFloat)input.readAt(x, y)).value);
-                }
-            }
+            for(int y = 0; y < input.getLength(); y++ )
+                for (int x = 0; x < input.getWidth(); x++)
+                    result.setAt(x, y, ((ValueFloat) input.readAt(x, y)).value);
 
             return result;
         }
 
-        private static IMap2d<IValue> covertFromFloatToValueFloat(IMap2d<Float> input) {
-            int x, y;
+        private static IMap2d<IValue> covertFromFloatToValueFloat(final IMap2d<Float> input) {
 
-            IMap2d<IValue> result = new Map2d<>(input.getWidth(), input.getLength());
+            final IMap2d<IValue> result = new Map2d<>(input.getWidth(), input.getLength());
 
-            for( y = 0; y < input.getLength(); y++ )
-            {
-                for( x = 0; x < input.getWidth(); x++ )
-                {
+            for(int y = 0; y < input.getLength(); y++ )
+                for (int x = 0; x < input.getWidth(); x++)
                     result.setAt(x, y, new ValueFloat(input.readAt(x, y)));
-                }
-            }
 
             return result;
         }

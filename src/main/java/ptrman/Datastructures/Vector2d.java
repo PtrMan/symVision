@@ -15,7 +15,7 @@ import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
 public class Vector2d<Type extends Number>
 {
-    public Vector2d(Type x, Type y)
+    public Vector2d(final Type x, final Type y)
     {
         this.x = x;
         this.y = y;
@@ -43,66 +43,66 @@ public class Vector2d<Type extends Number>
     {
         ;
 
-        public static IntIntPair add(IntIntPair a, IntIntPair b)
+        public static IntIntPair add(final IntIntPair a, final IntIntPair b)
         {
             return pair(a.getOne() + b.getOne(), a.getTwo() + b.getTwo());
         }
-        public static IntIntPair add(Vector2d<Integer> a, Vector2d<Integer> b)
+        public static IntIntPair add(final Vector2d<Integer> a, final Vector2d<Integer> b)
         {
             return pair(a.xInt() + b.xInt(), a.yInt() + b.yInt());
         }
-        public static IntIntPair add(Vector2d<Integer> a, IntIntPair b)
+        public static IntIntPair add(final Vector2d<Integer> a, final IntIntPair b)
         {
             return pair(a.xInt() + b.getOne(), a.yInt() + b.getTwo());
         }
-        public static Vector2d<Integer> sub(Vector2d<Integer> a, Vector2d<Integer> b)
+        public static Vector2d<Integer> sub(final Vector2d<Integer> a, final Vector2d<Integer> b)
         {
             return new Vector2d<>(a.xInt() - b.xInt(), a.yInt() - b.yInt());
         }
         
-        public static Vector2d<Integer> max(Vector2d<Integer> a, Vector2d<Integer> b)
+        public static Vector2d<Integer> max(final Vector2d<Integer> a, final Vector2d<Integer> b)
         {
             return new Vector2d<>(Math.max(a.xInt(), b.xInt()), Math.max(a.yInt(), b.yInt()));
         }
-        public static Vector2d<Integer> max(Vector2d<Integer> a, IntIntPair b)
+        public static Vector2d<Integer> max(final Vector2d<Integer> a, final IntIntPair b)
         {
             return new Vector2d<>(Math.max(a.xInt(), b.getOne()), Math.max(a.yInt(), b.getTwo()));
         }
 
-        public static Vector2d<Integer> max4(Vector2d<Integer> a, Vector2d<Integer> b, Vector2d<Integer> c, Vector2d<Integer> d)
+        public static Vector2d<Integer> max4(final Vector2d<Integer> a, final Vector2d<Integer> b, final Vector2d<Integer> c, final Vector2d<Integer> d)
         {
-            Vector2d<Integer> maxLeft = max(a, b);
-            Vector2d<Integer> maxRight = max(c, d);
+            final var maxLeft = max(a, b);
+            final var maxRight = max(c, d);
             return max(maxLeft, maxRight);
         }
         
-        public static Vector2d<Integer> min(Vector2d<Integer> a, Vector2d<Integer> b)
+        public static Vector2d<Integer> min(final Vector2d<Integer> a, final Vector2d<Integer> b)
         {
             return new Vector2d<>(Math.min(a.xInt(), b.xInt()), Math.min(a.yInt(), b.yInt()));
         }
-        public static Vector2d<Integer> min(Vector2d<Integer> a, IntIntPair b)
+        public static Vector2d<Integer> min(final Vector2d<Integer> a, final IntIntPair b)
         {
             return new Vector2d<>(Math.min(a.xInt(), b.getOne()), Math.min(a.yInt(), b.getTwo()));
         }
 
-        public static Vector2d<Integer> min4(Vector2d<Integer> a, Vector2d<Integer> b, Vector2d<Integer> c, Vector2d<Integer> d)
+        public static Vector2d<Integer> min4(final Vector2d<Integer> a, final Vector2d<Integer> b, final Vector2d<Integer> c, final Vector2d<Integer> d)
         {
-            Vector2d<Integer> minLeft = min(a, b);
-            Vector2d<Integer> minRight = min(c, d);
+            final var minLeft = min(a, b);
+            final var minRight = min(c, d);
             return min(minLeft, minRight);
         }
-        public static Vector2d<Integer> min4(Vector2d<Integer> a, IntIntPair b, Vector2d<Integer> c, Vector2d<Integer> d)
+        public static Vector2d<Integer> min4(final Vector2d<Integer> a, final IntIntPair b, final Vector2d<Integer> c, final Vector2d<Integer> d)
         {
-            Vector2d<Integer> minLeft = min(a, b);
-            Vector2d<Integer> minRight = min(c, d);
+            final var minLeft = min(a, b);
+            final var minRight = min(c, d);
             return min(minLeft, minRight);
         }
 
-        public static IntIntPair getScaled(IntIntPair a, int value)
+        public static IntIntPair getScaled(final IntIntPair a, final int value)
         {
             return pair(a.getOne() * value, a.getTwo() * value);
         }
-        public static Vector2d<Integer> getScaled(Vector2d<Integer> a, int value)
+        public static Vector2d<Integer> getScaled(final Vector2d<Integer> a, final int value)
         {
             return new Vector2d<>(a.xInt() * value, a.yInt() * value);
         }
@@ -112,35 +112,35 @@ public class Vector2d<Type extends Number>
     {
         ;
 
-        public static float dot(Vector2d<Float> a, Vector2d<Float> b)
+        public static float dot(final Vector2d<Float> a, final Vector2d<Float> b)
         {
             return a.xFloat()*b.xFloat() + a.yFloat()*b.yFloat();
         }
         
-        public static Vector2d<Float> add(Vector2d<Float> a, Vector2d<Float> b)
+        public static Vector2d<Float> add(final Vector2d<Float> a, final Vector2d<Float> b)
         {
             return new Vector2d<>(a.xFloat() + b.xFloat(), a.yFloat() + b.yFloat());
         }
         
-        public static Vector2d<Float> sub(Vector2d<Float> a, Vector2d<Float> b)
+        public static Vector2d<Float> sub(final Vector2d<Float> a, final Vector2d<Float> b)
         {
             return new Vector2d<>(a.xFloat() - b.xFloat(), a.yFloat() - b.yFloat());
         }
         
-        public static Vector2d<Float> normalize(Vector2d<Float> vector)
+        public static Vector2d<Float> normalize(final Vector2d<Float> vector)
         {
 
-            float length = getLength(vector);
-            float invLength = 1.0f / length;
+            final var length = getLength(vector);
+            final var invLength = 1.0f / length;
             return new Vector2d<>(vector.xFloat() * invLength, vector.yFloat() * invLength);
         }
         
-        public static float getLength(Vector2d<Float> vector)
+        public static float getLength(final Vector2d<Float> vector)
         {
             return (float)Math.sqrt(vector.xFloat()*vector.xFloat() + vector.yFloat()*vector.yFloat());
         }
         
-        public static Vector2d<Float> getScaled(Vector2d<Float> a, float value)
+        public static Vector2d<Float> getScaled(final Vector2d<Float> a, final float value)
         {
             return new Vector2d<>(a.xFloat() * value, a.yFloat() * value);
         }
@@ -150,12 +150,12 @@ public class Vector2d<Type extends Number>
     {
         ;
 
-        public static Vector2d<Float> convertIntVectorToFloat(Vector2d<Integer> vector)
+        public static Vector2d<Float> convertIntVectorToFloat(final Vector2d<Integer> vector)
         {
             return new Vector2d<>((float) vector.xInt(), (float) vector.xInt());
         }
         
-        public static Vector2d<Integer> convertFloatVectorToInt(Vector2d<Float> vector)
+        public static Vector2d<Integer> convertFloatVectorToInt(final Vector2d<Float> vector)
         {
             return new Vector2d<>(Math.round(vector.xFloat()), Math.round(vector.yFloat()));
         }

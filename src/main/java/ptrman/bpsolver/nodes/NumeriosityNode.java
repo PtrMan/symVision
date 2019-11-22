@@ -13,7 +13,7 @@ import ptrman.FargGeneral.network.Node;
 
 public class NumeriosityNode extends Node
 {
-    public NumeriosityNode(Node numerosityTypeNode)
+    public NumeriosityNode(final Node numerosityTypeNode)
     {
         super(NodeTypes.EnumType.NUMEROSITYNODE.ordinal());
         this.numerosityTypeNode = numerosityTypeNode;

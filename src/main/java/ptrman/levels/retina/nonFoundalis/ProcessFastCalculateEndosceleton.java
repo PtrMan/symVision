@@ -25,7 +25,7 @@ import java.util.List;
 // not(partially) implemented!
 public class ProcessFastCalculateEndosceleton implements IProcess {
     @Override
-    public void setImageSize(Vector2d<Integer> imageSize) {
+    public void setImageSize(final Vector2d<Integer> imageSize) {
 
     }
 
@@ -42,18 +42,18 @@ public class ProcessFastCalculateEndosceleton implements IProcess {
     @Override
     public void processData() {
         // corrode in one direction
-        List<IMap2d<Boolean>> directonalCorrededInputs = corrodeDirectional(inputs);
+        final var directonalCorrededInputs = corrodeDirectional(inputs);
 
         // or it together
-        IMap2d<Boolean> combinedDirectonalCorrodedInput = booleanOperationOrOnMaps(directonalCorrededInputs);
+        final var combinedDirectonalCorrodedInput = booleanOperationOrOnMaps(directonalCorrededInputs);
 
 
-        IMap2d<Boolean> combinedSkeletons = Map2dBinary.skeletalize(combinedDirectonalCorrodedInput);
+        final var combinedSkeletons = Map2dBinary.skeletalize(combinedDirectonalCorrodedInput);
 
         convertMapToVectorRepresentation(combinedSkeletons);
     }
 
-    protected void convertMapToVectorRepresentation(IMap2d<Boolean> combinedSkeletons) {
+    protected void convertMapToVectorRepresentation(final IMap2d<Boolean> combinedSkeletons) {
         // TODO< sample the image >
 
         // TODO< call gng >
@@ -61,8 +61,8 @@ public class ProcessFastCalculateEndosceleton implements IProcess {
         // TODO< convert result back to symvision vector form and store in this object >
     }
 
-    protected static List<IMap2d<Boolean>> corrodeDirectional(List<IMap2d<Boolean>> inputs) {
-        List<IMap2d<Boolean>> directonalCorrededInputs = new ArrayList<>();
+    protected static List<IMap2d<Boolean>> corrodeDirectional(final List<IMap2d<Boolean>> inputs) {
+        final List<IMap2d<Boolean>> directonalCorrededInputs = new ArrayList<>();
 
         // TODO< corrode in just one direction the inputs >
 
@@ -84,11 +84,9 @@ public class ProcessFastCalculateEndosceleton implements IProcess {
     }
 
     protected static IMap2d<Boolean> booleanOperationOrOnMaps(final List<IMap2d<Boolean>> inputs) {
-        IMap2d<Boolean> resultMap =  new Map2d<>(inputs.get(0).getWidth(), inputs.get(0).getLength());
+        final IMap2d<Boolean> resultMap =  new Map2d<>(inputs.get(0).getWidth(), inputs.get(0).getLength());
 
-        for( final IMap2d<Boolean> currentInput : inputs ) {
-            Map2dBinary.orInplace(resultMap, currentInput, resultMap);
-        }
+        for( final var currentInput : inputs ) Map2dBinary.orInplace(resultMap, currentInput, resultMap);
 
         return resultMap;
     }

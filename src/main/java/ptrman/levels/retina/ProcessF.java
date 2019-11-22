@@ -31,14 +31,14 @@ public class ProcessF implements IProcess {
     public ProcessConnector<ProcessA.Sample> inputSampleConnector;
     public ProcessConnector<ProcessA.Sample> outputSampleConnector;
 
-    public static int COUNTOFRAYDIRECTIONS = 16;
-    public static ArrayRealVector[] RAYDIRECTIONS;
+    public static final int COUNTOFRAYDIRECTIONS = 16;
+    public static final ArrayRealVector[] RAYDIRECTIONS;
 
     @Override
-    public void setImageSize(Vector2d<Integer> imageSize) {
+    public void setImageSize(final Vector2d<Integer> imageSize) {
     }
 
-    public void preSetup(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector) {
+    public void preSetup(final ProcessConnector<ProcessA.Sample> inputSampleConnector, final ProcessConnector<ProcessA.Sample> outputSampleConnector) {
         this.inputSampleConnector = inputSampleConnector;
         this.outputSampleConnector = outputSampleConnector;
     }
@@ -55,13 +55,12 @@ public class ProcessF implements IProcess {
 
     @Override
     public void processData() {
-        ArrayRealVector[] borderPositions = new ArrayRealVector[COUNTOFRAYDIRECTIONS];
-        List<Ray> activeRays = new FastList<>(RAYDIRECTIONS.length);
+        var borderPositions = new ArrayRealVector[COUNTOFRAYDIRECTIONS];
+        final List<Ray> activeRays = new FastList<>(RAYDIRECTIONS.length);
 
-        while (inputSampleConnector.getSize() > 0) {
-            for( ArrayRealVector borderPos : (borderPositions = processSample(inputSampleConnector.poll(), borderPositions, activeRays)))
+        while (inputSampleConnector.getSize() > 0)
+            for (final var borderPos : (borderPositions = processSample(inputSampleConnector.poll(), borderPositions, activeRays)))
                 outputSampleConnector.add(new ProcessA.Sample(borderPos));
-        }
     }
 
     @Override
@@ -69,45 +68,39 @@ public class ProcessF implements IProcess {
 
     }
 
-    public void set(IMap2d<Boolean> map) {
+    public void set(final IMap2d<Boolean> map) {
         this.map = map;
     }
 
-    private ArrayRealVector[] processSample(ProcessA.Sample sample, ArrayRealVector[] resultPositions, List<Ray> active) {
+    private ArrayRealVector[] processSample(final ProcessA.Sample sample, final ArrayRealVector[] resultPositions, final List<Ray> active) {
 
         active.clear();
-        for( ArrayRealVector currentRayDirection : RAYDIRECTIONS )
+        for( final var currentRayDirection : RAYDIRECTIONS )
             active.add(new Ray(sample.position, currentRayDirection));
 
-        int remaining = COUNTOFRAYDIRECTIONS;
+        var remaining = COUNTOFRAYDIRECTIONS;
 
-        while (remaining > 0) {
-
-            for( Ray r : active ) {
-                if (r.isActive) {
-                    r.advance();
-                    if( !readMapAtFloat(r.position) ) {
-                        r.isActive = false;
-                        remaining--;
-                    }
+        while (remaining > 0) for (final var r : active)
+            if (r.isActive) {
+                r.advance();
+                if (!readMapAtFloat(r.position)) {
+                    r.isActive = false;
+                    remaining--;
                 }
             }
 
-        }
-
-        for( int i = 0; i < COUNTOFRAYDIRECTIONS; i++ ) {
-            resultPositions[i] = active.get(i).position;
-        }
+        for(var i = 0; i < COUNTOFRAYDIRECTIONS; i++ ) resultPositions[i] = active.get(i).position;
 
         return resultPositions;
 
     }
 
-    private boolean readMapAtFloat(ArrayRealVector position) {
-        final double[] dr = position.getDataRef();
+    private boolean readMapAtFloat(final ArrayRealVector position) {
+        final var dr = position.getDataRef();
 
         //int x = (int) dr[0], y = (int) dr[1]; //default rounding
-        int x = (int)Math.round(dr[0]), y = (int)Math.round(dr[1]);
+        final var x = (int)Math.round(dr[0]);
+        final var y = (int)Math.round(dr[1]);
 
         return map.inBounds(x, y) && map.readAt(x, y);
     }
@@ -125,11 +118,11 @@ public class ProcessF implements IProcess {
 
     private static class Ray {
 
-        public Ray(IntIntPair position, ArrayRealVector direction) {
+        public Ray(final IntIntPair position, final ArrayRealVector direction) {
             this(real(position), direction);
         }
 
-        public Ray(ArrayRealVector position, ArrayRealVector direction) {
+        public Ray(final ArrayRealVector position, final ArrayRealVector direction) {
             this.position = position;
             this.direction = direction;
         }
@@ -145,16 +138,16 @@ public class ProcessF implements IProcess {
     }
 
     static {
-        int divisions = COUNTOFRAYDIRECTIONS;
+        final var divisions = COUNTOFRAYDIRECTIONS;
 
-        ArrayRealVector[] result = new ArrayRealVector[divisions];
+        final var result = new ArrayRealVector[divisions];
 
-        for( int currentDivision = 0; currentDivision < divisions; currentDivision++ ) {
-            double relativeDivision = (double)currentDivision / (double)divisions;
-            double radiants = relativeDivision * 2.0 * java.lang.Math.PI;
+        for(var currentDivision = 0; currentDivision < divisions; currentDivision++ ) {
+            final var relativeDivision = (double)currentDivision / (double)divisions;
+            final var radiants = relativeDivision * 2.0 * java.lang.Math.PI;
 
-            double x = java.lang.Math.sin(radiants);
-            double y = java.lang.Math.cos(radiants);
+            final var x = java.lang.Math.sin(radiants);
+            final var y = java.lang.Math.cos(radiants);
 
             result[currentDivision] = new ArrayRealVector(new double[]{x, y}, false);
         }

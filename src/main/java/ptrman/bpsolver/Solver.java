@@ -87,8 +87,8 @@ public class Solver {
         processB.setImageSize(getImageSize());
         processB.setup();
 
-        final int PROCESSCGRIDSIZE = 8;
         processC.setImageSize(getImageSize());
+        final var PROCESSCGRIDSIZE = 8;
         processC.gridsize = PROCESSCGRIDSIZE;
         processC.setup();
 
@@ -118,23 +118,23 @@ public class Solver {
 
     }
 
-    public void cycle(int cycleCount) {
+    public void cycle(final int cycleCount) {
         coderack.cycle(cycleCount);
     }
 
-    public void recalculate(IMap2d<Boolean> image) {
+    public void recalculate(final IMap2d<Boolean> image) {
         recalculate(image, 1.0f);
     }
 
     /** use throttle < 1.0 to degrade quality */
-    public void recalculate(IMap2d<Boolean> image, float throttle) {
-        final boolean enableProcessH = true;
-        final boolean enableProcessE = true;
-        final boolean enableProcessM = false;
+    public void recalculate(final IMap2d<Boolean> image, final float throttle) {
+        final var enableProcessH = true;
+        final var enableProcessE = true;
+        final var enableProcessM = false;
 
-        final boolean debugLineIntersections = false;
+        final var debugLineIntersections = false;
 
-        final int NUMBEROFCYCLES = 500;
+        final var NUMBEROFCYCLES = 500;
 
         // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
         coderack.flush();
@@ -152,16 +152,14 @@ public class Solver {
         ProcessF processF = new ProcessF();
         */
 
-        allConnectors.forEach(ProcessConnector::flush);
+        for (final var allConnector : allConnectors) allConnector.flush();
 
 
-        ProcessZFacade processZFacade = new ProcessZFacade();
-
-        final int processzNumberOfPixelsToMagnifyThreshold = 8;
-
-        final int processZGridsize = 8;
+        final var processZFacade = new ProcessZFacade();
 
         processZFacade.setImageSize(getImageSize());
+        final var processZGridsize = 8;
+        final var processzNumberOfPixelsToMagnifyThreshold = 8;
         processZFacade.preSetupSet(processZGridsize, processzNumberOfPixelsToMagnifyThreshold);
         processZFacade.setup();
 
@@ -469,7 +467,7 @@ public class Solver {
         networkHandles.anglePointAngleValuePrimitiveNode = new PlatonicPrimitiveNode("AnglePointAngleValue", "Angle");
         
         networkHandles.lineStructureAbstractPrimitiveNode.isAbstract = true;
-        ptrman.FargGeneral.network.Link link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.endpointPlatonicPrimitiveNode);
+        var link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.endpointPlatonicPrimitiveNode);
         networkHandles.lineStructureAbstractPrimitiveNode.out(link);
         link = network.linkCreator.createLink(ptrman.FargGeneral.network.Link.EnumType.HASFEATURE, networkHandles.bayPlatonicPrimitiveNode);
         networkHandles.lineStructureAbstractPrimitiveNode.out(link);
@@ -548,7 +546,7 @@ public class Solver {
 
         codeletLtmLookup = new CodeletLtmLookup();
 
-        CodeletLtmLookup.RegisterEntry createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
+        var createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
         SolverCodelet createdCodelet = new LineSegmentLength(this);
         createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.5f));
         
@@ -594,14 +592,12 @@ public class Solver {
 
 
     // TODO< refactor out >
-    private static List<Intersection> getAllLineIntersections(Iterable<RetinaPrimitive> lineDetectors) {
+    private static List<Intersection> getAllLineIntersections(final Iterable<RetinaPrimitive> lineDetectors) {
 
-        List<Intersection> uniqueIntersections = new ArrayList<>();
+        final List<Intersection> uniqueIntersections = new ArrayList<>();
 
-        for( RetinaPrimitive currentPrimitive : lineDetectors ) {
-            if( currentPrimitive.type != RetinaPrimitive.EnumType.LINESEGMENT ) {
-                continue;
-            }
+        for( final var currentPrimitive : lineDetectors ) {
+            if( currentPrimitive.type != RetinaPrimitive.EnumType.LINESEGMENT ) continue;
 
             findAndAddUniqueIntersections(uniqueIntersections, currentPrimitive.line.intersections);
         }
@@ -610,21 +606,12 @@ public class Solver {
     }
 
     // modifies uniqueIntersections
-    private static void findAndAddUniqueIntersections(Collection<Intersection> uniqueIntersections, Iterable<Intersection> intersections) {
-        for( Intersection currentOuterIntersection : intersections ) {
+    private static void findAndAddUniqueIntersections(final Collection<Intersection> uniqueIntersections, final Iterable<Intersection> intersections) {
+        for( final var currentOuterIntersection : intersections ) {
 
-            boolean found = false;
+            final var found = uniqueIntersections.stream().anyMatch(currentUnqiueIntersection -> currentUnqiueIntersection.equals(currentOuterIntersection));
 
-            for( Intersection currentUnqiueIntersection : uniqueIntersections ) {
-                if( currentUnqiueIntersection.equals(currentOuterIntersection) ) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if( !found ) {
-                uniqueIntersections.add(currentOuterIntersection);
-            }
+            if( !found ) uniqueIntersections.add(currentOuterIntersection);
         }
 
 
@@ -657,7 +644,7 @@ public class Solver {
         return imageSize;
     }
     
-    public void setImageSize(Vector2d<Integer> imageSize)
+    public void setImageSize(final Vector2d<Integer> imageSize)
     {
         this.imageSize = imageSize;
     }

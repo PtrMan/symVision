@@ -26,18 +26,18 @@ public enum Kernels
     public static class MarrHildrethOperator implements  IKernel<Float, Float>
     {
 
-        public MarrHildrethOperator(float sigma)
+        public MarrHildrethOperator(final float sigma)
         {
             this.sigma = sigma;
         }
 
         @Override
-        public Float calculateAt(Vector2d<Float> position)
+        public Float calculateAt(final Vector2d<Float> position)
         {
-			final double factor = -1.0/(java.lang.Math.PI*java.lang.Math.pow(sigma, 4.0f));
+			final var factor = -1.0/(java.lang.Math.PI*java.lang.Math.pow(sigma, 4.0f));
 
-			double gaussianFactor = Math.exp(-1.0f * (Maths.squaredDistance(new double[]{position.x, position.y}) / (2.0 * Maths.power2(sigma))));
-			double scalingFactor = 1.0 - Maths.squaredDistance(new double[]{position.x, position.y}) / (2.0 * Maths.power2(sigma));
+			final var gaussianFactor = Math.exp(-1.0f * (Maths.squaredDistance(new double[]{position.x, position.y}) / (2.0 * Maths.power2(sigma))));
+			final var scalingFactor = 1.0 - Maths.squaredDistance(new double[]{position.x, position.y}) / (2.0 * Maths.power2(sigma));
 
             return (float)(factor*gaussianFactor*scalingFactor);
         }
@@ -52,7 +52,7 @@ public enum Kernels
      * candidate for SUPERCOMPILATION, slow when executed
      *
      */
-    public static float calcMarrHildrethOperator(Vector2d<Float> position, float sigma)
+    public static float calcMarrHildrethOperator(final Vector2d<Float> position, final float sigma)
     {
         return new MarrHildrethOperator(sigma).calculateAt(position);
     }

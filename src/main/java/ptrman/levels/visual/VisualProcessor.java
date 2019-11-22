@@ -9,9 +9,9 @@
  */
 package ptrman.levels.visual;
 
+import org.eclipse.collections.api.block.procedure.primitive.IntProcedure;
 import ptrman.Datastructures.*;
 import ptrman.meter.event.DurationStartMeter;
-import ptrman.misc.Assert;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -23,12 +23,12 @@ import java.util.function.Function;
 public class VisualProcessor
 {
     public static class ThresholdMap2dMapperFunction implements Function<Float, Boolean> {
-        public ThresholdMap2dMapperFunction(float threshold) {
+        public ThresholdMap2dMapperFunction(final float threshold) {
             this.threshold = threshold;
         }
 
         @Override
-        public Boolean apply(Float value)
+        public Boolean apply(final Float value)
         {
             return value > threshold;
         }
@@ -39,13 +39,13 @@ public class VisualProcessor
     public static class ConvertToGrayImageMap2dMapperFunction implements Function<ColorRgb, Float> {
         private final ColorRgb colorScale;
 
-        public ConvertToGrayImageMap2dMapperFunction(ColorRgb colorScale)
+        public ConvertToGrayImageMap2dMapperFunction(final ColorRgb colorScale)
         {
             this.colorScale = colorScale;
         }
 
         @Override
-        public Float apply(ColorRgb value)
+        public Float apply(final ColorRgb value)
         {
             return value.getScaledNormalizedMagnitude(colorScale);
         }
@@ -79,7 +79,7 @@ public class VisualProcessor
 
         public static class MarrHildrethOperatorParameter
         {
-            public MarrHildrethOperatorParameter(int filterSize, float sigma)
+            public MarrHildrethOperatorParameter(final int filterSize, final float sigma)
             {
                 this.filterSize = filterSize;
                 this.sigma = sigma;
@@ -95,18 +95,18 @@ public class VisualProcessor
 
         public static class DitheringFilter implements IFilter<Float, Boolean> {
             @Override
-            public void apply(IMap2d<Float> input, IMap2d<Boolean> output) {
+            public void apply(final IMap2d<Float> input, final IMap2d<Boolean> output) {
                 Map2dDither.Generic.floydSteinbergDitheringFloatToBoolean(input, output);
             }
         }
 
         public static class ThresholdFilter implements IFilter<Float, Boolean> {
-            public ThresholdFilter(float threshold) {
+            public ThresholdFilter(final float threshold) {
                 this.threshold = threshold;
             }
 
             @Override
-            public void apply(IMap2d<Float> input, IMap2d<Boolean> output) {
+            public void apply(final IMap2d<Float> input, final IMap2d<Boolean> output) {
                 Map2dMapper.map(new ThresholdMap2dMapperFunction(threshold), input, output);
             }
 
@@ -115,12 +115,12 @@ public class VisualProcessor
         }
 
         public static class ConvertColorRgbToGrayscaleFilter implements IFilter<ColorRgb, Float> {
-            public ConvertColorRgbToGrayscaleFilter(ColorRgb colorToGrayColorScale) {
+            public ConvertColorRgbToGrayscaleFilter(final ColorRgb colorToGrayColorScale) {
                 this.colorToGrayColorScale = colorToGrayColorScale;
             }
 
             @Override
-            public void apply(IMap2d<ColorRgb> input, IMap2d<Float> output) {
+            public void apply(final IMap2d<ColorRgb> input, final IMap2d<Float> output) {
                 Map2dMapper.map(new ConvertToGrayImageMap2dMapperFunction(colorToGrayColorScale), input, output);
             }
 
@@ -130,7 +130,7 @@ public class VisualProcessor
 
 
         public abstract static class ChainElement {
-            public ChainElement(EnumMapType inputType, EnumMapType outputType, String meterName) {
+            public ChainElement(final EnumMapType inputType, final EnumMapType outputType, final String meterName) {
                 this.inputType = inputType;
                 this.outputType = outputType;
                 durationMeters = new DurationStartMeter(meterName, true, 1.0, false);
@@ -144,14 +144,14 @@ public class VisualProcessor
         }
 
         public abstract static class ApplyChainElement<InputType, ResultType> extends ChainElement {
-            public ApplyChainElement(EnumMapType inputType, EnumMapType outputType, String meterName, Vector2d<Integer> imageSize, IFilter<InputType, ResultType> filter) {
+            public ApplyChainElement(final EnumMapType inputType, final EnumMapType outputType, final String meterName, final Vector2d<Integer> imageSize, final IFilter<InputType, ResultType> filter) {
                 super(inputType, outputType, meterName);
                 this.result = newResultMap(imageSize.x, imageSize.y);
                 this.filter = filter;
             }
 
             /** default, but can be overridden in subclasses */
-            protected IMap2d<ResultType> newResultMap(int w, int h) {
+            protected IMap2d<ResultType> newResultMap(final int w, final int h) {
                 return new Map2d<>(w, h);
             }
 
@@ -167,30 +167,30 @@ public class VisualProcessor
         }
 
         public static class ChainElementFloatFloat extends ApplyChainElement<Float, Float> {
-            public ChainElementFloatFloat(IFilter<Float, Float> filter, String meterName, Vector2d<Integer> imageSize) {
+            public ChainElementFloatFloat(final IFilter<Float, Float> filter, final String meterName, final Vector2d<Integer> imageSize) {
                 super(EnumMapType.FLOAT, EnumMapType.FLOAT, meterName, imageSize, filter);
             }
 
             @Override
-            protected IMap2d<Float> newResultMap(int w, int h) {
+            protected IMap2d<Float> newResultMap(final int w, final int h) {
                 return new FloatMap2d(w, h);
             }
 
         }
 
         public static class ChainElementFloatBoolean extends ApplyChainElement<Float, Boolean> {
-            public ChainElementFloatBoolean(IFilter<Float, Boolean> filter, String meterName, Vector2d<Integer> imageSize) {
+            public ChainElementFloatBoolean(final IFilter<Float, Boolean> filter, final String meterName, final Vector2d<Integer> imageSize) {
                 super(EnumMapType.FLOAT, EnumMapType.BOOLEAN, meterName, imageSize, filter);
             }
 
             @Override
-            protected IMap2d<Boolean> newResultMap(int w, int h) {
+            protected IMap2d<Boolean> newResultMap(final int w, final int h) {
                 return new FastBooleanMap2d(w, h);
             }
         }
 
         public static class ChainElementColorFloat extends ApplyChainElement<ColorRgb, Float> {
-            public ChainElementColorFloat(IFilter<ColorRgb, Float> filter, String meterName, Vector2d<Integer> imageSize) {
+            public ChainElementColorFloat(final IFilter<ColorRgb, Float> filter, final String meterName, final Vector2d<Integer> imageSize) {
                 super(EnumMapType.COLOR, EnumMapType.FLOAT, meterName, imageSize, filter);
             }
         }
@@ -201,49 +201,47 @@ public class VisualProcessor
 
         }
 
-        public void filterChain(IMap2d<ColorRgb> inputColorImage)
+        public void filterChain(final IMap2d<ColorRgb> inputColorImage)
         {
 
 
-            Deque<Integer> chainIndicesToProcess = new ArrayDeque<>();
+            final Deque<Integer> chainIndicesToProcess = new ArrayDeque<>();
 
-            boolean processFromInput = true;
             chainIndicesToProcess.add(0);
 
-            for(;;) {
+            var processFromInput = true;
+            while (true) {
 
-                if( chainIndicesToProcess.isEmpty() ) {
-                    break;
-                }
+                if( chainIndicesToProcess.isEmpty() ) break;
 
-                int currentDagElementIndex = chainIndicesToProcess.pollFirst();
+                final int currentDagElementIndex = chainIndicesToProcess.pollFirst();
 
-                Dag.Element<ChainElement> currentDagElement = filterChainDag.elements.get(currentDagElementIndex);
+                final var currentDagElement = filterChainDag.elements.get(currentDagElementIndex);
 
                 if( processFromInput ) {
 
                     processFromInput = false;
 
-                    Assert.Assert(currentDagElement.content.inputType == EnumMapType.COLOR, "");
-                    Assert.Assert(currentDagElement.content.outputType == EnumMapType.FLOAT, "");
+                    assert currentDagElement.content.inputType == EnumMapType.COLOR : "ASSERT: " + "";
+                    assert currentDagElement.content.outputType == EnumMapType.FLOAT : "ASSERT: " + "";
 
-                    ChainElementColorFloat chainElement = (ChainElementColorFloat) currentDagElement.content;
+                    final var chainElement = (ChainElementColorFloat) currentDagElement.content;
 
                     chainElement.input = inputColorImage;
                 }
 
                 currentDagElement.content.apply();
 
-                IMap2d MapForFilterOutput = ((ApplyChainElement) currentDagElement.content).result;
+                final var MapForFilterOutput = ((ApplyChainElement) currentDagElement.content).result;
 
 
-                currentDagElement.childIndices.forEach( iterationChildIndex -> {
+                currentDagElement.childIndices.forEach((IntProcedure) iterationChildIndex -> {
 
-                    Dag.Element<ChainElement> iterationDagElement = filterChainDag.elements.get(iterationChildIndex);
+                    final var iterationDagElement = filterChainDag.elements.get(iterationChildIndex);
 
-                    Assert.Assert(iterationDagElement.content.inputType == currentDagElement.content.outputType, "Types of filters are incompatible");
+                    assert iterationDagElement.content.inputType == currentDagElement.content.outputType : "ASSERT: " + "Types of filters are incompatible";
 
-                    ((ApplyChainElement)iterationDagElement.content).input = MapForFilterOutput;
+                    ((ApplyChainElement) iterationDagElement.content).input = MapForFilterOutput;
 
                     chainIndicesToProcess.add(iterationChildIndex);
                 });

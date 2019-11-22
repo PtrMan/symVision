@@ -21,7 +21,6 @@ import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.math.Maths;
-import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -42,7 +41,7 @@ public class FeaturePatternMatching {
          *
          * see Foundalis dissertation page 225   8.2.5 Using difference to compute similarity
          */
-        public static float distanceToSimilarity(float distance)
+        public static float distanceToSimilarity(final float distance)
         {
             return (float)Math.exp(-distance);
         }
@@ -56,12 +55,9 @@ public class FeaturePatternMatching {
     public static class MultiplyMatchingPathRatingStrategy implements  IMatchingPathRatingStrategy {
 
         @Override
-        public float calculate(List<MatchingPathElement<Link>> matchingPathElements) {
+        public float calculate(final List<MatchingPathElement<Link>> matchingPathElements) {
 
-            double result = 1.0f;
-
-            for( MatchingPathElement iterationMatchingPathElement : matchingPathElements )
-                result *= iterationMatchingPathElement.similarity;
+            final var result = matchingPathElements.stream().mapToDouble(iterationMatchingPathElement -> iterationMatchingPathElement.similarity).reduce(1.0f, (a, b) -> a * b);
 
             return (float)result;
         }
@@ -70,7 +66,7 @@ public class FeaturePatternMatching {
     private static class IntegrateTDistributionUpperIntegral implements UnivariateFunction {
         public double n;
         
-        public double value(double x) {
+        public double value(final double x) {
             return (float)Math.pow((n - 1.0f)/(n - 1.0f + x * x), n/2.0f);
         }
     }
@@ -78,13 +74,13 @@ public class FeaturePatternMatching {
     private static class IntegrateTDistributionLowerIntegral implements UnivariateFunction {
         public double n;
         
-        public double value(double x) {
+        public double value(final double x) {
             return (float)Math.pow(Math.sin(x), n);
         }
     }
     
     private static class IntegrateEquation8Dot4 implements UnivariateFunction {
-        public double value(double x) {
+        public double value(final double x) {
             return Math.pow(Math.E, -0.5*x*x);
         }
     }
@@ -93,34 +89,26 @@ public class FeaturePatternMatching {
      * 
      * f1 and f2 are from the Node of the same type (excluding numerosity)
      */
-    public double matchSameTypeNonNumerosity(FeatureStatistics f1, FeatureStatistics f2) {
-        if( f1.numberOfObservations == 1 && f2.numberOfObservations == 1 ) {
+    public double matchSameTypeNonNumerosity(final FeatureStatistics f1, final FeatureStatistics f2) {
+        if( f1.numberOfObservations == 1 && f2.numberOfObservations == 1 )
             return matchSameTypeNonNumerosityWithBothNumberOfObservationsEquals1(f1, f2);
-        }
-        else if( f1.numberOfObservations == 1 && f2.numberOfObservations > 1 ) {
+        else if( f1.numberOfObservations == 1 && f2.numberOfObservations > 1 )
             return matchSameTypeNonNumerosityWithF1Equals1(f1, f2);
-        }
-        else {
-            return matchSameTypeNonNumeroistyWithF1AndF2NotEqual1(f1, f2);
-        }
+        else return matchSameTypeNonNumeroistyWithF1AndF2NotEqual1(f1, f2);
     }
     
-    public float matchSameTypeNumerosity(FeatureStatistics f1, int numeriosity1, FeatureStatistics f2, int numeriosity2) {
-        if( f1.numberOfObservations == 1 && f2.numberOfObservations == 1 ) {
+    public float matchSameTypeNumerosity(final FeatureStatistics f1, final int numeriosity1, final FeatureStatistics f2, final int numeriosity2) {
+        if( f1.numberOfObservations == 1 && f2.numberOfObservations == 1 )
             return matchSameTypeNumerosityWithBothNumberOfObservationsEquals1(f1, numeriosity1, f2, numeriosity2);
-        }
-        else if( f1.numberOfObservations == 1 && f2.numberOfObservations > 1 ) {
+        else if( f1.numberOfObservations == 1 && f2.numberOfObservations > 1 )
             return matchSameTypeNumerosityWithF1Equals1(f1, numeriosity1, f2, numeriosity2);
-        }
-        else {
-            return matchSameTypeNumeroistyWithF1AndF2NotEqual1(f1, numeriosity1, f2, numeriosity2);
-        }
+        else return matchSameTypeNumeroistyWithF1AndF2NotEqual1(f1, numeriosity1, f2, numeriosity2);
     }
     
     // matches two (PlatonicPrimitiveInstanceNode for now) against each other and returns the matching degree
     // takes the activation/priming inside the LTM into account to do so
     // see foundalis disertation 8.2.3 to see how it is compared
-    public float matchAnyNonRecursive(Node nodeA, Node nodeB, NetworkHandles networkHandles) {
+    public float matchAnyNonRecursive(final Node nodeA, final Node nodeB, final NetworkHandles networkHandles) {
         // the type is FeatureNode.featureTypeNode
         // only if two elements are in the array the type is
 
@@ -128,15 +116,14 @@ public class FeaturePatternMatching {
         // this can be removed if we need functionality which isn't constrained that way
         // for now its enought
         // if we remove this we need for each node a IS link(and the best would be an accelerated type based access)
-        Assert.Assert(nodeA.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "");
-        Assert.Assert(nodeB.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "");
-        
-        // we return zero here because if the type is different it is ill-defined (as defined for now)
-        if( !( ((PlatonicPrimitiveInstanceNode)nodeA).primitiveNode.equals(((PlatonicPrimitiveInstanceNode)nodeB).primitiveNode) ) ) {
-            return 0.0f;
-        }
+        assert nodeA.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() : "ASSERT: " + "";
+        assert nodeB.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() : "ASSERT: " + "";
 
-        Map<Node, ArrayList<FeatureNode>> featureNodesByType = new HashMap<>();
+        // we return zero here because if the type is different it is ill-defined (as defined for now)
+        if( !( ((PlatonicPrimitiveInstanceNode)nodeA).primitiveNode.equals(((PlatonicPrimitiveInstanceNode)nodeB).primitiveNode) ) )
+            return 0.0f;
+
+        final Map<Node, ArrayList<FeatureNode>> featureNodesByType = new HashMap<>();
         
         getAllFeatureNodesAndAddToMap(nodeA, featureNodesByType);
         getAllFeatureNodesAndAddToMap(nodeB, featureNodesByType);
@@ -147,9 +134,9 @@ public class FeaturePatternMatching {
     // TODO< document source (chapter of foundalis disertation after the chapter about the nonrecursive version) >
     // TODO< recurse until reach of lower bound >
     // recursive until lower bound
-    public List<MatchingPathElement<Link>> matchAnyRecursive(Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist, int maxDepth) {
+    public List<MatchingPathElement<Link>> matchAnyRecursive(final Node nodeA, final Node nodeB, final NetworkHandles networkHandles, final List<Link.EnumType> linkWhitelist, final int maxDepth) {
 
-        List<MatchingPathElement<Link>> resultMatchingPath = new ArrayList<>();
+        final List<MatchingPathElement<Link>> resultMatchingPath = new ArrayList<>();
 
         matchAnyRecursiveInternal(resultMatchingPath, nodeA, nodeB, networkHandles, linkWhitelist, maxDepth, 1);
 
@@ -157,41 +144,38 @@ public class FeaturePatternMatching {
     }
 
     // helper for calculate rating with strategy
-    public static float calculateRatingWithDefaultStrategy(List<MatchingPathElement<Link>> matchingPathElements) {
+    public static float calculateRatingWithDefaultStrategy(final List<MatchingPathElement<Link>> matchingPathElements) {
 
-        IMatchingPathRatingStrategy strategy = new MultiplyMatchingPathRatingStrategy();
+        final IMatchingPathRatingStrategy strategy = new MultiplyMatchingPathRatingStrategy();
 
         return strategy.calculate(matchingPathElements);
     }
 
 
-    private void matchAnyRecursiveInternal(List<MatchingPathElement<Link>> resultMatchingPath, Node nodeA, Node nodeB, NetworkHandles networkHandles, List<Link.EnumType> linkWhitelist, int maxDepth, int currentDepth) {
+    private void matchAnyRecursiveInternal(final List<MatchingPathElement<Link>> resultMatchingPath, final Node nodeA, final Node nodeB, final NetworkHandles networkHandles, final List<Link.EnumType> linkWhitelist, final int maxDepth, final int currentDepth) {
 
 
-        if( currentDepth >= maxDepth ) {
-            return;
-        }
+        if( currentDepth >= maxDepth ) return;
 
-        MatchingPathElement<Link> bestMatchingPathElement = new MatchingPathElement<>();
+        final var bestMatchingPathElement = new MatchingPathElement<Link>();
         bestMatchingPathElement.similarity = 0.0f;
 
-        for (Link linkA : nodeA.out()) {
-            for (Link linkB : nodeB.out()) {
+        for (final var linkA : nodeA.out())
+            for (final var linkB : nodeB.out()) {
 
-                if( !doesLinkTypeListContainType(linkWhitelist, linkA.type) || !doesLinkTypeListContainType(linkWhitelist, linkB.type) )
+                if (!doesLinkTypeListContainType(linkWhitelist, linkA.type) || !doesLinkTypeListContainType(linkWhitelist, linkB.type))
                     continue;
 
-                float currentDistance = matchAnyNonRecursive(linkA.target, linkB.target, networkHandles);
-                float currentSimilarity = Converter.distanceToSimilarity(currentDistance);
+                final var currentDistance = matchAnyNonRecursive(linkA.target, linkB.target, networkHandles);
+                final var currentSimilarity = Converter.distanceToSimilarity(currentDistance);
 
-                if( currentSimilarity > bestMatchingPathElement.similarity) {
+                if (currentSimilarity > bestMatchingPathElement.similarity) {
                     bestMatchingPathElement.similarity = currentSimilarity;
                     bestMatchingPathElement.bestMatchA = linkA;
                     bestMatchingPathElement.bestMatchB = linkB;
                 }
 
             }
-        }
 
 
         if( bestMatchingPathElement.similarity != 0.0f ) {
@@ -213,23 +197,19 @@ public class FeaturePatternMatching {
      * non common FeatureNodes (where the count is != 2) are weighted with zero
      * 
      */
-    private float matchAndWeightFeatureNodesByType(Map<Node, ArrayList<FeatureNode>> featureNodesByType,  NetworkHandles networkHandles) {
+    private float matchAndWeightFeatureNodesByType(final Map<Node, ArrayList<FeatureNode>> featureNodesByType, final NetworkHandles networkHandles) {
 
-        float weightSum = 0.0f;
-        float upperSum = 0.0f;
-        
-        if( featureNodesByType.keySet().isEmpty() ) {
-            return 0.0f;
-        }
-        
-        for(Map.Entry<Node, ArrayList<FeatureNode>> nodeArrayListEntry : featureNodesByType.entrySet()) {
-            double featureDistance;
+        if( featureNodesByType.keySet().isEmpty() ) return 0.0f;
 
-            ArrayList<FeatureNode> featureNodesForType = nodeArrayListEntry.getValue();
+        var upperSum = 0.0f;
+        var weightSum = 0.0f;
+        for(final var nodeArrayListEntry : featureNodesByType.entrySet()) {
 
-            featureDistance = featureNodesForType.size() == 2 ? matchSameTypeNonNumerosity(featureNodesForType.get(0).statistics, featureNodesForType.get(1).statistics) : 0.0;
-            
-            float weight = (nodeArrayListEntry.getKey().activation + getSystemWeightOfPlatonicFeatureType(nodeArrayListEntry.getKey(), networkHandles)) * 0.5f;
+            final var featureNodesForType = nodeArrayListEntry.getValue();
+
+            final double featureDistance = featureNodesForType.size() == 2 ? matchSameTypeNonNumerosity(featureNodesForType.get(0).statistics, featureNodesForType.get(1).statistics) : 0.0;
+
+            final var weight = (nodeArrayListEntry.getKey().activation + getSystemWeightOfPlatonicFeatureType(nodeArrayListEntry.getKey(), networkHandles)) * 0.5f;
             
             upperSum += (featureDistance * weight);
             weightSum += weight;
@@ -239,28 +219,27 @@ public class FeaturePatternMatching {
     }
     
     // helper for
-    private static float getSystemWeightOfPlatonicFeatureType(Node featureType, NetworkHandles networkHandles) {
-        if( featureType.equals(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode) ) {
+    private static float getSystemWeightOfPlatonicFeatureType(final Node featureType, final NetworkHandles networkHandles) {
+        if( featureType.equals(networkHandles.lineSegmentFeatureLineLengthPrimitiveNode) )
             return HardParameters.FeatureWeights.LINESEGMENTFEATURELINELENGTH;
-        }
         return 0.0f;
     }
     
     // helper for matchAnyNonRecursive
-    private static void getAllFeatureNodesAndAddToMap(Node node, Map<Node, ArrayList<FeatureNode>> featureNodesByType) {
+    private static void getAllFeatureNodesAndAddToMap(final Node node, final Map<Node, ArrayList<FeatureNode>> featureNodesByType) {
 
-        for( Link iterationAttributeLink : node.getLinksByType(Link.EnumType.HASATTRIBUTE)) {
+        for( final var iterationAttributeLink : node.getLinksByType(Link.EnumType.HASATTRIBUTE)) {
 
             if( iterationAttributeLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() )
                 continue;
 
-            FeatureNode targetFeatureNode = (FeatureNode) iterationAttributeLink.target;
+            final var targetFeatureNode = (FeatureNode) iterationAttributeLink.target;
             
-            if( featureNodesByType.containsKey(targetFeatureNode.featureTypeNode) ) {
+            if( featureNodesByType.containsKey(targetFeatureNode.featureTypeNode) )
                 featureNodesByType.get(targetFeatureNode.featureTypeNode).add(targetFeatureNode);
-            } else {
+            else {
 
-                ArrayList<FeatureNode> createdFeatureNodeList = new ArrayList<>(1);
+                final var createdFeatureNodeList = new ArrayList<FeatureNode>(1);
                 createdFeatureNodeList.add(targetFeatureNode);
                 featureNodesByType.put(targetFeatureNode.featureTypeNode, createdFeatureNodeList);
             }
@@ -268,83 +247,79 @@ public class FeaturePatternMatching {
     }
 
     // helper
-    private static boolean doesLinkTypeListContainType(Iterable<Link.EnumType> list, Link.EnumType searchFor) {
-        for( Link.EnumType iterationType : list ) {
-            if( iterationType.ordinal() == searchFor.ordinal() ) {
-                return true;
-            }
-        }
+    private static boolean doesLinkTypeListContainType(final Iterable<Link.EnumType> list, final Link.EnumType searchFor) {
+        for( final var iterationType : list ) if (iterationType.ordinal() == searchFor.ordinal()) return true;
 
         return false;
     }
     
-    private float matchSameTypeNumerosityWithBothNumberOfObservationsEquals1(FeatureStatistics f1, int numeriosity1, FeatureStatistics f2, int numeriosity2) {
+    private float matchSameTypeNumerosityWithBothNumberOfObservationsEquals1(final FeatureStatistics f1, final int numeriosity1, final FeatureStatistics f2, final int numeriosity2) {
 
-        float l = Math.max(numeriosity1, numeriosity2);
-        float s = Math.min(numeriosity1, numeriosity2);
+        final float l = Math.max(numeriosity1, numeriosity2);
+        final float s = Math.min(numeriosity1, numeriosity2);
 
-        float z = Math.abs(l - s) / (SIGMAZERO * (float) Math.sqrt(l + s));
+        final var z = Math.abs(l - s) / (SIGMAZERO * (float) Math.sqrt(l + s));
         
         return calcNumeriosityD(z);
     }
     
     // maybe this is wrong implemented
-    private float matchSameTypeNumerosityWithF1Equals1(FeatureStatistics f1, int numeriosity1, FeatureStatistics f2, int numeriosity2) {
+    private float matchSameTypeNumerosityWithF1Equals1(final FeatureStatistics f1, final int numeriosity1, final FeatureStatistics f2, final int numeriosity2) {
 
-        double insideSqrt = SIGMAZERO * SIGMAZERO * f1.getMean() + Maths.power2(f2.getStandardDeviation()) / Maths.power2(f2.numberOfObservations);
-        float z = (float) (Math.abs(f1.getMean() - f2.getMean()) / Math.sqrt(insideSqrt));
+        final var insideSqrt = SIGMAZERO * SIGMAZERO * f1.getMean() + Maths.power2(f2.getStandardDeviation()) / Maths.power2(f2.numberOfObservations);
+        final var z = (float) (Math.abs(f1.getMean() - f2.getMean()) / Math.sqrt(insideSqrt));
         
         return calcNumeriosityD(z);
     }
     
-    private float matchSameTypeNumeroistyWithF1AndF2NotEqual1(FeatureStatistics f1, int numeriosity1, FeatureStatistics f2, int numeriosity2) {
+    private float matchSameTypeNumeroistyWithF1AndF2NotEqual1(final FeatureStatistics f1, final int numeriosity1, final FeatureStatistics f2, final int numeriosity2) {
 
-        double insideSqrt = Maths.power2(f1.getStandardDeviation()) / f1.numberOfObservations + Maths.power2(f2.getStandardDeviation()) / f2.numberOfObservations;
-        float z = (float) (Math.abs(f1.getMean() - f2.getMean()) / Math.sqrt(insideSqrt));
+        final var insideSqrt = Maths.power2(f1.getStandardDeviation()) / f1.numberOfObservations + Maths.power2(f2.getStandardDeviation()) / f2.numberOfObservations;
+        final var z = (float) (Math.abs(f1.getMean() - f2.getMean()) / Math.sqrt(insideSqrt));
         
         return calcNumeriosityD(z);
     }
     
-    private float calcNumeriosityD(float z) {
+    private float calcNumeriosityD(final float z) {
         return (float)(1.0f/(Math.sqrt(2.0*Math.PI)))*(float)integrator.integrate(INTEGRATEMAXEVAL, integrateEquation8Dot4, -z, z);
     }
     
-    private static float matchSameTypeNonNumerosityWithBothNumberOfObservationsEquals1(FeatureStatistics f1, FeatureStatistics f2) {
+    private static float matchSameTypeNonNumerosityWithBothNumberOfObservationsEquals1(final FeatureStatistics f1, final FeatureStatistics f2) {
         return Math.abs(f1.getMean() - f2.getMean()) / f1.primitiveFeatureMax;
     }
     
-    private double matchSameTypeNonNumerosityWithF1Equals1(FeatureStatistics f1, FeatureStatistics f2) {
-        double n = f2.numberOfObservations;
-        double t = ((f2.getMean()-f1.getMean())*Math.sqrt(n))/f2.getStandardDeviation();
+    private double matchSameTypeNonNumerosityWithF1Equals1(final FeatureStatistics f1, final FeatureStatistics f2) {
+        final double n = f2.numberOfObservations;
+        final var t = ((f2.getMean()-f1.getMean())*Math.sqrt(n))/f2.getStandardDeviation();
         
         return calcStudentTDistribution(n, t);
     }
     
-    private double matchSameTypeNonNumeroistyWithF1AndF2NotEqual1(FeatureStatistics f1, FeatureStatistics f2) {
-        double s1 = f1.getStandardDeviation();
-        double n1 = f1.numberOfObservations;
+    private double matchSameTypeNonNumeroistyWithF1AndF2NotEqual1(final FeatureStatistics f1, final FeatureStatistics f2) {
+        final double s1 = f1.getStandardDeviation();
+        final double n1 = f1.numberOfObservations;
 
-        double s2 = f2.getStandardDeviation();
-        double n2 = f2.numberOfObservations;
+        final double s2 = f2.getStandardDeviation();
+        final double n2 = f2.numberOfObservations;
 
-        double nDividend = Maths.power2(s1)/n1 + Maths.power2(s2)/n2;
-        double nDivisorSum1 = Maths.power2((s1 * s1) / n1) / (n1 - 1.0f);
-        double nDivisorSum2 = Maths.power2((s2 * s2) / n2) / (n2 - 1.0f);
+        final var nDividend = Maths.power2(s1)/n1 + Maths.power2(s2)/n2;
+        final var nDivisorSum1 = Maths.power2((s1 * s1) / n1) / (n1 - 1.0f);
+        final var nDivisorSum2 = Maths.power2((s2 * s2) / n2) / (n2 - 1.0f);
 
-        double n = nDividend / (nDivisorSum1 + nDivisorSum2);
-        double t = Math.abs(f1.getMean()-f2.getMean())/Math.sqrt(Maths.power2(s1) / n1 + Maths.power2(s2) / n2);
+        final var n = nDividend / (nDivisorSum1 + nDivisorSum2);
+        final var t = Math.abs(f1.getMean()-f2.getMean())/Math.sqrt(Maths.power2(s1) / n1 + Maths.power2(s2) / n2);
         
         return calcStudentTDistribution(n, t);
     }
     
-    private double calcStudentTDistribution(double n, double t) {
+    private double calcStudentTDistribution(final double n, final double t) {
 
 
         integrateTDistributionUpperIntegral.n = n;
         integrateTDistributionLowerIntegral.n = n;
 
-        float upperIntegral = (float) integrator.integrate(INTEGRATEMAXEVAL, integrateTDistributionUpperIntegral, -t, t);
-        float lowerIntegral = (float) integrator.integrate(INTEGRATEMAXEVAL, integrateTDistributionLowerIntegral, 0, 2.0f * Math.PI);
+        final var upperIntegral = (float) integrator.integrate(INTEGRATEMAXEVAL, integrateTDistributionUpperIntegral, -t, t);
+        final var lowerIntegral = (float) integrator.integrate(INTEGRATEMAXEVAL, integrateTDistributionLowerIntegral, 0, 2.0f * Math.PI);
         
         return (upperIntegral)/((float)Math.sqrt(n-1.0f)*lowerIntegral);
     }

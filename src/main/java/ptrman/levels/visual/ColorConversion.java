@@ -21,15 +21,15 @@ public enum ColorConversion
     }
     
     // http://www.rapidtables.com/convert/color/hsl-to-rgb.htm
-    static public ColorRgb hslToRgb(ColorHsl input)
+    static public ColorRgb hslToRgb(final ColorHsl input)
     {
-        float r;
-        float g;
+        assert input.h >= 0.0f : "ASSERT: " + "";
+        final var c = 1.0f - Math.abs(2.0f * input.l - 1.0f) * input.s;
+		final var x = c * (1.0f - (float) Math.abs(((input.h / 0.25f) % 2.0f) - 1.0));
+		final var m = input.l - c * 0.5f;
         float b;
-		ptrman.misc.Assert.Assert(input.h >= 0.0f, "");
-		float c = 1.0f - Math.abs(2.0f * input.l - 1.0f) * input.s;
-		float x = c * (1.0f - (float) Math.abs(((input.h / 0.25f) % 2.0f) - 1.0));
-		float m = input.l - c * 0.5f;
+        float g;
+        float r;
         if (input.h < 60.0f / 360.0f)
         {
             r = c;
@@ -72,11 +72,11 @@ public enum ColorConversion
         return new ColorRgb(r,g,b);
     }
 
-    static public ColorHsl rgbToHsl(ColorRgb rgb)
+    static public ColorHsl rgbToHsl(final ColorRgb rgb)
     {
-		ColorHsl result = new ColorHsl();
-		EnumRgb rgbMax = EnumRgb.R;
-		float max = rgb.r;
+		final var result = new ColorHsl();
+        var rgbMax = EnumRgb.R;
+        var max = rgb.r;
         if (rgb.g > max)
         {
             rgbMax = EnumRgb.G;
@@ -89,8 +89,8 @@ public enum ColorConversion
             max = rgb.b;
         }
 
-		EnumRgb rgbMin = EnumRgb.R;
-		float min = rgb.r;
+        var rgbMin = EnumRgb.R;
+        var min = rgb.r;
         if (rgb.g < min)
         {
             rgbMin = EnumRgb.G;
@@ -104,27 +104,19 @@ public enum ColorConversion
         }
          
         result.h = result.s = result.l = (max + min) * 0.5f;
+        // accromatic
         if (rgbMax == rgbMin)
-        {
-            // accromatic
             result.h = result.s = 0.0f;
-        }
         else
         {
-			float d = max - min;
+			final var d = max - min;
             result.s = (result.l > 0.5f) ? d / (2.0f - max - min) : d / (max + min);
             if (rgbMax == EnumRgb.R)
-            {
                 result.h = (rgb.g - rgb.b) / d + ((rgb.g < rgb.b) ? 6.0f : 0.0f);
-            }
             else if (rgbMax == EnumRgb.G)
-            {
                 result.h = (rgb.b - rgb.r) / d + 2.0f;
-            }
             else
-            {
                 result.h = (rgb.r - rgb.g) / d + 4.0f;
-            }  
             result.h /= 6.0f;
         } 
         return result;

@@ -14,22 +14,20 @@ import ptrman.Datastructures.IMap2d;
 public enum Map2dConverter {
 	;
 
-	public static void booleanToFloat(final IMap2d<Boolean> input, IMap2d<Float> output) {
-        for( int iy = 0; iy < input.getLength(); iy++ ) {
-            for( int ix = 0; ix < input.getWidth(); ix++ ) {
-                boolean valueAtPosition = input.readAt(ix, iy);
+	public static void booleanToFloat(final IMap2d<Boolean> input, final IMap2d<Float> output) {
+        for(var iy = 0; iy < input.getLength(); iy++ )
+            for (var ix = 0; ix < input.getWidth(); ix++) {
+                final boolean valueAtPosition = input.readAt(ix, iy);
                 output.setAt(ix, iy, convertBooleanToFloat(valueAtPosition));
             }
-        }
     }
 
-    public static void floatToBoolean(final IMap2d<Float> input, IMap2d<Boolean> output, final float threshold) {
-        for( int iy = 0; iy < input.getLength(); iy++ ) {
-            for( int ix = 0; ix < input.getWidth(); ix++ ) {
-                float valueAtPosition = input.readAt(ix, iy);
+    public static void floatToBoolean(final IMap2d<Float> input, final IMap2d<Boolean> output, final float threshold) {
+        for(var iy = 0; iy < input.getLength(); iy++ )
+            for (var ix = 0; ix < input.getWidth(); ix++) {
+                final float valueAtPosition = input.readAt(ix, iy);
                 output.setAt(ix, iy, floatAboveThreshold(valueAtPosition, threshold));
             }
-        }
     }
 
     private static float convertBooleanToFloat(final boolean value) {

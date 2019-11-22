@@ -23,36 +23,32 @@ import ptrman.bpsolver.nodes.PlatonicPrimitiveNode;
 public enum HelperFunctions {
 	;
 
-	public static PlatonicPrimitiveInstanceNode createVectorAttributeNode(ArrayRealVector vector, PlatonicPrimitiveNode primitiveNodeType, Solver bpSolver) {
-        PlatonicPrimitiveInstanceNode createdVectorInstanceNode = new PlatonicPrimitiveInstanceNode(primitiveNodeType);
+	public static PlatonicPrimitiveInstanceNode createVectorAttributeNode(final ArrayRealVector vector, final PlatonicPrimitiveNode primitiveNodeType, final Solver bpSolver) {
+        final var createdVectorInstanceNode = new PlatonicPrimitiveInstanceNode(primitiveNodeType);
         
-        final FeatureNode createdXNode = FeatureNode.createFloatNode(bpSolver.networkHandles.xCoordinatePlatonicPrimitiveNode, vector.getDataRef()[0], 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(bpSolver.networkHandles.xCoordinatePlatonicPrimitiveNode));
-        final FeatureNode createdYNode = FeatureNode.createFloatNode(bpSolver.networkHandles.yCoordinatePlatonicPrimitiveNode, vector.getDataRef()[1], 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(bpSolver.networkHandles.yCoordinatePlatonicPrimitiveNode));
-        final Link linkToXNode = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdXNode);
+        final var createdXNode = FeatureNode.createFloatNode(bpSolver.networkHandles.xCoordinatePlatonicPrimitiveNode, vector.getDataRef()[0], 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(bpSolver.networkHandles.xCoordinatePlatonicPrimitiveNode));
+        final var createdYNode = FeatureNode.createFloatNode(bpSolver.networkHandles.yCoordinatePlatonicPrimitiveNode, vector.getDataRef()[1], 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(bpSolver.networkHandles.yCoordinatePlatonicPrimitiveNode));
+        final var linkToXNode = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdXNode);
         createdVectorInstanceNode.out(linkToXNode);
-        final Link linkToYNode = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdYNode);
+        final var linkToYNode = bpSolver.network.linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdYNode);
         createdVectorInstanceNode.out(linkToYNode);
         
         return createdVectorInstanceNode;
     }
     
     public static ArrayRealVector getVectorFromVectorAttributeNode(final NetworkHandles networkHandles, final PlatonicPrimitiveInstanceNode node) {
-        ArrayRealVector result = new ArrayRealVector(new double[]{0.0f, 0.0f});
+        final var result = new ArrayRealVector(new double[]{0.0f, 0.0f});
         
-        for( Link iterationLink : node.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
+        for( final var iterationLink : node.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
 
-			if( iterationLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() ) {
-                continue;
-            }
+			if( iterationLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() ) continue;
 
-			FeatureNode targetFeatureNode = (FeatureNode) iterationLink.target;
+			final var targetFeatureNode = (FeatureNode) iterationLink.target;
 
-            if( targetFeatureNode.featureTypeNode.equals(networkHandles.xCoordinatePlatonicPrimitiveNode) ) {
+            if( targetFeatureNode.featureTypeNode.equals(networkHandles.xCoordinatePlatonicPrimitiveNode) )
                 result.getDataRef()[0] = targetFeatureNode.getValueAsFloat();
-            }
-            else if( targetFeatureNode.featureTypeNode.equals(networkHandles.yCoordinatePlatonicPrimitiveNode) ) {
+            else if( targetFeatureNode.featureTypeNode.equals(networkHandles.yCoordinatePlatonicPrimitiveNode) )
                 result.getDataRef()[0] = targetFeatureNode.getValueAsFloat();
-            }
             // else ignore
         }
         

@@ -16,14 +16,13 @@ import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import ptrman.misc.Assert;
 
 /**
  * calculates endpoints of a line segment or a curve
  * must be called only once!
  */
 public class EndPoint extends SolverCodelet {
-    public EndPoint(Solver bpSolver) {
+    public EndPoint(final Solver bpSolver) {
         super(bpSolver);
     }
 
@@ -39,14 +38,14 @@ public class EndPoint extends SolverCodelet {
 
     @Override
     public RunResult run() {
-        Assert.Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "must be platonic instance node");
-        final PlatonicPrimitiveInstanceNode startNodeAsPlatonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode)startNode;
+        assert startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() : "ASSERT: " + "must be platonic instance node";
+        final var startNodeAsPlatonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode)startNode;
         
-        final ArrayRealVector[] endPoints = calculateEndpointsOfPlatonicPrimitiveInstanceNode(startNodeAsPlatonicPrimitiveInstanceNode);
+        final var endPoints = calculateEndpointsOfPlatonicPrimitiveInstanceNode(startNodeAsPlatonicPrimitiveInstanceNode);
         
-        for( int endpointI = 0; endpointI < 2; endpointI++ ) {
-            final PlatonicPrimitiveInstanceNode createdEndpointInstanceNode = HelperFunctions.createVectorAttributeNode(endPoints[endpointI], getNetworkHandles().endpointPlatonicPrimitiveNode, bpSolver);
-            final Link linkToEndpoint = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdEndpointInstanceNode);
+        for(var endpointI = 0; endpointI < 2; endpointI++ ) {
+            final var createdEndpointInstanceNode = HelperFunctions.createVectorAttributeNode(endPoints[endpointI], getNetworkHandles().endpointPlatonicPrimitiveNode, bpSolver);
+            final var linkToEndpoint = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdEndpointInstanceNode);
             startNode.out(linkToEndpoint);
         }
         
@@ -54,7 +53,7 @@ public class EndPoint extends SolverCodelet {
     }
 
     private ArrayRealVector[] calculateEndpointsOfPlatonicPrimitiveInstanceNode(final PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode) {
-        ArrayRealVector[] resultPoints = new ArrayRealVector[2];
+        final var resultPoints = new ArrayRealVector[2];
         
         if( platonicPrimitiveInstanceNode.primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) ) {
             resultPoints[0] = platonicPrimitiveInstanceNode.p1;
@@ -63,9 +62,7 @@ public class EndPoint extends SolverCodelet {
         else if( false /* TODO curve */ ) {
             // TODO
         }
-        else {
-            Assert.Assert(false, "unreachable");
-        }
+        else assert false : "ASSERT: " + "unreachable";
         
         return resultPoints;
     }

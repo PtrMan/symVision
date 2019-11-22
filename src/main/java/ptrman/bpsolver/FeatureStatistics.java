@@ -52,13 +52,11 @@ public class FeatureStatistics
     {
         // TODO< running Variance and fusing of variances >
 
-        float mean = getMean();
-        float runningSum = 0.0f;
+        final var mean = getMean();
+        var runningSum = 0.0f;
         
-        for( float value : values )
-        {
+        for( final float value : values )
             runningSum += Maths.power2(value - mean);
-        }
         
         return 1.0f/runningSum;
     }
@@ -79,7 +77,7 @@ public class FeatureStatistics
         return mean;
     }
     
-    public void addValue(float value)
+    public void addValue(final float value)
     {
         mean = (mean*numberOfObservations + value)/(numberOfObservations+1);
         sum += value;
@@ -92,7 +90,7 @@ public class FeatureStatistics
         numberOfObservations++;
     }
 
-    public void addValuesFromStatistics(FeatureStatistics other)
+    public void addValuesFromStatistics(final FeatureStatistics other)
     {
         values.addAll(other.values);
     }
@@ -109,10 +107,10 @@ public class FeatureStatistics
         values.clear();
     }
     
-    public static FeatureStatistics fuse(FeatureStatistics a, FeatureStatistics b)
+    public static FeatureStatistics fuse(final FeatureStatistics a, final FeatureStatistics b)
     {
 
-        FeatureStatistics result = new FeatureStatistics();
+        final var result = new FeatureStatistics();
         result.min = Math.min(a.min, b.min);
         result.max = Math.max(a.max, b.max);
         result.mean = (a.mean*a.numberOfObservations + b.mean*b.numberOfObservations) / (a.numberOfObservations+b.numberOfObservations);

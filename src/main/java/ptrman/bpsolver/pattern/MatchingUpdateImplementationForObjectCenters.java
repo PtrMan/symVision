@@ -11,7 +11,6 @@ package ptrman.bpsolver.pattern;
 
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.NetworkHandles;
-import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 
@@ -39,30 +38,31 @@ public class MatchingUpdateImplementationForObjectCenters implements IMatchingUp
         }
     }
     
-    public MatchingUpdateImplementationForObjectCenters(float absoluteClusteringDistance, float clusteringThreshold)
+    public MatchingUpdateImplementationForObjectCenters(final float absoluteClusteringDistance, final float clusteringThreshold)
     {
         this.absoluteClusteringDistance = absoluteClusteringDistance;
         this.clusteringThreshold = clusteringThreshold;
     }
     
     @Override
-    public Pattern updateCore(Pattern orginal, Pattern additional, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
+    public Pattern updateCore(final Pattern orginal, final Pattern additional, final NetworkHandles networkHandles, final FeaturePatternMatching featurePatternMatching)
     {
-        Vector2d<Float> newCenter;
-        
-        Assert.Assert(orginal instanceof PatternWithCenterAndMass, "");
-        Assert.Assert(additional instanceof PatternWithCenterAndMass, "");
 
-        PatternWithCenterAndMass orginalWithCenterAndMass = (PatternWithCenterAndMass) orginal;
-        PatternWithCenterAndMass additionalWithCenterAndMass = (PatternWithCenterAndMass) additional;
+        final boolean value1 = orginal instanceof PatternWithCenterAndMass;
+        assert value1 : "ASSERT: " + "";
+        final boolean value = additional instanceof PatternWithCenterAndMass;
+        assert value : "ASSERT: " + "";
+
+        final var orginalWithCenterAndMass = (PatternWithCenterAndMass) orginal;
+        final var additionalWithCenterAndMass = (PatternWithCenterAndMass) additional;
         
         // deep copy exemplars from orginal and additional
-        PatternWithCenterAndMass createdPattern = new PatternWithCenterAndMass();
+        final var createdPattern = new PatternWithCenterAndMass();
         createdPattern.exemplars = new ArrayList<>();
 		createdPattern.exemplars.addAll(orginal.exemplars);
 		createdPattern.exemplars.addAll(additional.exemplars);
-        
-        newCenter = add(getScaled(orginalWithCenterAndMass.clusterCenter, orginalWithCenterAndMass.getWeight()), getScaled(additionalWithCenterAndMass.clusterCenter, additionalWithCenterAndMass.getWeight()));
+
+        Vector2d<Float> newCenter = add(getScaled(orginalWithCenterAndMass.clusterCenter, orginalWithCenterAndMass.getWeight()), getScaled(additionalWithCenterAndMass.clusterCenter, additionalWithCenterAndMass.getWeight()));
         newCenter = getScaled(newCenter, 1.0f/(orginalWithCenterAndMass.getWeight()+additionalWithCenterAndMass.getWeight()));
         
         createdPattern.clusterCenter = newCenter;
@@ -71,24 +71,24 @@ public class MatchingUpdateImplementationForObjectCenters implements IMatchingUp
     }
 
     @Override
-    public float match(Pattern a, Pattern b, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
+    public float match(final Pattern a, final Pattern b, final NetworkHandles networkHandles, final FeaturePatternMatching featurePatternMatching)
     {
 
-        Assert.Assert(a instanceof PatternWithCenterAndMass, "");
-        Assert.Assert(b instanceof PatternWithCenterAndMass, "");
+        final boolean value1 = a instanceof PatternWithCenterAndMass;
+        assert value1 : "ASSERT: " + "";
+        final boolean value = b instanceof PatternWithCenterAndMass;
+        assert value : "ASSERT: " + "";
 
-        PatternWithCenterAndMass aWithCenterAndMass = (PatternWithCenterAndMass) a;
-        PatternWithCenterAndMass bWithCenterAndMass = (PatternWithCenterAndMass) b;
+        final var aWithCenterAndMass = (PatternWithCenterAndMass) a;
+        final var bWithCenterAndMass = (PatternWithCenterAndMass) b;
 
-        Vector2d<Float> diff = sub(aWithCenterAndMass.clusterCenter, bWithCenterAndMass.clusterCenter);
-        float distance = (float) Math.sqrt(diff.x * diff.x + diff.y * diff.y);
+        final var diff = sub(aWithCenterAndMass.clusterCenter, bWithCenterAndMass.clusterCenter);
+        final var distance = (float) Math.sqrt(diff.x * diff.x + diff.y * diff.y);
         
         if( distance > absoluteClusteringDistance )
-        {
             return 0.0f;
-        }
 
-        float absoluteMaximalDistanceForNullRating = absoluteClusteringDistance * (1.0f / clusteringThreshold);
+        final var absoluteMaximalDistanceForNullRating = absoluteClusteringDistance * (1.0f / clusteringThreshold);
         return 1.0f - (distance / absoluteMaximalDistanceForNullRating);
     }
     

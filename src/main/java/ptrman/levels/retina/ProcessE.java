@@ -10,13 +10,10 @@
 package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import ptrman.Datastructures.IMap2d;
 import ptrman.math.ArrayRealVectorHelper;
-import ptrman.misc.Assert;
 
 import java.util.Collection;
-import java.util.Deque;
 
 import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimitives;
 import static ptrman.bpsolver.Helper.isNeightborhoodPixelSet;
@@ -29,69 +26,60 @@ import static ptrman.math.ArrayRealVectorHelper.arrayRealVectorToInteger;
 public class ProcessE {
     // TODO< sort out only the line detectors or make sure only linedetectors get in, remove asserts if its made sure >
 
-    public static void process(Collection<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
+    public static void process(final Collection<RetinaPrimitive> lineDetectors, final IMap2d<Boolean> image) {
         // we examine ALL possible intersections of all lines
         // this is only possible if we have the whole image at an instance
         // we assume here that this is the case
 
-        IntObjectHashMap<Deque<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(lineDetectors);
+        final var objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(lineDetectors);
 
         // detect line intersections only per object
-        for( Deque<RetinaPrimitive> primitivesOfObject : objectIdToRetinaPrimitivesMap.values() ) {
+        for( final var primitivesOfObject : objectIdToRetinaPrimitivesMap.values() )
             findIntersectionOfLineDetectors(primitivesOfObject, image);
-        }
     }
 
-    private static void findIntersectionOfLineDetectors(Iterable<RetinaPrimitive> lineDetectors, IMap2d<Boolean> image) {
-        for (RetinaPrimitive lowLinePrimitive : lineDetectors) {
-            //commented because we don't consider object id
-            //Assert.Assert(lowLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
+    private static void findIntersectionOfLineDetectors(final Iterable<RetinaPrimitive> lineDetectors, final IMap2d<Boolean> image) {
+        //commented because we don't consider object id
+        //Assert.Assert(lowLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
+        for (final var lowLinePrimitive : lineDetectors)
+            for (final var highLinePrimitive : lineDetectors) {
 
-            for (RetinaPrimitive highLinePrimitive : lineDetectors) {
-
-                Assert.Assert(lowLinePrimitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "");
-                Assert.Assert(highLinePrimitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "");
+                assert lowLinePrimitive.type == RetinaPrimitive.EnumType.LINESEGMENT : "ASSERT: " + "";
+                assert highLinePrimitive.type == RetinaPrimitive.EnumType.LINESEGMENT : "ASSERT: " + "";
                 //commented because we don't consider object id
                 //Assert.Assert(highLinePrimitive.hasValidObjectId(), "line detector RetinaPrimitive has no valid object id!");
 
-                if( highLinePrimitive == lowLinePrimitive ) {
-                    continue;
-                }
+                if (highLinePrimitive == lowLinePrimitive) continue;
                 //commented because we don't consider object id
                 //if( lowLinePrimitive.objectId != highLinePrimitive.objectId ) {
                 //    continue;
                 //}
 
-                ArrayRealVector intersectionPosition = intersectLineDetectors(lowLinePrimitive.line, highLinePrimitive.line);
-                
-                if( intersectionPosition == null ) {
+                final var intersectionPosition = intersectLineDetectors(lowLinePrimitive.line, highLinePrimitive.line);
+
+                if (intersectionPosition == null) continue;
+
+                if (!image.inBounds(arrayRealVectorToInteger(intersectionPosition, ArrayRealVectorHelper.EnumRoundMode.DOWN)))
                     continue;
-                }
-                
-                if( !image.inBounds(arrayRealVectorToInteger(intersectionPosition, ArrayRealVectorHelper.EnumRoundMode.DOWN)) ) {
-                    continue;
-                }
-                
+
                 // examine neighborhood of intersection position
-                if( !isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPosition, ArrayRealVectorHelper.EnumRoundMode.DOWN), image) ) {
+                if (!isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPosition, ArrayRealVectorHelper.EnumRoundMode.DOWN), image))
                     continue;
-                }
 
                 // create entry and register stuff ...
                 // TODO< register it on the line itself? >
-                Intersection createdIntersection = new Intersection(intersectionPosition,
+                final var createdIntersection = new Intersection(intersectionPosition,
                         new Intersection.IntersectionPartner(lowLinePrimitive, lowLinePrimitive.line.getIntersectionEndpoint(intersectionPosition)),
                         new Intersection.IntersectionPartner(highLinePrimitive, highLinePrimitive.line.getIntersectionEndpoint(intersectionPosition))
-                        );
+                );
 
                 lowLinePrimitive.line.intersections.add(createdIntersection);
                 highLinePrimitive.line.intersections.add(createdIntersection);
             }
-        }
     }
     
-    public static ArrayRealVector intersectLineDetectors(SingleLineDetector lineA, SingleLineDetector lineB) {
-        ArrayRealVector intersectionPosition = SingleLineDetector.intersectLineDetectors(lineA, lineB);
+    public static ArrayRealVector intersectLineDetectors(final SingleLineDetector lineA, final SingleLineDetector lineB) {
+        final var intersectionPosition = SingleLineDetector.intersectLineDetectors(lineA, lineB);
         return intersectionPosition;
     }
 }

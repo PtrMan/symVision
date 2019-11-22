@@ -20,7 +20,7 @@ public enum FloodFill {
     }
 
     private static class SpecificExecutor<Type> implements GeneralizedFloodFill.IFillExecutor {
-        public SpecificExecutor(IPixelSetListener pixelSetListener, IMap2d<Type> map, final Type targetColor, final Type replacementColor) {
+        public SpecificExecutor(final IPixelSetListener pixelSetListener, final IMap2d<Type> map, final Type targetColor, final Type replacementColor) {
             this.pixelSetListener = pixelSetListener;
             this.map = map;
             this.targetColor = targetColor;
@@ -28,23 +28,21 @@ public enum FloodFill {
         }
 
         @Override
-        public void fillAt(Vector2d<Integer> position, Vector2d<Integer> fromDirection) {
+        public void fillAt(final Vector2d<Integer> position, final Vector2d<Integer> fromDirection) {
             map.setAt(position.x, position.y, replacementColor);
 
             pixelSetListener.seted(position);
         }
 
         @Override
-        public boolean canAndShouldBeFilled(Vector2d<Integer> position) {
-            if( targetColor.equals(replacementColor) ) {
-                return false;
-            }
+        public boolean canAndShouldBeFilled(final Vector2d<Integer> position) {
+            if( targetColor.equals(replacementColor) ) return false;
 
             return map.readAt(position.x, position.y).equals(targetColor);
         }
 
         @Override
-        public boolean inRange(Vector2d<Integer> position) {
+        public boolean inRange(final Vector2d<Integer> position) {
             return map.inBounds(position);
         }
 
@@ -54,8 +52,8 @@ public enum FloodFill {
         private final IPixelSetListener pixelSetListener;
     }
     
-    public static <Type> void fill(IMap2d<Type> map, Vector2d<Integer> centerPosition, final Type targetColor, final Type replacementColor, final boolean cross, IPixelSetListener pixelSetListener) {
-        GeneralizedFloodFill.IFillExecutor fillExecutor = new SpecificExecutor<>(pixelSetListener, map, targetColor, replacementColor);
+    public static <Type> void fill(final IMap2d<Type> map, final Vector2d<Integer> centerPosition, final Type targetColor, final Type replacementColor, final boolean cross, final IPixelSetListener pixelSetListener) {
+        final GeneralizedFloodFill.IFillExecutor fillExecutor = new SpecificExecutor<>(pixelSetListener, map, targetColor, replacementColor);
         GeneralizedFloodFill.fill(centerPosition, cross, fillExecutor);
     }
 }

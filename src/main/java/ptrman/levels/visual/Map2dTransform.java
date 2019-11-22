@@ -13,29 +13,19 @@ import ptrman.Datastructures.IMap2d;
 
 public class Map2dTransform<Type>
 {
-    public void magnify(IMap2d<Type> input, IMap2d<Type> output, int factor)
+    public void magnify(final IMap2d<Type> input, final IMap2d<Type> output, final int factor)
     {
-        int ix, iy;
 
-        for( iy = 0; iy < input.getLength(); iy++ )
-        {
-            for( ix = 0; ix < input.getWidth(); ix++ )
-            {
+        for(int iy = 0; iy < input.getLength(); iy++ )
+            for (int ix = 0; ix < input.getWidth(); ix++)
                 writeMagnified(output, ix, iy, input.readAt(ix, iy), factor);
-            }
-        }
     }
 
-    private void writeMagnified(IMap2d<Type> output, int ix, int iy, Type value, int factor)
+    private void writeMagnified(final IMap2d<Type> output, final int ix, final int iy, final Type value, final int factor)
     {
-        int writeX, writeY;
 
-        for( writeY = 0; writeY < factor; writeY++ )
-        {
-            for( writeX = 0; writeX < factor; writeX++ )
-            {
-                output.setAt(ix*factor + writeX, iy*factor + writeY, value);
-            }
-        }
+        for(int writeY = 0; writeY < factor; writeY++ )
+            for (int writeX = 0; writeX < factor; writeX++)
+                output.setAt(ix * factor + writeX, iy * factor + writeY, value);
     }
 }

@@ -9,8 +9,6 @@
  */
 package ptrman.levels.retina.helper;
 
-import ptrman.misc.Assert;
-
 import java.util.*;
 
 import static ptrman.levels.retina.helper.ProcessConnector.EnumMode.*;
@@ -32,42 +30,34 @@ public class ProcessConnector<Type> {
         return new ProcessConnector<>(new ArrayDeque<>(), new ArrayList<>(), mode);
     }
 
-    private ProcessConnector(Queue<Type> queueImplementation, List<Type> workspaceImplementation, EnumMode mode) {
+    private ProcessConnector(final Queue<Type> queueImplementation, final List<Type> workspaceImplementation, final EnumMode mode) {
         this.queue = queueImplementation;
         this.workspace = workspaceImplementation;
         this.mode = mode;
     }
 
     public List<Type> getWorkspace() {
-        Assert.Assert(mode == WORKSPACE || mode == PRIMARY_QUEUE, "");
-        Assert.Assert(workspace != null, "");
+        assert mode == WORKSPACE || mode == PRIMARY_QUEUE : "ASSERT: " + "";
+        assert workspace != null : "ASSERT: " + "";
         return workspace;
     }
 
-    public void addAll(Collection<Type> elements) {
-        if( mode == WORKSPACE || mode == PRIMARY_QUEUE ) {
-            workspace.addAll(elements);
-        }
+    public void addAll(final Collection<Type> elements) {
+        if( mode == WORKSPACE || mode == PRIMARY_QUEUE ) workspace.addAll(elements);
 
-        if( mode == QUEUE || mode == PRIMARY_QUEUE ) {
-            queue.addAll(elements);
-        }
+        if( mode == QUEUE || mode == PRIMARY_QUEUE ) queue.addAll(elements);
 
     }
 
-    public void add(Type element) {
+    public void add(final Type element) {
 
-        if( mode == WORKSPACE || mode == PRIMARY_QUEUE ) {
-            workspace.add(element);
-        }
+        if( mode == WORKSPACE || mode == PRIMARY_QUEUE ) workspace.add(element);
 
-        if( mode == QUEUE || mode == PRIMARY_QUEUE ) {
-            queue.add(element);
-        }
+        if( mode == QUEUE || mode == PRIMARY_QUEUE ) queue.add(element);
     }
 
     public Type poll() {
-        Assert.Assert( mode == QUEUE || mode == PRIMARY_QUEUE, "");
+        assert mode == QUEUE || mode == PRIMARY_QUEUE : "ASSERT: " + "";
         return queue.poll();
     }
 
@@ -76,13 +66,9 @@ public class ProcessConnector<Type> {
     }
 
     public void flush() {
-        if( workspace != null ) {
-            workspace.clear();
-        }
+        if( workspace != null ) workspace.clear();
 
-        if ( queue != null ) {
-            queue.clear();
-        }
+        if ( queue != null ) queue.clear();
     }
 
     public final EnumMode mode;

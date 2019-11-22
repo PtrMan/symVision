@@ -20,14 +20,14 @@ import static ptrman.math.ArrayRealVectorHelper.integerToArrayRealVector;
 public class ProcessBTest {
     @Test
     public void test() {
-        final BufferedImage testImage = drawTestImage();
-        final IMap2d<ColorRgb> colorMap = translateFromImageToMap(testImage);
+        final var testImage = drawTestImage();
+        final var colorMap = translateFromImageToMap(testImage);
 
         // setup the processing chain
 
-        VisualProcessor.ProcessingChain processingChain = new VisualProcessor.ProcessingChain();
+        final var processingChain = new VisualProcessor.ProcessingChain();
 
-        Dag.Element newDagElement = new Dag.Element(
+        var newDagElement = new Dag.Element(
             new VisualProcessor.ProcessingChain.ChainElementColorFloat(
                 new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
                 "convertRgbToGrayscale",
@@ -52,16 +52,13 @@ public class ProcessBTest {
 
         processingChain.filterChain(colorMap);
 
-        IMap2d<Boolean> mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement)processingChain.filterChainDag.elements.get(1).content).result;
+        final IMap2d<Boolean> mapBoolean = ((VisualProcessor.ProcessingChain.ApplyChainElement)processingChain.filterChainDag.elements.get(1).content).result;
 
-        ProcessA processA = new ProcessA();
+        final var processA = new ProcessA();
 
-        IMap2d<Integer> dummyObjectIdMap = new Map2d<>(mapBoolean.getWidth(), mapBoolean.getLength());
-        for( int y = 0; y < dummyObjectIdMap.getLength(); y++ ) {
-            for( int x = 0; x < dummyObjectIdMap.getWidth(); x++ ) {
-                dummyObjectIdMap.setAt(x, y, 0);
-            }
-        }
+        final IMap2d<Integer> dummyObjectIdMap = new Map2d<>(mapBoolean.getWidth(), mapBoolean.getLength());
+        for(var y = 0; y < dummyObjectIdMap.getLength(); y++ )
+            for (var x = 0; x < dummyObjectIdMap.getWidth(); x++) dummyObjectIdMap.setAt(x, y, 0);
 
         /*
 
@@ -103,14 +100,14 @@ public class ProcessBTest {
          *
          * we use the whole image, in phaeaco he worked with the incomplete image witht the guiding of processA, this is not implemented that way
          */
-        public void process(List<ProcessA.Sample> samples, IMap2d<Boolean> image) {
+        public void process(final List<ProcessA.Sample> samples, final IMap2d<Boolean> image) {
             Vector2d<Integer> foundPosition;
 
-            final int MAXRADIUS = 100;
+            final var MAXRADIUS = 100;
 
-            for( ProcessA.Sample iterationSample : samples ) {
+            for( final var iterationSample : samples ) {
 
-                Tuple2<Vector2d<Integer>, Double> nearestResult = findNearestPositionWhereMapIs(false,
+                final var nearestResult = findNearestPositionWhereMapIs(false,
                     arrayRealVectorToInteger(real(iterationSample.position), ArrayRealVectorHelper.EnumRoundMode.DOWN), image, MAXRADIUS);
 
                 if( nearestResult == null ) {
@@ -131,33 +128,33 @@ public class ProcessBTest {
          */
         private static Tuple2<Vector2d<Integer>, Double> findNearestPositionWhereMapIs(final boolean value, final Vector2d<Integer> position, final IMap2d<Boolean> image, final int radius) {
 
-            Vector2d<Integer> outwardIteratorOffsetUnbound = new Vector2d<>(0, 0);
-            Vector2d<Integer> borderMin = new Vector2d<>(0, 0);
-            Vector2d<Integer> borderMax = new Vector2d<>(image.getWidth(), image.getLength());
+            final var outwardIteratorOffsetUnbound = new Vector2d<Integer>(0, 0);
+            final var borderMin = new Vector2d<Integer>(0, 0);
+            final var borderMax = new Vector2d<Integer>(image.getWidth(), image.getLength());
 
-            Vector2d<Integer> positionAsInt = position;
+            final var positionAsInt = position;
 
-            Vector2d<Integer> one = new Vector2d<>(1, 1);
+            final var one = new Vector2d<Integer>(1, 1);
 
             while (-outwardIteratorOffsetUnbound.x <= radius) {
 
                 Vector2d<Integer> bestPosition = null;
-                double bestDistanceSquared = Double.MAX_VALUE;
+                var bestDistanceSquared = Double.MAX_VALUE;
 
-                final Vector2d<Integer> iteratorOffsetBoundMin = Vector2d.IntegerHelper.max(borderMin, Vector2d.IntegerHelper.add(outwardIteratorOffsetUnbound, positionAsInt));
-                final Vector2d<Integer> iteratorOffsetBoundMax = Vector2d.IntegerHelper.min4(borderMax, Vector2d.IntegerHelper.add((Vector2d<Integer>) Vector2d.IntegerHelper.add(
+                final var iteratorOffsetBoundMin = Vector2d.IntegerHelper.max(borderMin, Vector2d.IntegerHelper.add(outwardIteratorOffsetUnbound, positionAsInt));
+                final var iteratorOffsetBoundMax = Vector2d.IntegerHelper.min4(borderMax, Vector2d.IntegerHelper.add((Vector2d<Integer>) Vector2d.IntegerHelper.add(
                     Vector2d.IntegerHelper.getScaled(outwardIteratorOffsetUnbound, -1),
                     one), positionAsInt), borderMax, borderMax);
 
-                for (int y = iteratorOffsetBoundMin.y; y < iteratorOffsetBoundMax.y; y++) {
-                    for (int x = iteratorOffsetBoundMin.x; x < iteratorOffsetBoundMax.x; x++) {
-                        // just find at the border
+                // just find at the border
+                for (int y = iteratorOffsetBoundMin.y; y < iteratorOffsetBoundMax.y; y++)
+                    for (int x = iteratorOffsetBoundMin.x; x < iteratorOffsetBoundMax.x; x++)
                         if (y == (iteratorOffsetBoundMin.y) || y == iteratorOffsetBoundMax.y - 1 || x == (iteratorOffsetBoundMin.x) || x == iteratorOffsetBoundMax.x - 1) {
                             final boolean valueAtPoint = image.readAt(x, y);
 
                             if (valueAtPoint == value) {
-                                final ArrayRealVector diff = integerToArrayRealVector(new Vector2d<>(x, y)).subtract(integerToArrayRealVector(position));
-                                final double currentDistanceSquared = diff.dotProduct(diff);
+                                final var diff = integerToArrayRealVector(new Vector2d<>(x, y)).subtract(integerToArrayRealVector(position));
+                                final var currentDistanceSquared = diff.dotProduct(diff);
 
                                 if (currentDistanceSquared < bestDistanceSquared) {
                                     bestDistanceSquared = currentDistanceSquared;
@@ -167,12 +164,8 @@ public class ProcessBTest {
                                 //return new Tuple2(new Vector2d<>(x, y), (double)getLength(sub(new Vector2d<>((float) x, (float) y), Vector2d.ConverterHelper.convertIntVectorToFloat(position))));
                             }
                         }
-                    }
-                }
 
-                if (bestPosition != null) {
-                    return new Tuple2(bestPosition, Math.sqrt(bestDistanceSquared));
-                }
+                if (bestPosition != null) return new Tuple2(bestPosition, Math.sqrt(bestDistanceSquared));
 
                 outwardIteratorOffsetUnbound.x--;
                 outwardIteratorOffsetUnbound.y--;
@@ -185,17 +178,15 @@ public class ProcessBTest {
 
 
     // TODO< move this into the functionality of the visual processor >
-    private static IMap2d<ColorRgb> translateFromImageToMap(BufferedImage javaImage) {
-        DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
+    private static IMap2d<ColorRgb> translateFromImageToMap(final BufferedImage javaImage) {
+        final var imageBuffer = javaImage.getData().getDataBuffer();
 
-        int bufferI;
+        final IMap2d<ColorRgb> convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
 
-        IMap2d<ColorRgb> convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
-
-        for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ )
+        for(int bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ )
         {
 
-            int pixelValue = javaImage.getRGB(bufferI % convertedToMap.getWidth(), bufferI / convertedToMap.getWidth());
+            final var pixelValue = javaImage.getRGB(bufferI % convertedToMap.getWidth(), bufferI / convertedToMap.getWidth());
 
 
             convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(),
@@ -209,12 +200,12 @@ public class ProcessBTest {
 
 
     private static BufferedImage drawTestImage() {
-        final int RETINA_WIDTH = 256;
-        final int RETINA_HEIGHT = 256;
+        final var RETINA_WIDTH = 256;
+        final var RETINA_HEIGHT = 256;
 
-        BufferedImage resultImage = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+        final var resultImage = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
 
-        Graphics2D g2 = resultImage.createGraphics();
+        final var g2 = resultImage.createGraphics();
 
 
         g2.setColor(Color.BLACK);

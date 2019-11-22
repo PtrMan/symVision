@@ -10,7 +10,6 @@
 package ptrman.levels.retina.algorithms;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
-import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,10 +35,8 @@ public enum DeriveConvexHull {
      *
      * @return boolean of inclusion of point
      */
-    public static boolean considerPoint(final ArrayRealVector position, State state) {
-        if( isPointInside(position, state.cornerPositions) ) {
-            return false;
-        }
+    public static boolean considerPoint(final ArrayRealVector position, final State state) {
+        if( isPointInside(position, state.cornerPositions) ) return false;
         // if we are here the point was not inside the convex hull
 
         addPointToConvexHull(position, state);
@@ -52,21 +49,19 @@ public enum DeriveConvexHull {
         return getIndexOfEdgeWherePointIsOutside(position, cornerPositions) == -1;
     }
 
-    private static void addPointToConvexHull(final ArrayRealVector position, State state) {
+    private static void addPointToConvexHull(final ArrayRealVector position, final State state) {
         // * create new edge where point is outside
         // * update convex hull structure so it stays convex
 
-        final int indexOfCornerEdgeWherePointIsOutside = getIndexOfEdgeWherePointIsOutside(position, state.cornerPositions);
+        final var indexOfCornerEdgeWherePointIsOutside = getIndexOfEdgeWherePointIsOutside(position, state.cornerPositions);
 
 
         state.cornerPositions.add(indexOfCornerEdgeWherePointIsOutside, position);
 
         // correct the convex hull so it stays convex
-        for(;;) {
-            final boolean wasCorrected = keepConvexAndWasCorrected(state);
-            if( !wasCorrected ) {
-                break;
-            }
+        while (true) {
+            final var wasCorrected = keepConvexAndWasCorrected(state);
+            if( !wasCorrected ) break;
         }
     }
 
@@ -80,12 +75,12 @@ public enum DeriveConvexHull {
      * @param state ...
      * @return true if the convex hull was corrected
      */
-    private static boolean keepConvexAndWasCorrected(State state) {
-        for( int i = 0; i < state.cornerPositions.size(); i++ ) {
-            final ArrayRealVector centerPointPosition = state.cornerPositions.get(i);
+    private static boolean keepConvexAndWasCorrected(final State state) {
+        for(var i = 0; i < state.cornerPositions.size(); i++ ) {
+            final var centerPointPosition = state.cornerPositions.get(i);
 
-            final ArrayRealVector cornerPositionA = getCornerPositionAtIndexWrapAround(i-1, state.cornerPositions);
-            final ArrayRealVector cornerPositionB = getCornerPositionAtIndexWrapAround(i + 1, state.cornerPositions);
+            final var cornerPositionA = getCornerPositionAtIndexWrapAround(i-1, state.cornerPositions);
+            final var cornerPositionB = getCornerPositionAtIndexWrapAround(i + 1, state.cornerPositions);
 
             if( !isPointOnPositiveSide(centerPointPosition, cornerPositionA, cornerPositionB)) {
                 state.cornerPositions.remove(i);
@@ -101,24 +96,20 @@ public enum DeriveConvexHull {
     }
 
     private static int getIndexOfEdgeWherePointIsOutside(final ArrayRealVector position, final List<ArrayRealVector> cornerPositions) {
-        Assert.Assert(cornerPositions.size() >= 3, "not enougth corners");
+        assert cornerPositions.size() >= 3 : "ASSERT: " + "not enougth corners";
 
-        for( int i = 0; i < cornerPositions.size()-1; i++ ) {
-            final ArrayRealVector cornerPositionA = cornerPositions.get(i);
-            final ArrayRealVector cornerPositionB = cornerPositions.get(i+1);
+        for(var i = 0; i < cornerPositions.size()-1; i++ ) {
+            final var cornerPositionA = cornerPositions.get(i);
+            final var cornerPositionB = cornerPositions.get(i+1);
 
-            if( !isPointOnPositiveSide(position, cornerPositionA, cornerPositionB)) {
-                return i;
-            }
+            if( !isPointOnPositiveSide(position, cornerPositionA, cornerPositionB)) return i;
         }
 
         // check corner from lastIndex to 0
-        final ArrayRealVector cornerPositionA = cornerPositions.get(cornerPositions.size()-1);
-        final ArrayRealVector cornerPositionB = cornerPositions.get(0);
+        final var cornerPositionA = cornerPositions.get(cornerPositions.size()-1);
+        final var cornerPositionB = cornerPositions.get(0);
 
-        if( !isPointOnPositiveSide(position, cornerPositionA, cornerPositionB) ) {
-            return cornerPositions.size()-1;
-        }
+        if( !isPointOnPositiveSide(position, cornerPositionA, cornerPositionB) ) return cornerPositions.size() - 1;
 
         return -1;
     }
@@ -126,15 +117,15 @@ public enum DeriveConvexHull {
     private static boolean isPointOnPositiveSide(final ArrayRealVector position, final ArrayRealVector pa, final ArrayRealVector pb) {
         // project -> calculate projected position on line -> difference with point -> dot with rotated normal of pb-pa -> sign test
 
-        final ArrayRealVector normalizedDirection = normalize(pb.subtract(pa));
-        final ArrayRealVector unnormalizedDiff = position.subtract(pa);
+        final var normalizedDirection = normalize(pb.subtract(pa));
+        final var unnormalizedDiff = position.subtract(pa);
 
-        final double dot = normalizedDirection.dotProduct(unnormalizedDiff);
+        final var dot = normalizedDirection.dotProduct(unnormalizedDiff);
 
-        final ArrayRealVector projectedPosition = pa.add(getScaled(normalizedDirection, dot));
-        final ArrayRealVector positionDiff = position.subtract(projectedPosition);
+        final var projectedPosition = pa.add(getScaled(normalizedDirection, dot));
+        final var positionDiff = position.subtract(projectedPosition);
 
-        final ArrayRealVector tangent = getTangent(normalizedDirection);
+        final var tangent = getTangent(normalizedDirection);
 
         return tangent.dotProduct(positionDiff) < 0.0;
     }

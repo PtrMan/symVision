@@ -21,8 +21,8 @@ import java.util.List;
 public enum ArrayRealVectorHelper {
     ;
 
-    public static double diffDotProduct(IntIntPair a, IntIntPair b) {
-        final ArrayRealVector diff = new ArrayRealVector(new double[] {
+    public static double diffDotProduct(final IntIntPair a, final IntIntPair b) {
+        final var diff = new ArrayRealVector(new double[] {
             a.getOne() - b.getOne(), a.getTwo() - b.getTwo()
         });
         return diff.dotProduct(diff);
@@ -41,55 +41,49 @@ public enum ArrayRealVectorHelper {
         ;
 
         public static ArrayRealVector getTangent(final ArrayRealVector vector) {
-            final double[] vectorData = vector.getDataRef();
+            final var vectorData = vector.getDataRef();
 
-            final double x = vectorData[0];
-            final double y = vectorData[1];
+            final var x = vectorData[0];
+            final var y = vectorData[1];
 
             return new ArrayRealVector(new double[]{-y, x}, false);
         }
     }
 
-    public static ArrayRealVector normalize(ArrayRealVector vector) {
-        ArrayRealVector result = new ArrayRealVector(vector.getDimension());
-        double length = vector.getNorm();
-        double inverseLength = 1.0/length;
+    public static ArrayRealVector normalize(final ArrayRealVector vector) {
+        final var result = new ArrayRealVector(vector.getDimension());
+        final var length = vector.getNorm();
+        final var inverseLength = 1.0/length;
 
-        final double[] resultData = result.getDataRef();
-        final double[] vectorData = vector.getDataRef();
+        final var resultData = result.getDataRef();
+        final var vectorData = vector.getDataRef();
 
-        for( int i = 0; i < vectorData.length; i++ ) {
-            resultData[i] = inverseLength * vectorData[i];
-        }
+        for(var i = 0; i < vectorData.length; i++ ) resultData[i] = inverseLength * vectorData[i];
 
         return result;
     }
 
-    public static ArrayRealVector getScaled(ArrayRealVector vector, double scale) {
-        ArrayRealVector result = new ArrayRealVector(vector.getDimension());
+    public static ArrayRealVector getScaled(final ArrayRealVector vector, final double scale) {
+        final var result = new ArrayRealVector(vector.getDimension());
 
-        final double[] resultData = result.getDataRef();
-        final double[] vectorData = vector.getDataRef();
+        final var resultData = result.getDataRef();
+        final var vectorData = vector.getDataRef();
 
-        for( int i = 0; i < vectorData.length; i++ ) {
-            resultData[i] = vectorData[i] * scale;
-        }
+        for(var i = 0; i < vectorData.length; i++ ) resultData[i] = vectorData[i] * scale;
 
         return result;
     }
     public static ArrayRealVector getScaled(final ArrayRealVector vector, final double scale, final ArrayRealVector result) {
-        final double[] resultData = result.getDataRef();
-        final double[] vectorData = vector.getDataRef();
+        final var resultData = result.getDataRef();
+        final var vectorData = vector.getDataRef();
 
-        for( int i = 0; i < vector.getDimension(); i++ ) {
-            resultData[i] = vectorData[i] * scale;
-        }
+        for(var i = 0; i < vector.getDimension(); i++ ) resultData[i] = vectorData[i] * scale;
 
         return result;
     }
 
-    public static Vector2d<Integer> arrayRealVectorToInteger(ArrayRealVector vector, EnumRoundMode roundMode) {
-        final double[] vectorData = vector.getDataRef();
+    public static Vector2d<Integer> arrayRealVectorToInteger(final ArrayRealVector vector, final EnumRoundMode roundMode) {
+        final var vectorData = vector.getDataRef();
         return roundMode == EnumRoundMode.NEAREST ?
             new Vector2d<>((int) (vectorData[0]), (int) (vectorData[1])) :
             new Vector2d<>((int) Math.floor(vectorData[0]), (int) Math.floor(vectorData[1]));
@@ -97,37 +91,32 @@ public enum ArrayRealVectorHelper {
     }
 
     public static ArrayRealVector getAverage(final List<ArrayRealVector> elements) {
-        ArrayRealVector result = new ArrayRealVector(elements.get(0).getDimension());
+        final var result = new ArrayRealVector(elements.get(0).getDimension());
 
-        for( final ArrayRealVector currentElement : elements ) {
-            //result = result.add(currentElement);
-            result.combineToSelf(1,1, currentElement);
+        //result = result.add(currentElement);
+        for( final var currentElement : elements ) result.combineToSelf(1, 1, currentElement);
 
-        }
-
-        final double[] d = result.getDataRef();
-        for( int i = 0; i < elements.get(0).getDimension(); i++ ) {
-            d[i] /= elements.size();
-        }
+        final var d = result.getDataRef();
+        for(var i = 0; i < elements.get(0).getDimension(); i++ ) d[i] /= elements.size();
 
         return result;
     }
 
     /** cartesian distance */
-    public static double distance(ArrayRealVector a, ArrayRealVector b) {
+    public static double distance(final ArrayRealVector a, final ArrayRealVector b) {
         return a.getDistance(b);
     }
     /** cartesian distance */
-    public static double distance(IntIntPair a, ArrayRealVector b) {
-        double dx = b.getEntry(0) - a.getOne();
-        double dy = b.getEntry(1) - a.getTwo();
+    public static double distance(final IntIntPair a, final ArrayRealVector b) {
+        final var dx = b.getEntry(0) - a.getOne();
+        final var dy = b.getEntry(1) - a.getTwo();
         return Math.sqrt( dx*dx+dy*dy);
     }
     // TODO< rename class >
     /** cartesian distance */
-    public static double distance(IntIntPair a, IntIntPair b) {
-        double dx = b.getOne() - a.getOne();
-        double dy = b.getTwo() - a.getTwo();
+    public static double distance(final IntIntPair a, final IntIntPair b) {
+        final double dx = b.getOne() - a.getOne();
+        final double dy = b.getTwo() - a.getTwo();
         return Math.sqrt( dx*dx+dy*dy);
     }
 }

@@ -27,7 +27,7 @@ public enum TestGroupingForObjectCenters
 {
     ;
 
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         test();
     }
     
@@ -38,18 +38,17 @@ public enum TestGroupingForObjectCenters
     private static void testClustering1() {
         // for testing we use the numerosity node as content to tell the elements apart
 
-        Collection<Pattern> exemplars = new ArrayList<>();
-
-        IMatchingUpdate matchingUpdateImplementation = new MatchingUpdateImplementationForObjectCenters(10.0f, 0.6f);
+        final IMatchingUpdate matchingUpdateImplementation = new MatchingUpdateImplementationForObjectCenters(10.0f, 0.6f);
         
-        MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass patternA = new MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass();
+        final var patternA = new MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass();
         patternA.clusterCenter = new Vector2d<>(5.0f, 0.0f);
         patternA.exemplars = new ArrayList<>();
         patternA.exemplars.add(new NumeriosityNode(null));
         ((NumeriosityNode)patternA.exemplars.get(0)).numerosity = 0;
+        final Collection<Pattern> exemplars = new ArrayList<>();
         exemplars.add(patternA);
         
-        MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass patternB = new MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass();
+        final var patternB = new MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass();
         patternB.clusterCenter = new Vector2d<>(6.0f, 0.0f);
         patternB.exemplars = new ArrayList<>();
         patternB.exemplars.add(new NumeriosityNode(null));
@@ -57,7 +56,7 @@ public enum TestGroupingForObjectCenters
         exemplars.add(patternB);
         
         // pattern C is external
-        MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass patternC = new MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass();
+        final var patternC = new MatchingUpdateImplementationForObjectCenters.PatternWithCenterAndMass();
         patternC.clusterCenter = new Vector2d<>(17.0f, 0.0f);
         patternC.exemplars = new ArrayList<>();
         patternC.exemplars.add(new NumeriosityNode(null));

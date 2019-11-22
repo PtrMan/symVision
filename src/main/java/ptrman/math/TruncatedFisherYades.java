@@ -26,21 +26,18 @@ public class TruncatedFisherYades<Type>
         Type generate(int index);
     }
     
-    public TruncatedFisherYades(int numberOfElements, IGenerator<Type> generator)
-    {
-        int i;
-        
-        for( i = 0; i < numberOfElements; i++ )
-        {
-            candidates.add(generator.generate(i));
-        }
-    }
-    
-    public Type takeOne(Random random)
+    public TruncatedFisherYades(final int numberOfElements, final IGenerator<Type> generator)
     {
 
-        int chosenIndex = random.nextInt(candidates.size());
-        Type result = candidates.get(chosenIndex);
+        for(int i = 0; i < numberOfElements; i++ )
+            candidates.add(generator.generate(i));
+    }
+    
+    public Type takeOne(final Random random)
+    {
+
+        final var chosenIndex = random.nextInt(candidates.size());
+        final var result = candidates.get(chosenIndex);
         swapWithLast(chosenIndex);
         
         // remove last element
@@ -49,18 +46,18 @@ public class TruncatedFisherYades<Type>
         return result;
     }
     
-    private void swapWithLast(int index)
+    private void swapWithLast(final int index)
     {
         Type element;
 
-        int lastIndex = candidates.size() - 1;
+        final var lastIndex = candidates.size() - 1;
         swap(index, lastIndex);
     }
     
-    private void swap(int indexA, int indexB)
+    private void swap(final int indexA, final int indexB)
     {
 
-        Type element = candidates.get(indexA);
+        final var element = candidates.get(indexA);
         candidates.set(indexA, candidates.get(indexB));
         candidates.set(indexB, element);
     }

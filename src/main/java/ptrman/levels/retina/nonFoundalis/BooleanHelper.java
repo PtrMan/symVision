@@ -7,24 +7,27 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package ptrman.math;
+package ptrman.levels.retina.nonFoundalis;
 
 /**
- * Non-axiomatic logic  truth value computations
+ *
  */
-public enum NalTv {
-    ;
-    public static final double HORIZON = 1.0;
+public enum BooleanHelper {
+	;
 
-    public final static double w2c(final double w) {
-        return w / (w + HORIZON);
+	public static boolean[] booleanNot(final boolean[] array) {
+        final var result = new boolean[array.length];
+
+        for(var i = 0; i < result.length; i++ ) result[i] = !array[i];
+
+        return result;
     }
 
-    public final static double c2w(final double conf) {
-        return HORIZON * conf / (1 - conf);
-    }
+    public static boolean[] booleanAnd(final boolean[] a, final boolean[] b) {
+        final var result = new boolean[a.length];
 
-    public final static double calcRevConf(double confA, double confB) {
-        return w2c( c2w(confA)+c2w(confB) );
+        for(var i = 0; i < result.length; i++ ) result[i] = a[i] && b[i];
+
+        return result;
     }
 }

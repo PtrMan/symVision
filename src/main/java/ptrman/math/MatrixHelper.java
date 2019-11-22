@@ -17,13 +17,10 @@ public enum MatrixHelper {
 	;
 
 	public static float[] convertMatrixToArray(final RealMatrix matrix) {
-        float[] result = new float[16];
+        final var result = new float[16];
 
-        for( int row = 0; row < 4; row++ ) {
-            for( int column = 0; column < 4; column++ ) {
-                result[row*4+column] = (float)matrix.getRow(row)[column];
-            }
-        }
+        for(var row = 0; row < 4; row++ )
+            for (var column = 0; column < 4; column++) result[row * 4 + column] = (float) matrix.getRow(row)[column];
 
         return result;
     }
@@ -41,16 +38,14 @@ public enum MatrixHelper {
     */
 
     public static Array2DRowRealMatrix getIdentityMatrix() {
-        Array2DRowRealMatrix result = new Array2DRowRealMatrix(4, 4);
-        for( int i = 0; i < 4; i++ ) {
-            result.setEntry(i, i, 1);
-        }
+        final var result = new Array2DRowRealMatrix(4, 4);
+        for(var i = 0; i < 4; i++ ) result.setEntry(i, i, 1);
 
         return result;
     }
 
     public static Array2DRowRealMatrix getTranslationMatrix(final ArrayRealVector translation) {
-        Array2DRowRealMatrix result = getIdentityMatrix();
+        final var result = getIdentityMatrix();
         result.setEntry(3, 0, translation.getDataRef()[0]);
         result.setEntry(3, 1, translation.getDataRef()[1]);
         result.setEntry(3, 2, translation.getDataRef()[2]);
@@ -58,7 +53,7 @@ public enum MatrixHelper {
     }
 
     public static Array2DRowRealMatrix getScaleMatrix(final ArrayRealVector scale) {
-        Array2DRowRealMatrix result = getIdentityMatrix();
+        final var result = getIdentityMatrix();
         result.setEntry(0, 0, scale.getDataRef()[0]);
         result.setEntry(1, 1, scale.getDataRef()[1]);
         result.setEntry(2, 2, scale.getDataRef()[2]);

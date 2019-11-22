@@ -10,8 +10,11 @@
 package ptrman.meter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 /**
  * Convenience implementation for a 1-signal meter
@@ -21,38 +24,31 @@ public abstract class FunctionMeter<M> implements Meter<M> {
     private final List<Signal> signals;
     private M[] vector;
 
-    public static String[] newDefaultSignalIDs(String prefix, int n) {
-        String[] s = new String[n];
-        for (int i = 0; i < n; i++)
-            s[i] = prefix + '_' + i;
+    public static String[] newDefaultSignalIDs(final String prefix, final int n) {
+        final var s = IntStream.range(0, n).mapToObj(i -> prefix + '_' + i).toArray(String[]::new);
         return s;
     }
-    public static String[] newDefaultSignalIDs(String prefix, String... prefixes) {
-        String[] s = new String[prefixes.length];
-        for (int i = 0; i < prefixes.length; i++)
-            s[i] = prefix + '_' + prefixes[i];
+    public static String[] newDefaultSignalIDs(final String prefix, final String... prefixes) {
+        final var s = Arrays.stream(prefixes).map(item -> prefix + '_' + item).toArray(String[]::new);
         return s;
     }
     
-    public FunctionMeter(String prefix, int n) {
+    public FunctionMeter(final String prefix, final int n) {
         this(newDefaultSignalIDs(prefix, n));
     }
-    public FunctionMeter(String prefix, boolean noop, String... prefixes) {
+    public FunctionMeter(final String prefix, final boolean noop, final String... prefixes) {
         this(newDefaultSignalIDs(prefix, prefixes));
     }
     
-    public FunctionMeter(String... ids) {
-        List<Signal> s = new ArrayList();
-        for (String n : ids) {
-            s.add(new Signal(n, null));
-        }
+    public FunctionMeter(final String... ids) {
+        final var s = Arrays.stream(ids).map(n -> new Signal(n, null)).collect(Collectors.toList());
 
         this.signals = Collections.unmodifiableList(s);
     }
     
-    public void setUnits(String... units) { 
-        int i = 0;
-        for (Signal s : signals)
+    public void setUnits(final String... units) {
+        var i = 0;
+        for (final var s : signals)
             s.unit = units[i++];
     }
 
@@ -63,22 +59,17 @@ public abstract class FunctionMeter<M> implements Meter<M> {
 
     abstract protected M getValue(Object key, int index);
 
-    protected void fillVector(Object key, int fromIndex, int toIndex) {
-        for (int i = 0; i < vector.length; i++) {
-            vector[i] = getValue(key, i);
-        }
+    protected void fillVector(final Object key, final int fromIndex, final int toIndex) {
+        for (var i = 0; i < vector.length; i++) vector[i] = getValue(key, i);
 
     }
 
     @Override
-    public M[] sample(Object key) {
-        if (vector == null) {
-            //the following wont work because firstValue may be null
-            //M firstValue = getValue(key, 0);            
-            //vector = (M[]) Array.newInstance(firstValue.getClass(), signals.size());
-            vector = (M[]) new Object[signals.size()];
-
-        }
+    public M[] sample(final Object key) {
+        //the following wont work because firstValue may be null
+        //M firstValue = getValue(key, 0);
+        //vector = (M[]) Array.newInstance(firstValue.getClass(), signals.size());
+        if (vector == null) vector = (M[]) new Object[signals.size()];
 
         fillVector(key, 0, vector.length);
         

@@ -15,7 +15,6 @@ import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import ptrman.misc.Assert;
 
 
 /**
@@ -23,22 +22,22 @@ import ptrman.misc.Assert;
  * calculates the length of a LineSegment
  */
 public class LineSegmentLength extends SolverCodelet {
-    public LineSegmentLength(Solver bpSolver) {
+    public LineSegmentLength(final Solver bpSolver) {
         super(bpSolver);
     }
     
     @Override
     public RunResult run() {
-        Assert.Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "startNode node type is wrong!");
-        Assert.Assert(((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode), "startNode is not a line!");
+        assert startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() : "ASSERT: " + "startNode node type is wrong!";
+        assert ((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) : "ASSERT: " + "startNode is not a line!";
 
-        PlatonicPrimitiveInstanceNode thisLine = (PlatonicPrimitiveInstanceNode)startNode;
+        final var thisLine = (PlatonicPrimitiveInstanceNode)startNode;
         
-        double lineSegmentLength = thisLine.p1.getDistance(thisLine.p2);
+        final var lineSegmentLength = thisLine.p1.getDistance(thisLine.p2);
 
-        FeatureNode createdLineSegmentLength = FeatureNode.createFloatNode(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode, lineSegmentLength, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode));
+        final var createdLineSegmentLength = FeatureNode.createFloatNode(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode, lineSegmentLength, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().lineSegmentFeatureLineLengthPrimitiveNode));
         
-        Link createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdLineSegmentLength);
+        final var createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdLineSegmentLength);
         thisLine.out(createdLink);
         
         return new RunResult(false);
@@ -52,7 +51,7 @@ public class LineSegmentLength extends SolverCodelet {
     @Override
     public SolverCodelet cloneObject() {
 
-        LineSegmentLength cloned = new LineSegmentLength(bpSolver);
+        final var cloned = new LineSegmentLength(bpSolver);
         
         return cloned;
     }

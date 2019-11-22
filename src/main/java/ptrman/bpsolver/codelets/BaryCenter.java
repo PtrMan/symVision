@@ -17,7 +17,6 @@ import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import ptrman.misc.Assert;
 
 import static ptrman.math.ArrayRealVectorHelper.getScaled;
 
@@ -33,7 +32,7 @@ public class BaryCenter extends SolverCodelet {
         NO
     }
     
-    public BaryCenter(Solver bpSolver, EnumRecalculate recalculate) {
+    public BaryCenter(final Solver bpSolver, final EnumRecalculate recalculate) {
         super(bpSolver);
         this.recalculate = recalculate;
     }
@@ -50,33 +49,27 @@ public class BaryCenter extends SolverCodelet {
 
     @Override
     public RunResult run() {
-        if( hasObjectAlreadyABaryCenter() && recalculate == EnumRecalculate.NO ) {
-            return new RunResult(false);
-        }
+        if( hasObjectAlreadyABaryCenter() && recalculate == EnumRecalculate.NO ) return new RunResult(false);
         
-        final ArrayRealVector calculatedBaryCenter = calculateBaryCenter();
+        final var calculatedBaryCenter = calculateBaryCenter();
         
         // now we store the calculated barycenter
         if( hasObjectAlreadyABaryCenter() ) {
 
-            PlatonicPrimitiveInstanceNode baryCenterInstanceNode = getBaryCenterNodeOfObject();
-            Assert.Assert(baryCenterInstanceNode != null, "");
-            
+            final var baryCenterInstanceNode = getBaryCenterNodeOfObject();
+            assert baryCenterInstanceNode != null : "ASSERT: " + "";
+
             // update the coordinate nodes
             
-            for( Link iterationLink : baryCenterInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
-                if( iterationLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() ) {
-                    continue;
-                }
+            for( final var iterationLink : baryCenterInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
+                if( iterationLink.target.type != NodeTypes.EnumType.FEATURENODE.ordinal() ) continue;
                 
-                final FeatureNode targetFeatureNode = (FeatureNode)iterationLink.target;
+                final var targetFeatureNode = (FeatureNode)iterationLink.target;
                 
-                if( targetFeatureNode.featureTypeNode.equals(getNetworkHandles().xCoordinatePlatonicPrimitiveNode) ) {
+                if( targetFeatureNode.featureTypeNode.equals(getNetworkHandles().xCoordinatePlatonicPrimitiveNode) )
                     targetFeatureNode.setValueAsFloat(calculatedBaryCenter.getDataRef()[0]);
-                }
-                else if( targetFeatureNode.featureTypeNode.equals(getNetworkHandles().yCoordinatePlatonicPrimitiveNode) ) {
+                else if( targetFeatureNode.featureTypeNode.equals(getNetworkHandles().yCoordinatePlatonicPrimitiveNode) )
                     targetFeatureNode.setValueAsFloat(calculatedBaryCenter.getDataRef()[1]);
-                }
                 // else ignore
             }
         }
@@ -89,8 +82,8 @@ public class BaryCenter extends SolverCodelet {
             // create barycenter node and link it to the object
             // add the coordinate nodes
 
-            PlatonicPrimitiveInstanceNode createdBaryCenterInstanceNode = HelperFunctions.createVectorAttributeNode(calculatedBaryCenter, getNetworkHandles().barycenterPlatonicPrimitiveNode, bpSolver);
-            Link linkToBaryCenter = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdBaryCenterInstanceNode);
+            final var createdBaryCenterInstanceNode = HelperFunctions.createVectorAttributeNode(calculatedBaryCenter, getNetworkHandles().barycenterPlatonicPrimitiveNode, bpSolver);
+            final var linkToBaryCenter = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdBaryCenterInstanceNode);
             startNode.out(linkToBaryCenter);
             
         }
@@ -104,18 +97,15 @@ public class BaryCenter extends SolverCodelet {
     
     // returns null if the object has no BaryCenter
     private PlatonicPrimitiveInstanceNode getBaryCenterNodeOfObject() {
-        for( Link iterationLink : startNode.getLinksByType(Link.EnumType.HASATTRIBUTE)) {
+        for( final var iterationLink : startNode.getLinksByType(Link.EnumType.HASATTRIBUTE)) {
 
-            if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
-                continue;
-            }
+            if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) continue;
             // is platonic primitive instance node
 
-            PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNodeOfTarget = (PlatonicPrimitiveInstanceNode) iterationLink.target;
+            final var platonicPrimitiveInstanceNodeOfTarget = (PlatonicPrimitiveInstanceNode) iterationLink.target;
             
-            if( !platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(getNetworkHandles().barycenterPlatonicPrimitiveNode) ) {
+            if( !platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(getNetworkHandles().barycenterPlatonicPrimitiveNode) )
                 continue;
-            }
             
             return platonicPrimitiveInstanceNodeOfTarget;
         }
@@ -124,28 +114,26 @@ public class BaryCenter extends SolverCodelet {
     }
     
     private ArrayRealVector calculateBaryCenter() {
-        float weight = 0.0f;
+        var weight = 0.0f;
 
-        ArrayRealVector baryCenter = new ArrayRealVector(new double[]{0.0, 0.0});
+        var baryCenter = new ArrayRealVector(new double[]{0.0, 0.0});
 
-        for( Link iterationLink : startNode.getLinksByType(Link.EnumType.CONTAINS)) {
+        for( final var iterationLink : startNode.getLinksByType(Link.EnumType.CONTAINS)) {
 
-            if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
-                continue;
-            }
+            if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) continue;
             // is platonic primitive instance node
 
-            PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNodeOfTarget = (PlatonicPrimitiveInstanceNode) iterationLink.target;
+            final var platonicPrimitiveInstanceNodeOfTarget = (PlatonicPrimitiveInstanceNode) iterationLink.target;
             
             if( platonicPrimitiveInstanceNodeOfTarget.primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) ) {
-                final ArrayRealVector centerOfLine = getScaled(platonicPrimitiveInstanceNodeOfTarget.p1.add(platonicPrimitiveInstanceNodeOfTarget.p2), 0.5);
+                final var centerOfLine = getScaled(platonicPrimitiveInstanceNodeOfTarget.p1.add(platonicPrimitiveInstanceNodeOfTarget.p2), 0.5);
                 
                 if( weight == 0.0f ) {
                     baryCenter = centerOfLine;
                     weight = 1.0f;
                 }
                 else {
-                    ArrayRealVector tempVector = baryCenter.add(getScaled(centerOfLine, 1.0f / weight));
+                    var tempVector = baryCenter.add(getScaled(centerOfLine, 1.0f / weight));
                     tempVector = getScaled(tempVector, 1.0f/(weight+1.0f));
                     
                     weight += 1.0f;

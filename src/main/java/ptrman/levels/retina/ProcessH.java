@@ -10,19 +10,15 @@
 package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
-import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.levels.retina.helper.ProcessConnector;
-import ptrman.math.NalTv;
-import ptrman.misc.Assert;
 
 import java.util.Collection;
 import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
 
 import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimitives;
 
@@ -33,38 +29,35 @@ import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimiti
  */
 public class ProcessH implements IProcess {
 
-    public float maxFusionsPerCycle = 0.15f; //adjustable
+    public final float maxFusionsPerCycle = 0.15f; //adjustable
 
     public ProcessConnector<RetinaPrimitive> resultPrimitiveConnector;
     public ProcessConnector<RetinaPrimitive> inputPrimitiveConnection;
 
     public Vector2d<Integer> imageSize;
 
-    public int GRIDSIZE = 8;
+    public final int GRIDSIZE = 8;
     public IMap2d<Boolean> accelerationMap;
 
-    public void set(ProcessConnector<RetinaPrimitive> inputPrimitiveConnection, ProcessConnector<RetinaPrimitive> resultPrimitiveConnector) {
+    public void set(final ProcessConnector<RetinaPrimitive> inputPrimitiveConnection, final ProcessConnector<RetinaPrimitive> resultPrimitiveConnector) {
         this.inputPrimitiveConnection = inputPrimitiveConnection;
         this.resultPrimitiveConnector = resultPrimitiveConnector;
     }
 
     @Override
-    public void setImageSize(Vector2d<Integer> imageSize) {
+    public void setImageSize(final Vector2d<Integer> imageSize) {
         this.imageSize = imageSize;
     }
 
     @Override
     public void setup() {
-        Assert.Assert((imageSize.x % GRIDSIZE) == 0, "");
-        Assert.Assert((imageSize.y % GRIDSIZE) == 0, "");
+        assert (imageSize.x % GRIDSIZE) == 0 : "ASSERT: " + "";
+        assert (imageSize.y % GRIDSIZE) == 0 : "ASSERT: " + "";
 
         accelerationMap = new Map2d<>(imageSize.x / GRIDSIZE, imageSize.y / GRIDSIZE);
 
-        for( int y = 0; y < accelerationMap.getLength(); y++ ) {
-            for( int x = 0; x < accelerationMap.getWidth(); x++ ) {
-                accelerationMap.setAt(x, y, false);
-            }
-        }
+        for(var y = 0; y < accelerationMap.getLength(); y++ )
+            for (var x = 0; x < accelerationMap.getWidth(); x++) accelerationMap.setAt(x, y, false);
     }
 
     @Override
@@ -74,11 +67,11 @@ public class ProcessH implements IProcess {
 
     @Override
     public void processData() {
-        List<RetinaPrimitive> allInputDetectors = inputPrimitiveConnection.getWorkspace();
+        final var allInputDetectors = inputPrimitiveConnection.getWorkspace();
 
-        IntObjectHashMap<Deque<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(allInputDetectors);
+        final var objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(allInputDetectors);
 
-        objectIdToRetinaPrimitivesMap.forEachKeyValue( (k, v) -> {
+        objectIdToRetinaPrimitivesMap.forEachKeyValue((IntObjectProcedure<Deque<RetinaPrimitive>>) (k, v) -> {
             combineOfObjectId(v, k, maxFusionsPerCycle);
 
             // transfer the detectors into the result
@@ -92,7 +85,7 @@ public class ProcessH implements IProcess {
 
     }
 
-    public static void combineOfObjectId(Deque<RetinaPrimitive> workingDetectors, final int objectId, float maxFusionPercent) {
+    public static void combineOfObjectId(final Deque<RetinaPrimitive> workingDetectors, final int objectId, final float maxFusionPercent) {
         // called low and high because the index low is always lower than high
 
 
@@ -106,44 +99,40 @@ public class ProcessH implements IProcess {
         //terminate = true;
 
 
-
-        int remainingCombinations = (int) Math.ceil( maxFusionPercent * workingDetectors.size() );
+        var remainingCombinations = (int) Math.ceil( maxFusionPercent * workingDetectors.size() );
 
 
         //System.out.println("H: START detectors=" + workingDetectors.size());
 
-        Iterator<RetinaPrimitive> a = workingDetectors.iterator();
+        final var a = workingDetectors.iterator();
 
         while (a.hasNext()) {
-            SingleLineDetector detectorLow = a.next().line;
+            final var detectorLow = a.next().line;
 
             //Assert.Assert(workingDetectors.get(iteratorLow).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
 
-            Iterator<RetinaPrimitive> b = workingDetectors.descendingIterator();
+            final var b = workingDetectors.descendingIterator();
             while (b.hasNext()) {
-                SingleLineDetector detectorHigh = b.next().line;
+                final var detectorHigh = b.next().line;
 
                 //Assert.Assert(workingDetectors.get(iteratorHigh).type == RetinaPrimitive.EnumType.LINESEGMENT, "");
 
-                if (detectorHigh.serial <= detectorLow.serial) {
-                    //exclude reverse order permutations (triangular matrix)
-                    break;
-                }
+                //exclude reverse order permutations (triangular matrix)
+                if (detectorHigh.serial <= detectorLow.serial) break;
 
 
-
-                boolean fused = false;
+                var fused = false;
 
                 if( canDetectorsBeFusedOverlap(detectorLow, detectorHigh) ) {
 
-                    SingleLineDetector fusedLineDetector = fuseLineDetectorsOverlap(detectorLow, detectorHigh);
+                    final var fusedLineDetector = fuseLineDetectorsOverlap(detectorLow, detectorHigh);
                     addNewLine(workingDetectors, objectId, fusedLineDetector);
 
                     fused = true;
                 }
                 else if( canDetectorsBeFusedInside(detectorLow, detectorHigh) ) {
 
-                    SingleLineDetector fusedLineDetector = fuseLineDetectorsInside(detectorLow, detectorHigh);
+                    final var fusedLineDetector = fuseLineDetectorsInside(detectorLow, detectorHigh);
                     addNewLine(workingDetectors, objectId, fusedLineDetector);
 
                     fused = true;
@@ -167,9 +156,9 @@ public class ProcessH implements IProcess {
         }
     }
 
-    private static void addNewLine(Collection<RetinaPrimitive> workingDetectors, int objectId, SingleLineDetector fusedLineDetector) {
+    private static void addNewLine(final Collection<RetinaPrimitive> workingDetectors, final int objectId, final SingleLineDetector fusedLineDetector) {
 
-        RetinaPrimitive newLine = RetinaPrimitive.makeLine(fusedLineDetector);
+        final var newLine = RetinaPrimitive.makeLine(fusedLineDetector);
         newLine.objectId = objectId;
         workingDetectors.add(newLine);
     }
@@ -187,31 +176,31 @@ public class ProcessH implements IProcess {
 //    }
 
     // overlap case
-    private static boolean canDetectorsBeFusedOverlap(SingleLineDetector detectorA, SingleLineDetector detectorB) {
+    private static boolean canDetectorsBeFusedOverlap(final SingleLineDetector detectorA, final SingleLineDetector detectorB) {
         // TODO< vertical special case >
 
-        ArrayRealVector projectedABegin = detectorA.getAProjected();
-        ArrayRealVector projectedAEnd = detectorA.getBProjected();
-        ArrayRealVector projectedBBegin = detectorB.getAProjected();
-        ArrayRealVector projectedBEnd = detectorB.getBProjected();
+        var projectedABegin = detectorA.getAProjected();
+        var projectedAEnd = detectorA.getBProjected();
+        var projectedBBegin = detectorB.getAProjected();
+        var projectedBEnd = detectorB.getBProjected();
 
-        SingleLineDetector inplaceDetectorA = detectorA;
-        SingleLineDetector inplaceDetectorB = detectorB;
+        var inplaceDetectorA = detectorA;
+        var inplaceDetectorB = detectorB;
 
         // we need to sort them after the x of the begin, so ABegin.x is always the lowest
         if( projectedBBegin.getDataRef()[0] < projectedABegin.getDataRef()[0] ) {
 
 
-            ArrayRealVector tempBegin = projectedABegin;
+            final var tempBegin = projectedABegin;
             projectedABegin = projectedBBegin;
             projectedBBegin = tempBegin;
 
-            ArrayRealVector tempEnd = projectedAEnd;
+            final var tempEnd = projectedAEnd;
             projectedAEnd = projectedBEnd;
             projectedBEnd = tempEnd;
 
 
-            SingleLineDetector tempDetector = inplaceDetectorA;
+            final var tempDetector = inplaceDetectorA;
             inplaceDetectorA = inplaceDetectorB;
             inplaceDetectorB = tempDetector;
         }
@@ -219,29 +208,25 @@ public class ProcessH implements IProcess {
         if( vectorXBetweenInclusive(projectedABegin, projectedAEnd, projectedBBegin) && vectorXBetweenInclusive(projectedBBegin, projectedBEnd, projectedAEnd) )
         {
         }
-        else {
-            return false;
-        }
+        else return false;
 
         // projecting the points on the other line and measue the distance
 
-        if( !isProjectedPointOntoLineBelowDistanceLimit(projectedBBegin, inplaceDetectorA) ) {
-            return false;
-        }
+        if( !isProjectedPointOntoLineBelowDistanceLimit(projectedBBegin, inplaceDetectorA) ) return false;
 
         return isProjectedPointOntoLineBelowDistanceLimit(projectedAEnd, inplaceDetectorB);
     }
 
     // fusing for overlap case
-    private static SingleLineDetector fuseLineDetectorsOverlap(SingleLineDetector detectorA, SingleLineDetector detectorB) {
+    private static SingleLineDetector fuseLineDetectorsOverlap(final SingleLineDetector detectorA, final SingleLineDetector detectorB) {
         // TODO< vertical special case >
 
         // we fuse them with taking the lowest begin-x as the begin and the other as the end
 
-        ArrayRealVector projectedABegin = detectorA.getAProjected();
-        ArrayRealVector projectedAEnd = detectorA.getBProjected();
-        ArrayRealVector projectedBBegin = detectorB.getAProjected();
-        ArrayRealVector projectedBEnd = detectorB.getBProjected();
+        var projectedABegin = detectorA.getAProjected();
+        final var projectedAEnd = detectorA.getBProjected();
+        final var projectedBBegin = detectorB.getAProjected();
+        var projectedBEnd = detectorB.getBProjected();
 
         // we need to sort them after the x of the begin, so ABegin.x is always the lowest
         // TODO BUG FIXME< the variables after the switching are not used >
@@ -251,41 +236,37 @@ public class ProcessH implements IProcess {
             projectedABegin = projectedBBegin;
             //projectedBBegin = tempBegin;
 
-            ArrayRealVector /*tempBegin, */tempEnd = projectedAEnd;
+            final var /*tempBegin, */tempEnd = projectedAEnd;
             //projectedAEnd = projectedBEnd;
             projectedBEnd = tempEnd;
         }
 
 
-        double conf = NalTv.calcRevConf(detectorA.conf, detectorB.conf);
-        SingleLineDetector fusedLineDetector = SingleLineDetector.createFromFloatPositions(projectedABegin, projectedBEnd, conf);
+        final var conf = NalTv.calcRevConf(detectorA.conf, detectorB.conf);
+        final var fusedLineDetector = SingleLineDetector.createFromFloatPositions(projectedABegin, projectedBEnd, conf);
         fusedLineDetector.resultOfCombination = true;
         return fusedLineDetector;
     }
 
     // inside case
-    private static boolean canDetectorsBeFusedInside(SingleLineDetector detectorA, SingleLineDetector detectorB) {
+    private static boolean canDetectorsBeFusedInside(final SingleLineDetector detectorA, final SingleLineDetector detectorB) {
         // TODO< vertical special case >
 
         // which case?
-        if( vectorXBetweenInclusive(detectorA.a, detectorA.b, detectorB.a) && vectorXBetweenInclusive(detectorA.a, detectorA.b, detectorB.b)  ) {
-            // detectorB inside detectorA ?
+        // detectorB inside detectorA ?
+        if( vectorXBetweenInclusive(detectorA.a, detectorA.b, detectorB.a) && vectorXBetweenInclusive(detectorA.a, detectorA.b, detectorB.b)  )
             return isProjectedPointOntoLineBelowDistanceLimit(detectorB.a, detectorA) && isProjectedPointOntoLineBelowDistanceLimit(detectorB.b, detectorA);
-        }
-        else if( vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.a) && vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.b) ) {
-            // detectorA inside detectorB ?
-            return isProjectedPointOntoLineBelowDistanceLimit(detectorA.a, detectorB) && isProjectedPointOntoLineBelowDistanceLimit(detectorA.b, detectorB);
-        }
-        else {
-            return false;
-        }
+        else // detectorA inside detectorB ?
+            if( vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.a) && vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.b) )
+                return isProjectedPointOntoLineBelowDistanceLimit(detectorA.a, detectorB) && isProjectedPointOntoLineBelowDistanceLimit(detectorA.b, detectorB);
+        else return false;
     }
 
     // TODO fuseLineDetectorsInside
-    private static SingleLineDetector fuseLineDetectorsInside(SingleLineDetector detectorA, SingleLineDetector detectorB) {
-        SingleLineDetector fusedLineDetector;
+    private static SingleLineDetector fuseLineDetectorsInside(final SingleLineDetector detectorA, final SingleLineDetector detectorB) {
+        final SingleLineDetector fusedLineDetector;
 
-        double conf = NalTv.calcRevConf(detectorA.conf, detectorB.conf);
+        final var conf = NalTv.calcRevConf(detectorA.conf, detectorB.conf);
 
         // TODO< vertical special case >
 
@@ -298,7 +279,7 @@ public class ProcessH implements IProcess {
             return fusedLineDetector;
         }
         else {
-            Assert.Assert(vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.a) && vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.b), "");
+            assert vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.a) && vectorXBetweenInclusive(detectorB.a, detectorB.b, detectorA.b) : "ASSERT: " + "";
 
             // detectorA inside detectorB
 
@@ -312,19 +293,19 @@ public class ProcessH implements IProcess {
      * checks if the value.x is between min.x and max.x
      *
      */
-    private static boolean vectorXBetween(ArrayRealVector min, ArrayRealVector max, ArrayRealVector value) {
-        final double[] vData = value.getDataRef();
+    private static boolean vectorXBetween(final ArrayRealVector min, final ArrayRealVector max, final ArrayRealVector value) {
+        final var vData = value.getDataRef();
         return vData[0] > min.getDataRef()[0] && vData[0] < max.getDataRef()[0];
     }
 
-    private static boolean vectorXBetweenInclusive(ArrayRealVector min, ArrayRealVector max, ArrayRealVector value) {
-        final double[] vData = value.getDataRef();
+    private static boolean vectorXBetweenInclusive(final ArrayRealVector min, final ArrayRealVector max, final ArrayRealVector value) {
+        final var vData = value.getDataRef();
         return vData[0] >= min.getDataRef()[0] && vData[0] <= max.getDataRef()[0];
     }
 
-    private static boolean isProjectedPointOntoLineBelowDistanceLimit(ArrayRealVector point, SingleLineDetector line) {
-        ArrayRealVector projectedPoint = line.projectPointOntoLine(point);
-        double distanceBetweenProjectedAndPoint = projectedPoint.getDistance(point);
+    private static boolean isProjectedPointOntoLineBelowDistanceLimit(final ArrayRealVector point, final SingleLineDetector line) {
+        final var projectedPoint = line.projectPointOntoLine(point);
+        final var distanceBetweenProjectedAndPoint = projectedPoint.getDistance(point);
 
         return distanceBetweenProjectedAndPoint < HardParameters.ProcessH.MAXDISTANCEFORCANDIDATEPOINT;
     }

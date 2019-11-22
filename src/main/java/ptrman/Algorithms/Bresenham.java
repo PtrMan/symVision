@@ -28,19 +28,20 @@ public enum Bresenham {
         void set(final IntIntPair position, final IntIntPair direction);
     }
 
-    public static void rasterCircle(final IntIntPair position, final int radius, IDrawer drawer) {
-        int f = 1 - radius;
-        int ddF_x = 0;
-        int ddF_y = -2 * radius;
-        int x = 0;
-        int y = radius;
+    public static void rasterCircle(final IntIntPair position, final int radius, final IDrawer drawer) {
 
-        int positionx = position.getOne(), positiony = position.getTwo();
+        final var positionx = position.getOne();
+        final var positiony = position.getTwo();
         drawer.set(pair(positionx, positiony + radius), pair(0, 1));
         drawer.set(pair(positionx, positiony - radius), pair(0, -1));
         drawer.set(pair(positionx + radius, positiony), pair(1, 0));
         drawer.set(pair(positionx - radius, positiony), pair(-1, 0));
 
+        var y = radius;
+        var x = 0;
+        var ddF_y = -2 * radius;
+        var ddF_x = 0;
+        var f = 1 - radius;
         while(x < y) {
             if(f >= 0) {
                 y--;
@@ -62,12 +63,12 @@ public enum Bresenham {
         }
     }
 
-    public static void rasterLine(final IntIntPair a, final IntIntPair b, IDrawer drawer) {
+    public static void rasterLine(final IntIntPair a, final IntIntPair b, final IDrawer drawer) {
         // special cases
-        int ay = a.getTwo();
-        int by = b.getTwo();
-        int ax = a.getOne();
-        int bx = b.getOne();
+        final var ay = a.getTwo();
+        final var by = b.getTwo();
+        final var ax = a.getOne();
+        final var bx = b.getOne();
         if( ay == by) {
             final int x1, x2;
 
@@ -80,9 +81,7 @@ public enum Bresenham {
                 x2 = b.getOne();
             }
 
-            for( int x = x1; x <= x2; x++ ) {
-                drawer.set(pair(x, ay), null);
-            }
+            for(var x = x1; x <= x2; x++ ) drawer.set(pair(x, ay), null);
 
             return;
         }
@@ -99,9 +98,7 @@ public enum Bresenham {
                 y2 = by;
             }
 
-            for( int y = y1; y <= y2; y++ ) {
-                drawer.set(pair(ax, y), null);
-            }
+            for(var y = y1; y <= y2; y++ ) drawer.set(pair(ax, y), null);
 
             return;
         }
@@ -109,26 +106,24 @@ public enum Bresenham {
         rasterLineBresenham(a, b, drawer);
     }
 
-    private static void rasterLineBresenham(final IntIntPair a, final IntIntPair b, IDrawer drawer) {
-        final int dx = java.lang.Math.abs(b.getOne() - a.getOne());
-        final int dy = -java.lang.Math.abs(b.getTwo() - a.getTwo());
+    private static void rasterLineBresenham(final IntIntPair a, final IntIntPair b, final IDrawer drawer) {
+        final var dx = java.lang.Math.abs(b.getOne() - a.getOne());
+        final var dy = -java.lang.Math.abs(b.getTwo() - a.getTwo());
 
-        final int sx = signumWithoutZero(b.getOne() - a.getOne());
-        final int sy = signumWithoutZero(b.getTwo() - a.getTwo());
+        final var sx = signumWithoutZero(b.getOne() - a.getOne());
+        final var sy = signumWithoutZero(b.getTwo() - a.getTwo());
 
-        int err = dx+dy;
+        var err = dx+dy;
 
-        int x = a.getOne();
-        int y = a.getTwo();
+        var x = a.getOne();
+        var y = a.getTwo();
 
-        for(;;) {
+        while (true) {
             drawer.set(pair(x, y), null);
 
-            if( x == b.getOne() && y == b.getTwo() ) {
-                break;
-            }
+            if( x == b.getOne() && y == b.getTwo() ) break;
 
-            int e2 = 2*err;
+            final var e2 = 2*err;
 
             if( e2 > dy ) {
                 err += dy; x += sx;

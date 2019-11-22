@@ -17,7 +17,6 @@ import ptrman.bpsolver.HardParameters;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.levels.retina.helper.SpatialDrawer;
 import ptrman.levels.retina.helper.SpatialListMap2d;
-import ptrman.misc.Assert;
 
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +32,7 @@ public class ProcessC implements IProcess {
 
     private SpatialListMap2d<ProcessA.Sample> accelerationMap;
 
-    public int maxSortedSamples = 8;
+    public final int maxSortedSamples = 8;
 
     public int gridsize = 8;
     private Vector2d<Integer> imageSize;
@@ -49,7 +48,7 @@ public class ProcessC implements IProcess {
     private static class SampleWithDistance implements Comparable<SampleWithDistance> {
 
 
-        public SampleWithDistance(ProcessA.Sample sample, double distance) {
+        public SampleWithDistance(final ProcessA.Sample sample, final double distance) {
             this.sample = sample;
             this.distance = distance;
             used = true;
@@ -62,7 +61,7 @@ public class ProcessC implements IProcess {
         public boolean used = false; // used for the sorted array
 
         @Override
-        public int compareTo(SampleWithDistance o) {
+        public int compareTo(final SampleWithDistance o) {
             return Double.compare(distance, o.distance);
         }
     }
@@ -71,10 +70,8 @@ public class ProcessC implements IProcess {
 
     }
 
-    public void set(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> resultSampleConnector, ProcessConnector<ProcessA.Sample> resultSamplesToProcessF) {
-        if( inputSampleConnector.getWorkspace() == null ) {
-            throw new RuntimeException("inputSampleConnector must be a workspace Connector!");
-        }
+    public void set(final ProcessConnector<ProcessA.Sample> inputSampleConnector, final ProcessConnector<ProcessA.Sample> resultSampleConnector, final ProcessConnector<ProcessA.Sample> resultSamplesToProcessF) {
+        assert inputSampleConnector.getWorkspace() != null : "inputSampleConnector must be a workspace Connector!";
 
         this.inputSampleConnector = inputSampleConnector;
         this.resultSamplesToProcessF = resultSamplesToProcessF;
@@ -82,13 +79,13 @@ public class ProcessC implements IProcess {
     }
 
     @Override
-    public void setImageSize(Vector2d<Integer> imageSize) {
+    public void setImageSize(final Vector2d<Integer> imageSize) {
         this.imageSize = imageSize;
     }
 
     @Override
     public void setup() {
-        Assert.Assert(imageSize != null, "imagesize is null");
+        assert imageSize != null : "ASSERT: " + "imagesize is null";
 
         accelerationMap = new SpatialListMap2d<>(imageSize, gridsize);
     }
@@ -103,78 +100,71 @@ public class ProcessC implements IProcess {
         processData(1f);
     }
 
-    public void processData(float throttle) {
+    public void processData(final float throttle) {
 
         // clean acceleration map
         accelerationMap.clear();
 
         // fill
-        for( final ProcessA.Sample iterationSample : inputSampleConnector.getWorkspace()  ) {
-            final IntIntPair p = accelerationMap.getCellPositionOfIntegerPosition(iterationSample.position);
-            List<ProcessA.Sample> samplesOfCell = accelerationMap.addAt(p.getOne(), p.getTwo(), iterationSample);
+        for( final var iterationSample : inputSampleConnector.getWorkspace()  ) {
+            final var p = accelerationMap.getCellPositionOfIntegerPosition(iterationSample.position);
+            final var samplesOfCell = accelerationMap.addAt(p.getOne(), p.getTwo(), iterationSample);
         }
 
 
-        int maxSortedSamples = (int)Math.ceil( this.maxSortedSamples * throttle );
+        final var maxSortedSamples = (int)Math.ceil( this.maxSortedSamples * throttle );
 
-        for( int outerI = 0; outerI < inputSampleConnector.getWorkspace().size(); outerI++ ) {
+        for(var outerI = 0; outerI < inputSampleConnector.getWorkspace().size(); outerI++ ) {
 
 
 
             //SampleWithDistance[] sortedArray = createSortedArray();
 
-            ProcessA.Sample outerSample = inputSampleConnector.getWorkspace().get(outerI);
+            final var outerSample = inputSampleConnector.getWorkspace().get(outerI);
 
-            int numberOfConsideredSamples = 0;
+            var numberOfConsideredSamples = 0;
 
-            int maxRadius = (int)java.lang.Math.sqrt(imageSize.x*imageSize.y);
+            var maxRadius = (int)java.lang.Math.sqrt(imageSize.x*imageSize.y);
 
-            for( int currentRadius = 0; currentRadius < maxRadius; currentRadius++ ) {
-                if( numberOfConsideredSamples >= 8 ) {
-                    maxRadius = Math.min(currentRadius + 2, maxRadius);
-                }
+            for(var currentRadius = 0; currentRadius < maxRadius; currentRadius++ ) {
+                if( numberOfConsideredSamples >= 8 ) maxRadius = Math.min(currentRadius + 2, maxRadius);
 
-                List<IntIntPair> cellPositionsToScan;
+                final List<IntIntPair> cellPositionsToScan;
 
                 if( currentRadius == 0 ) {
                     cellPositionsToScan = new FastList<>(1);
                     cellPositionsToScan.add(accelerationMap.getCellPositionOfIntegerPosition(outerSample.position));
                 }
-                else {
+                else
                     cellPositionsToScan = SpatialDrawer.getPositionsOfCellsOfCircleBound(accelerationMap.getCellPositionOfIntegerPosition(outerSample.position), currentRadius, pair(accelerationMap.getWidth(), accelerationMap.getLength()));
-                }
 
-                for( final IntIntPair currentCellPosition : cellPositionsToScan ) {
-                    final List<ProcessA.Sample> samplesOfCurrentCell = accelerationMap.readAt(currentCellPosition.getOne(), currentCellPosition.getTwo());
-                    if (samplesOfCurrentCell!=null) {
+                for( final var currentCellPosition : cellPositionsToScan ) {
+                    final var samplesOfCurrentCell = accelerationMap.readAt(currentCellPosition.getOne(), currentCellPosition.getTwo());
+                    if (samplesOfCurrentCell!=null) for (final var iterationSample : samplesOfCurrentCell) {
+                        // we don't want to calculate it for the same sample
+                        if (iterationSample.equals(outerSample)) continue;
 
-                        for (final ProcessA.Sample iterationSample : samplesOfCurrentCell) {
-                            // we don't want to calculate it for the same sample
-                            if (iterationSample.equals(outerSample)) {
-                                continue;
-                            }
+                        final var distance = calculateDistanceBetweenSamples(outerSample, iterationSample);
 
-                            final double distance = calculateDistanceBetweenSamples(outerSample, iterationSample);
-
-                            numberOfConsideredSamples++;
+                        numberOfConsideredSamples++;
 
 
-                            if (sortedSamples.size() < maxSortedSamples || distance < sortedSamples.getLast().distance) {
-                                SampleWithDistance sd = new SampleWithDistance(iterationSample, distance);
+                        if (sortedSamples.size() < maxSortedSamples || distance < sortedSamples.getLast().distance) {
+                            final var sd = new SampleWithDistance(iterationSample, distance);
 
-                                /** binary insertion sort: sort order: lowest distance first */
-                                int index = Collections.binarySearch(sortedSamples, sd);
-                                if (index < 0) {
-                                    index = -(index + 1);
-                                    if (index < maxSortedSamples) {
-                                        sortedSamples.add(index, sd);
-                                        while (sortedSamples.size() > maxSortedSamples)
-                                            sortedSamples.remove(sortedSamples.size() - 1);
-                                    }
+                            /** binary insertion sort: sort order: lowest distance first */
+                            var index = Collections.binarySearch(sortedSamples, sd);
+                            if (index < 0) {
+                                index = -(index + 1);
+                                if (index < maxSortedSamples) {
+                                    sortedSamples.add(index, sd);
+                                    while (sortedSamples.size() > maxSortedSamples)
+                                        sortedSamples.remove(sortedSamples.size() - 1);
                                 }
                             }
+                        }
 
-                            //sortedSamples.add(sd);
+                        //sortedSamples.add(sd);
 
 //                            putSampleWithDistanceIntoSortedArray(, sortedArray);
 //                            Arrays.sort(sortedArray, new Comparator<SampleWithDistance>() {
@@ -182,7 +172,6 @@ public class ProcessC implements IProcess {
 //                                    return Double.compare(a.distance, b.distance);
 //                                }
 //                            });
-                        }
                     }
                 }
             }
@@ -192,15 +181,11 @@ public class ProcessC implements IProcess {
             if( noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(sortedSamples, outerSample) ) {
                 outerSample.type = ProcessA.Sample.EnumType.ENDOSCELETON;
 
-                if( outerSample.altitude >= HardParameters.ProcessC.FILLEDREGIONALTITUDETHRESHOLD ) {
-                    if( random.nextFloat() < HardParameters.ProcessC.FILLEDREGIONCANDIDATEPROPABILITY ) {
+                if( outerSample.altitude >= HardParameters.ProcessC.FILLEDREGIONALTITUDETHRESHOLD )
+                    if (random.nextFloat() < HardParameters.ProcessC.FILLEDREGIONCANDIDATEPROPABILITY)
                         resultSamplesToProcessF.add(outerSample);
-                    }
-                }
             }
-            else {
-                outerSample.type = ProcessA.Sample.EnumType.EXOSCELETON;
-            }
+            else outerSample.type = ProcessA.Sample.EnumType.EXOSCELETON;
 
             resultSampleConnector.add(outerSample);
 
@@ -251,30 +236,26 @@ public class ProcessC implements IProcess {
 //    }
 
     
-    private static double calculateDistanceBetweenSamples(ProcessA.Sample a, ProcessA.Sample b) {
+    private static double calculateDistanceBetweenSamples(final ProcessA.Sample a, final ProcessA.Sample b) {
         if (a==b) return 0;
 
         //a.position.getDistance(b.position);
-        double dx = b.position.getOne() - a.position.getOne();
-        double dy = b.position.getTwo() - a.position.getTwo();
+        final double dx = b.position.getOne() - a.position.getOne();
+        final double dy = b.position.getTwo() - a.position.getTwo();
         return Math.sqrt(dx*dx+dy*dy);
     }
     
-    private static boolean noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(Iterable<SampleWithDistance> neightborArray, ProcessA.Sample compareSample) {
-        int numberOfNeightborsWithAltitudeStrictlyGreaterThan = 0;
+    private static boolean noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(final Iterable<SampleWithDistance> neightborArray, final ProcessA.Sample compareSample) {
+        var numberOfNeightborsWithAltitudeStrictlyGreaterThan = 0;
 
-        for (SampleWithDistance s : neightborArray) {
-            if( !s.used ) {
-                return true;
-            }
+        for (final var s : neightborArray) {
+            if( !s.used ) return true;
             // else here
 
             if( s.sample.altitude > compareSample.altitude ) {
                 numberOfNeightborsWithAltitudeStrictlyGreaterThan++;
 
-                if( numberOfNeightborsWithAltitudeStrictlyGreaterThan > 2 ) {
-                    return false;
-                }
+                if( numberOfNeightborsWithAltitudeStrictlyGreaterThan > 2 ) return false;
             }
         }
         

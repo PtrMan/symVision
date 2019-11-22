@@ -1,5 +1,6 @@
 package ptrman.bpsolver;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
@@ -23,111 +24,99 @@ public class SolverTest {
         Parameters.init();
     }
 
-    @Test
+   @Ignore
+   @Test
     public void testAnglePointV() {
-        Solver bpSolver = new Solver();
+        final var bpSolver = new Solver();
         bpSolver.setImageSize(new Vector2d<>(100, 100));
         
         
 
-        BufferedImage javaImage = drawToJavaImage(bpSolver);
-        Map2d<Boolean> image = drawToImage(javaImage);
+        final var javaImage = drawToJavaImage(bpSolver);
+        final var image = drawToImage(javaImage);
 
-        List<Node> nodes = getNodesFromImage(image, bpSolver);
+        final var nodes = getNodesFromImage(image, bpSolver);
         
-        for( Node iterationNode : nodes ) {
+        for( final var iterationNode : nodes ) {
 
-            boolean doesHaveAtLeastOneVAnglePoint = doesNodeHaveAtLeastOneVAnglePoint(iterationNode, bpSolver.networkHandles);
+            final var doesHaveAtLeastOneVAnglePoint = doesNodeHaveAtLeastOneVAnglePoint(iterationNode, bpSolver.networkHandles);
             if( doesHaveAtLeastOneVAnglePoint ) {
                 // pass
-                int DEBUG0 = 0;
+                final var DEBUG0 = 0;
             }
         }
         
         // fail
         // TODO
         
-        int x = 0;
+        final var x = 0;
         
         // TODO< check for at least one V anglepoint >
     }
     
-    private static boolean doesNodeHaveAtLeastOneVAnglePoint(Node node, NetworkHandles networkHandles) {
+    private static boolean doesNodeHaveAtLeastOneVAnglePoint(final Node node, final NetworkHandles networkHandles) {
 
-        ArrayList<Node> doneList = new ArrayList<>();
-        ArrayList<Node> nodeHeap = new ArrayList<>();
+        final var nodeHeap = new ArrayList<Node>();
         nodeHeap.add(node);
-        
-        for(;;) {
 
-            if( nodeHeap.size() == 0) {
-                return false;
-            }
+        final var doneList = new ArrayList<Node>();
+        while (true) {
 
-            Node currentNode = nodeHeap.get(0);
+            if( nodeHeap.size() == 0) return false;
+
+            final var currentNode = nodeHeap.get(0);
             nodeHeap.remove(0);
             
-            if( doneList.contains(currentNode) ) {
-                continue;
-            }
+            if( doneList.contains(currentNode) ) continue;
             
             doneList.add(currentNode);
             
-            for( Link iterationLink : currentNode.out()) {
-                nodeHeap.add(iterationLink.target);
-            }
+            for( final var iterationLink : currentNode.out()) nodeHeap.add(iterationLink.target);
             
             if( currentNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
 
-                PlatonicPrimitiveInstanceNode currentNodeAsPlatonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode) currentNode;
-                
-                if( currentNodeAsPlatonicPrimitiveInstanceNode.primitiveNode.equals(networkHandles.anglePointNodePlatonicPrimitiveNode) ) {
-                    // test if it is a V
-                    for( Link iterationLink : currentNodeAsPlatonicPrimitiveInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
+                final var currentNodeAsPlatonicPrimitiveInstanceNode = (PlatonicPrimitiveInstanceNode) currentNode;
 
-                        if( !(iterationLink.target.type == NodeTypes.EnumType.ATTRIBUTENODE.ordinal()) ) {
-                            continue;
-                        }
+                // test if it is a V
+                if( currentNodeAsPlatonicPrimitiveInstanceNode.primitiveNode.equals(networkHandles.anglePointNodePlatonicPrimitiveNode) )
+                    for (final var iterationLink : currentNodeAsPlatonicPrimitiveInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE)) {
 
-                        AttributeNode targetAttributeNode = (AttributeNode) iterationLink.target;
-                        
-                        if( !targetAttributeNode.attributeTypeNode.equals(networkHandles.anglePointFeatureTypePrimitiveNode) ) {
+                        if (!(iterationLink.target.type == NodeTypes.EnumType.ATTRIBUTENODE.ordinal())) continue;
+
+                        final var targetAttributeNode = (AttributeNode) iterationLink.target;
+
+                        if (!targetAttributeNode.attributeTypeNode.equals(networkHandles.anglePointFeatureTypePrimitiveNode))
                             continue;
-                        }
                         // if here -> is a anglePointFeatureTypeNode
 
-                        AttributeNode anglePointTypeAttributeNode = targetAttributeNode;
+                        final var anglePointTypeAttributeNode = targetAttributeNode;
 
-                        int anglePointType = anglePointTypeAttributeNode.getValueAsInt();
-                        if( anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.V.ordinal() ) {
+                        final var anglePointType = anglePointTypeAttributeNode.getValueAsInt();
+                        if (anglePointType == PointProximityStrategy.Crosspoint.EnumAnglePointType.V.ordinal())
                             return true;
-                        }
                     }
-                }
             }
         }
     }
     
-    private static Map2d<Boolean> drawToImage(BufferedImage javaImage) {
-        DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
+    private static Map2d<Boolean> drawToImage(final BufferedImage javaImage) {
+        final var imageBuffer = javaImage.getData().getDataBuffer();
 
-        int bufferI;
+        final var convertedToMap = new Map2d<Boolean>(javaImage.getWidth(), javaImage.getHeight());
 
-        Map2d<Boolean> convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
+        for(int bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ ) {
 
-        for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ ) {
-
-            boolean convertedPixel = imageBuffer.getElem(bufferI) != 0;
+            final var convertedPixel = imageBuffer.getElem(bufferI) != 0;
             convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(), convertedPixel);
         }
 
         return convertedToMap;
     }
     
-    private static BufferedImage drawToJavaImage(Solver bpSolver) {
-        BufferedImage off_Image = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
+    private static BufferedImage drawToJavaImage(final Solver bpSolver) {
+        final var off_Image = new BufferedImage(bpSolver.getImageSize().x, bpSolver.getImageSize().y, BufferedImage.TYPE_INT_ARGB);
 
-        Graphics2D g2 = off_Image.createGraphics();
+        final var g2 = off_Image.createGraphics();
         g2.setColor(Color.BLACK);
 
         g2.drawLine(10, 10, 15, 30);
@@ -136,24 +125,21 @@ public class SolverTest {
         return off_Image;
     }
     
-    private static List<Node> getNodesFromImage(Map2d<Boolean> image, Solver bpSolver) {
+    private static List<Node> getNodesFromImage(final Map2d<Boolean> image, final Solver bpSolver) {
         // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
         bpSolver.coderack.flush();
         
-        ProcessA processA = new ProcessA();
-        ProcessB processB = new ProcessB();
+        final var processA = new ProcessA();
+        final var processB = new ProcessB();
         // ProcessC processC = new ProcessC(null); TODO< overwork >
-        ProcessD processD = new ProcessD();
-        ProcessH processH = new ProcessH();
-        ProcessE processE = new ProcessE();
-        ProcessM processM = new ProcessM();
+        final var processD = new ProcessD();
+        final var processH = new ProcessH();
+        final var processE = new ProcessE();
+        final var processM = new ProcessM();
 
-        IMap2d<Integer> dummyObjectIdMap = new Map2d<>(image.getWidth(), image.getLength());
-        for( int y = 0; y < dummyObjectIdMap.getLength(); y++ ) {
-            for( int x = 0; x < dummyObjectIdMap.getWidth(); x++ ) {
-                dummyObjectIdMap.setAt(x, y, 0);
-            }
-        }
+        final IMap2d<Integer> dummyObjectIdMap = new Map2d<>(image.getWidth(), image.getLength());
+        for(var y = 0; y < dummyObjectIdMap.getLength(); y++ )
+            for (var x = 0; x < dummyObjectIdMap.getWidth(); x++) dummyObjectIdMap.setAt(x, y, 0);
 
         throw new RuntimeException("Not implemented!");
 
@@ -206,33 +192,23 @@ public class SolverTest {
     }
     
     // TODO< refactor out >
-    private static List<Intersection> getAllLineIntersections(List<RetinaPrimitive> primitives) {
-        List<Intersection> uniqueIntersections = new ArrayList<>();
+    private static List<Intersection> getAllLineIntersections(final List<RetinaPrimitive> primitives) {
+        final List<Intersection> uniqueIntersections = new ArrayList<>();
 
-        for( RetinaPrimitive currentDetector : primitives ) {
+        for( final var currentDetector : primitives )
             findAndAddUniqueIntersections(uniqueIntersections, currentDetector.line.intersections);
-        }
 
         return uniqueIntersections;
     }
 
 
     // modifies uniqueIntersections
-    private static void findAndAddUniqueIntersections(List<Intersection> uniqueIntersections, List<Intersection> intersections) {
-        for( Intersection currentOuterIntersection : intersections ) {
+    private static void findAndAddUniqueIntersections(final List<Intersection> uniqueIntersections, final List<Intersection> intersections) {
+        for( final var currentOuterIntersection : intersections ) {
 
-            boolean found = false;
+            final var found = uniqueIntersections.stream().anyMatch(currentUnqiueIntersection -> currentUnqiueIntersection.equals(currentOuterIntersection));
 
-            for( Intersection currentUnqiueIntersection : uniqueIntersections ) {
-                if( currentUnqiueIntersection.equals(currentOuterIntersection) ) {
-                    found = true;
-                    break;
-                }
-            }
-
-            if( !found ) {
-                uniqueIntersections.add(currentOuterIntersection);
-            }
+            if( !found ) uniqueIntersections.add(currentOuterIntersection);
         }
     }
 }

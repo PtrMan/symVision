@@ -29,13 +29,13 @@ public class HashableVector2dInteger extends Vector2d<Integer> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (!(obj instanceof HashableVector2dInteger))
             return false;
         if (obj == this)
             return true;
 
-        final HashableVector2dInteger rhs = (HashableVector2dInteger)obj;
+        final var rhs = (HashableVector2dInteger)obj;
 
         return x == rhs.x && y == rhs.y;
     }

@@ -45,41 +45,39 @@ public class Network
     
     public void letAllNodesDecay()
     {
-        for( Node iterationNode : nodes )
+        for( final var iterationNode : nodes )
         {
 
-            float decayRate = depthToDecay.translateDepthToDecayrate(iterationNode.conceptualDepth);
+            final var decayRate = depthToDecay.translateDepthToDecayrate(iterationNode.conceptualDepth);
             iterationNode.activation *= (1.0f - decayRate);
         }
     }
     
     private void resetActivationDelta()
     {
-        for( Node iterationNode : nodes )
-        {
+        for( final var iterationNode : nodes )
             iterationNode.resetActivationDelta();
-        }
     }
     
     private void spreadActivationInternal()
     {
-        for( Node iterationNode : nodes ) {
+        for( final var iterationNode : nodes ) {
 
-            float sourceNodeActivation = iterationNode.activation;
+            final var sourceNodeActivation = iterationNode.activation;
             
-            for( Link iterationLink : iterationNode.out())
+            for( final var iterationLink : iterationNode.out())
                 iterationLink.target.activationDelta += (iterationLink.strength * sourceNodeActivation);
         }
     }
     
     private void addActivationDelta() {
-        for( Node n : nodes )
+        for( final var n : nodes )
             n.addActivationDelta();
     }
     
     private void limitActivation()
     {
-        for( Node n : nodes )
+        for( final var n : nodes )
             n.activation = Math.min(n.activation, 1.0f);
     }
     

@@ -17,11 +17,9 @@ public enum FunctionalHelper {
 	;
 
 	public static <ParameterType, ResultType> List<ResultType> apply(final Function<ParameterType,ResultType> function, final Iterable<ParameterType> parameters) {
-        List<ResultType> result = new ArrayList<>();
+        final List<ResultType> result = new ArrayList<>();
 
-        for( final ParameterType currentParameter : parameters) {
-            result.add(function.apply(currentParameter));
-        }
+        for( final var currentParameter : parameters) result.add(function.apply(currentParameter));
 
         return result;
     }

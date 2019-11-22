@@ -15,18 +15,16 @@ public class SingleLineDetectorTest  {
     @Test
     public void unittestProjectPoint() {
 
-		SingleLineDetector testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{1.0f, 2.0f}), new ArrayRealVector(new double[]{2.0f, 3.0f}), 0.2);
-		ArrayRealVector point = new ArrayRealVector(new double[]{2.0f, 1.0f}, false);
+        var testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{1.0f, 2.0f}), new ArrayRealVector(new double[]{2.0f, 3.0f}), 0.2);
+        var point = new ArrayRealVector(new double[]{2.0f, 1.0f}, false);
 
-		ArrayRealVector projectedPoint = testLine.projectPointOntoLine(point);
+        var projectedPoint = testLine.projectPointOntoLine(point);
 
+        //throw new RuntimeException("Unittest failed (1)");
         if( projectedPoint.getEntry(0) < 1.0f + 0.01f && projectedPoint.getEntry(0) > 1.0f - 0.01f && projectedPoint.getEntry(1) < 2.0f + 0.01f && projectedPoint.getEntry(1) > 2.0f - 0.01f ) {
             // all fine
         }
-        else {
-            //throw new RuntimeException("Unittest failed (1)");
-			fail();
-        }
+        else fail();
 
 
         testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{1.0f, 2.0f}), new ArrayRealVector(new double[]{2.0f, 2.0f}), 0.2);
@@ -34,13 +32,11 @@ public class SingleLineDetectorTest  {
 
         projectedPoint = testLine.projectPointOntoLine(point);
 
+        //throw new RuntimeException("Unittest failed (1)");
         if( projectedPoint.getEntry(0) < 2.0f + 0.01f && projectedPoint.getEntry(0) > 2.0f - 0.01f && projectedPoint.getEntry(1) < 2.0f + 0.01f && projectedPoint.getEntry(1) > 2.0f - 0.01f ) {
             // all fine
         }
-        else {
-            //throw new RuntimeException("Unittest failed (1)");
-			fail();
-        }
+        else fail();
 
         testLine = SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{0.0f, 1.0f}), new ArrayRealVector(new double[]{1.0f, 0.0f}), 0.2);
         point = new ArrayRealVector(new double[]{2.0f, 1.0f});

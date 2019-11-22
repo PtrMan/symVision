@@ -11,7 +11,7 @@ package ptrman.FargGeneral.network;
 
 public class Link
 {
-    public Link(EnumType type)
+    public Link(final EnumType type)
     {
         this.type = type;
     }
@@ -41,7 +41,7 @@ public class Link
         
         private final String string;
         
-        EnumType(String name){string = name;}
+        EnumType(final String name){string = name;}
 
         public String toString() {
             return string;

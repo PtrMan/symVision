@@ -21,17 +21,12 @@ public enum Map2dMapper
     ;
 
 
-    public static <X,Y> void map(Function<X, Y> f, IMap2d<X> m, IMap2d<Y> resultMap) {
-            int x, y;
+    public static <X,Y> void map(final Function<X, Y> f, final IMap2d<X> m, final IMap2d<Y> resultMap) {
 
-            int h = m.getLength();
-            int w = m.getWidth();
+        final var h = m.getLength();
+            final var w = m.getWidth();
 
-            for(y = 0; y < h; y++ ) {
-                for(x = 0; x < w; x++ ) {
-                    resultMap.setAt(x, y, f.apply(m.readAt(x, y)));
-                }
-            }
+            for(int y = 0; y < h; y++ ) for (int x = 0; x < w; x++) resultMap.setAt(x, y, f.apply(m.readAt(x, y)));
         }
 
 }

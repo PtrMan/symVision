@@ -16,7 +16,7 @@ public class SignalData {
     final int index;
     private Object[] data;
 
-    public SignalData(Metrics m, Signal s) {
+    public SignalData(final Metrics m, final Signal s) {
         this.metric = m;
         this.signal = s;
         this.index = metric.getSignals().indexOf(s);
@@ -27,9 +27,7 @@ public class SignalData {
     }
 
     public Object[] getDataCached() {
-        if (data == null) {
-            this.data = getData();
-        }
+        if (data == null) this.data = getData();
         return data;
     }
 
@@ -42,7 +40,7 @@ public class SignalData {
     }
 
     /** iterates any other signal in the metric's data, by its column ID's */
-    public Iterator<Object[]> iterateOtherSignals(int... columns) {
+    public Iterator<Object[]> iterateOtherSignals(final int... columns) {
         return metric.iterator(columns);
     }
 
@@ -52,7 +50,7 @@ public class SignalData {
     }
 
     /** iterates this signal's data in 1st index, along with one other column, in the 0th index */
-    public Iterator<Object[]> iteratorWith(int columns) {
+    public Iterator<Object[]> iteratorWith(final int columns) {
         return metric.iterator(columns, getIndex());
     }
 

@@ -9,8 +9,6 @@
  */
 package ptrman.FargGeneral;
 
-import ptrman.misc.Assert;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -21,13 +19,13 @@ public class PriorityQueue<Type> {
         public float priority = 0.0f;
     }
     
-    public PriorityQueue(Random random) {
+    public PriorityQueue(final Random random) {
         this.random = random;
     }
     
     public QueueElement getReference() {
 
-        int chosenIndex = getNextQueueIndex();
+        final var chosenIndex = getNextQueueIndex();
 
         return queue.get(chosenIndex);
     }
@@ -36,9 +34,9 @@ public class PriorityQueue<Type> {
     * 
     * only used for (re)filling
     */
-    public void add(Type value, float priority) {
+    public void add(final Type value, final float priority) {
 
-        QueueElement element = new QueueElement();
+        final var element = new QueueElement();
         element.priority = priority;
         element.value = value;
         
@@ -62,8 +60,8 @@ public class PriorityQueue<Type> {
     
     public QueueElement<Type> dequeueQueueElement() {
 
-        int chosenIndex = getNextQueueIndex();
-        QueueElement<Type> result = queue.get(chosenIndex);
+        final var chosenIndex = getNextQueueIndex();
+        final QueueElement<Type> result = queue.get(chosenIndex);
         queue.remove(chosenIndex);
         
         return result;
@@ -76,31 +74,29 @@ public class PriorityQueue<Type> {
 
         //System.Diagnostics.Debug.Assert(queue.Count > 0);
 
-        int priorityDiscreteRange = (int) (prioritySum / PRIORITYGRANULARITY);
-        int chosenDiscretePriority = random.nextInt(priorityDiscreteRange);
-        float remainingPriority = (float) chosenDiscretePriority * PRIORITYGRANULARITY;
+        final var priorityDiscreteRange = (int) (prioritySum / PRIORITYGRANULARITY);
+        final var chosenDiscretePriority = random.nextInt(priorityDiscreteRange);
+        var remainingPriority = (float) chosenDiscretePriority * PRIORITYGRANULARITY;
 
-        int chosenIndex = 0;
-        for (; ; ) {
-            Assert.Assert(chosenIndex <= queue.size(), "");
-            
+        var chosenIndex = 0;
+        while (true) {
+            assert chosenIndex <= queue.size() : "ASSERT: " + "";
+
             if( chosenIndex == queue.size() ) {
-                Assert.Assert(queue.size() != 0, "");
+                assert queue.size() != 0 : "ASSERT: " + "";
                 chosenIndex = queue.size() - 1;
                 
                 break;
             }
             
-            if( remainingPriority < queue.get(chosenIndex).priority ) {
-                break;
-            }
+            if( remainingPriority < queue.get(chosenIndex).priority ) break;
             // else
 
             remainingPriority -= queue.get(chosenIndex).priority;
             
             chosenIndex++;
         }
-        
+
         return chosenIndex;
     }
 

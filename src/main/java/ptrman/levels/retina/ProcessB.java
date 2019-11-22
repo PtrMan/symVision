@@ -14,12 +14,11 @@ import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import ptrman.Datastructures.*;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.ArrayRealVectorHelper;
-import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.Function;
+import java.util.function.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -41,7 +40,7 @@ public class ProcessB extends AbstractProcessB {
     public ProcessConnector<ProcessA.Sample> outputSampleConnector;
 
     @Override
-    public void set(IMap2d<Boolean> map, ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector) {
+    public void set(final IMap2d<Boolean> map, final ProcessConnector<ProcessA.Sample> inputSampleConnector, final ProcessConnector<ProcessA.Sample> outputSampleConnector) {
         this.inputMap = map;
         this.inputSampleConnector = inputSampleConnector;
         this.outputSampleConnector = outputSampleConnector;
@@ -61,31 +60,29 @@ public class ProcessB extends AbstractProcessB {
      */
     @Override
     public void processData() {
-        List<ProcessA.Sample> samples = inputSampleConnector.getWorkspace();
+        final var samples = inputSampleConnector.getWorkspace();
 
-        final int MAXRADIUS = (int)Math.ceil( Math.sqrt( imageSize.x*imageSize.x + imageSize.y*imageSize.y) ); // (int)Math.sqrt(squaredDistance(new double[]{(double)imageSize.x, (double)imageSize.y}));
-
-        final int GRIDSIZE_FOR_SPATIALACCELERATEDMAP2D = 8;
+        final var MAXRADIUS = (int)Math.ceil( Math.sqrt( imageSize.x*imageSize.x + imageSize.y*imageSize.y) ); // (int)Math.sqrt(squaredDistance(new double[]{(double)imageSize.x, (double)imageSize.y}));
 
         counterCellPositiveCandidates = 0;
         counterCellCandidates = 0;
 
         this.map = convertMapToFastBooleanMap2d(inputMap);
 
+        final var GRIDSIZE_FOR_SPATIALACCELERATEDMAP2D = 8;
         spatialAcceleratedMap2d = new SpatialAcceleratedMap2d(map, GRIDSIZE_FOR_SPATIALACCELERATEDMAP2D);
         spatialAcceleratedMap2d.recalculateGridCellStateMap();
         
-        for( ProcessA.Sample iterationSample : samples ) {
+        for( final var iterationSample : samples ) {
 
-            Tuple2<IntIntPair, Double> nearestResult = findNearestPositionWhereMapIs(false, iterationSample.position, map, MAXRADIUS);
-            if( nearestResult == null ) {
-                iterationSample.altitude =
+            final var nearestResult = findNearestPositionWhereMapIs(false, iterationSample.position, map, MAXRADIUS);
+            if( nearestResult == null ) iterationSample.altitude =
                     //TODO CHECK
                     //((MAXRADIUS+1)*2)*((MAXRADIUS+1)*2);
-                    Math.sqrt( Math.pow(((MAXRADIUS+1)*2),2) + Math.pow(((MAXRADIUS+1)*2),2 ));
-            } else {
+                    Math.sqrt(Math.pow(((MAXRADIUS + 1) * 2), 2) + Math.pow(((MAXRADIUS + 1) * 2), 2));
+            else {
                 // create a new sample to the output connector
-                ProcessA.Sample outputSample = iterationSample.getClone();
+                final var outputSample = iterationSample.getClone();
                 outputSample.altitude = nearestResult.e1;
                 outputSampleConnector.add(outputSample);
             }
@@ -98,15 +95,12 @@ public class ProcessB extends AbstractProcessB {
     public void postProcessData() {
     }
 
-    private static FastBooleanMap2d convertMapToFastBooleanMap2d(IMap2d<Boolean> map) {
-        final int roundUpWidth = 64 + map.getWidth() - (map.getWidth() % 64);
-        FastBooleanMap2d fastMap = new FastBooleanMap2d(roundUpWidth, map.getLength());
+    private static FastBooleanMap2d convertMapToFastBooleanMap2d(final IMap2d<Boolean> map) {
+        final var roundUpWidth = 64 + map.getWidth() - (map.getWidth() % 64);
+        final var fastMap = new FastBooleanMap2d(roundUpWidth, map.getLength());
 
-        for( int y = 0; y < map.getLength(); y++ ) {
-            for( int x = 0; x < map.getWidth(); x++ ) {
-                fastMap.setAt(x, y, map.readAt(x, y));
-            }
-        }
+        for(var y = 0; y < map.getLength(); y++ )
+            for (var x = 0; x < map.getWidth(); x++) fastMap.setAt(x, y, map.readAt(x, y));
 
         return fastMap;
     }
@@ -117,39 +111,36 @@ public class ProcessB extends AbstractProcessB {
      * 
      * \return null if no point could be found in the radius 
      */
-    private Tuple2<IntIntPair, Double> findNearestPositionWhereMapIs(boolean value, IntIntPair position, IMap2d<Boolean> image, int radius) {
+    private Tuple2<IntIntPair, Double> findNearestPositionWhereMapIs(final boolean value, final IntIntPair position, final IMap2d<Boolean> image, final int radius) {
         /* debug
         if( position.x > 80 && position.x < 90 && position.y > 60 && position.y < 70 ) {
             int x = 0;
         }
         */
 
-        IMap2d<Boolean> debugMap = new Map2d<>(spatialAcceleratedMap2d.getSize().x, spatialAcceleratedMap2d.getSize().y);
-        for( int y = 0; y < debugMap.getLength(); y++ ) {
-            for( int x = 0; x < debugMap.getWidth(); x++ ) {
-                debugMap.setAt(x, y, false);
-            }
-        }
+        final IMap2d<Boolean> debugMap = new Map2d<>(spatialAcceleratedMap2d.getSize().x, spatialAcceleratedMap2d.getSize().y);
+        for(var y = 0; y < debugMap.getLength(); y++ )
+            for (var x = 0; x < debugMap.getWidth(); x++) debugMap.setAt(x, y, false);
 
 //        final ArrayRealVector positionReal = ptrman.math.ArrayRealVectorHelper.integerToArrayRealVector(position);
 
-        final IntIntPair gridCenterPosition = spatialAcceleratedMap2d.getGridPositionOfPosition(position);
+        final var gridCenterPosition = spatialAcceleratedMap2d.getGridPositionOfPosition(position);
 
-        float gridMaxSearchRadius = 2f + ((float)radius) / spatialAcceleratedMap2d.getGridsize();
+        final var gridMaxSearchRadius = 2f + ((float)radius) / spatialAcceleratedMap2d.getGridsize();
 
         // set this to int.max when the radius is not limited
 
-        final IntIntPair[] nearestPixelCandidate = new IntIntPair[]{null};
+        final var nearestPixelCandidate = new IntIntPair[]{null};
         final double[] nearestPixelCandidateDistanceSquared = {Double.MAX_VALUE};
 
-        int radiusToScan = (int) Math.ceil(gridMaxSearchRadius);
+        var radiusToScan = (int) Math.ceil(gridMaxSearchRadius);
 
         /** grid cells to scan TODO use a LongHashSet storing the int pair into 64-bit long, or 32-bit int */
-        Collection<IntIntPair> toScan = new UnifiedSet(0); //(int)Math.ceil(radius * radius * Math.PI));
+        final Collection<IntIntPair> toScan = new UnifiedSet(0); //(int)Math.ceil(radius * radius * Math.PI));
 
-        Function<IntIntPair, Stream<? extends IntIntPair>> getPositionsOfCandidatePixelsOfCellWhereFalse = this::getPositionsOfCandidatePixelsOfCellWhereFalse;
+        final Function<IntIntPair, Stream<? extends IntIntPair>> getPositionsOfCandidatePixelsOfCellWhereFalse = this::getPositionsOfCandidatePixelsOfCellWhereFalse;
 
-        for( int currentGridRadius = 0; currentGridRadius < radiusToScan; currentGridRadius++ ) {
+        for(var currentGridRadius = 0; currentGridRadius < radiusToScan; currentGridRadius++ ) {
 
             // if we are at the center we need to scan only the center
 
@@ -157,9 +148,8 @@ public class ProcessB extends AbstractProcessB {
 
             if( currentGridRadius == 0 )
                 toScan.add(gridCenterPosition);
-            else {
+            else
                 spatialAcceleratedMap2d.getGridLocationsWithNegativeDirectionOfGridRadius(gridCenterPosition, currentGridRadius, toScan);
-            }
 
             /*
             // debugging
@@ -192,7 +182,7 @@ public class ProcessB extends AbstractProcessB {
             toScan.removeIf(c -> !spatialAcceleratedMap2d.canValueBeFoundInCell(c, value));
 
             // statistics
-            int scanSize = toScan.size();
+            final var scanSize = toScan.size();
             counterCellCandidates += scanSize;
             counterCellPositiveCandidates += scanSize;
 
@@ -203,8 +193,8 @@ public class ProcessB extends AbstractProcessB {
             //TODO use .collect or something
 
             toScan.stream().flatMap(getPositionsOfCandidatePixelsOfCellWhereFalse).forEach(i -> {
-                final double currentDistanceSquared = ArrayRealVectorHelper.diffDotProduct(position, i);
-                if( currentDistanceSquared < nearestPixelCandidateDistanceSquared[0]) {
+                final var currentDistanceSquared = ArrayRealVectorHelper.diffDotProduct(position, i);
+                if (currentDistanceSquared < nearestPixelCandidateDistanceSquared[0]) {
                     nearestPixelCandidateDistanceSquared[0] = currentDistanceSquared;
                     nearestPixelCandidate[0] = i;
                 }
@@ -217,19 +207,18 @@ public class ProcessB extends AbstractProcessB {
 
     private Stream<IntIntPair> getPositionsOfCandidatePixelsOfCellWhereFalse(final IntIntPair cellPosition) {
 
-        final int gridsize = spatialAcceleratedMap2d.getGridsize();
+        final var gridsize = spatialAcceleratedMap2d.getGridsize();
 
-        Assert.Assert(gridsize == 8, "only implemented for gridsize = 8");
+        assert gridsize == 8 : "ASSERT: " + "only implemented for gridsize = 8";
 
-        int px = cellPosition.getOne();
-        int x0 = px * gridsize;
-        int x1 = (px + 1) * gridsize;
+        final var px = cellPosition.getOne();
+        final var x0 = px * gridsize;
+        final var x1 = (px + 1) * gridsize;
 
-        int py = cellPosition.getTwo();
-        return IntStream.range(py * gridsize, (py + 1) * gridsize).mapToObj((int y) ->
-            IntStream.range(x0, x1)
-                .filter((int x) -> !map.readAt(x, y))
-                .mapToObj((int x) -> pair(x,y))
+        final var py = cellPosition.getTwo();
+        return IntStream.range(py * gridsize, (py + 1) * gridsize).mapToObj(y -> IntStream.range(x0, x1)
+                .filter(x -> !map.readAt(x, y))
+                .mapToObj(x -> pair(x, y))
         ).flatMap(x -> x);
 
 //        int h = (cellPosition.y + 1) * gridsize;
@@ -249,17 +238,13 @@ public class ProcessB extends AbstractProcessB {
 
 
     private List<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCell(final Vector2d<Integer> cellPosition, final boolean value) {
-        List<Vector2d<Integer>> result = new ArrayList<>();
+        final List<Vector2d<Integer>> result = new ArrayList<>();
 
-        final int gridsize = spatialAcceleratedMap2d.getGridsize();
+        final var gridsize = spatialAcceleratedMap2d.getGridsize();
 
-        for( int y = cellPosition.y * gridsize; y < (cellPosition.y+1) * gridsize; y++ ) {
-            for( int x = cellPosition.x * gridsize; x < (cellPosition.x+1) * gridsize; x++ ) {
-                if( map.readAt(x, y) == value ) {
-                    result.add(new Vector2d<>(x, y));
-                }
-            }
-        }
+        for(var y = cellPosition.y * gridsize; y < (cellPosition.y+1) * gridsize; y++ )
+            for (var x = cellPosition.x * gridsize; x < (cellPosition.x + 1) * gridsize; x++)
+                if (map.readAt(x, y) == value) result.add(new Vector2d<>(x, y));
 
         return result;
     }

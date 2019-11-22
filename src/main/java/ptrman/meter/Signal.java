@@ -17,11 +17,11 @@ public class Signal implements Comparable<Signal> {
     private double min, max;
 
 
-    public Signal(String id) {
+    public Signal(final String id) {
         this(id, null);
     }
 
-    public Signal(String id, String unit) {
+    public Signal(final String id, final String unit) {
         this.id = id;
         this.unit = unit;
     }
@@ -32,7 +32,7 @@ public class Signal implements Comparable<Signal> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         return id.equals(((Signal)obj).id);
     }
     
@@ -42,7 +42,7 @@ public class Signal implements Comparable<Signal> {
     }
 
     @Override
-    public int compareTo(Signal o) {
+    public int compareTo(final Signal o) {
         return id.compareTo(o.id);
     }
 
@@ -54,8 +54,8 @@ public class Signal implements Comparable<Signal> {
         return min;
     }
     
-        void setMin(double newMin) { this.min = newMin; }
-        void setMax(double newMax) { this.max = newMax; }
+        void setMin(final double newMin) { this.min = newMin; }
+        void setMax(final double newMax) { this.max = newMax; }
 
         void resetBounds() {
             min = Double.POSITIVE_INFINITY;

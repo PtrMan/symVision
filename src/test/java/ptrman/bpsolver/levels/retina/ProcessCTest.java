@@ -1,9 +1,9 @@
 package ptrman.bpsolver.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
+import org.junit.Ignore;
 import org.junit.Test;
 import ptrman.levels.retina.ProcessA;
-import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,13 +12,13 @@ import java.util.List;
  *
  */
 public class ProcessCTest {
-    @Test
+    @Test @Ignore
     public void testProcessC() {
-        List<ProcessA.Sample> samples = new ArrayList<>();
 
 
-		ProcessA.Sample createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{0, 0}));
+        var createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{0, 0}));
         createdSample.altitude = (float)Math.sqrt(0.0f);
+        final List<ProcessA.Sample> samples = new ArrayList<>();
         samples.add(createdSample);
 
         createdSample = new ProcessA.Sample(new ArrayRealVector(new double[]{1, 0}));
@@ -55,20 +55,16 @@ public class ProcessCTest {
         createdSample.altitude = (float)Math.sqrt(0.0f);
         samples.add(createdSample);
 
-        Assert.Assert(false, "TODO< overwork >");
+        assert false : "ASSERT: " + "TODO< overwork >";
         //ProcessC processC = new ProcessC(null);
 
         // TODO
         // processC.process(samples);
 
-        for( int i = 0; i < samples.size(); i++ ) {
-            if( i == 4 ) {
-                Assert.Assert(samples.get(i).type == ProcessA.Sample.EnumType.ENDOSCELETON, "must be endosceleton");
-            }
-            else {
-                Assert.Assert(samples.get(i).type == ProcessA.Sample.EnumType.EXOSCELETON, "must be exosceleton");
-            }
-        }
+        for(var i = 0; i < samples.size(); i++ )
+            if (i == 4)
+                assert samples.get(i).type == ProcessA.Sample.EnumType.ENDOSCELETON : "ASSERT: " + "must be endosceleton";
+            else assert samples.get(i).type == ProcessA.Sample.EnumType.EXOSCELETON : "ASSERT: " + "must be exosceleton";
 
 
     }

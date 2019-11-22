@@ -21,14 +21,14 @@ public class FloatMap2d implements IMap2d<Float> {
     private final int h;
     public final float[][] data;
 
-    public FloatMap2d(int w, int h) {
+    public FloatMap2d(final int w, final int h) {
         this.w = w;
         this.h = h;
         this.data = new float[h][];
-        for (int i = 0; i < h; i++) data[i] = new float[w];
+        for (var i = 0; i < h; i++) data[i] = new float[w];
     }
 
-    public FloatMap2d(FloatMap2d f) {
+    public FloatMap2d(final FloatMap2d f) {
         throw new RuntimeException("not impl yet");
         //this.w = f.w;
         //this.h = f.h;
@@ -37,26 +37,26 @@ public class FloatMap2d implements IMap2d<Float> {
 
     @Override
     public void clear() {
-        for (float[] d : data)
+        for (final var d : data)
             Arrays.fill(d, 0);
     }
 
 
     @Override
-    public Float readAt(int x, int y) {
+    public Float readAt(final int x, final int y) {
         return get(x, y);
     }
 
-    public float get(int x, int y) {
+    public float get(final int x, final int y) {
         return data[y][x];
     }
 
     @Override
-    public void setAt(int x, int y, Float value) {
+    public void setAt(final int x, final int y, final Float value) {
         set(x, y, value);
     }
 
-    public void set(int x, int y, float v) {
+    public void set(final int x, final int y, final float v) {
         data[y][x] = v;
     }
 

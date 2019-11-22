@@ -14,7 +14,6 @@ import ptrman.Datastructures.HashableVector2dInteger;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
-import ptrman.misc.Assert;
 
 import java.util.*;
 
@@ -45,7 +44,7 @@ public class ProcessZFacade implements IProcess {
         public Vector2d<Integer> max;
     }
 
-    public void set(IMap2d<Boolean> image) {
+    public void set(final IMap2d<Boolean> image) {
         this.alreadyCopiedImage = image.copy();
     }
 
@@ -54,14 +53,14 @@ public class ProcessZFacade implements IProcess {
         }
 
         @Override
-        public void seted(Vector2d<Integer> position) {
+        public void seted(final Vector2d<Integer> position) {
             setPixelPositions.add(position);
         }
 
         public final List<Vector2d<Integer>> setPixelPositions = new ArrayList<>();
     }
 
-    public void preSetupSet(final int accelerationGridsize, int numberOfPixelsManificationThreshold) {
+    public void preSetupSet(final int accelerationGridsize, final int numberOfPixelsManificationThreshold) {
         this.accelerationGridsize = accelerationGridsize;
         this.numberOfPixelsMagnificationThreshold = numberOfPixelsManificationThreshold;
     }
@@ -79,7 +78,7 @@ public class ProcessZFacade implements IProcess {
     }
 
     @Override
-    public void setImageSize(Vector2d<Integer> imageSize) {
+    public void setImageSize(final Vector2d<Integer> imageSize) {
         this.imageSize = imageSize;
     }
 
@@ -91,20 +90,14 @@ public class ProcessZFacade implements IProcess {
     @Override
     public void preProcessData() {
         unprocessedPixelsMap = new Map2d<>(imageSize.x, imageSize.y);
-        for( int y = 0; y < unprocessedPixelsMap.getLength(); y++ ) {
-            for( int x = 0; x < unprocessedPixelsMap.getWidth(); x++ ) {
-                unprocessedPixelsMap.setAt(x, y, false);
-            }
-        }
+        for(var y = 0; y < unprocessedPixelsMap.getLength(); y++ )
+            for (var x = 0; x < unprocessedPixelsMap.getWidth(); x++) unprocessedPixelsMap.setAt(x, y, false);
 
-        Assert.Assert(accelerationGridsize != 0, "gridsize must be nonzero");
+        assert accelerationGridsize != 0 : "ASSERT: " + "gridsize must be nonzero";
 
         unprocessedPixelsCellCount = new Map2d<>(imageSize.x / accelerationGridsize, imageSize.y / accelerationGridsize);
-        for( int y = 0; y < unprocessedPixelsCellCount.getLength(); y++ ) {
-            for( int x = 0; x < unprocessedPixelsCellCount.getWidth(); x++ ) {
-                unprocessedPixelsCellCount.setAt(x, y, 0);
-            }
-        }
+        for(var y = 0; y < unprocessedPixelsCellCount.getLength(); y++ )
+            for (var x = 0; x < unprocessedPixelsCellCount.getWidth(); x++) unprocessedPixelsCellCount.setAt(x, y, 0);
 
         notMagnifiedOutputObjectIds = new Map2d<>(imageSize.x, imageSize.y);
 
@@ -139,37 +132,34 @@ public class ProcessZFacade implements IProcess {
     }
 
 
-    private static IMap2d<Boolean> createBlankBooleanMap(Vector2d<Integer> imageSize) {
-        IMap2d<Boolean> result = new Map2d<>(imageSize.x, imageSize.y);
+    private static IMap2d<Boolean> createBlankBooleanMap(final Vector2d<Integer> imageSize) {
+        final IMap2d<Boolean> result = new Map2d<>(imageSize.x, imageSize.y);
 
-        for( int y = 0; y < result.getLength(); y++ ) {
-            for( int x = 0; x < result.getWidth(); x++ ) {
-                result.setAt(x, y, false);
-            }
-        }
+        for(var y = 0; y < result.getLength(); y++ )
+            for (var x = 0; x < result.getWidth(); x++) result.setAt(x, y, false);
 
         return result;
     }
 
-    private void takeRandomPixelFromHashmapUntilNoCandidatesAndFillAndDecide(IMap2d<Boolean> input) {
+    private void takeRandomPixelFromHashmapUntilNoCandidatesAndFillAndDecide(final IMap2d<Boolean> input) {
 
-        PixelChangeListener pixelChangeListener = new PixelChangeListener();
+        final var pixelChangeListener = new PixelChangeListener();
 
         rects.clear();
 
 		while (!notCompletlyProcessedCells.isEmpty()) {
 
-			HashableVector2dInteger[] arrayOfNotCompletlyProcessedCells = notCompletlyProcessedCells.keySet().toArray(new HashableVector2dInteger[0]);
-			Vector2d<Integer> notCompletlyProcessedCellPosition = arrayOfNotCompletlyProcessedCells[random.nextInt(arrayOfNotCompletlyProcessedCells.length)];
-			Vector2d<Integer> randomPixelFromNotCompletlyProcessCell = getRandomPixelPositionOfCell(notCompletlyProcessedCellPosition);
+			final var arrayOfNotCompletlyProcessedCells = notCompletlyProcessedCells.keySet().toArray(new HashableVector2dInteger[0]);
+			final Vector2d<Integer> notCompletlyProcessedCellPosition = arrayOfNotCompletlyProcessedCells[random.nextInt(arrayOfNotCompletlyProcessedCells.length)];
+			final var randomPixelFromNotCompletlyProcessCell = getRandomPixelPositionOfCell(notCompletlyProcessedCellPosition);
 
 			FloodFill.fill(input, randomPixelFromNotCompletlyProcessCell, Boolean.TRUE, Boolean.FALSE, true, pixelChangeListener);
 
 			// TODO< decide with a propability if the filled patch should be magnified or not >
-			if (pixelChangeListener.setPixelPositions.size() < numberOfPixelsMagnificationThreshold) {
-				drawValuesIntoMap(pixelChangeListener.setPixelPositions, toMagnify, true);
-				//drawValuesIntoMap(pixelChangeListener.setPixelPositions, toMagnifiedOutputObjectIds, idCounter);
-			} else {
+            //drawValuesIntoMap(pixelChangeListener.setPixelPositions, toMagnifiedOutputObjectIds, idCounter);
+            if (pixelChangeListener.setPixelPositions.size() < numberOfPixelsMagnificationThreshold)
+                drawValuesIntoMap(pixelChangeListener.setPixelPositions, toMagnify, true);
+            else {
 				drawValuesIntoMap(pixelChangeListener.setPixelPositions, notMagnifiedOutput, true);
 				drawValuesIntoMap(pixelChangeListener.setPixelPositions, notMagnifiedOutputObjectIds, idCounter);
 			}
@@ -185,9 +175,9 @@ public class ProcessZFacade implements IProcess {
     }
 
     private static Rect getRectForPixelPositions(final List<Vector2d<Integer>> setPixelPositions) {
-        Rect rect = Rect.createFromSinglePoint(setPixelPositions.get(0));
+        final var rect = Rect.createFromSinglePoint(setPixelPositions.get(0));
 
-        for( Vector2d<Integer> iterationPosition : setPixelPositions )
+        for( final var iterationPosition : setPixelPositions )
             rect.addPosition(iterationPosition);
 
 
@@ -195,72 +185,57 @@ public class ProcessZFacade implements IProcess {
     }
 
     private Vector2d<Integer> getRandomPixelPositionOfCell(final Vector2d<Integer> cellPosition) {
-        List<Vector2d<Integer>> candidateList = new ArrayList<>();
+        final List<Vector2d<Integer>> candidateList = new ArrayList<>();
 
-        for( int y = cellPosition.y * accelerationGridsize; y < (cellPosition.y+1) * accelerationGridsize; y++ ) {
-            for( int x = cellPosition.x * accelerationGridsize; x < (cellPosition.x+1) * accelerationGridsize; x++ ) {
-                if( unprocessedPixelsMap.readAt(x, y) ) {
-                    candidateList.add(new Vector2d<>(x, y));
-                }
-            }
-        }
+        for(var y = cellPosition.y * accelerationGridsize; y < (cellPosition.y+1) * accelerationGridsize; y++ )
+            for (var x = cellPosition.x * accelerationGridsize; x < (cellPosition.x + 1) * accelerationGridsize; x++)
+                if (unprocessedPixelsMap.readAt(x, y)) candidateList.add(new Vector2d<>(x, y));
 
-        final int candidateIndex = random.nextInt(candidateList.size());
+        final var candidateIndex = random.nextInt(candidateList.size());
         return candidateList.get(candidateIndex);
     }
 
-    private static<Type> void drawValuesIntoMap(final Iterable<Vector2d<Integer>> positions, IMap2d<Type> map, final Type value) {
-        for( Vector2d<Integer> iterationPosition : positions ) {
-            map.setAt(iterationPosition.x, iterationPosition.y, value);
-        }
+    private static<Type> void drawValuesIntoMap(final Iterable<Vector2d<Integer>> positions, final IMap2d<Type> map, final Type value) {
+        for( final var iterationPosition : positions ) map.setAt(iterationPosition.x, iterationPosition.y, value);
     }
 
-    private static<Type> void setMapToValue(IMap2d<Type> map, final Type value) {
-        for( int y = 0; y < map.getLength(); y++ ) {
-            for( int x = 0; x < map.getWidth(); x++ ) {
-                map.setAt(x, y, value);
-            }
-        }
+    private static<Type> void setMapToValue(final IMap2d<Type> map, final Type value) {
+        for(var y = 0; y < map.getLength(); y++ ) for (var x = 0; x < map.getWidth(); x++) map.setAt(x, y, value);
     }
 
     private void storePixelsIntoAccelerationDatastructuresFromMap(final IMap2d<Boolean> input) {
-        for( int iy = 0; iy < input.getLength(); iy++ ) {
-            for( int ix = 0; ix < input.getWidth(); ix++ ) {
-                if( input.readAt(ix, iy) ) {
+        for(var iy = 0; iy < input.getLength(); iy++ )
+            for (var ix = 0; ix < input.getWidth(); ix++)
+                if (input.readAt(ix, iy)) {
                     unprocessedPixelsMap.setAt(ix, iy, true);
 
-                    final Vector2d<Integer> cellPositionOfPixel = pixelPositionToCellPosition(new Vector2d<>(ix, iy));
+                    final var cellPositionOfPixel = pixelPositionToCellPosition(new Vector2d<>(ix, iy));
                     unprocessedPixelsCellCount.setAt(cellPositionOfPixel.x, cellPositionOfPixel.y, unprocessedPixelsCellCount.readAt(cellPositionOfPixel.x, cellPositionOfPixel.y) + 1);
                 }
-            }
-        }
 
         // setup the hashmap
-        for( int y = 0; y < unprocessedPixelsCellCount.getLength(); y++ ) {
-            for( int x = 0; x < unprocessedPixelsCellCount.getWidth(); x++ ) {
+        for(var y = 0; y < unprocessedPixelsCellCount.getLength(); y++ )
+            for (var x = 0; x < unprocessedPixelsCellCount.getWidth(); x++) {
                 final int cellCountForCell = unprocessedPixelsCellCount.readAt(x, y);
 
-                if( cellCountForCell > 0 ) {
+                if (cellCountForCell > 0)
                     notCompletlyProcessedCells.put(HashableVector2dInteger.fromVector2dInteger(new Vector2d<>(x, y)), null);
-                }
             }
-        }
     }
 
     private void removePixelsFromAccelerationDatastructures(final Iterable<Vector2d<Integer>> pixels) {
         drawValuesIntoMap(pixels, unprocessedPixelsMap, false);
 
-        for( final Vector2d<Integer> iterationPixel : pixels ) {
-            final Vector2d<Integer> cellPositionOfPixel = pixelPositionToCellPosition(iterationPixel);
+        for( final var iterationPixel : pixels ) {
+            final var cellPositionOfPixel = pixelPositionToCellPosition(iterationPixel);
 
             int numberOfSetPixelsInUnprocessedPixelsMapCell = unprocessedPixelsCellCount.readAt(cellPositionOfPixel.x, cellPositionOfPixel.y);
-            Assert.Assert(numberOfSetPixelsInUnprocessedPixelsMapCell > 0, "");
+            assert numberOfSetPixelsInUnprocessedPixelsMapCell > 0 : "ASSERT: " + "";
             numberOfSetPixelsInUnprocessedPixelsMapCell--;
             unprocessedPixelsCellCount.setAt(cellPositionOfPixel.x, cellPositionOfPixel.y, numberOfSetPixelsInUnprocessedPixelsMapCell);
 
-            if( numberOfSetPixelsInUnprocessedPixelsMapCell == 0 ) {
+            if( numberOfSetPixelsInUnprocessedPixelsMapCell == 0 )
                 notCompletlyProcessedCells.remove(HashableVector2dInteger.fromVector2dInteger(cellPositionOfPixel));
-            }
         }
     }
 

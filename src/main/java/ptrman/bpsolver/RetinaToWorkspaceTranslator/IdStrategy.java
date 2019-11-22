@@ -10,6 +10,7 @@
 package ptrman.bpsolver.RetinaToWorkspaceTranslator;
 
 //import com.gs.collections.impl.map.mutable.primitive.IntObjectHashMap;
+import org.eclipse.collections.api.block.procedure.primitive.IntObjectProcedure;
 import org.eclipse.collections.api.map.primitive.IntObjectMap;
 import org.eclipse.collections.impl.map.mutable.primitive.IntObjectHashMap;
 import ptrman.FargGeneral.network.Link;
@@ -30,25 +31,25 @@ import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimiti
  */
 public class IdStrategy extends AbstractTranslatorStrategy {
     @Override
-    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver) {
-        IntObjectHashMap<Deque<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(primitives);
+    public List<Node> createObjectsFromRetinaPrimitives(final List<RetinaPrimitive> primitives, final Solver bpSolver) {
+        final var objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(primitives);
         return createNodesFromMap(objectIdToRetinaPrimitivesMap, bpSolver);
     }
 
     private static List<Node> createNodesFromMap(final IntObjectMap<Deque<RetinaPrimitive>> map, final Solver bpSolver) {
-        List<Node> resultNodes = new ArrayList<>();
+        final List<Node> resultNodes = new ArrayList<>();
 
-        map.forEachKeyValue( (k, v) -> {
-            Node objectNode = new PlatonicPrimitiveInstanceNode(bpSolver.networkHandles.objectPlatonicPrimitiveNode);
+        map.forEachKeyValue((IntObjectProcedure<Deque<RetinaPrimitive>>) (k, v) -> {
+            final Node objectNode = new PlatonicPrimitiveInstanceNode(bpSolver.networkHandles.objectPlatonicPrimitiveNode);
 
-            for( final RetinaPrimitive iterationRetinaPrimitive : v)  {
-                Node nodeForRetinaPrimitive = createPlatonicInstanceNodeForRetinaObject(iterationRetinaPrimitive, bpSolver.networkHandles);
+            for (final var iterationRetinaPrimitive : v) {
+                final Node nodeForRetinaPrimitive = createPlatonicInstanceNodeForRetinaObject(iterationRetinaPrimitive, bpSolver.networkHandles);
 
                 // linkage
-                Link createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.CONTAINS, nodeForRetinaPrimitive);
+                final var createdForwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.CONTAINS, nodeForRetinaPrimitive);
                 objectNode.out(createdForwardLink);
 
-                Link createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
+                final var createdBackwardLink = bpSolver.network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
                 nodeForRetinaPrimitive.out(createdBackwardLink);
             }
 

@@ -23,7 +23,7 @@ public class DurationMeter extends DoubleMeter {
     private final boolean frequency;
     private final boolean strict = false;
     
-    public DurationMeter(String id, boolean nanoSeconds, double windowSec, boolean asFrequency) {
+    public DurationMeter(final String id, final boolean nanoSeconds, final double windowSec, final boolean asFrequency) {
         super(id);
         
         
@@ -48,17 +48,16 @@ public class DurationMeter extends DoubleMeter {
 
     /** returns the value which it stores (duration time, or frequency) */
     public synchronized double stop() {
-        if (strict && !isStarted())
-            throw new RuntimeException(this + " not previously started");
-        double duration = sinceStart();
-        double v = frequency ? (1.0 / duration) : duration;
+        assert !strict || isStarted() : this + " not previously started";
+        final var duration = sinceStart();
+        final var v = frequency ? (1.0 / duration) : duration;
         set(v);
         startTime = Double.NaN;
         return v;
     }
     
     public synchronized double sinceStart() {
-        double resolutionTime = nanoSeconds ? 1.0E9 : 1.0E3;
+        final var resolutionTime = nanoSeconds ? 1.0E9 : 1.0E3;
         return (PeriodMeter.now(nanoSeconds) - startTime) / resolutionTime;
     }
 

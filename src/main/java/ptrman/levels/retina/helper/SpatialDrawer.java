@@ -16,6 +16,7 @@ import ptrman.Algorithms.Bresenham;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static ptrman.Datastructures.Vector2d.IntegerHelper.add;
 import static ptrman.Datastructures.Vector2d.IntegerHelper.getScaled;
@@ -48,13 +49,13 @@ public enum SpatialDrawer {
     }
 
     public static List<IntIntPair> getPositionsOfCellsOfCircleBound(final IntIntPair center, final int radius, final IntIntPair boundary) {
-        Drawer drawer = new Drawer();
+        final var drawer = new Drawer();
 
         Bresenham.rasterCircle(center, radius, drawer);
 
-        List<IntIntPair> resultPositions = new FastList<>(drawer.positionWithDirections.size());
-        for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections) {
-            IntIntPair position = iterationPositionWithDirection.position;
+        final List<IntIntPair> resultPositions = new FastList<>(drawer.positionWithDirections.size());
+        for (final var iterationPositionWithDirection : drawer.positionWithDirections) {
+            final var position = iterationPositionWithDirection.position;
             if (isGridLocationInBound(position, boundary))
                 resultPositions.add(position);
         }
@@ -64,19 +65,17 @@ public enum SpatialDrawer {
         return resultPositions;
     }
 
-    public static void getPositionsOfCellsWithNegativeDirectionOfCircleBound(final IntIntPair center, final int radius, IntIntPair boundary, Collection<IntIntPair> y) {
-        Drawer drawer = new Drawer();
+    public static void getPositionsOfCellsWithNegativeDirectionOfCircleBound(final IntIntPair center, final int radius, final IntIntPair boundary, final Collection<IntIntPair> y) {
+        final var drawer = new Drawer();
 
         Bresenham.rasterCircle(center, radius, drawer);
 
-        for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections) {
+        for (final var iterationPositionWithDirection : drawer.positionWithDirections) {
 
-            final IntIntPair a = iterationPositionWithDirection.position;
-            if (isGridLocationInBound(a, boundary)) {
-                y.add(a);
-            }
+            final var a = iterationPositionWithDirection.position;
+            if (isGridLocationInBound(a, boundary)) y.add(a);
 
-            final IntIntPair b = add(a, getScaled(iterationPositionWithDirection.direction, -1));
+            final var b = add(a, getScaled(iterationPositionWithDirection.direction, -1));
             if (isGridLocationInBound(b, boundary))
                 y.add(b);
         }
@@ -85,23 +84,20 @@ public enum SpatialDrawer {
 
     /** TODO stream */
     public static Iterable<IntIntPair> getPositionsOfCellsOfLineUnbound(final IntIntPair a, final IntIntPair b) {
-        Drawer drawer = new Drawer();
+        final var drawer = new Drawer();
 
         Bresenham.rasterLine(a, b, drawer);
 
-        Collection<IntIntPair> resultPositions = new ArrayList<>(drawer.positionWithDirections.size());
-        for (final Drawer.PositionWithDirection iterationPositionWithDirection : drawer.positionWithDirections)
-            resultPositions.add(iterationPositionWithDirection.position);
+        final Collection<IntIntPair> resultPositions = drawer.positionWithDirections.stream().map(iterationPositionWithDirection -> iterationPositionWithDirection.position).collect(Collectors.toCollection(() -> new ArrayList<>(drawer.positionWithDirections.size())));
 
         return resultPositions;
     }
 
     private static boolean isGridLocationInBound(final IntIntPair position, final IntIntPair boundary) {
-        final int x = position.getOne();
+        final var x = position.getOne();
         if (x >= 0 && x < boundary.getOne()) {
-            final int y = position.getTwo();
-            if (y >= 0 && y < boundary.getTwo())
-                return true;
+            final var y = position.getTwo();
+            return y >= 0 && y < boundary.getTwo();
         }
         return false;
     }

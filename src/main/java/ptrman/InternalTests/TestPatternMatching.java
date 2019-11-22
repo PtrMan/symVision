@@ -35,19 +35,19 @@ public enum TestPatternMatching {
      * tests if the pattern matching recognizes the same line as the same object
      *
      */
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
 
-		Solver bpSolver = new Solver();
+		final var bpSolver = new Solver();
         bpSolver.setImageSize(new Vector2d<>(128, 128));
         bpSolver.setup();
 
-		List<RetinaPrimitive> lineDetectors = new ArrayList<>();
+		final List<RetinaPrimitive> lineDetectors = new ArrayList<>();
 
         lineDetectors.add(RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(new ArrayRealVector(new double[]{0.0f, 0.0f}), new ArrayRealVector(new double[]{10.0f, 40.0f}), 0.2)));
 
-		ITranslatorStrategy retinaToWorkspaceTranslatorStrategy = new NearIntersectionStrategy();
+		final ITranslatorStrategy retinaToWorkspaceTranslatorStrategy = new NearIntersectionStrategy();
 
-        List<Node> objectNodes = retinaToWorkspaceTranslatorStrategy.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver);
+        final var objectNodes = retinaToWorkspaceTranslatorStrategy.createObjectsFromRetinaPrimitives(lineDetectors, bpSolver);
 
         bpSolver.cycle(500);
 
@@ -55,16 +55,16 @@ public enum TestPatternMatching {
 
 
 
-        final int MAXDEPTH = 3;
+        final var MAXDEPTH = 3;
 
-		FeaturePatternMatching featurePatternMatching = new FeaturePatternMatching();
+		final var featurePatternMatching = new FeaturePatternMatching();
 
-		List<FeaturePatternMatching.MatchingPathElement<Link>> matchingPathElements = featurePatternMatching.matchAnyRecursive(objectNodes.get(0), objectNodes.get(0), bpSolver.networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), MAXDEPTH);
-		float matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
+		final var matchingPathElements = featurePatternMatching.matchAnyRecursive(objectNodes.get(0), objectNodes.get(0), bpSolver.networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), MAXDEPTH);
+		final var matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
 
         if( matchingSimilarityValue > 1.001f || matchingSimilarityValue < 0.999f ) {
             // test failed
-            int testFailed = 1;
+            final var testFailed = 1;
         }
 
     }

@@ -21,14 +21,14 @@ public class ObjectMeter<X> extends SourceFunctionMeter<X> {
 
 
 
-    public ObjectMeter(String id, boolean autoReset) {
+    public ObjectMeter(final String id, final boolean autoReset) {
         super(id);
         this.name = id;
         this.autoReset = autoReset;
     }
 
 
-    public ObjectMeter(String id) {
+    public ObjectMeter(final String id) {
         this(id, false);
     }    
 
@@ -39,8 +39,8 @@ public class ObjectMeter<X> extends SourceFunctionMeter<X> {
     }
     
     /** returns the previous value, or NaN if none were set  */
-    public X set(X newValue) {
-        X oldValue = val;
+    public X set(final X newValue) {
+        final var oldValue = val;
         val = newValue;
         return oldValue;
     }
@@ -50,16 +50,14 @@ public class ObjectMeter<X> extends SourceFunctionMeter<X> {
 
     
     @Override
-    protected X getValue(Object key, int index) {
-        X c = val;
-        if (autoReset) {
-            reset();
-        }
+    protected X getValue(final Object key, final int index) {
+        final var c = val;
+        if (autoReset) reset();
         return c;        
     }
 
     /** whether to reset to NaN after the count is next stored in the Metrics */
-    public void setAutoReset(boolean autoReset) {
+    public void setAutoReset(final boolean autoReset) {
         this.autoReset = autoReset;
     }
     

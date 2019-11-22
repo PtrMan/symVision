@@ -12,6 +12,7 @@ package ptrman.FargGeneral.network;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 import java.util.*;
+import java.util.function.Function;
 
 public abstract class Node
 {
@@ -26,7 +27,7 @@ public abstract class Node
 
     //public ArrayList<Link> incommingLinks = new ArrayList<Link>(); // only bidirection links are in here
     
-    public Node(int type)
+    public Node(final int type)
     {
         this.type = type;
     }
@@ -42,10 +43,10 @@ public abstract class Node
     }
     
     // TODO< good place to access a Map of the links >
-    public Iterable<Link> getLinksByType(Link.EnumType type)
+    public Iterable<Link> getLinksByType(final Link.EnumType type)
     {
 
-        Set<Link> y = out.get(type);
+        final var y = out.get(type);
         return y == null ? Collections.emptyList() : y;
 
         //return Iterables.filter(out, x->x.type==type);
@@ -63,8 +64,8 @@ public abstract class Node
 //        return result;
     }
 
-    public boolean out(Link l) {
-        return out.computeIfAbsent(l.type, (x)->new UnifiedSet()).add(l);
+    public boolean out(final Link l) {
+        return out.computeIfAbsent(l.type, x -> new UnifiedSet()).add(l);
     }
 
     public Iterable<Link> out() {

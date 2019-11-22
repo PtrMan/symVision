@@ -22,7 +22,7 @@ public class MemoryUseTracker extends DoubleMeter {
 
     //long lastUsedMemory = -1;
 
-    public MemoryUseTracker(String id) {
+    public MemoryUseTracker(final String id) {
         super(id);
     }
 
@@ -31,7 +31,7 @@ public class MemoryUseTracker extends DoubleMeter {
     }
 
     @Override
-    public Double[] sample(Object key) {
+    public Double[] sample(final Object key) {
         return new Double[] { (double)getMemoryUsed() };
     }
     

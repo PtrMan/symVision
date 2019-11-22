@@ -15,11 +15,10 @@ import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Node;
 import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import ptrman.levels.retina.Intersection;
 import ptrman.levels.retina.RetinaPrimitive;
-import ptrman.misc.Assert;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * implements a strategy which groups retina objects based on the intersections of retina objects
@@ -29,14 +28,14 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
 
 
     @Override
-    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver) {
+    public List<Node> createObjectsFromRetinaPrimitives(final List<RetinaPrimitive> primitives, final Solver bpSolver) {
         List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints;
 
         // TODO< hard parameters >
-        final int GRIDCOUNTX = 10;
-        final int GRIDCOUNTY = 10;
+        final var GRIDCOUNTX = 10;
+        final var GRIDCOUNTY = 10;
 
-        SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects = new SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects();
+        final var spatialAccelerationForCrosspointsWithMappingOfRetinaObjects = new SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects();
         spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints = new SpatialAcceleration<>(GRIDCOUNTX, GRIDCOUNTY, bpSolver.getImageSize().x, bpSolver.getImageSize().y);
 
         spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap = NearIntersectionStrategy.createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(primitives, bpSolver);
@@ -50,13 +49,13 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
         
         
         // NOTE< does hashmap work? >
-        Map<RetinaPrimitive, Boolean> remainingRetinaObjects = new HashMap<>();
 
         NearIntersectionStrategy.resetAllMarkings(primitives);
         
         // algorithm
         
         // ...
+        final Map<RetinaPrimitive, Boolean> remainingRetinaObjects = new HashMap<>();
         storeAllRetinaPrimitivesInMap(primitives, remainingRetinaObjects);
         
         // then pick one at random and put connected (assert unmarked) retinaObjects into the same object and put them out of the map
@@ -65,15 +64,15 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
         return NearIntersectionStrategy.pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(remainingRetinaObjects, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap, random, bpSolver);
     }
 
-    private static Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(Iterable<RetinaPrimitive> primitives, Solver bpSolver) {
+    private static Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> createWorkspaceNodeAndRegisterCodeletsAndOutputAsMapFromRetinaPrimitives(final Iterable<RetinaPrimitive> primitives, final Solver bpSolver) {
 
-        Map<RetinaPrimitive, RetinaObjectWithAssociatedPointsAndWorkspaceNode> resultMap = new HashMap<>();
+        final Map<RetinaPrimitive, RetinaObjectWithAssociatedPointsAndWorkspaceNode> resultMap = new HashMap<>();
 
-        for( RetinaPrimitive iterationRetinaPrimitive : primitives ) {
+        for( final var iterationRetinaPrimitive : primitives ) {
 
-            PlatonicPrimitiveInstanceNode createdPlatonicInstanceNodeForRetinaObject = createPlatonicInstanceNodeForRetinaObject(iterationRetinaPrimitive, bpSolver.networkHandles);
+            final var createdPlatonicInstanceNodeForRetinaObject = createPlatonicInstanceNodeForRetinaObject(iterationRetinaPrimitive, bpSolver.networkHandles);
 
-            RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssocPointsAndWorkspace = new RetinaObjectWithAssociatedPointsAndWorkspaceNode(iterationRetinaPrimitive);
+            final var retinaObjectWithAssocPointsAndWorkspace = new RetinaObjectWithAssociatedPointsAndWorkspaceNode(iterationRetinaPrimitive);
             retinaObjectWithAssocPointsAndWorkspace.workspaceNode = createdPlatonicInstanceNodeForRetinaObject;
 
             // add all codelet's of it
@@ -86,41 +85,38 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
     }
 
     private static List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> convertPrimitivesToRetinaObjectsWithAssoc(final Iterable<RetinaPrimitive> primitives) {
-        List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints = new ArrayList<>();
+        final List<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints = new ArrayList<>();
         
-        for( RetinaPrimitive iterationPrimitive : primitives ) {
+        for( final var iterationPrimitive : primitives )
             retinaObjectsWithAssociatedPoints.add(associatePointsToRetinaPrimitive(iterationPrimitive));
-        }
         
         return retinaObjectsWithAssociatedPoints;
     }
     
-    private static void storeAllRetinaPrimitivesInMap(Iterable<RetinaPrimitive> primitives, Map<RetinaPrimitive, Boolean> map) {
-        for( RetinaPrimitive iterationPrimitive : primitives ) {
-            map.put(iterationPrimitive, Boolean.FALSE);
-        }
+    private static void storeAllRetinaPrimitivesInMap(final Iterable<RetinaPrimitive> primitives, final Map<RetinaPrimitive, Boolean> map) {
+        for( final var iterationPrimitive : primitives ) map.put(iterationPrimitive, Boolean.FALSE);
     }
     
-    private static List<RetinaPrimitive> pickRetinaPrimitiveAtRandomAndMarkAndRemoveConnectedPrimitivesAndRetunListOfPrimitives(Map<RetinaPrimitive, Boolean> map, Random random) {
+    private static List<RetinaPrimitive> pickRetinaPrimitiveAtRandomAndMarkAndRemoveConnectedPrimitivesAndRetunListOfPrimitives(final Map<RetinaPrimitive, Boolean> map, final Random random) {
 
-        List<RetinaPrimitive> resultPrimitives = new ArrayList<>();
-        List<RetinaPrimitive> openList = new ArrayList<>();
+        final List<RetinaPrimitive> openList = new ArrayList<>();
         
         {
 
-            RetinaPrimitive chosenStartRetinaPrimitive = pickRandomRetinaPrimitiveFromMap(map, random);
+            final var chosenStartRetinaPrimitive = pickRandomRetinaPrimitiveFromMap(map, random);
             openList.add(chosenStartRetinaPrimitive);
         }
-        
-        for(;;) {
 
-            int os = openList.size();
+        final List<RetinaPrimitive> resultPrimitives = new ArrayList<>();
+        while (true) {
+
+            final var os = openList.size();
 
             if( os == 0 )
                 break;
 
 
-            RetinaPrimitive retinaPrimitiveFromOpenList = openList.get(os - 1);
+            final var retinaPrimitiveFromOpenList = openList.get(os - 1);
             openList.remove(os -1);
             
             // we do this because we are "done" with it
@@ -130,68 +126,59 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
             
             resultPrimitives.add(retinaPrimitiveFromOpenList);
 
-            List<RetinaPrimitive> notYetMarkedConnectedRetinaPrimitives = getNotYetMarkedConnectedRetinaPrimitives(retinaPrimitiveFromOpenList);
+            final var notYetMarkedConnectedRetinaPrimitives = getNotYetMarkedConnectedRetinaPrimitives(retinaPrimitiveFromOpenList);
             
             openList.addAll(notYetMarkedConnectedRetinaPrimitives);
         }
-        
+
         return resultPrimitives;
     }
     
-    private static RetinaPrimitive pickRandomRetinaPrimitiveFromMap(Map<RetinaPrimitive, Boolean> map, Random random) {
+    private static RetinaPrimitive pickRandomRetinaPrimitiveFromMap(final Map<RetinaPrimitive, Boolean> map, final Random random) {
 
-        Object[] array = map.keySet().toArray();
+        final var array = map.keySet().toArray();
 
-        int index = random.nextInt(array.length);
+        final var index = random.nextInt(array.length);
         return (RetinaPrimitive)array[index];
     }
 
-    private static List<RetinaPrimitive> getNotYetMarkedConnectedRetinaPrimitives(RetinaPrimitive retinaPrimitiveFromOpenList) {
+    private static List<RetinaPrimitive> getNotYetMarkedConnectedRetinaPrimitives(final RetinaPrimitive retinaPrimitiveFromOpenList) {
 
-        Collection<RetinaPrimitive> unfilteredIntersectionPartners = new ArrayList<>();
+        final var allIntersections = retinaPrimitiveFromOpenList.getIntersections();
 
-        List<Intersection> allIntersections = retinaPrimitiveFromOpenList.getIntersections();
-        
-        for( Intersection iterationIntersection : allIntersections ) {
-            unfilteredIntersectionPartners.add(iterationIntersection.getOtherPartner(retinaPrimitiveFromOpenList).primitive);
-        }
+        final Collection<RetinaPrimitive> unfilteredIntersectionPartners = allIntersections.stream().map(iterationIntersection -> iterationIntersection.getOtherPartner(retinaPrimitiveFromOpenList).primitive).collect(Collectors.toList());
 
-        List<RetinaPrimitive> filteredIntersectionPartners = filterRetinaPrimitivesForUnmarkedOnes(unfilteredIntersectionPartners);
+        final var filteredIntersectionPartners = filterRetinaPrimitivesForUnmarkedOnes(unfilteredIntersectionPartners);
         return filteredIntersectionPartners;
     }
     
-    private static List<RetinaPrimitive> filterRetinaPrimitivesForUnmarkedOnes(Iterable<RetinaPrimitive> unfilteredIntersectionPartners) {
+    private static List<RetinaPrimitive> filterRetinaPrimitivesForUnmarkedOnes(final Iterable<RetinaPrimitive> unfilteredIntersectionPartners) {
 
-        List<RetinaPrimitive> result = new ArrayList<>();
+        final List<RetinaPrimitive> result = new ArrayList<>();
         
-        for( RetinaPrimitive iterationRetinaPrimitive : unfilteredIntersectionPartners ) {
-            if( !iterationRetinaPrimitive.marked ) {
-                result.add(iterationRetinaPrimitive);
-            }
-        }
+        for( final var iterationRetinaPrimitive : unfilteredIntersectionPartners )
+            if (!iterationRetinaPrimitive.marked) result.add(iterationRetinaPrimitive);
         
         return result;
     }
     
 
-    private static List<Node> pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(Map<RetinaPrimitive, Boolean> map, Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitveToRetinaObjectWithAssocMap, Random random, Solver bpSolver) {
-        List<Node> resultObjectNodes = new ArrayList<>();
-        
-        for(;;) {
+    private static List<Node> pickRetinaPrimitiveAtRandomUntilNoCandidateIsLeftAndReturnItAsObjects(final Map<RetinaPrimitive, Boolean> map, final Map<RetinaPrimitive,RetinaObjectWithAssociatedPointsAndWorkspaceNode> primitveToRetinaObjectWithAssocMap, final Random random, final Solver bpSolver) {
+        final List<Node> resultObjectNodes = new ArrayList<>();
 
-            if( map.size() == 0 ) {
-                return resultObjectNodes;
-            }
+        while (true) {
 
-            List<RetinaPrimitive> retinaPrimitivesOfObject = pickRetinaPrimitiveAtRandomAndMarkAndRemoveConnectedPrimitivesAndRetunListOfPrimitives(map, random);
+            if( map.size() == 0 ) return resultObjectNodes;
 
-            PlatonicPrimitiveInstanceNode objectNode = new PlatonicPrimitiveInstanceNode(bpSolver.networkHandles.objectPlatonicPrimitiveNode);
+            final var retinaPrimitivesOfObject = pickRetinaPrimitiveAtRandomAndMarkAndRemoveConnectedPrimitivesAndRetunListOfPrimitives(map, random);
+
+            final var objectNode = new PlatonicPrimitiveInstanceNode(bpSolver.networkHandles.objectPlatonicPrimitiveNode);
             
             // create for the retinaPrimitives network nodes and link them
             {
-                for( RetinaPrimitive iterationPrimitive : retinaPrimitivesOfObject ) {
+                for( final var iterationPrimitive : retinaPrimitivesOfObject ) {
 
-                    Node nodeForRetinaPrimitive = primitveToRetinaObjectWithAssocMap.get(iterationPrimitive).workspaceNode;
+                    final var nodeForRetinaPrimitive = primitveToRetinaObjectWithAssocMap.get(iterationPrimitive).workspaceNode;
 
                     // linkage
                     //      forward
@@ -206,67 +193,59 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
     }
     
 
-    private static void resetAllMarkings(Iterable<RetinaPrimitive> primitives) {
-        for( RetinaPrimitive iterationPrimitive : primitives ) {
-            iterationPrimitive.marked = false;
-        }
+    private static void resetAllMarkings(final Iterable<RetinaPrimitive> primitives) {
+        for( final var iterationPrimitive : primitives ) iterationPrimitive.marked = false;
     }
     
-    private void bundleAllIntersections(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, Iterable<RetinaPrimitive> listOfRetinaPrimitives) {
-        for( RetinaPrimitive iterationRetinaPrimitive : listOfRetinaPrimitives ) {
+    private void bundleAllIntersections(final SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, final Iterable<RetinaPrimitive> listOfRetinaPrimitives) {
+        // we store the intersectionposition and the intersectionpartners
+        for( final var iterationRetinaPrimitive : listOfRetinaPrimitives )
+            for (final var iterationIntersection : iterationRetinaPrimitive.getIntersections()) {
+                final var crosspointsAtPosition = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getElementsNearPoint(iterationIntersection.intersectionPosition, 1000.0f /* TODO const */);
 
-            // we store the intersectionposition and the intersectionpartners
+                if (crosspointsAtPosition.isEmpty()) {
 
-            for( Intersection iterationIntersection : iterationRetinaPrimitive.getIntersections()) {
-                List<SpatialAcceleration<Crosspoint>.Element> crosspointsAtPosition = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getElementsNearPoint(iterationIntersection.intersectionPosition, 1000.0f /* TODO const */);
-                
-                if( crosspointsAtPosition.isEmpty() ) {
-
-                    SpatialAcceleration<Crosspoint>.Element createdCrosspointElement = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.new Element();
+                    final var createdCrosspointElement = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.new Element();
                     createdCrosspointElement.data = new Crosspoint();
                     createdCrosspointElement.data.position = iterationIntersection.intersectionPosition;
                     createdCrosspointElement.position = iterationIntersection.intersectionPosition;
 
 
-                    RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p0.primitive);
-                    Assert.Assert(retinaObjectWithAssoc != null, "");
+                    var retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p0.primitive);
+                    assert retinaObjectWithAssoc != null : "ASSERT: " + "";
                     createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.p0.intersectionEndpointType));
-                    
+
                     retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p1.primitive);
-                    Assert.Assert(retinaObjectWithAssoc != null, "");
+                    assert retinaObjectWithAssoc != null : "ASSERT: " + "";
                     createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.p1.intersectionEndpointType));
-                    
+
                     spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.addElement(createdCrosspointElement);
-                }
-                else {
+                } else {
 
-                    SpatialAcceleration<Crosspoint>.Element nearestCrosspointElement = getNearestCrosspointElement(crosspointsAtPosition, iterationIntersection.intersectionPosition);
+                    final var nearestCrosspointElement = getNearestCrosspointElement(crosspointsAtPosition, iterationIntersection.intersectionPosition);
 
-                    RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p0.primitive);
-                    Assert.Assert(retinaObjectWithAssoc != null, "");
+                    var retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p0.primitive);
+                    assert retinaObjectWithAssoc != null : "ASSERT: " + "";
 
-                    if( !nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc) ) {
+                    if (!nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc))
                         nearestCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.p0.intersectionEndpointType));
-                    }
-                    
+
                     retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p1.primitive);
-                    Assert.Assert(retinaObjectWithAssoc != null, "");
-                    
-                    if( !nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc) ) {
+                    assert retinaObjectWithAssoc != null : "ASSERT: " + "";
+
+                    if (!nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc))
                         nearestCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.p1.intersectionEndpointType));
-                    }
-                    
+
                 }
             }
-        }
     }
     
     private static SpatialAcceleration<Crosspoint>.Element getNearestCrosspointElement(final List<SpatialAcceleration<Crosspoint>.Element> crosspointElements, final ArrayRealVector position) {
-        SpatialAcceleration<Crosspoint>.Element nearestElement = crosspointElements.get(0);
-        double nearestDistance = crosspointElements.get(0).position.getDistance(position);
+        var nearestElement = crosspointElements.get(0);
+        var nearestDistance = crosspointElements.get(0).position.getDistance(position);
 
-        for( SpatialAcceleration<Crosspoint>.Element iterationCrosspointElement : crosspointElements ) {
-            final double distance = iterationCrosspointElement.position.getDistance(position);
+        for( final var iterationCrosspointElement : crosspointElements ) {
+            final var distance = iterationCrosspointElement.position.getDistance(position);
             if( distance < nearestDistance ) {
                 nearestDistance = distance;
                 nearestElement = iterationCrosspointElement;

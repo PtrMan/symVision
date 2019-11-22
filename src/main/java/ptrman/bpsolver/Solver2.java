@@ -19,12 +19,13 @@ import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.levels.visual.*;
 
 import java.awt.image.BufferedImage;
+import java.util.stream.IntStream;
 
 /**
  * new solver which is incomplete but should be in a working state
  */
 public class Solver2 {
-    public ProcessD processD;
+    public final ProcessD processD;
     public ProcessD[] processDEdge;
     public ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
     public ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
@@ -37,7 +38,7 @@ public class Solver2 {
     // connector for final processing
     public ProcessConnector<RetinaPrimitive> cntrFinalProcessing;
 
-    public NarsBinding narsBinding;
+    public final NarsBinding narsBinding;
 
     public int annealingStep = 0;
 
@@ -68,12 +69,12 @@ public class Solver2 {
     public void preFrame() {
         annealingStep = 0;
 
-        BufferedImage image = imageDrawer.apply(null);
+        final var image = imageDrawer.apply(null);
 
         imageSize = new Vector2d<>(image.getWidth(), image.getHeight());
 
 
-        IMap2d<ColorRgb> mapColor = Map2dImageConverter.convertImageToMap(image);
+        final var mapColor = Map2dImageConverter.convertImageToMap(image);
 
 
 
@@ -81,9 +82,9 @@ public class Solver2 {
 
         // setup the processing chain
 
-        VisualProcessor.ProcessingChain processingChain = new VisualProcessor.ProcessingChain();
+        final var processingChain = new VisualProcessor.ProcessingChain();
 
-        Dag.Element newDagElement = new Dag.Element(
+        final var newDagElement = new Dag.Element(
                 new VisualProcessor.ProcessingChain.ChainElementColorFloat(
                         new VisualProcessor.ProcessingChain.ConvertColorRgbToGrayscaleFilter(new ColorRgb(1.0f, 1.0f, 1.0f)),
                         "convertRgbToGrayscale",
@@ -109,24 +110,19 @@ public class Solver2 {
 
         processingChain.filterChain(mapColor);
 
-        IMap2d<Float> mapGrayscale = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(processingChain.filterChainDag.elements.size()-1).content).result; // get from last element in the chain
+        final IMap2d<Float> mapGrayscale = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(processingChain.filterChainDag.elements.size()-1).content).result; // get from last element in the chain
 
-        int numberOfEdgeDetectorDirections = 8;
+        final var numberOfEdgeDetectorDirections = 8;
 
         // convolution
-        Map2dApplyConvolution[] edgeDetectors = new Map2dApplyConvolution[numberOfEdgeDetectorDirections];
-        for(int i=0; i<numberOfEdgeDetectorDirections;i++) {
-            edgeDetectors[i] = new Map2dApplyConvolution(Convolution2dHelper.calcGaborKernel(8, (float)i/(float)numberOfEdgeDetectorDirections * 2.0f * (float)Math.PI, 10.0f/64.0f, (float)Math.PI*0.5f, 0.4f));
-        }
+        final var edgeDetectors = IntStream.range(0, numberOfEdgeDetectorDirections).mapToObj(i -> new Map2dApplyConvolution(Convolution2dHelper.calcGaborKernel(8, (float) i / (float) numberOfEdgeDetectorDirections * 2.0f * (float) Math.PI, 10.0f / 64.0f, (float) Math.PI * 0.5f, 0.4f))).toArray(Map2dApplyConvolution[]::new);
 
-        IMap2d<Float>[] edges = new IMap2d[numberOfEdgeDetectorDirections];
-        for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // detect edges with filters
-            edges[i] = edgeDetectors[i].process(mapGrayscale);
-        }
+        final IMap2d<Float>[] edges = IntStream.range(0, numberOfEdgeDetectorDirections).mapToObj(i -> edgeDetectors[i].process(mapGrayscale)).toArray(IMap2d[]::new);
+        // detect edges with filters
 
-        ProcessA[] processAEdge = new ProcessA[numberOfEdgeDetectorDirections];
         processDEdge = new ProcessD[numberOfEdgeDetectorDirections];
-        for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // create processors for edges
+        final var processAEdge = new ProcessA[numberOfEdgeDetectorDirections];
+        for(var i = 0; i<numberOfEdgeDetectorDirections; i++) { // create processors for edges
             processAEdge[i] = new ProcessA();
             processDEdge[i] = new ProcessD();
             processDEdge[i].maximalDistanceOfPositions = 5000.0;
@@ -136,18 +132,18 @@ public class Solver2 {
         connectorDetectorsFromProcessDForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
         connectorSamplesFromProcessAForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
         connectorDetectorsFromProcessHForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
-        for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // create connectors for edges
+        for(var i = 0; i<numberOfEdgeDetectorDirections; i++) { // create connectors for edges
             connectorDetectorsFromProcessHForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
             connectorDetectorsFromProcessDForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
             connectorSamplesFromProcessAForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
         }
 
-        for(int i=0; i<numberOfEdgeDetectorDirections;i++) {
+        for(var i = 0; i<numberOfEdgeDetectorDirections; i++) {
             // copy image because processA changes the image
 
-            IMap2d<Boolean> mapBoolean = Map2dBinary.threshold(edges[i], 0.01f); // convert from edges[0]
+            final var mapBoolean = Map2dBinary.threshold(edges[i], 0.01f); // convert from edges[0]
 
-            ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+            final ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
             processAEdge[i].set(mapBoolean.copy(), null, connectorSamplesFromProcessAForEdge[i]);
 
             processAEdge[i].setup(imageSize);
@@ -166,16 +162,14 @@ public class Solver2 {
 
         mapBoolean = Map2dBinary.threshold(mapGrayscale, 0.1f); // convert from edges[0]
 
-        ProcessZFacade processZFacade = new ProcessZFacade();
-
-        final int processzNumberOfPixelsToMagnifyThreshold = 8;
-
-        final int processZGridsize = 8;
+        final var processZFacade = new ProcessZFacade();
 
         connectorSamplesForEndosceleton.workspace.clear();
         processD.annealedCandidates.clear(); // TODO< cleanup in process with method >
 
         processZFacade.setImageSize(imageSize);
+        final var processZGridsize = 8;
+        final var processzNumberOfPixelsToMagnifyThreshold = 8;
         processZFacade.preSetupSet(processZGridsize, processzNumberOfPixelsToMagnifyThreshold);
         processZFacade.setup();
 
@@ -185,24 +179,24 @@ public class Solver2 {
         processZFacade.processData();
         processZFacade.postProcessData();
 
-        IMap2d<Integer> notMagnifiedOutputObjectIdsMapDebug = processZFacade.getNotMagnifiedOutputObjectIds();
+        final var notMagnifiedOutputObjectIdsMapDebug = processZFacade.getNotMagnifiedOutputObjectIds();
 
-        ProcessA processA = new ProcessA();
-        ProcessB processB = new ProcessB();
-        ProcessC processC = new ProcessC();
+        final var processA = new ProcessA();
+        final var processB = new ProcessB();
+        final var processC = new ProcessC();
 
         // copy image because processA changes the image
-        ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        final ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
         processA.set(mapBoolean.copy(), processZFacade.getNotMagnifiedOutputObjectIds(), connectorSamplesFromProcessA);
         processA.setup(imageSize);
 
-        ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessB = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        final ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessB = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
         processB.set(mapBoolean.copy(), connectorSamplesFromProcessA, conntrSamplesFromProcessB);
         processB.setup(imageSize);
 
 
-        ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessC0 = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
-        ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessC1 = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        final ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessC0 = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        final ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessC1 = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
         processC.set(conntrSamplesFromProcessB, conntrSamplesFromProcessC0, conntrSamplesFromProcessC1);
         processC.setup(imageSize);
 
@@ -240,9 +234,7 @@ public class Solver2 {
 
         processD.step();
 
-        for (ProcessD d : processDEdge) {
-            d.step();
-        }
+        for (final var d : processDEdge) d.step();
 
         annealingStep++;
     }
@@ -255,14 +247,12 @@ public class Solver2 {
 
         processD.commitLineDetectors(); // split line detectors into "real" primitives
 
-        for (ProcessD iD : processDEdge) {
-            iD.commitLineDetectors();
-        }
+        for (final var iD : processDEdge) iD.commitLineDetectors();
 
         // * process-H for edges
         for (int i = 0, processDEdgeLength = processDEdge.length; i < processDEdgeLength; i++) {
             //ProcessD iD = processDEdge[i];
-            ProcessH processH = new ProcessH();
+            final var processH = new ProcessH();
             processH.setImageSize(imageSize);
             processH.set(connectorDetectorsFromProcessDForEdge[i], connectorDetectorsFromProcessHForEdge[i]);
             processH.setup();
@@ -274,7 +264,7 @@ public class Solver2 {
 
         // * process-H and process-E
 
-        ProcessH processH = new ProcessH();
+        final var processH = new ProcessH();
         processH.setImageSize(imageSize);
         processH.set(connectorDetectorsEndosceletonFromProcessD, connectorDetectorsEndosceletonFromProcessH);
         processH.setup();

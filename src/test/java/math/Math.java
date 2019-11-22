@@ -1,7 +1,6 @@
 package math;
 
 import org.junit.Test;
-import ptrman.misc.Assert;
 
 import static ptrman.math.Maths.modNegativeWraparound;
 
@@ -11,14 +10,14 @@ import static ptrman.math.Maths.modNegativeWraparound;
 public class Math {
     @Test
     public void testModNegativeWraparound() {
-        Assert.Assert(modNegativeWraparound(0, 3) == 0, "");
-        Assert.Assert(modNegativeWraparound(1, 3) == 1, "");
-        Assert.Assert(modNegativeWraparound(2, 3) == 2, "");
-        Assert.Assert(modNegativeWraparound(3, 3) == 0, "");
+        assert modNegativeWraparound(0, 3) == 0 : "ASSERT: " + "";
+        assert modNegativeWraparound(1, 3) == 1 : "ASSERT: " + "";
+        assert modNegativeWraparound(2, 3) == 2 : "ASSERT: " + "";
+        assert modNegativeWraparound(3, 3) == 0 : "ASSERT: " + "";
 
-        Assert.Assert(modNegativeWraparound(-1, 3) == 2, "");
-        Assert.Assert(modNegativeWraparound(-2, 3) == 1, "");
-        Assert.Assert(modNegativeWraparound(-3, 3) == 0, "");
-        Assert.Assert(modNegativeWraparound(-4, 3) == 2, "");
+        assert modNegativeWraparound(-1, 3) == 2 : "ASSERT: " + "";
+        assert modNegativeWraparound(-2, 3) == 1 : "ASSERT: " + "";
+        assert modNegativeWraparound(-3, 3) == 0 : "ASSERT: " + "";
+        assert modNegativeWraparound(-4, 3) == 2 : "ASSERT: " + "";
     }
 }

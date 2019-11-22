@@ -16,7 +16,7 @@ public interface IProcess {
 
     void setup();
 
-    default void setup(Vector2d<Integer> imageSize) {
+    default void setup(final Vector2d<Integer> imageSize) {
         setImageSize(imageSize);
         setup();
     }

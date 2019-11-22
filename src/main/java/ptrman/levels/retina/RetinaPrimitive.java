@@ -10,7 +10,6 @@
 package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
-import ptrman.misc.Assert;
 
 import java.util.List;
 
@@ -19,24 +18,16 @@ import java.util.List;
  * 
  */
 public class RetinaPrimitive {
-    public ArrayRealVector getNormalizedTangentForIntersectionTypeAndT(Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType, double f) {
-        if( type == EnumType.LINESEGMENT ) {
-            return line.getNormalizedDirection();
-        }
-        else if( type == EnumType.CURVE ) {
-            // TODO< middle and pass over T and/or a type >
-            
-            if( intersectionPartnerType == Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN ) {
-                return curve.getNormalizedTangentAtEndpoint(0);
-            }
-            else if( intersectionPartnerType == Intersection.IntersectionPartner.EnumIntersectionEndpointType.END ) {
-                return curve.getNormalizedTangentAtEndpoint(1);
-            }
-            else {
-                // TODO
-                return curve.getNormalizedTangentAtEndpoint(0);
-            }
-        }
+    public ArrayRealVector getNormalizedTangentForIntersectionTypeAndT(final Intersection.IntersectionPartner.EnumIntersectionEndpointType intersectionPartnerType, final double f) {
+        if( type == EnumType.LINESEGMENT ) return line.getNormalizedDirection();
+        else // TODO< middle and pass over T and/or a type >
+            if( type == EnumType.CURVE )
+                if (intersectionPartnerType == Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN)
+                    return curve.getNormalizedTangentAtEndpoint(0);
+                else // TODO
+                    if (intersectionPartnerType == Intersection.IntersectionPartner.EnumIntersectionEndpointType.END)
+                        return curve.getNormalizedTangentAtEndpoint(1);
+                    else return curve.getNormalizedTangentAtEndpoint(0);
         
         throw new InternalError();
     }
@@ -65,18 +56,18 @@ public class RetinaPrimitive {
         return line.conf;
     }
     
-    public static RetinaPrimitive makeLine(SingleLineDetector line) {
+    public static RetinaPrimitive makeLine(final SingleLineDetector line) {
 
-		RetinaPrimitive resultPrimitive = new RetinaPrimitive();
+		final var resultPrimitive = new RetinaPrimitive();
         resultPrimitive.line = line;
         resultPrimitive.type = EnumType.LINESEGMENT;
 
         return resultPrimitive;
     }
 
-    public static RetinaPrimitive makeCurve(ProcessG.Curve curve) {
+    public static RetinaPrimitive makeCurve(final ProcessG.Curve curve) {
 
-		RetinaPrimitive resultPrimitive = new RetinaPrimitive();
+		final var resultPrimitive = new RetinaPrimitive();
         resultPrimitive.curve = curve;
         resultPrimitive.type = EnumType.CURVE;
 
@@ -84,22 +75,16 @@ public class RetinaPrimitive {
     }
     
     public List<Intersection> getIntersections() {
-        if( type == EnumType.LINESEGMENT ) {
-            return line.intersections;
-        }
+        if( type == EnumType.LINESEGMENT ) return line.intersections;
 
         throw new InternalError();
     }
     
-    public ArrayRealVector getNormalizedTangentOnEndpoint(int index) {
-        Assert.Assert(index >= 0 && index <= 1, "");
-        
-        if( type == EnumType.LINESEGMENT ) {
-            return line.getNormalizedDirection();
-        }
-        else if( type == EnumType.CURVE ) {
-            return curve.getNormalizedTangentAtEndpoint(index);
-        }
+    public ArrayRealVector getNormalizedTangentOnEndpoint(final int index) {
+        assert index >= 0 && index <= 1 : "ASSERT: " + "";
+
+        if( type == EnumType.LINESEGMENT ) return line.getNormalizedDirection();
+        else if( type == EnumType.CURVE ) return curve.getNormalizedTangentAtEndpoint(index);
         
         throw new InternalError();
     }

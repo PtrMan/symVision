@@ -15,9 +15,9 @@ import ptrman.FargGeneral.network.Node;
 
 public class LinkCreator implements Network.ILinkCreator{
     @Override
-    public Link createLink(Link.EnumType type, Node target) {
+    public Link createLink(final Link.EnumType type, final Node target) {
 
-		ptrman.bpsolver.ltm.Link createdLink = new ptrman.bpsolver.ltm.Link(type);
+		final var createdLink = new ptrman.bpsolver.ltm.Link(type);
         createdLink.target = target;
         
         return createdLink;

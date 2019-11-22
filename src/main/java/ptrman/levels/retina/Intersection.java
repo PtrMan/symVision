@@ -19,13 +19,13 @@ public class Intersection  {
 
     public final ArrayRealVector intersectionPosition;
 
-    public Intersection(ArrayRealVector pos, IntersectionPartner part0, IntersectionPartner part1) {
+    public Intersection(final ArrayRealVector pos, final IntersectionPartner part0, final IntersectionPartner part1) {
         this.intersectionPosition = pos;
         this.p0 = part0;
         this.p1 = part1;
     }
 
-    public IntersectionPartner getOtherPartner(RetinaPrimitive primary) {
+    public IntersectionPartner getOtherPartner(final RetinaPrimitive primary) {
         return primary.equals(p0.primitive) ? p1 : p0;
     }
 
@@ -36,7 +36,7 @@ public class Intersection  {
             END
         }
 
-        public IntersectionPartner(RetinaPrimitive primitive, EnumIntersectionEndpointType intersectionEndpointType) {
+        public IntersectionPartner(final RetinaPrimitive primitive, final EnumIntersectionEndpointType intersectionEndpointType) {
             this.primitive = primitive;
             this.intersectionEndpointType = intersectionEndpointType;
         }

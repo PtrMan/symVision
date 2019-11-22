@@ -21,14 +21,14 @@ import java.util.List;
  */
 public class FirstOrderDifference extends DependsOnColumn {
 
-    public FirstOrderDifference(Metrics metrics, String source) {
+    public FirstOrderDifference(final Metrics metrics, final String source) {
         super(metrics, source, 1);
         
 
     }
 
     @Override
-    protected String getColumnID(Signal dependent, int i) {
+    protected String getColumnID(final Signal dependent, final int i) {
         return dependent.id + ".change";
     }
 
@@ -36,16 +36,16 @@ public class FirstOrderDifference extends DependsOnColumn {
     
     
     @Override
-    protected Number getValue(Object key, int ignored) {
+    protected Number getValue(final Object key, final int ignored) {
         
-        List nv = newestValues(sourceColumn, 2);
+        final var nv = newestValues(sourceColumn, 2);
                 
-        List<Double> values = Metrics.doubles(nv);
+        final List<Double> values = Metrics.doubles(nv);
                 
         if (values.size()<2) return null;
                 
-        double currentValue = values.get(0);
-        double prevValue = values.get(1);
+        final double currentValue = values.get(0);
+        final double prevValue = values.get(1);
         
         return currentValue - prevValue;
     }

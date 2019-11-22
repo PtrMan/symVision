@@ -14,15 +14,15 @@ public enum RandomUtil
 	;
 	// this is the generator for the Halton sequence numbers
 
-    static public float radicalInverse(int n, int baseValue)
+    static public float radicalInverse(int n, final int baseValue)
     {
-        float Val = 0.0f;
-        float InvBase = 1.0f / (float)baseValue;
-        float InvBi = InvBase;
+        var Val = 0.0f;
+        final var InvBase = 1.0f / (float)baseValue;
+        var InvBi = InvBase;
 
         while (n > 0)
         {
-            int Di = (n % baseValue);
+            final var Di = (n % baseValue);
             Val += ((float)Di * InvBi);
             n = (int)((float)n * InvBase);
             InvBi *= InvBase;

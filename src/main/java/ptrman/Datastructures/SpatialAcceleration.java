@@ -21,7 +21,7 @@ import java.util.List;
  * 
  */
 public class SpatialAcceleration<Type> {
-    public SpatialAcceleration(int gridcountX, int gridcountY, float sizeX, float sizeY) {
+    public SpatialAcceleration(final int gridcountX, final int gridcountY, final float sizeX, final float sizeY) {
         this.gridcountX = gridcountX;
         this.gridcountY = gridcountY;
         this.sizeX = sizeX;
@@ -34,98 +34,86 @@ public class SpatialAcceleration<Type> {
     }
     
     public void flushCells() {
-        for( Cell iterationCell : cells ) {
-            iterationCell.content.clear();
-        }
+        for( final var iterationCell : cells ) iterationCell.content.clear();
     }
     
-    public void addElement(Element element) {
+    public void addElement(final Element element) {
 
-        Vector2d<Integer> center = calcCenterInt(element.position);
+        final var center = calcCenterInt(element.position);
         getCellAt(center.x, center.y).content.add(element);
     }
     
-    public List<Element> getElementsNearPoint(ArrayRealVector point, float maximalRadius) {
+    public List<Element> getElementsNearPoint(final ArrayRealVector point, final float maximalRadius) {
 
-        Vector2d<Integer> neightborRadiusInBlocks = calcNeightborRadiusInBlocks(maximalRadius);
-        Vector2d<Integer> center = calcCenterInt(point);
+        final var neightborRadiusInBlocks = calcNeightborRadiusInBlocks(maximalRadius);
+        final var center = calcCenterInt(point);
 
-        List<Element> adjacentElements = getElementsInAdjacentCells(center, neightborRadiusInBlocks);
-        List<Element> adjacentElementsInRadius = getElementsInRadius(adjacentElements, point, maximalRadius);
+        final var adjacentElements = getElementsInAdjacentCells(center, neightborRadiusInBlocks);
+        final var adjacentElementsInRadius = getElementsInRadius(adjacentElements, point, maximalRadius);
         return adjacentElementsInRadius;
     }
     
-    private Vector2d<Integer> calcNeightborRadiusInBlocks(float maximalRadius) {
+    private Vector2d<Integer> calcNeightborRadiusInBlocks(final float maximalRadius) {
         Vector2d<Integer> neightborRadiusInBlocks;
 
-        int neightborRadiusInBlocksX = 1 + (int) (maximalRadius / gridelementSizeX);
-        int neightborRadiusInBlocksY = 1 + (int) (maximalRadius / gridelementSizeY);
+        final var neightborRadiusInBlocksX = 1 + (int) (maximalRadius / gridelementSizeX);
+        final var neightborRadiusInBlocksY = 1 + (int) (maximalRadius / gridelementSizeY);
         
         return new Vector2d<>(neightborRadiusInBlocksX, neightborRadiusInBlocksY);
     }
     
-    private Vector2d<Integer> calcCenterInt(ArrayRealVector point) {
+    private Vector2d<Integer> calcCenterInt(final ArrayRealVector point) {
 
-        int centerX = (int) (point.getDataRef()[0] / gridelementSizeX);
-        int centerY = (int) (point.getDataRef()[1] / gridelementSizeY);
+        final var centerX = (int) (point.getDataRef()[0] / gridelementSizeX);
+        final var centerY = (int) (point.getDataRef()[1] / gridelementSizeY);
 
         return new Vector2d<>(centerX, centerY);
     }
     
-    private List<Element> getElementsInRadius(Iterable<Element> adjacentElements, ArrayRealVector point, float maximalRadius) {
-        List<Element> result = new ArrayList<>();
+    private List<Element> getElementsInRadius(final Iterable<Element> adjacentElements, final ArrayRealVector point, final float maximalRadius) {
+        final List<Element> result = new ArrayList<>();
         
-        for( Element iterationElement : adjacentElements ) {
-            double distance = iterationElement.position.getDistance(point);
-            if( distance < maximalRadius ) {
-                result.add(iterationElement);
-            }
+        for( final var iterationElement : adjacentElements ) {
+            final var distance = iterationElement.position.getDistance(point);
+            if( distance < maximalRadius ) result.add(iterationElement);
         }
         
         return result;
     }
     
-    private List<Element> getElementsInAdjacentCells(Vector2d<Integer> center, Vector2d<Integer> width) {
-        final int minX = Math.max(0, center.x - width.x);
-        final int maxX = Math.min(gridcountX - 1, center.x + width.x);
-        final int minY = Math.max(0, center.y - width.y);
-        final int maxY = Math.min(gridcountY-1, center.y+width.y);
+    private List<Element> getElementsInAdjacentCells(final Vector2d<Integer> center, final Vector2d<Integer> width) {
+        final var minX = Math.max(0, center.x - width.x);
+        final var maxX = Math.min(gridcountX - 1, center.x + width.x);
+        final var minY = Math.max(0, center.y - width.y);
+        final var maxY = Math.min(gridcountY-1, center.y+width.y);
 
-        List<Element> resultList = new ArrayList<>();
+        final List<Element> resultList = new ArrayList<>();
         
-        for( int y = minY; y <= maxY; y++ ) {
-            for( int x = minX; x <= maxX; x++ ) {
-                resultList.addAll(getCellAt(x, y).content);
-            }
-        }
+        for(var y = minY; y <= maxY; y++ )
+            for (var x = minX; x <= maxX; x++) resultList.addAll(getCellAt(x, y).content);
         
         return resultList;
     }
     
-    private Cell getCellAt(int x, int y) {
+    private Cell getCellAt(final int x, final int y) {
         return cells[x + y*gridcountX];
     }
 
-    private Cell[] createCells(int gridcountX, int gridcountY) {
-        int i;
+    private Cell[] createCells(final int gridcountX, final int gridcountY) {
 
-        Cell[] result = (Cell[]) Array.newInstance(Cell.class, gridcountX * gridcountY);
+        final var result = (Cell[]) Array.newInstance(Cell.class, gridcountX * gridcountY);
         
-        for( i = 0; i < gridcountX*gridcountY; i++ )
-        {
+        for(int i = 0; i < gridcountX*gridcountY; i++ )
             result[i] = new Cell();
-        }
         
         return result;
     }
 
     public Iterable<Element> getContentOfAllCells() {
 
-        Collection<Element> result = new ArrayList<>();
+        final Collection<Element> result = new ArrayList<>();
         
-        for( Cell iterationCell : cells ) {
-            result.addAll(iterationCell.content);
-        }
+        for( final var iterationCell : cells ) result.addAll(iterationCell.content);
         
         return result;
     }

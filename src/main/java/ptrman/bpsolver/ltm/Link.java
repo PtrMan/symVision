@@ -15,7 +15,7 @@ package ptrman.bpsolver.ltm;
  */
 public class Link extends ptrman.FargGeneral.network.Link
 {
-    public Link(ptrman.FargGeneral.network.Link.EnumType type)
+    public Link(final ptrman.FargGeneral.network.Link.EnumType type)
     {
         super(type);
     }

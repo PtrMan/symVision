@@ -23,7 +23,7 @@ import java.util.List;
  */
 public class Dag<Type> {
     public static class Element<ElementType> {
-        public Element(ElementType content)
+        public Element(final ElementType content)
         {
             this.content = content;
         }
@@ -32,7 +32,7 @@ public class Dag<Type> {
         public final ElementType content;
     }
 
-    public void addElement(Element<Type> element)
+    public void addElement(final Element<Type> element)
     {
         elements.add(element);
     }

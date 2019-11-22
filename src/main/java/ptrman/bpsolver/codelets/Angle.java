@@ -22,14 +22,14 @@ import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
 import ptrman.math.Maths;
 import ptrman.math.TruncatedFisherYades;
 import ptrman.misc.AngleHelper;
-import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static ptrman.math.ArrayRealVectorHelper.normalize;
-import static ptrman.misc.Assert.Assert;
 
 /**
  *
@@ -41,7 +41,7 @@ public class Angle extends SolverCodelet {
     private static final int KPOINTNUMBEROFCHOSENANGLES = 10; // must be smaller or equal to KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE
 
     private static class AngleInformation {
-        public AngleInformation(double angle, int count) {
+        public AngleInformation(final double angle, final int count) {
             this.angle = angle;
             this.count = count;
         }
@@ -50,7 +50,7 @@ public class Angle extends SolverCodelet {
         public final double angle;
     }
     
-    public Angle(Solver bpSolver) {
+    public Angle(final Solver bpSolver) {
         super(bpSolver);
     }
 
@@ -66,40 +66,33 @@ public class Angle extends SolverCodelet {
 
     @Override
     public RunResult run() {
-        Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() && ((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(getNetworkHandles().anglePointNodePlatonicPrimitiveNode), "");
+        assert startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() && ((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(getNetworkHandles().anglePointNodePlatonicPrimitiveNode) : "ASSERT: " + "";
 
-        AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType anglePointType = getAnglePointType((PlatonicPrimitiveInstanceNode) startNode);
-        final List<PlatonicPrimitiveInstanceNode> anglePartners = getPartnersOfAnglepoint((PlatonicPrimitiveInstanceNode)startNode);
-        final ArrayRealVector anglePosition = getAnglePosition((PlatonicPrimitiveInstanceNode)startNode);
+        final var anglePointType = getAnglePointType((PlatonicPrimitiveInstanceNode) startNode);
+        final var anglePartners = getPartnersOfAnglepoint((PlatonicPrimitiveInstanceNode)startNode);
+        final var anglePosition = getAnglePosition((PlatonicPrimitiveInstanceNode)startNode);
         
         // checks
-        if( anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.K ) {
-            Assert.Assert(anglePartners.size() >= 3, "");
-        }
-        else if( anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.V ) {
-            Assert.Assert(anglePartners.size() == 2, "");
-        }
-        else if( anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.X ) {
-            Assert.Assert(anglePartners.size() >= 2 && anglePartners.size() <= 4, "");
-        }
-        else if( anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.T ) {
-            Assert.Assert(anglePartners.size() == 2 || anglePartners.size() == 3, "");
-        }
-        else {
-            // relates to BUG 0001
+        if( anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.K )
+            assert anglePartners.size() >= 3 : "ASSERT: " + "";
+        else if( anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.V )
+            assert anglePartners.size() == 2 : "ASSERT: " + "";
+        else if( anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.X )
+            assert anglePartners.size() >= 2 && anglePartners.size() <= 4 : "ASSERT: " + "";
+        else // relates to BUG 0001
             // we just return when this case triggers
-            return new RunResult(false);
-            
             // uncomment when the bug is fixed
             //throw new InternalError();
-        }
+            if( anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.T )
+                assert anglePartners.size() == 2 || anglePartners.size() == 3 : "ASSERT: " + "";
+        else return new RunResult(false);
 
 
-        final List<Double> angles = calculateAnglesBetweenPartners(anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.K ? EnumIsKPoint.YES : EnumIsKPoint.NO,
+        final var angles = calculateAnglesBetweenPartners(anglePointType == AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.K ? EnumIsKPoint.YES : EnumIsKPoint.NO,
                 anglePartners,
                 anglePosition
         );
-        final List<AngleInformation> angleInformations = bundleAnglesAndCreateAngleInformations(angles);
+        final var angleInformations = bundleAnglesAndCreateAngleInformations(angles);
         
         createNodesAndLinkAngleInformation((PlatonicPrimitiveInstanceNode)startNode, angleInformations);
         createAndLinkAnglePointType((PlatonicPrimitiveInstanceNode)startNode, anglePointType);
@@ -107,37 +100,34 @@ public class Angle extends SolverCodelet {
         return new RunResult(false);
     }
     
-    private void createNodesAndLinkAngleInformation(PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, final Iterable<AngleInformation> angleInformations) {
-        for( AngleInformation iterationAngle : angleInformations ) {
-            FeatureNode createdFeatureNode = FeatureNode.createFloatNode(getNetworkHandles().anglePointAngleValuePrimitiveNode, iterationAngle.angle, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().anglePointAngleValuePrimitiveNode));
+    private void createNodesAndLinkAngleInformation(final PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, final Iterable<AngleInformation> angleInformations) {
+        for( final var iterationAngle : angleInformations ) {
+            final var createdFeatureNode = FeatureNode.createFloatNode(getNetworkHandles().anglePointAngleValuePrimitiveNode, iterationAngle.angle, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().anglePointAngleValuePrimitiveNode));
             
-            for( int linkI = 0; linkI < iterationAngle.count; linkI++ ) {
-                Link createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASFEATURE, createdFeatureNode);
+            for(var linkI = 0; linkI < iterationAngle.count; linkI++ ) {
+                final var createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASFEATURE, createdFeatureNode);
                 
                 anglePointPrimitiveInstanceNode.out(createdLink);
             }
         }
     }
     
-    private void createAndLinkAnglePointType(PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, final AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType anglePointType) {
-        final AttributeNode createAnglePointTypeNode = AttributeNode.createIntegerNode(getNetworkHandles().anglePointFeatureTypePrimitiveNode, anglePointType.ordinal());
+    private void createAndLinkAnglePointType(final PlatonicPrimitiveInstanceNode anglePointPrimitiveInstanceNode, final AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType anglePointType) {
+        final var createAnglePointTypeNode = AttributeNode.createIntegerNode(getNetworkHandles().anglePointFeatureTypePrimitiveNode, anglePointType.ordinal());
         
-        final Link createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createAnglePointTypeNode);
+        final var createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createAnglePointTypeNode);
         anglePointPrimitiveInstanceNode.out(createdLink);
     }
     
     private AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType getAnglePointType(final PlatonicPrimitiveInstanceNode anglePointNode) {
-        for( Link iterationLink : anglePointNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
+        for( final var iterationLink : anglePointNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
 
-            if( iterationLink.target.type != NodeTypes.EnumType.ATTRIBUTENODE.ordinal() ) {
-                continue;
-            }
+            if( iterationLink.target.type != NodeTypes.EnumType.ATTRIBUTENODE.ordinal() ) continue;
 
-            AttributeNode targetAttributeNode = (AttributeNode) iterationLink.target;
+            final var targetAttributeNode = (AttributeNode) iterationLink.target;
             
-            if( !targetAttributeNode.attributeTypeNode.equals(getNetworkHandles().anglePointFeatureTypePrimitiveNode) ) {
+            if( !targetAttributeNode.attributeTypeNode.equals(getNetworkHandles().anglePointFeatureTypePrimitiveNode) )
                 continue;
-            }
             
             return AbstractTranslatorStrategy.Crosspoint.EnumAnglePointType.fromInteger(targetAttributeNode.getValueAsInt());
             
@@ -147,17 +137,14 @@ public class Angle extends SolverCodelet {
     }
     
     private ArrayRealVector getAnglePosition(final PlatonicPrimitiveInstanceNode platonicPrimitiveInstanceNode) {
-        for( Link iterationLink : platonicPrimitiveInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
+        for( final var iterationLink : platonicPrimitiveInstanceNode.getLinksByType(Link.EnumType.HASATTRIBUTE) ) {
 
-            if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) {
-                continue;
-            }
+            if( iterationLink.target.type != NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() ) continue;
 
-            PlatonicPrimitiveInstanceNode targetNode = (PlatonicPrimitiveInstanceNode) iterationLink.target;
+            final var targetNode = (PlatonicPrimitiveInstanceNode) iterationLink.target;
             
-            if( !targetNode.primitiveNode.equals(getNetworkHandles().anglePointPositionPlatonicPrimitiveNode) ) {
+            if( !targetNode.primitiveNode.equals(getNetworkHandles().anglePointPositionPlatonicPrimitiveNode) )
                 continue;
-            }
             
             return HelperFunctions.getVectorFromVectorAttributeNode(getNetworkHandles(), targetNode);
         }
@@ -166,20 +153,20 @@ public class Angle extends SolverCodelet {
     }
     
     private static List<PlatonicPrimitiveInstanceNode> getPartnersOfAnglepoint(final PlatonicPrimitiveInstanceNode anglePointNode) {
-        List<PlatonicPrimitiveInstanceNode> resultList = new ArrayList<>();
+        final List<PlatonicPrimitiveInstanceNode> resultList = new ArrayList<>();
         
-        for( Link iterationLink : anglePointNode.getLinksByType(Link.EnumType.ISPARTOF) ) {
-            Assert.Assert(iterationLink.target.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "");
+        for( final var iterationLink : anglePointNode.getLinksByType(Link.EnumType.ISPARTOF) ) {
+            assert iterationLink.target.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() : "ASSERT: " + "";
             resultList.add((PlatonicPrimitiveInstanceNode)iterationLink.target);
         }
-        
-        Assert.Assert(resultList.size() > 0, "");
+
+        assert resultList.size() > 0 : "ASSERT: " + "";
         return resultList;
     }
     
     private double measureAngleBetweenPartnersAtPosition(final PlatonicPrimitiveInstanceNode a, final PlatonicPrimitiveInstanceNode b, final ArrayRealVector position) {
-        final ArrayRealVector tangentA = getTangentOfPlatonicPrimitiveInstanceAtPosition(a, position);
-        final ArrayRealVector tangentB = getTangentOfPlatonicPrimitiveInstanceAtPosition(b, position);
+        final var tangentA = getTangentOfPlatonicPrimitiveInstanceAtPosition(a, position);
+        final var tangentB = getTangentOfPlatonicPrimitiveInstanceAtPosition(b, position);
         
         return AngleHelper.getMinimalAngleInDegreeBetweenNormalizedVectors(tangentA, tangentB);
     }
@@ -187,32 +174,29 @@ public class Angle extends SolverCodelet {
     
     private ArrayRealVector getTangentOfPlatonicPrimitiveInstanceAtPosition(final PlatonicPrimitiveInstanceNode platonicPrimitive, final ArrayRealVector position) {
         if( platonicPrimitive.primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) ) {
-            final ArrayRealVector diff = platonicPrimitive.p1.subtract(platonicPrimitive.p2);
+            final var diff = platonicPrimitive.p1.subtract(platonicPrimitive.p2);
             return normalize(diff);
         }
-        else {
-            throw new InternalError("Unexpected type of primitive!");
-        }
+        else throw new InternalError("Unexpected type of primitive!");
     }
     
     
-    private static List<AngleInformation> bundleAnglesAndCreateAngleInformations(Iterable<Double> angles) {
-        List<AngleInformation> resultAngleInformation = new ArrayList<>();
+    private static List<AngleInformation> bundleAnglesAndCreateAngleInformations(final Iterable<Double> angles) {
+        final List<AngleInformation> resultAngleInformation = new ArrayList<>();
         
-        for( double angle : angles ) {
-            boolean similarAngleWasFound = false;
+        for( final double angle : angles ) {
+            var similarAngleWasFound = false;
             
-            for( AngleInformation iterationAngleInformation : resultAngleInformation ) {
-                if( Math.abs(angle - iterationAngleInformation.angle) < ANGLEMAXDIFFERENCE ) {
+            for( final var iterationAngleInformation : resultAngleInformation )
+                if (Math.abs(angle - iterationAngleInformation.angle) < ANGLEMAXDIFFERENCE) {
                     iterationAngleInformation.count++;
                     similarAngleWasFound = true;
                     break;
                 }
-            }
             
             if( !similarAngleWasFound ) {
 
-                AngleInformation createdAngleInformation = new AngleInformation(angle, 1);
+                final var createdAngleInformation = new AngleInformation(angle, 1);
                 resultAngleInformation.add(createdAngleInformation);
             }
         }
@@ -223,32 +207,27 @@ public class Angle extends SolverCodelet {
     private List<Double> calculateAnglesBetweenPartners(final EnumIsKPoint isKpoint, final List<PlatonicPrimitiveInstanceNode> anglePartners, final ArrayRealVector anglePosition) {
         List<Double> angleResult = new ArrayList<>();
         
-        final int numberOfCombinations = Maths.faculty(anglePartners.size());
+        final var numberOfCombinations = Maths.faculty(anglePartners.size());
 
         if( isKpoint == EnumIsKPoint.YES && numberOfCombinations > KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE ) {
             // NOTE PERFORMANCE< the Fisher yades algorithm is maybe too slow, future will tell >
             // NOTE< selection policy could be better, we measure only one angle per partner, could be many >
 
-            TruncatedFisherYades truncatedFisherYades = new TruncatedFisherYades((anglePartners.size() * anglePartners.size() - anglePartners.size()) / 2, new GeneratorImplementation());
+            final var truncatedFisherYades = new TruncatedFisherYades((anglePartners.size() * anglePartners.size() - anglePartners.size()) / 2, new GeneratorImplementation());
             
-            for( int i = 0; i < KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE; i++) {
-                final Tuple<Integer> indices = (Tuple<Integer>)truncatedFisherYades.takeOne(random);
+            for(var i = 0; i < KPOINTNUMBEROFANGLESUNTILSTOCHASTICCHOICE; i++) {
+                final var indices = (Tuple<Integer>)truncatedFisherYades.takeOne(random);
                 final int partnerIndexA = indices.left;
                 final int partnerIndexB = indices.right;
-                
-                Assert.Assert(partnerIndexA >= 0 && partnerIndexA < anglePartners.size(), "Invalid index");
-                Assert.Assert(partnerIndexB >= 0 && partnerIndexB < anglePartners.size(), "Invalid index");
-                
+
+                assert partnerIndexA >= 0 && partnerIndexA < anglePartners.size() : "ASSERT: " + "Invalid index";
+                assert partnerIndexB >= 0 && partnerIndexB < anglePartners.size() : "ASSERT: " + "Invalid index";
+
                 angleResult.add(measureAngleBetweenPartnersAtPosition(anglePartners.get(partnerIndexA), anglePartners.get(partnerIndexB), anglePosition));
             }
         }
-        else {
-            for( int lower = 0; lower < anglePartners.size(); lower++ ) {
-                for( int higher = lower+1; higher < anglePartners.size(); higher++ ) {
-                    angleResult.add(measureAngleBetweenPartnersAtPosition(anglePartners.get(0), anglePartners.get(1), anglePosition));
-                }
-            }
-        }
+        else
+            angleResult = IntStream.range(0, anglePartners.size()).flatMap(lower -> IntStream.range(lower + 1, anglePartners.size())).mapToObj(higher -> measureAngleBetweenPartnersAtPosition(anglePartners.get(0), anglePartners.get(1), anglePosition)).collect(Collectors.toList());
         
         return angleResult;
     }
@@ -258,8 +237,8 @@ public class Angle extends SolverCodelet {
         }
         
         @Override
-        public Tuple<Integer> generate(int index) {
-            final Tuple<Integer> triangleIndices = getIndicesOfTriangle(index);
+        public Tuple<Integer> generate(final int index) {
+            final var triangleIndices = getIndicesOfTriangle(index);
             
             // y+1 because we take the lower triangle in the matrix of the index combinations
             return new Tuple<>(triangleIndices.left, triangleIndices.right+1);
@@ -282,14 +261,12 @@ public class Angle extends SolverCodelet {
         
         // ...
         private static Tuple<Integer> getIndicesOfTriangle(final int index) {
-            int yIndex = 0;
-            int width = 1;
-            int remainingIndex = index;
-            
-            for(;;) {
-                if( remainingIndex < width ) {
-                    return new Tuple<>(remainingIndex, yIndex);
-                }
+            var yIndex = 0;
+            var width = 1;
+            var remainingIndex = index;
+
+            while (true) {
+                if( remainingIndex < width ) return new Tuple<>(remainingIndex, yIndex);
                 
                 remainingIndex -= width;
                 yIndex++;
@@ -303,7 +280,7 @@ public class Angle extends SolverCodelet {
         public final T left;
         public final T right;
         
-        public Tuple(T left, T right) {
+        public Tuple(final T left, final T right) {
             this.left = left;
             this.right = right;
         }

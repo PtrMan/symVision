@@ -9,8 +9,6 @@
  */
 package ptrman.levels.retina;
 
-import ptrman.misc.Assert;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,7 +18,7 @@ import java.util.Random;
  */
 public class ProcessM {
     public static class LineParsing {
-        public LineParsing(List<SingleLineDetector> lineParsing) {
+        public LineParsing(final List<SingleLineDetector> lineParsing) {
             this.lineParsing = lineParsing;
         }
         
@@ -30,14 +28,12 @@ public class ProcessM {
         public boolean processGRated = false; // used to check for invalidated curves and rerate them if necessary
     }
 
-    public Random rng = new Random();
+    public final Random rng = new Random();
 
-    public List<LineParsing> lineParsings = new ArrayList<>();
+    public final List<LineParsing> lineParsings = new ArrayList<>();
 
-    public void process(List<RetinaPrimitive> lineDetectors) {
-        if( lineDetectors.isEmpty() ) {
-            return;
-        }
+    public void process(final List<RetinaPrimitive> lineDetectors) {
+        if( lineDetectors.isEmpty() ) return;
         
         tryToFindLines(lineDetectors, 1);
     }
@@ -47,39 +43,37 @@ public class ProcessM {
         return lineParsings;
     }
     
-    private void tryToFindLines(List<RetinaPrimitive> lineDetectors, int numberOfIterations) {
-        int iteration;
-        
+    private void tryToFindLines(final List<RetinaPrimitive> lineDetectors, final int numberOfIterations) {
+
         lineParsings.clear();
         
-        for( iteration = 0; iteration < numberOfIterations; iteration++ ) {
+        for(int iteration = 0; iteration < numberOfIterations; iteration++ ) {
             resetMarkingsWithLocking(lineDetectors);
             selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(lineDetectors);
         }
     }
     
-    private static void resetMarkingsWithLocking(Iterable<RetinaPrimitive> lineDetectors) {
+    private static void resetMarkingsWithLocking(final Iterable<RetinaPrimitive> lineDetectors) {
         // TODO< lock >
         resetMarkingsSynchronous(lineDetectors);
         // TODO< unlock >
     }
     
-    private static void resetMarkingsSynchronous(Iterable<RetinaPrimitive> lineDetectors) {
-        for( RetinaPrimitive iterationDetector : lineDetectors ) {
-            iterationDetector.line.marked = false;
-        }
+    private static void resetMarkingsSynchronous(final Iterable<RetinaPrimitive> lineDetectors) {
+        for( final var iterationDetector : lineDetectors ) iterationDetector.line.marked = false;
     }
 
-    private void selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(List<RetinaPrimitive> lineDetectors) {
+    private void selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(final List<RetinaPrimitive> lineDetectors) {
 
         // TODO< lock >
-        
-        Assert.Assert(!lineDetectors.isEmpty(), "");
 
-        int startLineIndex = rng.nextInt(lineDetectors.size());
-        SingleLineDetector startLineDetector = lineDetectors.get(startLineIndex).line;
+        final boolean value = !lineDetectors.isEmpty();
+        assert value : "ASSERT: " + "";
 
-        ArrayList<SingleLineDetector> lineParsing = findLineParsingForStartLine(startLineDetector);
+        final var startLineIndex = rng.nextInt(lineDetectors.size());
+        final var startLineDetector = lineDetectors.get(startLineIndex).line;
+
+        final var lineParsing = findLineParsingForStartLine(startLineDetector);
         lineParsings.add(new LineParsing(lineParsing));
         
         // TODO< unlock >
@@ -91,58 +85,56 @@ public class ProcessM {
      * 
      * --- the lines are locked
      */
-    private ArrayList<SingleLineDetector> findLineParsingForStartLine(SingleLineDetector startLineDetector) {
+    private ArrayList<SingleLineDetector> findLineParsingForStartLine(final SingleLineDetector startLineDetector) {
+        ArrayList<SingleLineDetector> result = null;
 
-        ArrayList<SingleLineDetector> resultLineParsing = new ArrayList<>();
-        SingleLineDetector currentLineDetector = startLineDetector;
-        
-        for(;;) {
+        final var resultLineParsing = new ArrayList<SingleLineDetector>();
+        var currentLineDetector = startLineDetector;
 
-            List<Intersection> remainingIntersections = deepCopyIntersections(currentLineDetector.intersections);
-            
+        do {
+
+            final var remainingIntersections = deepCopyIntersections(currentLineDetector.intersections);
+
             // choose from the remaining intersections one and check it if it leads to a nonmarked edge
-            for(;;) {
+            while (true) {
 
-                if( remainingIntersections.isEmpty() ) {
+                if (remainingIntersections.isEmpty()) {
                     // if we don't have any edges we can't go to any other edge/line, so the "search" is terminated
-                    
-                    return resultLineParsing;
+
+                    result = resultLineParsing;
+                    break;
                 }
-                
+
                 // take out
-                int indexOfChosenRemainingIntersections = rng.nextInt(remainingIntersections.size());
-                Intersection currentIntersection = remainingIntersections.get(indexOfChosenRemainingIntersections);
+                final var indexOfChosenRemainingIntersections = rng.nextInt(remainingIntersections.size());
+                final var currentIntersection = remainingIntersections.get(indexOfChosenRemainingIntersections);
                 remainingIntersections.remove(indexOfChosenRemainingIntersections);
-                
-                Assert.Assert(currentIntersection.p0.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "is not line");
-                Assert.Assert(currentIntersection.p1.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "is not line");
-                
+
+                assert currentIntersection.p0.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT : "ASSERT: " + "is not line";
+                assert currentIntersection.p1.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT : "ASSERT: " + "is not line";
+
                 // check out if the other side was already marked, if so, continue search for a unmarked edge/line
-                if( currentIntersection.p0.primitive.line.equals(currentLineDetector) ) {
-                    if( currentIntersection.p1.primitive.line.marked ) {
-                        continue;
-                    }
+                if (currentIntersection.p0.primitive.line.equals(currentLineDetector)) {
+                    if (currentIntersection.p1.primitive.line.marked) continue;
                     // else we are here
-                    
+
                     currentIntersection.p1.primitive.line.marked = true;
                     resultLineParsing.add(currentIntersection.p1.primitive.line);
                     currentLineDetector = currentIntersection.p1.primitive.line;
-                }
-                else {
-                    if( currentIntersection.p0.primitive.line.marked ) {
-                        continue;
-                    }
+                } else {
+                    if (currentIntersection.p0.primitive.line.marked) continue;
                     // else we are here
-                    
+
                     currentIntersection.p0.primitive.line.marked = true;
                     resultLineParsing.add(currentIntersection.p0.primitive.line);
                     currentLineDetector = currentIntersection.p0.primitive.line;
                 }
             }
-        }
+        } while (result == null);
+        return result;
     }
     
-    private static List<Intersection> deepCopyIntersections(List<Intersection> intersections) {
+    private static List<Intersection> deepCopyIntersections(final List<Intersection> intersections) {
         return new ArrayList<>(intersections);
     }
 }

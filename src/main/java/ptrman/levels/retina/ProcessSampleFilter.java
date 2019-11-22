@@ -20,13 +20,13 @@ public class ProcessSampleFilter implements IProcess {
         this.filterType = filterType;
     }
 
-    public void preSetupSet(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector) {
+    public void preSetupSet(final ProcessConnector<ProcessA.Sample> inputSampleConnector, final ProcessConnector<ProcessA.Sample> outputSampleConnector) {
         this.inputSampleConnector = inputSampleConnector;
         this.outputSampleConnector = outputSampleConnector;
     }
 
     @Override
-    public void setImageSize(Vector2d<Integer> imageSize) {
+    public void setImageSize(final Vector2d<Integer> imageSize) {
     }
 
     @Override
@@ -41,11 +41,9 @@ public class ProcessSampleFilter implements IProcess {
     @Override
     public void processData() {
         while( inputSampleConnector.getSize() > 0 ) {
-            final ProcessA.Sample currentSample = inputSampleConnector.poll();
+            final var currentSample = inputSampleConnector.poll();
 
-            if( currentSample.type == filterType ) {
-                outputSampleConnector.add(currentSample);
-            }
+            if( currentSample.type == filterType ) outputSampleConnector.add(currentSample);
         }
     }
 

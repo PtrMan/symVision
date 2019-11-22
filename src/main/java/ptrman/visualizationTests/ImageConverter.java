@@ -7,7 +7,7 @@
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
-package ptrman.misc;
+package ptrman.visualizationTests;
 
 import processing.core.PConstants;
 import processing.core.PImage;
@@ -17,9 +17,9 @@ import java.awt.image.BufferedImage;
 public enum ImageConverter {
 	;
 
-	public static PImage convBufferedImageToPImage(BufferedImage bimg) {
+	public static PImage convBufferedImageToPImage(final BufferedImage bimg) {
         // code is inspired by https://forum.processing.org/one/topic/converting-bufferedimage-to-pimage.html
-        PImage img=new PImage(bimg.getWidth(),bimg.getHeight(), PConstants.ARGB);
+        final var img=new PImage(bimg.getWidth(),bimg.getHeight(), PConstants.ARGB);
         bimg.getRGB(0, 0, img.width, img.height, img.pixels, 0, img.width);
         img.updatePixels();
         return img;

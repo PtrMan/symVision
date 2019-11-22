@@ -21,24 +21,20 @@ public enum Convolution2dHelper
 {
 	;
 
-	public static IMap2d<Float> calculateMarrHildrethOperator(Vector2d<Integer> size, float sigma)
+	public static IMap2d<Float> calculateMarrHildrethOperator(final Vector2d<Integer> size, final float sigma)
     {
-        int x, y;
 
-        IMap2d<Float> kernel = new Map2d<>(size.x, size.y);
+        final IMap2d<Float> kernel = new Map2d<>(size.x, size.y);
 
-        for( y = 0; y < size.y; y++ )
-        {
-            for( x = 0; x < size.x; x++ )
-            {
+        for(int y = 0; y < size.y; y++ )
+            for (int x = 0; x < size.x; x++) {
 
-                float fx = (float) x * 2.0f - 1.0f;
-                float fy = (float) y * 2.0f - 1.0f;
+                final var fx = (float) x * 2.0f - 1.0f;
+                final var fy = (float) y * 2.0f - 1.0f;
 
-                float value = Kernels.calcMarrHildrethOperator(new Vector2d<>(fx, fy), sigma);
+                final var value = Kernels.calcMarrHildrethOperator(new Vector2d<>(fx, fy), sigma);
                 kernel.setAt(x, y, value);
             }
-        }
 
         return kernel;
     }
@@ -48,37 +44,30 @@ public enum Convolution2dHelper
      * \param phi angle in radiants
      * \param spartialRatioAspect ellipticity of the support of the Gabor function
      */
-    public static IMap2d<Float> calcGaborKernel(int width, float phi, float lambda, float phaseOffset, float spartialRatioAspect)
+    public static IMap2d<Float> calcGaborKernel(final int width, final float phi, final float lambda, final float phaseOffset, final float spartialRatioAspect)
     {
-        float xTick, yTick;
-        float sigma;
-        int xInt, yInt;
 
         // constant from http://bmia.bmt.tue.nl/Education/Courses/FEV/course/pdf/Petkov_Gabor_functions2011.pdf
-        sigma = 0.56f * lambda;
+        final float sigma = 0.56f * lambda;
 
-        IMap2d<Float> resultMap = new Map2d<>(width, width);
+        final IMap2d<Float> resultMap = new Map2d<>(width, width);
 
-        for( yInt = 0; yInt < width; yInt++ ) {
-            for( xInt = 0; xInt < width; xInt++ ) {
-                float x, y;
-                float insideExp, insideCos;
-                float filterValue;
+        for(int yInt = 0; yInt < width; yInt++ )
+            for (int xInt = 0; xInt < width; xInt++) {
 
-                x = ((float)(xInt - width / 2)/(float)width) * 2.0f;
-                y = ((float)(yInt - width / 2)/(float)width) * 2.0f;
+                final float x = ((float) (xInt - width / 2) / (float) width) * 2.0f;
+                final float y = ((float) (yInt - width / 2) / (float) width) * 2.0f;
 
-                xTick = x * (float)Math.cos(phi) + y * (float)Math.sin(phi);
-                yTick = -x * (float)Math.sin(phi) + y * (float)Math.cos(phi);
+                float xTick = x * (float) Math.cos(phi) + y * (float) Math.sin(phi);
+                float yTick = -x * (float) Math.sin(phi) + y * (float) Math.cos(phi);
 
-                insideExp = - (xTick*xTick + spartialRatioAspect*spartialRatioAspect * yTick*yTick)/(2.0f*sigma*sigma);
-                insideCos = 2.0f*(float)Math.PI * (xTick/lambda) + phaseOffset;
+                final float insideExp = -(xTick * xTick + spartialRatioAspect * spartialRatioAspect * yTick * yTick) / (2.0f * sigma * sigma);
+                final float insideCos = 2.0f * (float) Math.PI * (xTick / lambda) + phaseOffset;
 
-                filterValue = (float)Math.exp(insideExp) * (float)Math.cos(insideCos);
+                final float filterValue = (float) Math.exp(insideExp) * (float) Math.cos(insideCos);
 
                 resultMap.setAt(xInt, yInt, filterValue);
             }
-        }
 
         return resultMap;
     }

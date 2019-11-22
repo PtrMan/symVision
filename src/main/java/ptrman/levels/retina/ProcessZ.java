@@ -32,10 +32,10 @@ public class ProcessZ implements IProcess {
     public IMap2d<Boolean> magnifiedOutput;
     public final Map2dTransform<Float> map2dTranform = new Map2dTransform<>();
 
-    public float FLOATTOBOOLEANTHRESHOLD = 0.6f;
+    public final float FLOATTOBOOLEANTHRESHOLD = 0.6f;
 
     @Override
-    public void setImageSize(Vector2d<Integer> imageSize) {
+    public void setImageSize(final Vector2d<Integer> imageSize) {
         this.imageSize = imageSize;
     }
 

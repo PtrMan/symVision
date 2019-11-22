@@ -9,21 +9,19 @@
  */
 package ptrman.bpsolver.codelets;
 
-import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.FargGeneral.network.Link;
 import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.SolverCodelet;
 import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import ptrman.misc.Assert;
 
 /**
  *
  *
  */
 public class LineSegmentSlope extends SolverCodelet {
-    public LineSegmentSlope(Solver bpSolver) {
+    public LineSegmentSlope(final Solver bpSolver) {
         super(bpSolver);
     }
     
@@ -40,18 +38,18 @@ public class LineSegmentSlope extends SolverCodelet {
     @Override
     public RunResult run() {
 
-        Assert.Assert(startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "startNode node type is wrong!");
-        Assert.Assert(((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode), "startNode is not a line!");
+        assert startNode.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() : "ASSERT: " + "startNode node type is wrong!";
+        assert ((PlatonicPrimitiveInstanceNode)startNode).primitiveNode.equals(getNetworkHandles().lineSegmentPlatonicPrimitiveNode) : "ASSERT: " + "startNode is not a line!";
 
-        PlatonicPrimitiveInstanceNode thisLine = (PlatonicPrimitiveInstanceNode)startNode;
+        final var thisLine = (PlatonicPrimitiveInstanceNode)startNode;
         
-        ArrayRealVector diff = thisLine.p1.subtract(thisLine.p2);
+        final var diff = thisLine.p1.subtract(thisLine.p2);
 
-        double lineSegmentSlope = diff.getDataRef()[0] == 0.0f ? Float.POSITIVE_INFINITY : diff.getDataRef()[1] / diff.getDataRef()[0];
+        final var lineSegmentSlope = diff.getDataRef()[0] == 0.0f ? Float.POSITIVE_INFINITY : diff.getDataRef()[1] / diff.getDataRef()[0];
 
-        FeatureNode createdLineSlope = FeatureNode.createFloatNode(getNetworkHandles().lineSegmentFeatureLineSlopePrimitiveNode, lineSegmentSlope, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().lineSegmentFeatureLineSlopePrimitiveNode));
+        final var createdLineSlope = FeatureNode.createFloatNode(getNetworkHandles().lineSegmentFeatureLineSlopePrimitiveNode, lineSegmentSlope, 1, bpSolver.platonicPrimitiveDatabase.getMaxValueByPrimitiveNode(getNetworkHandles().lineSegmentFeatureLineSlopePrimitiveNode));
         
-        Link createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdLineSlope);
+        final var createdLink = getNetwork().linkCreator.createLink(Link.EnumType.HASATTRIBUTE, createdLineSlope);
         thisLine.out(createdLink);
         
         return new RunResult(false);

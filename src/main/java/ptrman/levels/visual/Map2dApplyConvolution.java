@@ -15,13 +15,13 @@ import ptrman.Datastructures.IMap2d;
  * applies a convolution
  */
 public class Map2dApplyConvolution {
-    public IMap2d<Float> kernel;
+    public final IMap2d<Float> kernel;
 
-    public Map2dApplyConvolution(IMap2d<Float> kernel) {
+    public Map2dApplyConvolution(final IMap2d<Float> kernel) {
         this.kernel = kernel;
     }
 
-    public IMap2d<Float> process(IMap2d<Float> input) {
+    public IMap2d<Float> process(final IMap2d<Float> input) {
         return Convolution2d.convolution(input, kernel);
     }
 }

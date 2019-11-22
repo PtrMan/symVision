@@ -17,12 +17,12 @@ public interface IMap2d<Type>
     int getWidth();
     int getLength();
 
-    default boolean inBounds(Vector2d<Integer> position) {
+    default boolean inBounds(final Vector2d<Integer> position) {
         return inBounds(position.xInt(), position.yInt() );
         //return position.xInt() < getWidth() && position.yInt() < getLength();
     }
 
-    default boolean inBounds(int x, int y) {
+    default boolean inBounds(final int x, final int y) {
         return x>=0 && y >=0 && x < getWidth() && y < getLength();
     }
 

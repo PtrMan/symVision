@@ -20,11 +20,10 @@ import ptrman.bpsolver.CodeletLtmLookup;
 import ptrman.bpsolver.NetworkHandles;
 import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
-import ptrman.levels.retina.Intersection;
 import ptrman.levels.retina.RetinaPrimitive;
-import ptrman.misc.Assert;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 // BUGS
 // BUG 0001
@@ -43,45 +42,40 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
      * \return the node which is the object node 
      */
     @Override
-    public List<Node> createObjectsFromRetinaPrimitives(List<RetinaPrimitive> primitives, Solver bpSolver) {
+    public List<Node> createObjectsFromRetinaPrimitives(final List<RetinaPrimitive> primitives, final Solver bpSolver) {
         HashMap<Integer, PlatonicPrimitiveInstanceNode> objectNodesByGroupId;
 
-        ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints = new ArrayList<>();
-        
-        for( RetinaPrimitive iterationPrimitive : primitives ) {
-            retinaObjectsWithAssociatedPoints.add(associatePointsToRetinaPrimitive(iterationPrimitive));
-        }
-        
-        ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints = createAndPropagateRetinaLevelObjects(retinaObjectsWithAssociatedPoints);
-        ArrayList<ObjectNodeWithGroup> objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints = createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(groupsOfRetinaObjectsWithAssociatedPoints, bpSolver.coderack, bpSolver.network, bpSolver.networkHandles, bpSolver.codeletLtmLookup, bpSolver, bpSolver.getImageSizeAsFloat());
-        ArrayList<Node> resultNodes = getNodesOfNodeAndGroupOfRetinaObject(objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints);
+        final var retinaObjectsWithAssociatedPoints = primitives.stream().map(AbstractTranslatorStrategy::associatePointsToRetinaPrimitive).collect(Collectors.toCollection(ArrayList::new));
+
+        final var groupsOfRetinaObjectsWithAssociatedPoints = createAndPropagateRetinaLevelObjects(retinaObjectsWithAssociatedPoints);
+        final var objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints = createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(groupsOfRetinaObjectsWithAssociatedPoints, bpSolver.coderack, bpSolver.network, bpSolver.networkHandles, bpSolver.codeletLtmLookup, bpSolver, bpSolver.getImageSizeAsFloat());
+        final var resultNodes = getNodesOfNodeAndGroupOfRetinaObject(objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints);
         return resultNodes;
     }
     
     
     
-    private static ArrayList<Node> getNodesOfNodeAndGroupOfRetinaObject(Iterable<ObjectNodeWithGroup> objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints) {
+    private static ArrayList<Node> getNodesOfNodeAndGroupOfRetinaObject(final Iterable<ObjectNodeWithGroup> objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints) {
 
-        ArrayList<Node> resultArray = new ArrayList<>();
+        final var resultArray = new ArrayList<Node>();
         
-        for( ObjectNodeWithGroup iterationObjectNodeWithGroup : objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints ) {
+        for( final var iterationObjectNodeWithGroup : objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints )
             resultArray.add(iterationObjectNodeWithGroup.objectNode);
-        }
         
         return resultArray;
     }
     
-    private ArrayList<ObjectNodeWithGroup> createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(Iterable<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Solver bpSolver, Vector2d<Float> imageSize) {
+    private ArrayList<ObjectNodeWithGroup> createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(final Iterable<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints, final Coderack coderack, final Network network, final NetworkHandles networkHandles, final CodeletLtmLookup codeletLtmLookup, final Solver bpSolver, final Vector2d<Float> imageSize) {
 
-        ArrayList<ObjectNodeWithGroup> resultObjectNodesWithGroup = new ArrayList<>();
+        final var resultObjectNodesWithGroup = new ArrayList<ObjectNodeWithGroup>();
         
-        for( GroupOfRetinaObjectWithAssociatedPoints iterationGroupOfRetinaObjectWithAssociatedPoints : groupsOfRetinaObjectsWithAssociatedPoints ) {
+        for( final var iterationGroupOfRetinaObjectWithAssociatedPoints : groupsOfRetinaObjectsWithAssociatedPoints ) {
 
-            PlatonicPrimitiveInstanceNode objectNode = new PlatonicPrimitiveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
+            final var objectNode = new PlatonicPrimitiveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
             createPlatonicInstanceNodeForRetinaObjectsAndLinkToParent(iterationGroupOfRetinaObjectWithAssociatedPoints.arrayOfRetinaObjectWithAssociatedPoints, objectNode, coderack, network, networkHandles, codeletLtmLookup);
             createAndLinkAnglePointsAndLink(iterationGroupOfRetinaObjectWithAssociatedPoints.arrayOfRetinaObjectWithAssociatedPoints, coderack, network, networkHandles, codeletLtmLookup, bpSolver, imageSize);
 
-            ObjectNodeWithGroup objectNodeWithGroup = new ObjectNodeWithGroup();
+            final var objectNodeWithGroup = new ObjectNodeWithGroup();
             objectNodeWithGroup.groupOfRetinaObjects = iterationGroupOfRetinaObjectWithAssociatedPoints;
             objectNodeWithGroup.objectNode = objectNode;
             
@@ -92,13 +86,13 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     }
     
     
-    private void createAndLinkAnglePointsAndLink(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Solver bpSolver, Vector2d<Float> imageSize) {
+    private void createAndLinkAnglePointsAndLink(final Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, final Coderack coderack, final Network network, final NetworkHandles networkHandles, final CodeletLtmLookup codeletLtmLookup, final Solver bpSolver, final Vector2d<Float> imageSize) {
 
         // TODO< hard parameters >
-        final int GRIDCOUNTX = 10;
-        final int GRIDCOUNTY = 10;
+        final var GRIDCOUNTX = 10;
+        final var GRIDCOUNTY = 10;
 
-        SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects = new SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects();
+        final var spatialAccelerationForCrosspointsWithMappingOfRetinaObjects = new SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects();
         spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints = new SpatialAcceleration<>(GRIDCOUNTX, GRIDCOUNTY, imageSize.x, imageSize.y);
         
         storeRetinaObjectWithAssocIntoMap(arrayOfRetinaObjectWithAssociatedPoints, spatialAccelerationForCrosspointsWithMappingOfRetinaObjects);
@@ -107,13 +101,12 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         AbstractTranslatorStrategy.createLinksAndNodesForAnglePoints(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, bpSolver);
     }
     
-    private static List<RetinaPrimitive> getRetinaPrimitivesOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints) {
+    private static List<RetinaPrimitive> getRetinaPrimitivesOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(final Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints) {
 
-        List<RetinaPrimitive> resultRetinaPrimitives = new ArrayList<>();
+        final List<RetinaPrimitive> resultRetinaPrimitives = new ArrayList<>();
         
-        for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject : arrayOfRetinaObjectWithAssociatedPoints ) {
+        for( final var iterationRetinaObject : arrayOfRetinaObjectWithAssociatedPoints )
             resultRetinaPrimitives.add(iterationRetinaObject.primitive);
-        }
         
         return resultRetinaPrimitives;
     }
@@ -123,47 +116,44 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
      * stores all intersections into a spatial acceleration structure
      *  
      */
-    private void bundleAllIntersectionsOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints) {
+    private void bundleAllIntersectionsOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(final SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, final Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints) {
         bundleAllIntersections(spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, getRetinaPrimitivesOfRetinaObjectWithAssociatedPointsAndWorkspaceNode(arrayOfRetinaObjectWithAssociatedPoints));
     }
     
-    private void bundleAllIntersections(SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, Iterable<RetinaPrimitive> listOfRetinaPrimitives) {
-        for( RetinaPrimitive iterationRetinaPrimitive : listOfRetinaPrimitives ) {
+    private void bundleAllIntersections(final SpatialAccelerationForCrosspointsWithMappingOfRetinaObjects spatialAccelerationForCrosspointsWithMappingOfRetinaObjects, final Iterable<RetinaPrimitive> listOfRetinaPrimitives) {
+        for( final var iterationRetinaPrimitive : listOfRetinaPrimitives ) {
 
-            List<Intersection> intersections = iterationRetinaPrimitive.getIntersections();
+            final var intersections = iterationRetinaPrimitive.getIntersections();
             
             // we store the intersectionposition and the intersectionpartners
             
-            for( Intersection iterationIntersection : intersections ) {
-                final List<SpatialAcceleration<Crosspoint>.Element> crosspointsAtPosition = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getElementsNearPoint(iterationIntersection.intersectionPosition, 1000.0f /* TODO const */);
+            for( final var iterationIntersection : intersections ) {
+                final var crosspointsAtPosition = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.getElementsNearPoint(iterationIntersection.intersectionPosition, 1000.0f /* TODO const */);
                 
                 if( crosspointsAtPosition.isEmpty() ) {
 
-                    SpatialAcceleration<Crosspoint>.Element createdCrosspointElement = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.new Element();
+                    final var createdCrosspointElement = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.new Element();
                     createdCrosspointElement.data = new Crosspoint();
                     createdCrosspointElement.data.position = iterationIntersection.intersectionPosition;
                     createdCrosspointElement.position = iterationIntersection.intersectionPosition;
                     
-                    RetinaPrimitive x = iterationIntersection.p0.primitive;
-                    Set<RetinaPrimitive> y = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.keySet();
+                    final var x = iterationIntersection.p0.primitive;
+                    final var y = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.keySet();
                     
-                    Object[] array = y.toArray();
+                    final var array = y.toArray();
 
-                    for (Object o : array) {
-                        System.out.println(System.identityHashCode(o));
-                    }
+                    for (final var o : array) System.out.println(System.identityHashCode(o));
                     
                     
                     System.out.println("searched " + System.identityHashCode(iterationIntersection.p0.primitive));
 
-                    RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p0.primitive);
+                    var retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p0.primitive);
                     // we can have intersectionpartners which are not inside
                     // seems to be a bug in clustering or something fishy is going on
                     // TODO< investigate and add here a assert that the assoc can't be null >
                     // relates propably to BUG 0001
-                    if( retinaObjectWithAssoc != null ) {
+                    if( retinaObjectWithAssoc != null )
                         createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.p0.intersectionEndpointType));
-                    }
                     
                     
                     
@@ -172,33 +162,28 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
                     retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p1.primitive);
                     // TODO SAME
                     // relates propably to BUG 0001
-                    if( retinaObjectWithAssoc != null ) {
+                    if( retinaObjectWithAssoc != null )
                         createdCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.p1.intersectionEndpointType));
-                    }
                     
                     spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.spatialForCrosspoints.addElement(createdCrosspointElement);
                 }
                 else {
 
-                    SpatialAcceleration<Crosspoint>.Element nearestCrosspointElement = getNearestCrosspointElement(crosspointsAtPosition, iterationIntersection.intersectionPosition);
+                    final var nearestCrosspointElement = getNearestCrosspointElement(crosspointsAtPosition, iterationIntersection.intersectionPosition);
 
-                    RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p0.primitive);
+                    var retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p0.primitive);
                     // TODO SAME
                     // relates propably to BUG 0001
-                    if( retinaObjectWithAssoc != null ) {
-                        if( !nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc) ) {
+                    if( retinaObjectWithAssoc != null )
+                        if (!nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc))
                             nearestCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.p0.intersectionEndpointType));
-                        }
-                    }
                     
                     retinaObjectWithAssoc = spatialAccelerationForCrosspointsWithMappingOfRetinaObjects.primitiveToRetinaObjectWithAssocMap.get(iterationIntersection.p1.primitive);
                     // TODO SAME
                     // relates propably to BUG 0001
-                    if( retinaObjectWithAssoc != null ) {
-                        if( !nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc) ) {
+                    if( retinaObjectWithAssoc != null )
+                        if (!nearestCrosspointElement.data.doesAdjacentRetinaObjectsContain(retinaObjectWithAssoc))
                             nearestCrosspointElement.data.adjacentRetinaObjects.add(new Crosspoint.RetinaObjectWithAssocWithIntersectionType(retinaObjectWithAssoc, iterationIntersection.p1.intersectionEndpointType));
-                        }
-                    }
                 }
             }
         }
@@ -206,10 +191,10 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     
     private static SpatialAcceleration<Crosspoint>.Element getNearestCrosspointElement(final Iterable<SpatialAcceleration<Crosspoint>.Element> crosspointElements, final ArrayRealVector position) {
         SpatialAcceleration<Crosspoint>.Element nearestElement = null;
-        double nearestDistance = Double.POSITIVE_INFINITY;
+        var nearestDistance = Double.POSITIVE_INFINITY;
         
-        for( SpatialAcceleration<Crosspoint>.Element iterationCrosspointElement : crosspointElements ) {
-            final double distance = iterationCrosspointElement.position.getDistance(position);
+        for( final var iterationCrosspointElement : crosspointElements ) {
+            final var distance = iterationCrosspointElement.position.getDistance(position);
             if( distance < nearestDistance ) {
                 nearestDistance = distance;
                 nearestElement = iterationCrosspointElement;
@@ -219,22 +204,21 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         return nearestElement;
     }
     
-    private static void createPlatonicInstanceNodeForRetinaObjectsAndLinkToParent(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, PlatonicPrimitiveInstanceNode objectNode, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup) {
-        for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject : arrayOfRetinaObjectWithAssociatedPoints ) {
+    private static void createPlatonicInstanceNodeForRetinaObjectsAndLinkToParent(final Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, final PlatonicPrimitiveInstanceNode objectNode, final Coderack coderack, final Network network, final NetworkHandles networkHandles, final CodeletLtmLookup codeletLtmLookup) {
+        for( final var iterationRetinaObject : arrayOfRetinaObjectWithAssociatedPoints )
             createPlatonicInstanceNodeForRetinaObjectAndLinkToParent(iterationRetinaObject, objectNode, coderack, network, networkHandles, codeletLtmLookup);
-        }
     }
     
-    private static void createPlatonicInstanceNodeForRetinaObjectAndLinkToParent(RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject, PlatonicPrimitiveInstanceNode objectNode, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup) {
+    private static void createPlatonicInstanceNodeForRetinaObjectAndLinkToParent(final RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject, final PlatonicPrimitiveInstanceNode objectNode, final Coderack coderack, final Network network, final NetworkHandles networkHandles, final CodeletLtmLookup codeletLtmLookup) {
 
-        PlatonicPrimitiveInstanceNode createdPlatonicInstanceNodeForRetinaObject = createPlatonicInstanceNodeForRetinaObject(iterationRetinaObject.primitive, networkHandles);
+        final var createdPlatonicInstanceNodeForRetinaObject = createPlatonicInstanceNodeForRetinaObject(iterationRetinaObject.primitive, networkHandles);
         iterationRetinaObject.workspaceNode = createdPlatonicInstanceNodeForRetinaObject;
         
         // linkage
-        Link createdForwardLink = network.linkCreator.createLink(Link.EnumType.CONTAINS, createdPlatonicInstanceNodeForRetinaObject);
+        final var createdForwardLink = network.linkCreator.createLink(Link.EnumType.CONTAINS, createdPlatonicInstanceNodeForRetinaObject);
         objectNode.out(createdForwardLink);
 
-        Link createdBackwardLink = network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
+        final var createdBackwardLink = network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
         createdPlatonicInstanceNodeForRetinaObject.out(createdBackwardLink);
 
         // add all codelet's of it
@@ -242,83 +226,76 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
 
     }
     
-    private static ArrayList<GroupOfRetinaObjectWithAssociatedPoints> createAndPropagateRetinaLevelObjects(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints) {
-        int retinaObjectI;
+    private static ArrayList<GroupOfRetinaObjectWithAssociatedPoints> createAndPropagateRetinaLevelObjects(final ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints) {
 
-        ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groups = new ArrayList<>();
+        final var groups = new ArrayList<GroupOfRetinaObjectWithAssociatedPoints>();
         
         groups.add(GroupOfRetinaObjectWithAssociatedPoints.createFromSingleRetinaObject(retinaObjectsWithAssociatedPoints.get(0)));
         
         // we first try to cluster as many RetinaObjects in a lear fashion, after this we try to combine these "mini clusters" to final large clusters
         
-        for( retinaObjectI = 1; retinaObjectI < retinaObjectsWithAssociatedPoints.size(); retinaObjectI++ ) {
+        for(int retinaObjectI = 1; retinaObjectI < retinaObjectsWithAssociatedPoints.size(); retinaObjectI++ ) {
 
 
-            RetinaObjectWithAssociatedPointsAndWorkspaceNode currentRetinaObject = retinaObjectsWithAssociatedPoints.get(retinaObjectI);
+            final var currentRetinaObject = retinaObjectsWithAssociatedPoints.get(retinaObjectI);
 
 
-            boolean wasIncludedInCluster = false;
+            var wasIncludedInCluster = false;
             
-            for( GroupOfRetinaObjectWithAssociatedPoints iterationGroup : groups ) {
-                if( iterationGroup.canBeIncludedInCluster(currentRetinaObject) ) {
+            for( final var iterationGroup : groups )
+                if (iterationGroup.canBeIncludedInCluster(currentRetinaObject)) {
                     wasIncludedInCluster = true;
                     iterationGroup.arrayOfRetinaObjectWithAssociatedPoints.add(currentRetinaObject);
                     break;
                 }
-            }
             
-            if( !wasIncludedInCluster ) {
+            if( !wasIncludedInCluster )
                 groups.add(GroupOfRetinaObjectWithAssociatedPoints.createFromSingleRetinaObject(currentRetinaObject));
-            }
             
         }
         
         
         
         // cluster
-        int lowerI, upperI;
 
         repeatSearch:
-        for( lowerI = 0; lowerI < groups.size(); lowerI++ ) {
-            for( upperI = lowerI+1; upperI < groups.size(); upperI++ ) {
+        for(int lowerI = 0; lowerI < groups.size(); lowerI++ )
+            for (int upperI = lowerI + 1; upperI < groups.size(); upperI++) {
 
-                GroupOfRetinaObjectWithAssociatedPoints lower = groups.get(lowerI);
-                GroupOfRetinaObjectWithAssociatedPoints upper = groups.get(upperI);
+                final var lower = groups.get(lowerI);
+                final var upper = groups.get(upperI);
 
-                if( GroupOfRetinaObjectWithAssociatedPoints.shareCommonPoint(lower, upper) ) {
+                if (GroupOfRetinaObjectWithAssociatedPoints.shareCommonPoint(lower, upper)) {
                     lower.append(upper);
                     groups.remove(upperI);
-                    
+
                     break repeatSearch;
                 }
             }
-        }
         
         return groups;
     }
     
     
-    private static boolean doRetinaObjectsShareCommonPoints(RetinaObjectWithAssociatedPointsAndWorkspaceNode a, RetinaObjectWithAssociatedPointsAndWorkspaceNode b) {
+    private static boolean doRetinaObjectsShareCommonPoints(final RetinaObjectWithAssociatedPointsAndWorkspaceNode a, final RetinaObjectWithAssociatedPointsAndWorkspaceNode b) {
         return getRetinaObjectSharedPoints(a, b, COMMONPOINTSMAXIMALDISTANCE).size() != 0;
     }
     
-    private static ArrayList<IndexTuple> getRetinaObjectSharedPoints(RetinaObjectWithAssociatedPointsAndWorkspaceNode a, RetinaObjectWithAssociatedPointsAndWorkspaceNode b, float maximalDistance) {
-        int Ib;
-        
-        Assert.Assert(!a.equals(b), "must be not the same");
+    private static ArrayList<IndexTuple> getRetinaObjectSharedPoints(final RetinaObjectWithAssociatedPointsAndWorkspaceNode a, final RetinaObjectWithAssociatedPointsAndWorkspaceNode b, final float maximalDistance) {
 
-        ArrayList<IndexTuple> resultIndexTuples = new ArrayList<>();
+        final boolean value = !a.equals(b);
+        assert value : "ASSERT: " + "must be not the same";
 
-        int Ia = 0;
+        final var resultIndexTuples = new ArrayList<IndexTuple>();
+
+        var Ia = 0;
         
-        for( ArrayRealVector pointFromA : a.pointPositions ) {
-            Ib = 0;
-            
-            for( ArrayRealVector pointFromB : b.pointPositions ) {
-                final double distance = pointFromA.getDistance(pointFromB);
-                if( distance < maximalDistance) {
-                    resultIndexTuples.add(new IndexTuple(Ia, Ib));
-                }
+        for( final var pointFromA : a.pointPositions ) {
+            int Ib = 0;
+
+            for( final var pointFromB : b.pointPositions ) {
+                final var distance = pointFromA.getDistance(pointFromB);
+                if( distance < maximalDistance) resultIndexTuples.add(new IndexTuple(Ia, Ib));
                 
                 Ib++;
             }
@@ -340,36 +317,24 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     private static class GroupOfRetinaObjectWithAssociatedPoints {
         public final Collection<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints = new ArrayList<>();
         
-        public boolean canBeIncludedInCluster(RetinaObjectWithAssociatedPointsAndWorkspaceNode candidate) {
-            for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject : arrayOfRetinaObjectWithAssociatedPoints ) {
-                if( doRetinaObjectsShareCommonPoints(iterationRetinaObject, candidate) ) {
-                    return true;
-                }
-            }
-            
-            return false;
+        public boolean canBeIncludedInCluster(final RetinaObjectWithAssociatedPointsAndWorkspaceNode candidate) {
+
+            return arrayOfRetinaObjectWithAssociatedPoints.stream().anyMatch(iterationRetinaObject -> doRetinaObjectsShareCommonPoints(iterationRetinaObject, candidate));
         }
         
-        public static GroupOfRetinaObjectWithAssociatedPoints createFromSingleRetinaObject(RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObject) {
+        public static GroupOfRetinaObjectWithAssociatedPoints createFromSingleRetinaObject(final RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObject) {
 
-            GroupOfRetinaObjectWithAssociatedPoints result = new GroupOfRetinaObjectWithAssociatedPoints();
+            final var result = new GroupOfRetinaObjectWithAssociatedPoints();
             result.arrayOfRetinaObjectWithAssociatedPoints.add(retinaObject);
             return result;
         }
         
-        public static boolean shareCommonPoint(GroupOfRetinaObjectWithAssociatedPoints a, GroupOfRetinaObjectWithAssociatedPoints b) {
-            for( RetinaObjectWithAssociatedPointsAndWorkspaceNode outerRetinaObjectWithAssosciatedPoints : a.arrayOfRetinaObjectWithAssociatedPoints ) {
-                for( RetinaObjectWithAssociatedPointsAndWorkspaceNode innerRetinaObjectWithAssosciatedPoints : b.arrayOfRetinaObjectWithAssociatedPoints ) {
-                    if( PointProximityStrategy.doRetinaObjectsShareCommonPoints(outerRetinaObjectWithAssosciatedPoints, innerRetinaObjectWithAssosciatedPoints) ) {
-                        return true;
-                    }
-                }
-            }
-            
-            return false;
+        public static boolean shareCommonPoint(final GroupOfRetinaObjectWithAssociatedPoints a, final GroupOfRetinaObjectWithAssociatedPoints b) {
+
+            return a.arrayOfRetinaObjectWithAssociatedPoints.stream().anyMatch(outerRetinaObjectWithAssosciatedPoints -> b.arrayOfRetinaObjectWithAssociatedPoints.stream().anyMatch(innerRetinaObjectWithAssosciatedPoints -> PointProximityStrategy.doRetinaObjectsShareCommonPoints(outerRetinaObjectWithAssosciatedPoints, innerRetinaObjectWithAssosciatedPoints)));
         }
 
-        private void append(GroupOfRetinaObjectWithAssociatedPoints appendix) {
+        private void append(final GroupOfRetinaObjectWithAssociatedPoints appendix) {
             arrayOfRetinaObjectWithAssociatedPoints.addAll(appendix.arrayOfRetinaObjectWithAssociatedPoints);
         }
     }
@@ -377,7 +342,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     
     
     private static class IndexTuple {
-        public IndexTuple(int a, int b)
+        public IndexTuple(final int a, final int b)
         {
             values = new int[]{a, b};
         }

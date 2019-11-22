@@ -13,7 +13,7 @@ public abstract class Codelet {
     public static class RunResult {
         public final boolean putback;
         
-        public RunResult(boolean putback) {
+        public RunResult(final boolean putback) {
             this.putback = putback;
         }
     }

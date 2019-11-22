@@ -17,7 +17,7 @@ import ptrman.bpsolver.nodes.NodeTypes;
 import java.util.Random;
 
 public class Numerosity extends SolverCodelet {
-    public Numerosity(Solver bpSolver)
+    public Numerosity(final Solver bpSolver)
     {
         super(bpSolver);
     }
@@ -117,7 +117,7 @@ public class Numerosity extends SolverCodelet {
     }
     
     
-    private static boolean isNodeNumberable(Node node)
+    private static boolean isNodeNumberable(final Node node)
     {
         return node.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal();
     }

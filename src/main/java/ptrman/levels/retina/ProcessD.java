@@ -14,17 +14,16 @@ import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomAdaptor;
 import org.apache.commons.math3.stat.regression.SimpleRegression;
 import org.eclipse.collections.api.IntIterable;
-import org.eclipse.collections.api.list.primitive.IntList;
-import org.eclipse.collections.api.tuple.primitive.IntIntPair;
+import org.eclipse.collections.api.block.procedure.primitive.IntProcedure;
 import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.Parameters;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.ArrayRealVectorHelper;
-import ptrman.misc.Assert;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static ptrman.levels.retina.LineDetectorWithMultiplePoints.real;
 import static ptrman.math.ArrayRealVectorHelper.distance;
@@ -62,12 +61,12 @@ public class ProcessD implements IProcess {
 
     public boolean onlyEndoskeleton = false; // only work with samples which belong to endoskeleton?
 
-    public double lineDetectorInitialXStep = 1.0 / 10.0; // initial step size of a line detector along the activation function
+    public final double lineDetectorInitialXStep = 1.0 / 10.0; // initial step size of a line detector along the activation function
 
     public final Random rng = new RandomAdaptor(new MersenneTwister());
 
 
-    public void set(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<RetinaPrimitive> outputLineDetectorConnector) {
+    public void set(final ProcessConnector<ProcessA.Sample> inputSampleConnector, final ProcessConnector<RetinaPrimitive> outputLineDetectorConnector) {
         this.inputSampleConnector = inputSampleConnector;
         this.outputLineDetectorConnector = outputLineDetectorConnector;
     }
@@ -93,7 +92,7 @@ public class ProcessD implements IProcess {
 
     // sorts annealedCandidates by activation and throws items with to low activation away
     public void sortByActivationAndThrowAway() {
-        annealedCandidates.sort((a, b) -> (a==b) ? 0 : a.calcActivation() < b.calcActivation() ? 1 : -1);
+        annealedCandidates.sort((a, b) -> (a == b) ? 0 : a.calcActivation() < b.calcActivation() ? 1 : -1);
 
         // limit size
         while(annealedCandidates.size() > anealedCandidatesMaxCount) {
@@ -102,12 +101,10 @@ public class ProcessD implements IProcess {
         }
     }
 
-    public void removeCandidatesBelowActivation(double threshold) {
-        for(int idx=annealedCandidates.size()-1;idx >= 0;idx--) {
-            double activation = annealedCandidates.get(idx).calcActivation();
-            if (activation < threshold) {
-                annealedCandidates.remove(idx);
-            }
+    public void removeCandidatesBelowActivation(final double threshold) {
+        for(var idx = annealedCandidates.size()-1; idx >= 0; idx--) {
+            final var activation = annealedCandidates.get(idx).calcActivation();
+            if (activation < threshold) annealedCandidates.remove(idx);
         }
     }
 
@@ -117,20 +114,18 @@ public class ProcessD implements IProcess {
      * @param source
      * @return
      */
-    public List<ProcessA.Sample> selectRandomSamples(List<ProcessA.Sample> source) {
-        if (source.size() < 3) {
-            return new ArrayList<>();
-        }
+    public List<ProcessA.Sample> selectRandomSamples(final List<ProcessA.Sample> source) {
+        if (source.size() < 3) return new ArrayList<>();
 
         // pick out rng points
-        int sampleIndex = 0; // NOTE< index in endosceletonPoint / workingSamples >
-        IntArrayList allCandidateSampleIndices = new IntArrayList();
-        for (final ProcessA.Sample iterationSample : source) {
+        var sampleIndex = 0; // NOTE< index in endosceletonPoint / workingSamples >
+        final var allCandidateSampleIndices = new IntArrayList();
+        for (final var iterationSample : source) {
             allCandidateSampleIndices.add(sampleIndex);
             sampleIndex++;
         }
 
-        IntList chosenCandidateSampleIndices = getRandomElements(allCandidateSampleIndices, 3, rng);
+        final var chosenCandidateSampleIndices = getRandomElements(allCandidateSampleIndices, 3, rng);
         return getSamplesByIndices(source, chosenCandidateSampleIndices);
     }
 
@@ -138,308 +133,65 @@ public class ProcessD implements IProcess {
      * tries to sample a new line candidate by picking rng points
      */
     public void sampleNewByRandom() {
-        final double maxLength = Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y})); // max length of line
+        final var maxLength = Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y})); // max length of line
 
-        final List<ProcessA.Sample> workingSamples = inputSampleConnector.getWorkspace();
+        final var workingSamples = inputSampleConnector.getWorkspace();
 
         // filter valid points
-        List<ProcessA.Sample> filteredSamples = new ArrayList<>();
-        for (final ProcessA.Sample iterationSample : workingSamples) {
-            boolean onlyAddEndoskeletonEnable = !(onlyEndoskeleton && iterationSample.type != ProcessA.Sample.EnumType.ENDOSCELETON);
-            boolean isReferenced = iterationSample.refCount != 0;
-            if(!isReferenced && onlyAddEndoskeletonEnable ) {
-                filteredSamples.add(iterationSample);
-            }
+        final List<ProcessA.Sample> filteredSamples = new ArrayList<>();
+        for (final var iterationSample : workingSamples) {
+            final var onlyAddEndoskeletonEnable = !(onlyEndoskeleton && iterationSample.type != ProcessA.Sample.EnumType.ENDOSCELETON);
+            final var isReferenced = iterationSample.refCount != 0;
+            if(!isReferenced && onlyAddEndoskeletonEnable ) filteredSamples.add(iterationSample);
         }
 
-        List<ProcessA.Sample> selectedSamples = selectRandomSamples(filteredSamples);
+        final var selectedSamples = selectRandomSamples(filteredSamples);
         tryCreateMultiLineDetector(maxLength, selectedSamples);
     }
 
-    public double processDSampleByProximityProximity = 20.0; // maximal proximity of points to get considered for sampling by proximity
+    public final double processDSampleByProximityProximity = 20.0; // maximal proximity of points to get considered for sampling by proximity
 
     /**
      * tries to sample a new detector by proximity of points
      */
     public void sampleNewByProximity() {
-        final double maxLength = Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y})); // max length of line
+        final var maxLength = Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y})); // max length of line
 
-        final List<ProcessA.Sample> workingSamples = inputSampleConnector.getWorkspace();
+        final var workingSamples = inputSampleConnector.getWorkspace();
 
-        if (workingSamples.size() < 2) {
-            return;
-        }
+        if (workingSamples.size() < 2) return;
 
-        int centerPointIdx = rng.nextInt(workingSamples.size());
-        IntIntPair centerPointPos = workingSamples.get(centerPointIdx).position;
+        final var centerPointIdx = rng.nextInt(workingSamples.size());
+        final var centerPointPos = workingSamples.get(centerPointIdx).position;
 
         // find all points in proximity
-        List<ProcessA.Sample> proximitySamples = new ArrayList<>();
-        for(ProcessA.Sample iSample : workingSamples) {
-            double dist = ArrayRealVectorHelper.distance(centerPointPos, iSample.position);
-            if (dist > processDSampleByProximityProximity) {
-                continue;
-            }
+        final List<ProcessA.Sample> proximitySamples = new ArrayList<>();
+        for(final var iSample : workingSamples) {
+            final var dist = ArrayRealVectorHelper.distance(centerPointPos, iSample.position);
+            if (dist > processDSampleByProximityProximity) continue;
 
-            boolean onlyAddEndoskeletonEnable = !(onlyEndoskeleton && iSample.type != ProcessA.Sample.EnumType.ENDOSCELETON);
-            boolean isReferenced = iSample.refCount != 0;
-            if(!isReferenced && onlyAddEndoskeletonEnable ) {
-                proximitySamples.add(iSample);
-            }
+            final var onlyAddEndoskeletonEnable = !(onlyEndoskeleton && iSample.type != ProcessA.Sample.EnumType.ENDOSCELETON);
+            final var isReferenced = iSample.refCount != 0;
+            if(!isReferenced && onlyAddEndoskeletonEnable ) proximitySamples.add(iSample);
         }
 
         // try to create line detector by selecting rng points from candidates
-        List<ProcessA.Sample> selectedSamples = selectRandomSamples(proximitySamples);
+        final var selectedSamples = selectRandomSamples(proximitySamples);
         tryCreateMultiLineDetector(maxLength, selectedSamples);
     }
 
-    public double processDNumberOfPointsToActivationScale = 0.15; // how much does a point improve the scaling
+    public final double processDNumberOfPointsToActivationScale = 0.15; // how much does a point improve the scaling
 
-    private void tryCreateMultiLineDetector(double maxLength, List<ProcessA.Sample> selectedSamples) {
+    private void tryCreateMultiLineDetector(final double maxLength, final List<ProcessA.Sample> selectedSamples) {
         // commented check because we don't assume object id's anymore (because it was from Phaeaco for solving BP's)
         //final boolean doAllSamplesHaveId = doAllSamplesHaveObjectId(selectedSamples);
         //if (!doAllSamplesHaveId) {
         //    return;
         //}
 
-        if (selectedSamples.size() < 2) {
-            return; // line is not defined
-        }
+        if (selectedSamples.size() < 2) return; // line is not defined
 
         // check if object ids are the same
-        final boolean objectIdsOfSamplesTheSame = areObjectIdsTheSameOfSamples(selectedSamples);
-        if (!objectIdsOfSamplesTheSame) {
-            return;
-        }
-
-        final List<ArrayRealVector> positionsOfSamples = getPositionsOfSamples(selectedSamples);
-
-        final ArrayRealVector averageOfPositionsOfSamples = getAverage(positionsOfSamples);
-        final double currentMaximalDistanceOfPositions = getMaximalDistanceOfPositionsTo(positionsOfSamples, averageOfPositionsOfSamples);
-
-        if (currentMaximalDistanceOfPositions > Math.min(maximalDistanceOfPositions, maxLength * 0.5f)) {
-            // one point is too far away from the average position, so this line is not formed
-            return;
-        }
-        // else we are here
-
-        final RegressionForLineResult regressionResult = calcRegressionResultOfSamples(selectedSamples);
-
-        if (regressionResult.mse > Parameters.getProcessdMaxMse()) {
-            return;
-        }
-        // else we are here
-
-        if(selectedSamples.size() <= 2) { // the regression mse is not defined if it are only two points
-            return; // only create detector if we have at least three samples
-        }
-
-
-        // create new line detector
-        LineDetectorWithMultiplePoints createdLineDetector = new LineDetectorWithMultiplePoints(lineDetectorInitialXStep);
-        createdLineDetector.samples = selectedSamples;
-
-        Assert.Assert(areObjectIdsTheSameOfSamples(selectedSamples), "");
-        createdLineDetector.commonObjectId = selectedSamples.get(0).objectId;
-
-
-        createdLineDetector.recalcConf(); // necessary
-
-        boolean addCreatedLineDetector = false;
-
-        if (createdLineDetector.samples.size() == 2) {
-            createdLineDetector.mse = 0.0f;
-
-            createdLineDetector.n = regressionResult.n;
-            createdLineDetector.m = regressionResult.m;
-
-            addCreatedLineDetector = true;
-        } else {
-            if (regressionResult.mse < Parameters.getProcessdMaxMse()) {
-                createdLineDetector.mse = regressionResult.mse;
-
-                createdLineDetector.n = regressionResult.n;
-                createdLineDetector.m = regressionResult.m;
-
-                addCreatedLineDetector = true;
-            }
-        }
-
-
-        if (createdLineDetector.getLength() > maxLength) {
-            return;
-        }
-        // else we are here
-
-        createdLineDetector.x += createdLineDetector.samples.size() * processDNumberOfPointsToActivationScale; // more fitting points -> better activation
-        createdLineDetector.x += (Parameters.getProcessdMaxMse() - createdLineDetector.mse) * Parameters.getProcessdLockingActivationScale(); // better mse -> better activation
-
-        if (addCreatedLineDetector) {
-            for(ProcessA.Sample iSample : createdLineDetector.samples) {
-                iSample.refCount++;
-            }
-
-            annealedCandidates.addAll(Collections.singletonList(createdLineDetector));
-        }
-    }
-
-    private static RegressionForLineResult calcRegressionResultOfSamples(Iterable<ProcessA.Sample> samples) {
-        return calcRegressionForPoints(getPositionsOfSamples(samples));
-    }
-
-    public void processData(float throttle) {
-
-        for(int i = 0; i < 9; i++) {
-            step();
-        }
-
-        /* TODO 16.11.2019 activate this code again because it is necessary as the last step
-        commitLineDetectors();
-         */
-    }
-
-    /**
-     * splits and pushes lines into the output connector
-     *
-     * is the last step when processing a frame
-     */
-    public void commitLineDetectors() {
-        // split the detectors into one or many lines
-        final List<RetinaPrimitive> resultSingleDetectors = splitDetectorsIntoLines(annealedCandidates);
-
-        for (final RetinaPrimitive iterationPrimitive : resultSingleDetectors) {
-            outputLineDetectorConnector.add(iterationPrimitive);
-        }
-    }
-
-    public List<RetinaPrimitive> splitDetectorsIntoLines(Iterable<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints) {
-        List<RetinaPrimitive> result;
-
-        result = new ArrayList<>();
-
-        for (LineDetectorWithMultiplePoints iterationDetector : lineDetectorsWithMultiplePoints) {
-            result.addAll(splitDetectorIntoLines(iterationDetector));
-        }
-
-        return result;
-    }
-
-    public int processDLineSamplesForProximity = 1; // number of proximity sampling tries for proposal of line detectors
-
-    /**
-     * processing step
-     */
-    public void step() {
-        sampleNewByRandom();
-        for(int i=0;i<processDLineSamplesForProximity;i++) {
-            sampleNewByProximity();
-        }
-        tryWiden();
-        detectorsHarden();
-        detectorsFadeActivation();
-        //sortByActivationAndThrowAway();
-        removeCandidatesBelowActivation(0.05);
-    }
-
-    public double processDHardenDetectorThreshold = 0.6;
-    public double processDHardenDetectorFactor = 0.1;
-
-    public void detectorsHarden() {
-        // make fading harden when the x value of the activation exceeds a threshold
-        // this is done to prefer to keep good detectors
-        // https://www.foundalis.com/res/Generalization_of_Hebbian_Learning_and_Categorization.pdf
-        // "
-        //    However, when x exceeds a threshold that is just before the maximum value 1,
-        //    the number of discrete steps along the x-axis  is  increased  somewhat
-        //    (the  resolution  of  segmenting  the x-axis grows). This implies that the subsequent
-        //    fading of the activation will become slower, because x will have more backward steps to
-        //    traverse along the x-axis. The meaning of this  change  is  that  associations  that  are
-        //    well  established  should  become  progressively  harder  to  fade,  after  repeated
-        //    confirmations of their correctness. The amount by which the number of steps is increased
-        //    is a parameter of the system.
-        // "
-        for (LineDetectorWithMultiplePoints iDetector : annealedCandidates) {
-            if (!iDetector.isHardened && iDetector.calcActivationX() > processDHardenDetectorThreshold) {
-                iDetector.isHardened = true;
-                iDetector.xStep *= processDHardenDetectorFactor; // make it harder to decay
-            }
-        }
-    }
-
-    /**
-     * fades the activation of all detectors as described in https://www.foundalis.com/res/Generalization_of_Hebbian_Learning_and_Categorization.pdf page 4
-     */
-    public void detectorsFadeActivation() {
-        for (LineDetectorWithMultiplePoints iDetector : annealedCandidates) {
-            iDetector.xDecayDelta -= iDetector.xStep;
-        }
-    }
-
-    /**
-     * tries to add points to existing lines
-     */
-    public void tryWiden() {
-        for (LineDetectorWithMultiplePoints iLinedetector : annealedCandidates) {
-
-            // sample samples and project to line, check distance if it is below threshold
-            for (int iSamplingAttempt=0;iSamplingAttempt<widenSamplesPerTrial;iSamplingAttempt++) {
-                int sampleIdx = rng.nextInt(inputSampleConnector.workspace.size());
-
-                ProcessA.Sample sample = inputSampleConnector.workspace.get(sampleIdx);
-                if(onlyEndoskeleton && sample.type != ProcessA.Sample.EnumType.ENDOSCELETON) {
-                    continue;
-                }
-                if (sample.refCount > 0) {
-                    continue; // sample is already in use
-                }
-
-                // * project on line, check
-                if (iLinedetector.isYAxisSingularity()) {
-                    continue; // ignore because we can't project
-                }
-                ArrayRealVector projectedPosition = iLinedetector.projectPointOntoLine(sample.position);
-                double dist = distance(sample.position, projectedPosition);
-                if (dist > widenSampleMaxDistance) {
-                    continue;
-                }
-
-                // * add to line
-                iLinedetector.samples.add(sample);
-                sample.refCount++;
-
-                // * recompute line and mse
-                RegressionForLineResult regressionResult = calcRegressionResultOfSamples(iLinedetector.samples);
-                iLinedetector.m = regressionResult.m;
-                iLinedetector.n = regressionResult.n;
-                iLinedetector.mse = regressionResult.mse;
-
-                iLinedetector.x = 0.0;
-                iLinedetector.x += iLinedetector.samples.size() * processDNumberOfPointsToActivationScale; // more fitting points -> better activation
-                iLinedetector.x += (Parameters.getProcessdMaxMse() - iLinedetector.mse) * Parameters.getProcessdLockingActivationScale(); // better mse -> better activation
-
-                // * recompute conf
-                iLinedetector.recalcConf();
-            }
-        }
-    }
-
-    @Override
-    public void postProcessData() {
-
-    }
-
-    private static boolean doAllSamplesHaveObjectId(final Iterable<ProcessA.Sample> samples) {
-        for (final ProcessA.Sample iterationSamples : samples) {
-            if (!iterationSamples.isObjectIdValid()) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    private static boolean areObjectIdsTheSameOfSamples(final List<ProcessA.Sample> samples) {
-        return true;
         /*
         Assert.Assert(samples.get(0).isObjectIdValid(), "");
 
@@ -456,23 +208,229 @@ public class ProcessD implements IProcess {
         return true;
 
          */
+        final var objectIdsOfSamplesTheSame = true;
+        if (!objectIdsOfSamplesTheSame) return;
+
+        final var positionsOfSamples = getPositionsOfSamples(selectedSamples);
+
+        final var averageOfPositionsOfSamples = getAverage(positionsOfSamples);
+        final var currentMaximalDistanceOfPositions = getMaximalDistanceOfPositionsTo(positionsOfSamples, averageOfPositionsOfSamples);
+
+        // one point is too far away from the average position, so this line is not formed
+        if (currentMaximalDistanceOfPositions > Math.min(maximalDistanceOfPositions, maxLength * 0.5f)) return;
+        // else we are here
+
+        final var regressionResult = calcRegressionResultOfSamples(selectedSamples);
+
+        if (regressionResult.mse > Parameters.getProcessdMaxMse()) return;
+        // else we are here
+
+        // the regression mse is not defined if it are only two points
+        if(selectedSamples.size() <= 2) return; // only create detector if we have at least three samples
+
+
+        // create new line detector
+        final var createdLineDetector = new LineDetectorWithMultiplePoints(lineDetectorInitialXStep);
+        createdLineDetector.samples = selectedSamples;
+
+        /*
+        Assert.Assert(samples.get(0).isObjectIdValid(), "");
+
+        final int objectId = samples.get(0).objectId;
+
+        for (final ProcessA.Sample iterationSamples : samples) {
+            Assert.Assert(iterationSamples.isObjectIdValid(), "");
+
+            if (iterationSamples.objectId != objectId) {
+                return false;
+            }
+        }
+
+        return true;
+
+         */
+        createdLineDetector.commonObjectId = selectedSamples.get(0).objectId;
+
+
+        createdLineDetector.recalcConf(); // necessary
+
+        var addCreatedLineDetector = false;
+
+        if (createdLineDetector.samples.size() == 2) {
+            createdLineDetector.mse = 0.0f;
+
+            createdLineDetector.n = regressionResult.n;
+            createdLineDetector.m = regressionResult.m;
+
+            addCreatedLineDetector = true;
+        } else if (regressionResult.mse < Parameters.getProcessdMaxMse()) {
+            createdLineDetector.mse = regressionResult.mse;
+
+            createdLineDetector.n = regressionResult.n;
+            createdLineDetector.m = regressionResult.m;
+
+            addCreatedLineDetector = true;
+        }
+
+
+        if (createdLineDetector.getLength() > maxLength) return;
+        // else we are here
+
+        createdLineDetector.x += createdLineDetector.samples.size() * processDNumberOfPointsToActivationScale; // more fitting points -> better activation
+        createdLineDetector.x += (Parameters.getProcessdMaxMse() - createdLineDetector.mse) * Parameters.getProcessdLockingActivationScale(); // better mse -> better activation
+
+        if (addCreatedLineDetector) {
+            for(final var iSample : createdLineDetector.samples) iSample.refCount++;
+
+            annealedCandidates.addAll(Collections.singletonList(createdLineDetector));
+        }
+    }
+
+    private static RegressionForLineResult calcRegressionResultOfSamples(final Iterable<ProcessA.Sample> samples) {
+        return calcRegressionForPoints(getPositionsOfSamples(samples));
+    }
+
+    public void processData(final float throttle) {
+
+        for(var i = 0; i < 9; i++) step();
+
+        /* TODO 16.11.2019 activate this code again because it is necessary as the last step
+        commitLineDetectors();
+         */
+    }
+
+    /**
+     * splits and pushes lines into the output connector
+     *
+     * is the last step when processing a frame
+     */
+    public void commitLineDetectors() {
+        // split the detectors into one or many lines
+        final var resultSingleDetectors = splitDetectorsIntoLines(annealedCandidates);
+
+        for (final var iterationPrimitive : resultSingleDetectors) outputLineDetectorConnector.add(iterationPrimitive);
+    }
+
+    public List<RetinaPrimitive> splitDetectorsIntoLines(final Iterable<LineDetectorWithMultiplePoints> lineDetectorsWithMultiplePoints) {
+
+        final List<RetinaPrimitive> result = new ArrayList<>();
+
+        for (final var iterationDetector : lineDetectorsWithMultiplePoints)
+            result.addAll(splitDetectorIntoLines(iterationDetector));
+
+        return result;
+    }
+
+    public int processDLineSamplesForProximity = 1; // number of proximity sampling tries for proposal of line detectors
+
+    /**
+     * processing step
+     */
+    public void step() {
+        sampleNewByRandom();
+        for(var i = 0; i<processDLineSamplesForProximity; i++) sampleNewByProximity();
+        tryWiden();
+        detectorsHarden();
+        detectorsFadeActivation();
+        //sortByActivationAndThrowAway();
+        removeCandidatesBelowActivation(0.05);
+    }
+
+    public final double processDHardenDetectorThreshold = 0.6;
+    public final double processDHardenDetectorFactor = 0.1;
+
+    public void detectorsHarden() {
+        // make fading harden when the x value of the activation exceeds a threshold
+        // this is done to prefer to keep good detectors
+        // https://www.foundalis.com/res/Generalization_of_Hebbian_Learning_and_Categorization.pdf
+        // "
+        //    However, when x exceeds a threshold that is just before the maximum value 1,
+        //    the number of discrete steps along the x-axis  is  increased  somewhat
+        //    (the  resolution  of  segmenting  the x-axis grows). This implies that the subsequent
+        //    fading of the activation will become slower, because x will have more backward steps to
+        //    traverse along the x-axis. The meaning of this  change  is  that  associations  that  are
+        //    well  established  should  become  progressively  harder  to  fade,  after  repeated
+        //    confirmations of their correctness. The amount by which the number of steps is increased
+        //    is a parameter of the system.
+        // "
+        for (final var iDetector : annealedCandidates)
+            if (!iDetector.isHardened && iDetector.calcActivationX() > processDHardenDetectorThreshold) {
+                iDetector.isHardened = true;
+                iDetector.xStep *= processDHardenDetectorFactor; // make it harder to decay
+            }
+    }
+
+    /**
+     * fades the activation of all detectors as described in https://www.foundalis.com/res/Generalization_of_Hebbian_Learning_and_Categorization.pdf page 4
+     */
+    public void detectorsFadeActivation() {
+        for (final var iDetector : annealedCandidates) iDetector.xDecayDelta -= iDetector.xStep;
+    }
+
+    /**
+     * tries to add points to existing lines
+     */
+    public void tryWiden() {
+        // sample samples and project to line, check distance if it is below threshold
+        for (final var iLinedetector : annealedCandidates)
+            for (var iSamplingAttempt = 0; iSamplingAttempt < widenSamplesPerTrial; iSamplingAttempt++) {
+                final var sampleIdx = rng.nextInt(inputSampleConnector.workspace.size());
+
+                final var sample = inputSampleConnector.workspace.get(sampleIdx);
+                if (onlyEndoskeleton && sample.type != ProcessA.Sample.EnumType.ENDOSCELETON) continue;
+                if (sample.refCount > 0) continue; // sample is already in use
+
+                // * project on line, check
+                if (iLinedetector.isYAxisSingularity()) continue; // ignore because we can't project
+                final var projectedPosition = iLinedetector.projectPointOntoLine(sample.position);
+                final var dist = distance(sample.position, projectedPosition);
+                if (dist > widenSampleMaxDistance) continue;
+
+                // * add to line
+                iLinedetector.samples.add(sample);
+                sample.refCount++;
+
+                // * recompute line and mse
+                final var regressionResult = calcRegressionResultOfSamples(iLinedetector.samples);
+                iLinedetector.m = regressionResult.m;
+                iLinedetector.n = regressionResult.n;
+                iLinedetector.mse = regressionResult.mse;
+
+                iLinedetector.x = 0.0;
+                iLinedetector.x += iLinedetector.samples.size() * processDNumberOfPointsToActivationScale; // more fitting points -> better activation
+                iLinedetector.x += (Parameters.getProcessdMaxMse() - iLinedetector.mse) * Parameters.getProcessdLockingActivationScale(); // better mse -> better activation
+
+                // * recompute conf
+                iLinedetector.recalcConf();
+            }
+    }
+
+    @Override
+    public void postProcessData() {
+
+    }
+
+    private static boolean doAllSamplesHaveObjectId(final Iterable<ProcessA.Sample> samples) {
+        for (final var iterationSamples : samples) if (!iterationSamples.isObjectIdValid()) return false;
+
+        return true;
     }
 
     /** TODO stream */
     private static List<ArrayRealVector> getPositionsOfSamples(final Iterable<ProcessA.Sample> samples) {
-        List<ArrayRealVector> resultPositions = new ArrayList<>();
+        final List<ArrayRealVector> resultPositions = new ArrayList<>();
 
-        for (final ProcessA.Sample iterationSample : samples)
+        for (final var iterationSample : samples)
             resultPositions.add(real(iterationSample.position));
 
         return resultPositions;
     }
 
     private static double getMaximalDistanceOfPositionsTo(final Iterable<ArrayRealVector> positions, final ArrayRealVector comparePosition) {
-        double maxDistance = 0.0;
+        var maxDistance = 0.0;
 
-        for (final ArrayRealVector iterationPosition : positions) {
-            final double currentDistance = iterationPosition.getDistance(comparePosition);
+        for (final var iterationPosition : positions) {
+            final var currentDistance = iterationPosition.getDistance(comparePosition);
             maxDistance = java.lang.Math.max(maxDistance, currentDistance);
         }
 
@@ -480,29 +438,28 @@ public class ProcessD implements IProcess {
     }
 
     private static List<ProcessA.Sample> getSamplesByIndices(final List<ProcessA.Sample> samples, final IntIterable indices) {
-        List<ProcessA.Sample> resultPositions = new ArrayList<>(indices.size());
-        indices.forEach(index -> resultPositions.add(samples.get(index)));
+        final List<ProcessA.Sample> resultPositions = new ArrayList<>(indices.size());
+        indices.forEach((IntProcedure) index -> resultPositions.add(samples.get(index)));
         return resultPositions;
     }
 
     /**
      * works by counting the "overlapping" pixel coordinates, chooses the axis with the less overlappings
      */
-    private static RegressionForLineResult calcRegressionForPoints(Iterable<ArrayRealVector> positions) {
+    private static RegressionForLineResult calcRegressionForPoints(final Iterable<ArrayRealVector> positions) {
 
-        int overlappingPixelsOnX = calcCountOfOverlappingPixelsForAxis(positions, EnumAxis.X);
-        int overlappingPixelsOnY = calcCountOfOverlappingPixelsForAxis(positions, EnumAxis.Y);
+        final var overlappingPixelsOnX = calcCountOfOverlappingPixelsForAxis(positions, EnumAxis.X);
+        final var overlappingPixelsOnY = calcCountOfOverlappingPixelsForAxis(positions, EnumAxis.Y);
 
-        SimpleRegression regression = new SimpleRegression();
+        final var regression = new SimpleRegression();
 
-        RegressionForLineResult regressionResultForLine = new RegressionForLineResult();
+        final var regressionResultForLine = new RegressionForLineResult();
 
         if (overlappingPixelsOnX <= overlappingPixelsOnY) {
             // regression on x axis
 
-            for (ArrayRealVector iterationPosition : positions) {
+            for (final var iterationPosition : positions)
                 regression.addData(iterationPosition.getDataRef()[0], iterationPosition.getDataRef()[1]);
-            }
 
             regressionResultForLine.mse = regression.getMeanSquareError();
             regressionResultForLine.n = regression.getIntercept();
@@ -511,17 +468,16 @@ public class ProcessD implements IProcess {
             // regression on y axis
             // we switch x and y and calculate m and n from the regression result
 
-            for (ArrayRealVector iterationPosition : positions) {
+            for (final var iterationPosition : positions)
                 regression.addData(iterationPosition.getDataRef()[1], iterationPosition.getDataRef()[0]);
-            }
 
             // calculate m and n
-            double regressionM = regression.getSlope();
-            double regressionN = regression.getIntercept();
+            final var regressionM = regression.getSlope();
+            final var regressionN = regression.getIntercept();
 
-            double m = 1.0f / regressionM;
-            ArrayRealVector pointOnRegressionLine = new ArrayRealVector(new double[]{regressionN, 0.0});
-            double n = pointOnRegressionLine.getDataRef()[1] - m * pointOnRegressionLine.getDataRef()[0];
+            final var m = 1.0f / regressionM;
+            final var pointOnRegressionLine = new ArrayRealVector(new double[]{regressionN, 0.0});
+            final var n = pointOnRegressionLine.getDataRef()[1] - m * pointOnRegressionLine.getDataRef()[0];
 
             regressionResultForLine.mse = regression.getMeanSquareError();
             regressionResultForLine.n = n;
@@ -531,70 +487,54 @@ public class ProcessD implements IProcess {
         return regressionResultForLine;
     }
 
-    private static int calcCountOfOverlappingPixelsForAxis(Iterable<ArrayRealVector> positions, EnumAxis axis) {
-        double maxCoordinatOnAxis = getMaximalCoordinateForPoints(positions, axis);
-        int arraysizeOfDimension = Math.round((float) maxCoordinatOnAxis) + 1;
-        int[] dimensionCounter = new int[arraysizeOfDimension];
+    private static int calcCountOfOverlappingPixelsForAxis(final Iterable<ArrayRealVector> positions, final EnumAxis axis) {
+        final var maxCoordinatOnAxis = getMaximalCoordinateForPoints(positions, axis);
+        final var arraysizeOfDimension = Math.round((float) maxCoordinatOnAxis) + 1;
+        final var dimensionCounter = new int[arraysizeOfDimension];
 
-        for (ArrayRealVector iterationPosition : positions) {
-            int dimensionCounterIndex = Math.round((float) Helper.getAxis(iterationPosition, axis));
+        for (final var iterationPosition : positions) {
+            final var dimensionCounterIndex = Math.round((float) Helper.getAxis(iterationPosition, axis));
 
             dimensionCounter[dimensionCounterIndex]++;
         }
 
         // count the "rows" where the count is greater than 1
-        int overlappingCounter = 0;
-
-        for (int i : dimensionCounter) {
-            if (i > 1) {
-                overlappingCounter++;
-            }
-        }
+        final var overlappingCounter = (int) Arrays.stream(dimensionCounter).filter(i -> i > 1).count();
 
         return overlappingCounter;
     }
 
     // used to calculate the arraysize
-    private static double getMaximalCoordinateForPoints(Iterable<ArrayRealVector> positions, EnumAxis axis) {
+    private static double getMaximalCoordinateForPoints(final Iterable<ArrayRealVector> positions, final EnumAxis axis) {
         double max = 0;
 
-        for (ArrayRealVector iterationPosition : positions) {
-            max = Math.max(max, Helper.getAxis(iterationPosition, axis));
-        }
+        for (final var iterationPosition : positions) max = Math.max(max, Helper.getAxis(iterationPosition, axis));
 
         return max;
     }
 
-    public static List<ArrayRealVector> getSortedSamplePositions(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints) {
+    public static List<ArrayRealVector> getSortedSamplePositions(final LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints) {
         List<ArrayRealVector> samplePositions = new ArrayList<>();
 
+        // project
         if (lineDetectorWithMultiplePoints.isYAxisSingularity()) {
             samplePositions.addAll(getPositionsOfSamples(lineDetectorWithMultiplePoints.samples));
 
             samplePositions.sort(new VectorComperatorByAxis(EnumAxis.Y));
-        } else {
-            // project
-            for (ArrayRealVector iterationSamplePosition : getPositionsOfSamples(lineDetectorWithMultiplePoints.samples)) {
-                ArrayRealVector projectedSamplePosition = lineDetectorWithMultiplePoints.projectPointOntoLine(iterationSamplePosition);
-
-                samplePositions.add(projectedSamplePosition);
-            }
-
-            samplePositions.sort(new VectorComperatorByAxis(EnumAxis.X));
-        }
+        } else
+            samplePositions = getPositionsOfSamples(lineDetectorWithMultiplePoints.samples).stream().map(lineDetectorWithMultiplePoints::projectPointOntoLine).sorted(new VectorComperatorByAxis(EnumAxis.X)).collect(Collectors.toList());
 
         return samplePositions;
     }
 
     public int overwriteObjectId = -1; // overwrite the object-id? -1 if object id is not overwritten
 
-    public List<RetinaPrimitive> splitDetectorIntoLines(LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints) {
-        List<ArrayRealVector> sortedSamplePositions = getSortedSamplePositions(lineDetectorWithMultiplePoints);
+    public List<RetinaPrimitive> splitDetectorIntoLines(final LineDetectorWithMultiplePoints lineDetectorWithMultiplePoints) {
+        final var sortedSamplePositions = getSortedSamplePositions(lineDetectorWithMultiplePoints);
 
-        int objectId = lineDetectorWithMultiplePoints.commonObjectId;
-        if (overwriteObjectId != -1) { // HACK< necessary because some parts still assume object id's >
-            objectId = overwriteObjectId;
-        }
+        var objectId = lineDetectorWithMultiplePoints.commonObjectId;
+        // HACK< necessary because some parts still assume object id's >
+        if (overwriteObjectId != -1) objectId = overwriteObjectId;
 
         return lineDetectorWithMultiplePoints.isYAxisSingularity() ?
             clusterPointsFromLinedetectorToLinedetectors(objectId, lineDetectorWithMultiplePoints.cachedConf, sortedSamplePositions, EnumAxis.Y) :
@@ -603,14 +543,14 @@ public class ProcessD implements IProcess {
 
 
     private static List<RetinaPrimitive> clusterPointsFromLinedetectorToLinedetectors(final int objectId, final double conf, final List<ArrayRealVector> pointPositions, final EnumAxis axis) {
-        List<RetinaPrimitive> resultSingleLineDetectors = new ArrayList<>();
+        final List<RetinaPrimitive> resultSingleLineDetectors = new ArrayList<>();
 
-        boolean nextIsNewLineStart = true;
+        var nextIsNewLineStart = true;
 
-        ArrayRealVector lineStartPosition = pointPositions.get(0);
-        double lastAxisPosition = Helper.getAxis(pointPositions.get(0), axis);
+        var lineStartPosition = pointPositions.get(0);
+        var lastAxisPosition = Helper.getAxis(pointPositions.get(0), axis);
 
-        for (ArrayRealVector iterationPoint : pointPositions) {
+        for (final var iterationPoint : pointPositions) {
             if (nextIsNewLineStart) {
                 lineStartPosition = iterationPoint;
                 lastAxisPosition = Helper.getAxis(iterationPoint, axis);
@@ -621,11 +561,11 @@ public class ProcessD implements IProcess {
             }
             // else we are here
 
-            if (Helper.getAxis(iterationPoint, axis) - lastAxisPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE) {
+            if (Helper.getAxis(iterationPoint, axis) - lastAxisPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE)
                 lastAxisPosition = Helper.getAxis(iterationPoint, axis);
-            } else {
+            else {
                 // form a new line
-                RetinaPrimitive newPrimitive = RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, iterationPoint, conf));
+                final var newPrimitive = RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, iterationPoint, conf));
                 newPrimitive.objectId = objectId;
                 resultSingleLineDetectors.add(newPrimitive);
 
@@ -634,10 +574,10 @@ public class ProcessD implements IProcess {
         }
 
         // form a new line for the last point
-        ArrayRealVector lastPoint = pointPositions.get(pointPositions.size() - 1);
+        final var lastPoint = pointPositions.get(pointPositions.size() - 1);
 
         if (!nextIsNewLineStart && Helper.getAxis(lastPoint, axis) - lastAxisPosition < HardParameters.ProcessD.LINECLUSTERINGMAXDISTANCE) {
-            RetinaPrimitive newPrimitive = RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, lastPoint, conf));
+            final var newPrimitive = RetinaPrimitive.makeLine(SingleLineDetector.createFromFloatPositions(lineStartPosition, lastPoint, conf));
             newPrimitive.objectId = objectId;
             resultSingleLineDetectors.add(newPrimitive);
         }
@@ -647,8 +587,8 @@ public class ProcessD implements IProcess {
 
     // TODO< belongs into dedicated helper >
     static private class Helper {
-        private static double getAxis(ArrayRealVector vector, EnumAxis axis) {
-            final double[] dr = vector.getDataRef();
+        private static double getAxis(final ArrayRealVector vector, final EnumAxis axis) {
+            final var dr = vector.getDataRef();
             return axis == EnumAxis.X ? dr[0] : dr[1];
         }
     }
@@ -656,12 +596,12 @@ public class ProcessD implements IProcess {
 
     private static class VectorComperatorByAxis implements Comparator<ArrayRealVector> {
 
-        public VectorComperatorByAxis(EnumAxis axis) {
+        public VectorComperatorByAxis(final EnumAxis axis) {
             this.axis = axis;
         }
 
         @Override
-        public int compare(ArrayRealVector a, ArrayRealVector b) {
+        public int compare(final ArrayRealVector a, final ArrayRealVector b) {
             return Double.compare(Helper.getAxis(a, axis), Helper.getAxis(b, axis));
 
         }

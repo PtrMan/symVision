@@ -17,12 +17,12 @@ import ptrman.bpsolver.FeatureStatistics;
  * foundalis dissertation page 143
  */
 public class FeatureNode extends Node {
-    public static FeatureNode createFloatNode(Node featureTypeNode, double value, int weight, float primitiveFeatureMax)
+    public static FeatureNode createFloatNode(final Node featureTypeNode, final double value, final int weight, final float primitiveFeatureMax)
     {
         return new FeatureNode(featureTypeNode, EnumValueType.FLOAT, value, 0, weight, primitiveFeatureMax);
     }
     
-    public static FeatureNode createIntegerNode(Node featureTypeNode, int value, int weight, float primitiveFeatureMax)
+    public static FeatureNode createIntegerNode(final Node featureTypeNode, final int value, final int weight, final float primitiveFeatureMax)
     {
         return new FeatureNode(featureTypeNode, EnumValueType.INT, 0.0f, value, weight, primitiveFeatureMax);
     }
@@ -34,7 +34,7 @@ public class FeatureNode extends Node {
      * \param valueFloat
      * \param valueInt 
      */
-    private FeatureNode(Node featureTypeNode, EnumValueType valueType, double valueFloat, int valueInt, int weight, float primitiveFeatureMax)
+    private FeatureNode(final Node featureTypeNode, final EnumValueType valueType, final double valueFloat, final int valueInt, final int weight, final float primitiveFeatureMax)
     {
         super(NodeTypes.EnumType.FEATURENODE.ordinal());
         
@@ -47,44 +47,34 @@ public class FeatureNode extends Node {
         this.weight = weight;
 
         if( valueType == EnumValueType.FLOAT )
-        {
-            this.statistics.addValue((float)valueFloat);
-        }
+            this.statistics.addValue((float) valueFloat);
         else
-        {
             this.statistics.addValue(valueInt);
-        }
 
         this.statistics.primitiveFeatureMax = primitiveFeatureMax;
     }
     
     public double getValueAsFloat()
     {
-        if( valueType != EnumValueType.FLOAT )
-        {
-            throw new RuntimeException("Non float queried!");
-        }
+        assert valueType == EnumValueType.FLOAT : "Non float queried!";
         
         return valueFloat;
     }
     
     public int getValueAsInt()
     {
-        if( valueType != EnumValueType.INT )
-        {
-            throw new RuntimeException("Non int queried!");
-        }
+        assert valueType == EnumValueType.INT : "Non int queried!";
         
         return valueInt;
     }
     
-    public void setValueAsFloat(double value)
+    public void setValueAsFloat(final double value)
     {
         valueType = EnumValueType.FLOAT;
         valueFloat = value;
     }
     
-    public void setValueAsInt(int value)
+    public void setValueAsInt(final int value)
     {
         valueType = EnumValueType.INT;
         valueInt = value;

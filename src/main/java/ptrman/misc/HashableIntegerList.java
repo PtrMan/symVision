@@ -10,6 +10,7 @@
 package ptrman.misc;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static ptrman.misc.BitOperations.rotateLeft;
 
@@ -17,13 +18,13 @@ import static ptrman.misc.BitOperations.rotateLeft;
  *
  */
 public class HashableIntegerList {
-    public HashableIntegerList(List<Integer> list) {
+    public HashableIntegerList(final List<Integer> list) {
         this.list = list;
     }
 
     @Override
     public int hashCode() {
-        int result = 0;
+        var result = 0;
 
         for( final int iterationInteger : list ) {
             result = result ^ iterationInteger;
@@ -34,25 +35,17 @@ public class HashableIntegerList {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(final Object obj) {
         if (!(obj instanceof HashableIntegerList))
             return false;
         if (obj == this)
             return true;
 
-        HashableIntegerList rhs = (HashableIntegerList) obj;
+        final var rhs = (HashableIntegerList) obj;
 
-        if( rhs.list.size() != list.size() ) {
-            return false;
-        }
+        if( rhs.list.size() != list.size() ) return false;
 
-        for( int i = 0; i < list.size(); i++ ) {
-            if( rhs.list.get(i) != list.get(i) ) {
-                return false;
-            }
-        }
-
-        return true;
+        return IntStream.range(0, list.size()).noneMatch(i -> rhs.list.get(i) != list.get(i));
     }
 
     private final List<Integer> list;

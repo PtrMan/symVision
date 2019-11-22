@@ -14,7 +14,6 @@ import org.apache.commons.math3.linear.*;
 import ptrman.Datastructures.IMap2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.math.ArrayRealVectorHelper;
-import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,36 +30,36 @@ import static ptrman.math.ArrayRealVectorHelper.*;
  */
 public class ProcessG {
     public static class Curve {
-        public Curve(List<CurveElement> curveElements) {
+        public Curve(final List<CurveElement> curveElements) {
             this.curveElements = curveElements;
         }
         
         public final List<CurveElement> curveElements;
         
-        public ArrayRealVector getNormalizedTangentAtEndpoint(int index) {
-            Assert.Assert(index >= 0 && index <= 1, "");
+        public ArrayRealVector getNormalizedTangentAtEndpoint(final int index) {
+            assert index >= 0 && index <= 1 : "ASSERT: " + "";
 
             return index == 0 ? curveElements.get(0).calcTangent(0.0f) : curveElements.get(curveElements.size() - 1).calcTangent(1.0f);
         }
         
-        public Intersection.IntersectionPartner.EnumIntersectionEndpointType getIntersectionEndpoint(ArrayRealVector point) {
+        public Intersection.IntersectionPartner.EnumIntersectionEndpointType getIntersectionEndpoint(final ArrayRealVector point) {
             // TODO< other strategy for figuring out if the point is *at* the line and not lear the endpoints >
 
-            ArrayRealVector diff = calcPosition(0.0f).subtract(point);
-            double distToBegin = diff.getNorm();
+            var diff = calcPosition(0.0f).subtract(point);
+            final var distToBegin = diff.getNorm();
             
             diff = calcPosition(1.0f).subtract(point);
-            double distToEnd = diff.getNorm();
+            final var distToEnd = diff.getNorm();
 
             return distToBegin < distToEnd ? Intersection.IntersectionPartner.EnumIntersectionEndpointType.BEGIN : Intersection.IntersectionPartner.EnumIntersectionEndpointType.END;
         }
         
-        public ArrayRealVector calcPosition(float t) {
+        public ArrayRealVector calcPosition(final float t) {
 
-            float t2 = t * (float) curveElements.size();
+            final var t2 = t * (float) curveElements.size();
 
-            float rem = t2 % 1.0f;
-            int index = Math.round(t2);
+            final var rem = t2 % 1.0f;
+            final var index = Math.round(t2);
             
             return curveElements.get(index).calcPosition(rem);
         }
@@ -70,18 +69,18 @@ public class ProcessG {
     // test, works
     public static void testPoints() {
 
-        List<ArrayRealVector> testPoints = new ArrayList<>();
+        final List<ArrayRealVector> testPoints = new ArrayList<>();
         testPoints.add(new ArrayRealVector(new double[]{1.0f, 5.0f}));
         testPoints.add(new ArrayRealVector(new double[]{1.8f, 4.0f}));
         testPoints.add(new ArrayRealVector(new double[]{2.0f, 7.0f}));
 
         // works fine
-        Curve resultCurve = calculatePolynominalsAndReturnCurve(testPoints);
+        final var resultCurve = calculatePolynominalsAndReturnCurve(testPoints);
     }
     
     
     public static class CurveElement {
-        public CurveElement(float a0, float a1, float a2, float a3, float b0, float b1, float b2, float b3) {
+        public CurveElement(final float a0, final float a1, final float a2, final float a3, final float b0, final float b1, final float b2, final float b3) {
             a = new float[]{a0, a1, a2, a3};
             b = new float[]{b0, b1, b2, b3};
         }
@@ -97,32 +96,30 @@ public class ProcessG {
          * \param t
          * \return 
          */
-        public ArrayRealVector calcTangent(double t) {
-            final double t2;
-            
-            final double TEPSILON = 0.0001;
-            
-            Assert.Assert(t >= 0.0 && t <= 1.0, "t not in range");
+        public ArrayRealVector calcTangent(final double t) {
 
-            t2 = t > 0.5 ? t - TEPSILON : t + TEPSILON;
+            assert t >= 0.0 && t <= 1.0 : "ASSERT: " + "t not in range";
 
-            ArrayRealVector p1 = calcPosition(t);
-            ArrayRealVector p2 = calcPosition(t2);
-            ArrayRealVector diff = p1.subtract(p2);
+            final var TEPSILON = 0.0001;
+            final double t2 = t > 0.5 ? t - TEPSILON : t + TEPSILON;
+
+            final var p1 = calcPosition(t);
+            final var p2 = calcPosition(t2);
+            final var diff = p1.subtract(p2);
             return normalize(diff);
         }
         
-        public ArrayRealVector calcPosition(double t) {
-            Assert.Assert(t >= 0.0 && t <= 1.0, "t not in range");
-            
-            double x = a[0] + t*a[1] + t*t*a[2] + t*t*t*a[3];
-            double y = b[0] + t*b[1] + t*t*b[2] + t*t*t*b[3];
+        public ArrayRealVector calcPosition(final double t) {
+            assert t >= 0.0 && t <= 1.0 : "ASSERT: " + "t not in range";
+
+            final var x = a[0] + t*a[1] + t*t*a[2] + t*t*t*a[3];
+            final var y = b[0] + t*b[1] + t*t*b[2] + t*t*t*b[3];
             
             return new ArrayRealVector(new double[]{x, y});
         }
     }
     
-    public void process(ArrayList<SingleLineDetector> lineDetectors, Iterable<ProcessM.LineParsing> lineParsings, Iterable<ProcessA.Sample> samples, IMap2d<Boolean> image) {
+    public void process(final ArrayList<SingleLineDetector> lineDetectors, final Iterable<ProcessM.LineParsing> lineParsings, final Iterable<ProcessA.Sample> samples, final IMap2d<Boolean> image) {
         resultCurves.clear();
         
         rerateLineParsings(lineParsings);
@@ -136,47 +133,44 @@ public class ProcessG {
         // for now we do this for *all* curves
         // TODO< select by rng >
 
-        for (ProcessM.LineParsing lineParsing : lineParsings) {
+        for (final var lineParsing : lineParsings) {
 
-            ProcessM.LineParsing currentLineParsing = lineParsing;
+            final var currentLineParsing = lineParsing;
 
 
             // try to covert (at least) a part of the lineParsing to a curve
 
-            Collection<List<ArrayRealVector>> protocurves = new ArrayList<>();
+            final Collection<List<ArrayRealVector>> protocurves = new ArrayList<>();
             List<ArrayRealVector> currentProtocurve = null;
 
-            for (int pointIndex = 1; pointIndex < currentLineParsing.lineParsing.size() - 1; pointIndex++) {
-                boolean atLeastOneSampleNotNearAdjacentLines = examineVincityOfSegmentPoint(pointIndex, currentLineParsing, samples);
+            for (var pointIndex = 1; pointIndex < currentLineParsing.lineParsing.size() - 1; pointIndex++) {
+                final var atLeastOneSampleNotNearAdjacentLines = examineVincityOfSegmentPoint(pointIndex, currentLineParsing, samples);
 
-                boolean IsParsingACurve = currentProtocurve != null;
+                final var IsParsingACurve = currentProtocurve != null;
 
-                if (IsParsingACurve) {
-                    if (atLeastOneSampleNotNearAdjacentLines) {
-                        // add segment to curve and mark last segment as in a curve
-                        currentProtocurve.add(currentLineParsing.lineParsing.get(pointIndex - 1).getBProjected());
+                if (IsParsingACurve) if (atLeastOneSampleNotNearAdjacentLines) {
+                    // add segment to curve and mark last segment as in a curve
+                    currentProtocurve.add(currentLineParsing.lineParsing.get(pointIndex - 1).getBProjected());
 
-                        currentLineParsing.lineParsing.get(pointIndex - 1).markedPartOfCurve = true;
-                    } else {
-                        // finish lineparsing
-                        protocurves.add(currentProtocurve);
-                        currentProtocurve = null;
-                    }
+                    currentLineParsing.lineParsing.get(pointIndex - 1).markedPartOfCurve = true;
                 } else {
-                    if (atLeastOneSampleNotNearAdjacentLines) {
-                        // begin a new lineparsing
-                        currentProtocurve = new ArrayList<>();
+                    // finish lineparsing
+                    protocurves.add(currentProtocurve);
+                    currentProtocurve = null;
+                }
+                else if (atLeastOneSampleNotNearAdjacentLines) {
+                    // begin a new lineparsing
+                    currentProtocurve = new ArrayList<>();
 
-                        currentProtocurve.add(currentLineParsing.lineParsing.get(pointIndex - 1).getBProjected());
+                    currentProtocurve.add(currentLineParsing.lineParsing.get(pointIndex - 1).getBProjected());
 
-                        currentLineParsing.lineParsing.get(pointIndex - 1).markedPartOfCurve = true;
-                    } else {
-                        // do nothing
-                    }
+                    currentLineParsing.lineParsing.get(pointIndex - 1).markedPartOfCurve = true;
+                } else {
+                    // do nothing
                 }
             }
 
-            boolean IsParsingACurve = currentProtocurve != null;
+            var IsParsingACurve = currentProtocurve != null;
 
             if (IsParsingACurve) {
                 protocurves.add(currentProtocurve);
@@ -186,9 +180,9 @@ public class ProcessG {
 
             // convert protocurves to real curves
 
-            for (List<ArrayRealVector> iterationProtoCurve : protocurves) {
+            for (final var iterationProtoCurve : protocurves) {
 
-                Curve createdCurve = calculatePolynominalsAndReturnCurve(iterationProtoCurve);
+                final var createdCurve = calculatePolynominalsAndReturnCurve(iterationProtoCurve);
                 resultCurves.add(createdCurve);
             }
         }
@@ -204,28 +198,28 @@ public class ProcessG {
     
     // calculates only intersections of tangents
     // TODO< other intersections >
-    private static void recalculateIntersections(Iterable<SingleLineDetector> lineDetectors, Iterable<Curve> curves, IMap2d<Boolean> image) {
+    private static void recalculateIntersections(final Iterable<SingleLineDetector> lineDetectors, final Iterable<Curve> curves, final IMap2d<Boolean> image) {
         // intersections between curves and lines
         
-        for( Curve iterationCurve : curves ) {
+        for( final var iterationCurve : curves ) {
 
-            CurveElement beginCurveElement = iterationCurve.curveElements.get(0);
-            CurveElement endCurveElement = iterationCurve.curveElements.get(iterationCurve.curveElements.size() - 1);
+            final var beginCurveElement = iterationCurve.curveElements.get(0);
+            final var endCurveElement = iterationCurve.curveElements.get(iterationCurve.curveElements.size() - 1);
             
             // TODO ASK< maybe we have to search the ending with the minimal x position? >
             // TODO< compute confidence >
-            SingleLineDetector tempBeginCurveTangentLine = SingleLineDetector.createFromFloatPositions(beginCurveElement.calcPosition(0.0f), beginCurveElement.calcPosition(0.0f).add(beginCurveElement.calcTangent(0.0f)), 0.0);
-            SingleLineDetector tempEndCurveTangentLine = SingleLineDetector.createFromFloatPositions(endCurveElement.calcPosition(1.0f), endCurveElement.calcPosition(1.0f).add(endCurveElement.calcTangent(1.0f)), 0.0);
+            final var tempBeginCurveTangentLine = SingleLineDetector.createFromFloatPositions(beginCurveElement.calcPosition(0.0f), beginCurveElement.calcPosition(0.0f).add(beginCurveElement.calcTangent(0.0f)), 0.0);
+            final var tempEndCurveTangentLine = SingleLineDetector.createFromFloatPositions(endCurveElement.calcPosition(1.0f), endCurveElement.calcPosition(1.0f).add(endCurveElement.calcTangent(1.0f)), 0.0);
             
-            final double curveBeginM = tempBeginCurveTangentLine.getM();
-            final double curveBeginN = tempBeginCurveTangentLine.getN();
+            final var curveBeginM = tempBeginCurveTangentLine.getM();
+            final var curveBeginN = tempBeginCurveTangentLine.getN();
 
-            final double curveEndM = tempEndCurveTangentLine.getM();
-            final double curveEndN = tempEndCurveTangentLine.getN();
+            final var curveEndM = tempEndCurveTangentLine.getM();
+            final var curveEndN = tempEndCurveTangentLine.getN();
             
-            for( SingleLineDetector iterationLineDetector : lineDetectors ) {
-                final ArrayRealVector intersectionPositionBegin = SingleLineDetector.intersectLineWithMN(iterationLineDetector, curveBeginM, curveBeginN);
-                final ArrayRealVector intersectionPositionEnd = SingleLineDetector.intersectLineWithMN(iterationLineDetector, curveEndM, curveEndN);
+            for( final var iterationLineDetector : lineDetectors ) {
+                final var intersectionPositionBegin = SingleLineDetector.intersectLineWithMN(iterationLineDetector, curveBeginM, curveBeginN);
+                final var intersectionPositionEnd = SingleLineDetector.intersectLineWithMN(iterationLineDetector, curveEndM, curveEndN);
                 
                 // examine the intersection positions for inside the image and the neightborhood
                 
@@ -234,7 +228,7 @@ public class ProcessG {
                     isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPositionBegin, ArrayRealVectorHelper.EnumRoundMode.DOWN), image)
                 ) {
 
-                    Intersection createdIntersection = new Intersection(intersectionPositionBegin,
+                    final var createdIntersection = new Intersection(intersectionPositionBegin,
                         new Intersection.IntersectionPartner(RetinaPrimitive.makeCurve(iterationCurve), iterationCurve.getIntersectionEndpoint(intersectionPositionBegin)),
                         new Intersection.IntersectionPartner(RetinaPrimitive.makeLine(iterationLineDetector), iterationLineDetector.getIntersectionEndpoint(intersectionPositionBegin))
                     );
@@ -247,7 +241,7 @@ public class ProcessG {
                                 isNeightborhoodPixelSet(arrayRealVectorToInteger(intersectionPositionEnd, ArrayRealVectorHelper.EnumRoundMode.DOWN), image)
                 ) {
 
-                    Intersection createdIntersection = new Intersection(intersectionPositionEnd,
+                    final var createdIntersection = new Intersection(intersectionPositionEnd,
                         new Intersection.IntersectionPartner(RetinaPrimitive.makeCurve(iterationCurve), iterationCurve.getIntersectionEndpoint(intersectionPositionEnd)),
                         new Intersection.IntersectionPartner(RetinaPrimitive.makeLine(iterationLineDetector), iterationLineDetector.getIntersectionEndpoint(intersectionPositionEnd))
                     );
@@ -274,10 +268,10 @@ public class ProcessG {
         return resultCurves;
     }
     
-    private static void removeLinedetectorsWhichWereUsedInCurves(ArrayList<SingleLineDetector> lineDetectors) {
-        for( int lineDetectorI = 0; lineDetectorI < lineDetectors.size(); lineDetectorI++ ) {
+    private static void removeLinedetectorsWhichWereUsedInCurves(final ArrayList<SingleLineDetector> lineDetectors) {
+        for(var lineDetectorI = 0; lineDetectorI < lineDetectors.size(); lineDetectorI++ ) {
 
-            SingleLineDetector currentLineDetector = lineDetectors.get(lineDetectorI);
+            final var currentLineDetector = lineDetectors.get(lineDetectorI);
             
             if( currentLineDetector.markedPartOfCurve ) {
                 // before we remove it we have to make sure it doesn't get referenced in intersections
@@ -290,27 +284,25 @@ public class ProcessG {
         }
     }
     
-    private static void removeLineDetectorFromNeightborIntersections(SingleLineDetector lineDetector) {
-        for( Intersection iterationIntersection : lineDetector.intersections ) {
-            Assert.Assert(iterationIntersection.p0.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
-            Assert.Assert(iterationIntersection.p1.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
-            
-            if( iterationIntersection.p0.primitive.line.equals(lineDetector) ) {
+    private static void removeLineDetectorFromNeightborIntersections(final SingleLineDetector lineDetector) {
+        for( final var iterationIntersection : lineDetector.intersections ) {
+            assert iterationIntersection.p0.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT : "ASSERT: " + "must be line";
+            assert iterationIntersection.p1.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT : "ASSERT: " + "must be line";
+
+            if( iterationIntersection.p0.primitive.line.equals(lineDetector) )
                 removeIntersectionBetweenLines(iterationIntersection.p1.primitive.line, lineDetector);
-            }
-            else if( iterationIntersection.p1.primitive.line.equals(lineDetector) ) {
+            else if( iterationIntersection.p1.primitive.line.equals(lineDetector) )
                 removeIntersectionBetweenLines(iterationIntersection.p0.primitive.line, lineDetector);
-            }
         }
     }
 
-    private static void removeIntersectionBetweenLines(SingleLineDetector lineA, SingleLineDetector lineB) {
-        for( int intersectionI = 0; intersectionI < lineA.intersections.size(); intersectionI++ ) {
+    private static void removeIntersectionBetweenLines(final SingleLineDetector lineA, final SingleLineDetector lineB) {
+        for(var intersectionI = 0; intersectionI < lineA.intersections.size(); intersectionI++ ) {
 
-            Intersection iterationIntersection = lineA.intersections.get(intersectionI);
-            
-            Assert.Assert(iterationIntersection.p0.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
-            Assert.Assert(iterationIntersection.p1.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
+            final var iterationIntersection = lineA.intersections.get(intersectionI);
+
+            assert iterationIntersection.p0.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT : "ASSERT: " + "must be line";
+            assert iterationIntersection.p1.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT : "ASSERT: " + "must be line";
 
             if( iterationIntersection.p0.primitive.line.equals(lineB) ) {
                 lineA.intersections.remove(intersectionI);
@@ -323,13 +315,13 @@ public class ProcessG {
         }
         
         
-        for( int intersectionI = 0; intersectionI < lineB.intersections.size(); intersectionI++ ) {
+        for(var intersectionI = 0; intersectionI < lineB.intersections.size(); intersectionI++ ) {
 
-            Intersection iterationIntersection = lineB.intersections.get(intersectionI);
-            
-            Assert.Assert(iterationIntersection.p0.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
-            Assert.Assert(iterationIntersection.p1.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT, "must be line");
-            
+            final var iterationIntersection = lineB.intersections.get(intersectionI);
+
+            assert iterationIntersection.p0.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT : "ASSERT: " + "must be line";
+            assert iterationIntersection.p1.primitive.type == RetinaPrimitive.EnumType.LINESEGMENT : "ASSERT: " + "must be line";
+
             if( iterationIntersection.p0.primitive.line.equals(lineA) ) {
                 lineB.intersections.remove(intersectionI);
                 break;
@@ -341,46 +333,40 @@ public class ProcessG {
         }
     }
     
-    private static void rerateLineParsings(Iterable<ProcessM.LineParsing> lineParsings) {
-        for( ProcessM.LineParsing iterationLineParsing : lineParsings ) {
-            rerateLineParsing(iterationLineParsing);
-        }
+    private static void rerateLineParsings(final Iterable<ProcessM.LineParsing> lineParsings) {
+        for( final var iterationLineParsing : lineParsings ) rerateLineParsing(iterationLineParsing);
     }
     
-    private static void rerateLineParsing(ProcessM.LineParsing lineParsing) {
-        int lineDetectorI;
-        
-        if( lineParsing.processGRated ) {
-            return;
-        }
+    private static void rerateLineParsing(final ProcessM.LineParsing lineParsing) {
+
+        if( lineParsing.processGRated ) return;
         
         lineParsing.processGInterestRating = 0.0f;
         
-        for( lineDetectorI = 0; lineDetectorI < lineParsing.lineParsing.size()-1; lineDetectorI++ ) {
-            float endToEndRating;
+        for(int lineDetectorI = 0; lineDetectorI < lineParsing.lineParsing.size()-1; lineDetectorI++ ) {
 
-            SingleLineDetector iterationLineDetector = lineParsing.lineParsing.get(lineDetectorI);
-            SingleLineDetector nextLineDetector = lineParsing.lineParsing.get(lineDetectorI + 1);
+            final var iterationLineDetector = lineParsing.lineParsing.get(lineDetectorI);
+            final var nextLineDetector = lineParsing.lineParsing.get(lineDetectorI + 1);
             
             // length criteria
             
-            double length = iterationLineDetector.getLength();
+            final var length = iterationLineDetector.getLength();
             
             // TODO< configurable constant >
             lineParsing.processGInterestRating += (1.0f/length);
             
             // angle criteria
             
-            double angleBetweenSegments = SingleLineDetector.getAngleBetween(iterationLineDetector, nextLineDetector);
+            final var angleBetweenSegments = SingleLineDetector.getAngleBetween(iterationLineDetector, nextLineDetector);
             lineParsing.processGInterestRating += (90.0f-angleBetweenSegments)*HardParameters.ProcessG.RATINGANGLEMULTIPLIER;
             
             // meeting end to end criteria
             
             // we assume that the point a is the first and point b is the last
 
-            double endToEndDistance = iterationLineDetector.b.getDistance(nextLineDetector.a);
-            
-            endToEndRating = (float)Math.max(0.0f, (HardParameters.ProcessG.RATINGENDTOENDMAXDISTANCE - endToEndDistance)/HardParameters.ProcessG.RATINGENDTOENDMAXDISTANCE);
+            final var endToEndDistance = iterationLineDetector.b.getDistance(nextLineDetector.a);
+
+            float endToEndRating = (float) Math.max(0.0f, (HardParameters.ProcessG.RATINGENDTOENDMAXDISTANCE - endToEndDistance) / HardParameters.ProcessG.RATINGENDTOENDMAXDISTANCE);
             endToEndRating *= HardParameters.ProcessG.RATINGENDTOENDMULTIPLIER;
             lineParsing.processGInterestRating += endToEndRating;
         }
@@ -391,28 +377,28 @@ public class ProcessG {
     
     
     
-    private static boolean examineVincityOfSegmentPoint(int pointIndex, ProcessM.LineParsing lineParsing, Iterable<ProcessA.Sample> samples) {
-        ArrayRealVector centerPoint = lineParsing.lineParsing.get(pointIndex).getBProjected();
-        List<ProcessA.Sample> endosceletonSamplesInVicinity = queryEndosceletonPointsInVicinityOf(samples, centerPoint);
-        List<SingleLineDetector> neightborLinesOfPoint = getNeightborLinesOfPoint(pointIndex, lineParsing);
-        boolean atLeastOneSampleNotNearLine = !areAllSamplesNearLines(endosceletonSamplesInVicinity, neightborLinesOfPoint, HardParameters.ProcessG.MAXIMALDISTANCEOFENDOSCELETONTOLINE);
+    private static boolean examineVincityOfSegmentPoint(final int pointIndex, final ProcessM.LineParsing lineParsing, final Iterable<ProcessA.Sample> samples) {
+        final var centerPoint = lineParsing.lineParsing.get(pointIndex).getBProjected();
+        final var endosceletonSamplesInVicinity = queryEndosceletonPointsInVicinityOf(samples, centerPoint);
+        final var neightborLinesOfPoint = getNeightborLinesOfPoint(pointIndex, lineParsing);
+        final var atLeastOneSampleNotNearLine = !areAllSamplesNearLines(endosceletonSamplesInVicinity, neightborLinesOfPoint, HardParameters.ProcessG.MAXIMALDISTANCEOFENDOSCELETONTOLINE);
         
         return atLeastOneSampleNotNearLine;
     }
     
-    private static List<ProcessA.Sample> queryEndosceletonPointsInVicinityOf(Iterable<ProcessA.Sample> samples, ArrayRealVector centerPoint) {
+    private static List<ProcessA.Sample> queryEndosceletonPointsInVicinityOf(final Iterable<ProcessA.Sample> samples, final ArrayRealVector centerPoint) {
         return queryPointsInRadius(samples, centerPoint, HardParameters.ProcessG.VICINITYRADIUS, new ProcessA.Sample.EnumType[]{ProcessA.Sample.EnumType.ENDOSCELETON});
     }
     
-    private static List<ProcessA.Sample> queryPointsInRadius(Iterable<ProcessA.Sample> samples, ArrayRealVector centerPoint, double radius, ProcessA.Sample.EnumType[] typeFilterCriteria) {
+    private static List<ProcessA.Sample> queryPointsInRadius(final Iterable<ProcessA.Sample> samples, final ArrayRealVector centerPoint, final double radius, final ProcessA.Sample.EnumType[] typeFilterCriteria) {
 
-        Set<ProcessA.Sample.EnumType> filterCriteria = ImmutableSet.copyOf(typeFilterCriteria);
+        final Set<ProcessA.Sample.EnumType> filterCriteria = ImmutableSet.copyOf(typeFilterCriteria);
 
-        List<ProcessA.Sample> samplesInRadius = new ArrayList<>();
+        final List<ProcessA.Sample> samplesInRadius = new ArrayList<>();
 
         // TODO< query the points in the radius with a optimized spartial scheme >
-        for( ProcessA.Sample iterationSample : samples ) {
-            double distance = distance(iterationSample.position, centerPoint);
+        for( final var iterationSample : samples ) {
+            final var distance = distance(iterationSample.position, centerPoint);
 
             if( distance < radius && filterCriteria.contains(iterationSample.type))
                 samplesInRadius.add(iterationSample);
@@ -422,9 +408,9 @@ public class ProcessG {
         return samplesInRadius;
     }
     
-    private static List<SingleLineDetector> getNeightborLinesOfPoint(int pointIndex, ProcessM.LineParsing lineParsing) {
+    private static List<SingleLineDetector> getNeightborLinesOfPoint(final int pointIndex, final ProcessM.LineParsing lineParsing) {
 
-        List<SingleLineDetector> resultLines = new ArrayList<>();
+        final List<SingleLineDetector> resultLines = new ArrayList<>();
         
         resultLines.add(lineParsing.lineParsing.get(pointIndex-1));
         resultLines.add(lineParsing.lineParsing.get(pointIndex));
@@ -437,24 +423,22 @@ public class ProcessG {
      * if this is not the case for one sample, it returns false
      *  
      */
-    private static boolean areAllSamplesNearLines(Iterable<ProcessA.Sample> samples, Iterable<SingleLineDetector> lines, final double maximalDistance) {
-        for( ProcessA.Sample iterationSample : samples ) {
-            ArrayRealVector iterationSamplePosition = real(iterationSample.position);
+    private static boolean areAllSamplesNearLines(final Iterable<ProcessA.Sample> samples, final Iterable<SingleLineDetector> lines, final double maximalDistance) {
+        for( final var iterationSample : samples ) {
+            final var iterationSamplePosition = real(iterationSample.position);
 
-            boolean sampleNearAnyLine = false;
+            var sampleNearAnyLine = false;
 
 
-            ArrayRealVector tmp = new ArrayRealVector(2);
-            for( SingleLineDetector iterationLine : lines ) {
-                ArrayRealVector projectedPointPosition = iterationLine.projectPointOntoLine(iterationSamplePosition, tmp);
-                boolean projectedPointInsideLine = iterationLine.isXOfPointInLine(projectedPointPosition);
+            final var tmp = new ArrayRealVector(2);
+            for( final var iterationLine : lines ) {
+                final var projectedPointPosition = iterationLine.projectPointOntoLine(iterationSamplePosition, tmp);
+                final var projectedPointInsideLine = iterationLine.isXOfPointInLine(projectedPointPosition);
                 
                 // ignore if it is not on the line
-                if( !projectedPointInsideLine ) {
-                    continue;
-                }
+                if( !projectedPointInsideLine ) continue;
 
-                double distanceOfPointToLine = projectedPointPosition.getDistance(iterationSamplePosition);
+                final var distanceOfPointToLine = projectedPointPosition.getDistance(iterationSamplePosition);
                 
                 if( distanceOfPointToLine < maximalDistance ) {
                     sampleNearAnyLine = true;
@@ -462,9 +446,7 @@ public class ProcessG {
                 }
             }
             
-            if( !sampleNearAnyLine ) {
-                return false;
-            }
+            if( !sampleNearAnyLine ) return false;
         }
         
         return true;
@@ -473,29 +455,28 @@ public class ProcessG {
     
     
     
-    private static Curve calculatePolynominalsAndReturnCurve(List<ArrayRealVector> points) {
+    private static Curve calculatePolynominalsAndReturnCurve(final List<ArrayRealVector> points) {
 
-        RealVector solvedA_2_i = ProcessG.solveLinearEquationFor2ForPoints(points, EnumAxis.X);
-        RealVector solvedA_1_i = ProcessG.calculate_1_i(points, solvedA_2_i, EnumAxis.X);
-        RealVector solvedA_3_i = ProcessG.calculate_2_i(points, solvedA_2_i);
-        RealVector solvedA_0_i = ProcessG.calculate_0_i(points, EnumAxis.X);
+        final var solvedA_2_i = ProcessG.solveLinearEquationFor2ForPoints(points, EnumAxis.X);
+        final var solvedA_1_i = ProcessG.calculate_1_i(points, solvedA_2_i, EnumAxis.X);
+        final var solvedA_3_i = ProcessG.calculate_2_i(points, solvedA_2_i);
+        final var solvedA_0_i = ProcessG.calculate_0_i(points, EnumAxis.X);
 
-        RealVector solvedB_2_i = ProcessG.solveLinearEquationFor2ForPoints(points, EnumAxis.Y);
-        RealVector solvedB_1_i = ProcessG.calculate_1_i(points, solvedB_2_i, EnumAxis.Y);
-        RealVector solvedB_3_i = ProcessG.calculate_2_i(points, solvedB_2_i);
-        RealVector solvedB_0_i = ProcessG.calculate_0_i(points, EnumAxis.Y);
+        final var solvedB_2_i = ProcessG.solveLinearEquationFor2ForPoints(points, EnumAxis.Y);
+        final var solvedB_1_i = ProcessG.calculate_1_i(points, solvedB_2_i, EnumAxis.Y);
+        final var solvedB_3_i = ProcessG.calculate_2_i(points, solvedB_2_i);
+        final var solvedB_0_i = ProcessG.calculate_0_i(points, EnumAxis.Y);
         
         return new Curve(createCurves(solvedA_0_i, solvedA_1_i, solvedA_2_i, solvedA_3_i, solvedB_0_i, solvedB_1_i, solvedB_2_i, solvedB_3_i));
     }
     
     // builds a linear equation for the a|b_2,i values and returns the coefficients
     // NOTE< points must be for sure sorted by x axis? >
-    private static RealVector solveLinearEquationFor2ForPoints(List<ArrayRealVector> points, EnumAxis axis) {
-        int i;
-        
+    private static RealVector solveLinearEquationFor2ForPoints(final List<ArrayRealVector> points, final EnumAxis axis) {
+
         // math libary usage see http://commons.apache.org/proper/commons-math/userguide/linear.html
 
-        Array2DRowRealMatrix matrix = new Array2DRowRealMatrix(points.size(), points.size());
+        final var matrix = new Array2DRowRealMatrix(points.size(), points.size());
         
         // populate matrix
         
@@ -504,7 +485,8 @@ public class ProcessG {
         matrix.setEntry(points.size()-1, points.size()-1, 1.0);
         
         // middle
-        for( i = 1; i < points.size()-1; i++ ) {
+        int i;
+        for(i = 1; i < points.size()-1; i++ ) {
             matrix.setEntry(i, i-1, 1.0);
             matrix.setEntry(i, i-1+1, 4.0);
             matrix.setEntry(i, i-1+2, 1.0);
@@ -512,32 +494,32 @@ public class ProcessG {
         
         // populate constants
 
-        RealVector constants = new ArrayRealVector(points.size());
+        final RealVector constants = new ArrayRealVector(points.size());
         constants.setEntry(0, 0.0);
         constants.setEntry(points.size()-1, 0.0);
         
         for( i = 0; i < points.size()-2; i++ ) {
 
-            double value = 3.0 * getAxisValueForPointOfArray(points, i, axis) - 6.0 * getAxisValueForPointOfArray(points, i + 1, axis) + 3.0 * getAxisValueForPointOfArray(points, i + 2, axis);
+            final var value = 3.0 * getAxisValueForPointOfArray(points, i, axis) - 6.0 * getAxisValueForPointOfArray(points, i + 1, axis) + 3.0 * getAxisValueForPointOfArray(points, i + 2, axis);
             constants.setEntry(i+1, value);
         }
         
         
         // solve system
-        DecompositionSolver solver = new LUDecomposition(matrix).getSolver();
-        RealVector solution = solver.solve(constants);
+        final var solver = new LUDecomposition(matrix).getSolver();
+        final var solution = solver.solve(constants);
         
         return solution;
     }
     
     // calculates the (A|B)_1_i after Formula (9a) (foundalis dissertation page 422)
     // note that the result vector is one shorter than the input vector
-    private static RealVector calculate_1_i(List<ArrayRealVector> points, RealVector a_2_i, EnumAxis axis) {
+    private static RealVector calculate_1_i(final List<ArrayRealVector> points, final RealVector a_2_i, final EnumAxis axis) {
 
-        RealVector result = new ArrayRealVector(a_2_i.getDimension() - 1);
-        for( int i = 0; i < a_2_i.getDimension()-1; i++ ) {
+        final RealVector result = new ArrayRealVector(a_2_i.getDimension() - 1);
+        for(var i = 0; i < a_2_i.getDimension()-1; i++ ) {
 
-            double result_1_i = getAxisValueForPointOfArray(points, i + 1, axis) - getAxisValueForPointOfArray(points, i, axis) - (1.0 / 3.0) * (2.0 * a_2_i.getEntry(i) + a_2_i.getEntry(i + 1));
+            final var result_1_i = getAxisValueForPointOfArray(points, i + 1, axis) - getAxisValueForPointOfArray(points, i, axis) - (1.0 / 3.0) * (2.0 * a_2_i.getEntry(i) + a_2_i.getEntry(i + 1));
             result.setEntry(i, result_1_i);
         }
         
@@ -545,11 +527,11 @@ public class ProcessG {
     }
     
     // calculate the (A|B)_3_i after formula (7)
-    private static RealVector calculate_2_i(List<ArrayRealVector> points, RealVector solved_2_i) {
+    private static RealVector calculate_2_i(final List<ArrayRealVector> points, final RealVector solved_2_i) {
 
-        RealVector result = new ArrayRealVector(solved_2_i.getDimension() - 1);
-        for( int i = 0; i < solved_2_i.getDimension()-1; i++ ) {
-            double result_3_i = (solved_2_i.getEntry(i+1)-solved_2_i.getEntry(i))*0.3333333333333333333333333;
+        final RealVector result = new ArrayRealVector(solved_2_i.getDimension() - 1);
+        for(var i = 0; i < solved_2_i.getDimension()-1; i++ ) {
+            final var result_3_i = (solved_2_i.getEntry(i+1)-solved_2_i.getEntry(i))*0.3333333333333333333333333;
             result.setEntry(i, result_3_i);
         }
         
@@ -557,12 +539,12 @@ public class ProcessG {
     }
     
     // "calculate" the (A|B)_0_i after formula (4)
-    private static RealVector calculate_0_i(List<ArrayRealVector> points, EnumAxis axis) {
+    private static RealVector calculate_0_i(final List<ArrayRealVector> points, final EnumAxis axis) {
 
-        RealVector result = new ArrayRealVector(points.size());
+        final RealVector result = new ArrayRealVector(points.size());
         
-        for( int i = 0; i < points.size(); i++ ) {
-            double result_0_i = getAxisValueForPointOfArray(points, i, axis);
+        for(var i = 0; i < points.size(); i++ ) {
+            final var result_0_i = getAxisValueForPointOfArray(points, i, axis);
             result.setEntry(i, result_0_i);
         }
         
@@ -570,37 +552,35 @@ public class ProcessG {
     }
     
     
-    private static List<CurveElement> createCurves(RealVector solvedA_0_i, RealVector solvedA_1_i, RealVector solvedA_2_i, RealVector solvedA_3_i, RealVector solvedB_0_i, RealVector solvedB_1_i, RealVector solvedB_2_i, RealVector solvedB_3_i) {
-        int curveI;
+    private static List<CurveElement> createCurves(final RealVector solvedA_0_i, final RealVector solvedA_1_i, final RealVector solvedA_2_i, final RealVector solvedA_3_i, final RealVector solvedB_0_i, final RealVector solvedB_1_i, final RealVector solvedB_2_i, final RealVector solvedB_3_i) {
 
-        int numberOfPoints = solvedA_0_i.getDimension();
+        final var numberOfPoints = solvedA_0_i.getDimension();
 
-        List<CurveElement> resultCurves = new ArrayList<>();
+        final List<CurveElement> resultCurves = new ArrayList<>();
         
-        for( curveI = 0; curveI < numberOfPoints-1; curveI++ ) {
+        for(int curveI = 0; curveI < numberOfPoints-1; curveI++ )
             resultCurves.add(new CurveElement(
-                    (float)solvedA_0_i.getEntry(curveI),
-                    (float)solvedA_1_i.getEntry(curveI),
-                    (float)solvedA_2_i.getEntry(curveI),
-                    (float)solvedA_3_i.getEntry(curveI),
-                    
-                    (float)solvedB_0_i.getEntry(curveI),
-                    (float)solvedB_1_i.getEntry(curveI),
-                    (float)solvedB_2_i.getEntry(curveI),
-                    (float)solvedB_3_i.getEntry(curveI)
-                )
+                            (float) solvedA_0_i.getEntry(curveI),
+                            (float) solvedA_1_i.getEntry(curveI),
+                            (float) solvedA_2_i.getEntry(curveI),
+                            (float) solvedA_3_i.getEntry(curveI),
+
+                            (float) solvedB_0_i.getEntry(curveI),
+                            (float) solvedB_1_i.getEntry(curveI),
+                            (float) solvedB_2_i.getEntry(curveI),
+                            (float) solvedB_3_i.getEntry(curveI)
+                    )
             );
-        }
         
         return resultCurves;
     }
     
     
-    private static double getAxisValueForPointOfArray(List<ArrayRealVector> points, int index, EnumAxis axis) {
+    private static double getAxisValueForPointOfArray(final List<ArrayRealVector> points, final int index, final EnumAxis axis) {
         return getAxisValueForPoint(points.get(index), axis);
     }
     
-    private static double getAxisValueForPoint(ArrayRealVector point, EnumAxis axis) {
+    private static double getAxisValueForPoint(final ArrayRealVector point, final EnumAxis axis) {
         return axis == EnumAxis.X ? point.getDataRef()[0] : point.getDataRef()[1];
     }
 

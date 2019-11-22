@@ -24,24 +24,24 @@ public enum Grouping
 {
 	;
 
-	public static Set<Pattern> group(Iterable<Pattern> exemplarsSet, float clusteringThreshold, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
+	public static Set<Pattern> group(final Iterable<Pattern> exemplarsSet, final float clusteringThreshold, final NetworkHandles networkHandles, final IMatchingUpdate matchingUpdateImplementation, final FeaturePatternMatching featurePatternMatching)
     {
 
-        Set<Pattern> patterns = new LinkedHashSet<>();
-        Collection<Pattern> knownExemplars = new LinkedHashSet<>();
+        final Set<Pattern> patterns = new LinkedHashSet<>();
+        final Collection<Pattern> knownExemplars = new LinkedHashSet<>();
         
-        for( Pattern iterationExemplarI : exemplarsSet )
+        for( final var iterationExemplarI : exemplarsSet )
         {
             if( !exemplarIsSimilarToAPattern(iterationExemplarI, patterns, clusteringThreshold, networkHandles, matchingUpdateImplementation, featurePatternMatching) )
             {
 
-                float maxSimilarity = 0.0f;
+                var maxSimilarity = 0.0f;
                 Pattern closest = null;
                 
-                for( Pattern iterationExemplarJ : knownExemplars )
+                for( final var iterationExemplarJ : knownExemplars )
                 {
 
-                    float similarity = match(iterationExemplarJ, iterationExemplarI, matchingUpdateImplementation, networkHandles, featurePatternMatching);
+                    final var similarity = match(iterationExemplarJ, iterationExemplarI, matchingUpdateImplementation, networkHandles, featurePatternMatching);
                     
                     if( similarity > maxSimilarity )
                     {
@@ -53,7 +53,7 @@ public enum Grouping
                 if( maxSimilarity > clusteringThreshold )
                 {
 
-                    Pattern createdPattern = formPattern(closest, iterationExemplarI, networkHandles, matchingUpdateImplementation, featurePatternMatching);
+                    final var createdPattern = formPattern(closest, iterationExemplarI, networkHandles, matchingUpdateImplementation, featurePatternMatching);
                     
                     if( !resemblesOneOf(createdPattern, patterns, clusteringThreshold, matchingUpdateImplementation, networkHandles, featurePatternMatching) )
                     {
@@ -72,24 +72,22 @@ public enum Grouping
         return patterns;
     }
     
-    private static boolean exemplarIsSimilarToAPattern(Pattern exemplar, Collection<Pattern> patterns, float clusteringThreshold, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
+    private static boolean exemplarIsSimilarToAPattern(final Pattern exemplar, final Collection<Pattern> patterns, final float clusteringThreshold, final NetworkHandles networkHandles, final IMatchingUpdate matchingUpdateImplementation, final FeaturePatternMatching featurePatternMatching)
     {
 
         if( patterns.isEmpty() )
-        {
             return false;
-        }
         // else here
 
-        float maxSimilarity = 0.0f;
+        var maxSimilarity = 0.0f;
         Pattern closestPattern = null; // null means there is none
 
-        for( Pattern iterationPattern : patterns )
+        for( final var iterationPattern : patterns )
         {
             if( resembles(iterationPattern, exemplar, clusteringThreshold, matchingUpdateImplementation, networkHandles, featurePatternMatching) )
             {
 
-                float similarity = match(iterationPattern, exemplar, matchingUpdateImplementation, networkHandles, featurePatternMatching);
+                final var similarity = match(iterationPattern, exemplar, matchingUpdateImplementation, networkHandles, featurePatternMatching);
                 if( similarity > maxSimilarity )
                 {
                     maxSimilarity = similarity;
@@ -98,22 +96,20 @@ public enum Grouping
             }
             
             if( closestPattern != null )
-            {
                 update(closestPattern, exemplar, networkHandles, matchingUpdateImplementation, featurePatternMatching);
-            }
         }
         
         return false;
     }
     
-    private static void update(Pattern orginal, Pattern additional, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
+    private static void update(final Pattern orginal, final Pattern additional, final NetworkHandles networkHandles, final IMatchingUpdate matchingUpdateImplementation, final FeaturePatternMatching featurePatternMatching)
     {
 
-        Pattern resultPattern = updateCore(orginal, additional, networkHandles, matchingUpdateImplementation, featurePatternMatching);
+        final var resultPattern = updateCore(orginal, additional, networkHandles, matchingUpdateImplementation, featurePatternMatching);
         orginal.exemplars = resultPattern.exemplars;
     }
     
-    private static Pattern formPattern(Pattern a, Pattern b, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
+    private static Pattern formPattern(final Pattern a, final Pattern b, final NetworkHandles networkHandles, final IMatchingUpdate matchingUpdateImplementation, final FeaturePatternMatching featurePatternMatching)
     {
         return updateCore(a, b, networkHandles, matchingUpdateImplementation, featurePatternMatching);
     }
@@ -125,30 +121,26 @@ public enum Grouping
      * 
      * update and formPattern are the same algorithm
      */
-    private static Pattern updateCore(Pattern orginal, Pattern additional, NetworkHandles networkHandles, IMatchingUpdate matchingUpdateImplementation, FeaturePatternMatching featurePatternMatching)
+    private static Pattern updateCore(final Pattern orginal, final Pattern additional, final NetworkHandles networkHandles, final IMatchingUpdate matchingUpdateImplementation, final FeaturePatternMatching featurePatternMatching)
     {
         return matchingUpdateImplementation.updateCore(orginal, additional, networkHandles, featurePatternMatching);
     }
     
-    private static boolean resemblesOneOf(Pattern a, Iterable<Pattern> set, float clusteringThreshold, IMatchingUpdate matchingUpdateImplementation, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
+    private static boolean resemblesOneOf(final Pattern a, final Iterable<Pattern> set, final float clusteringThreshold, final IMatchingUpdate matchingUpdateImplementation, final NetworkHandles networkHandles, final FeaturePatternMatching featurePatternMatching)
     {
-        for( Pattern iterationPattern : set )
-        {
-            if( resembles(a, iterationPattern, clusteringThreshold, matchingUpdateImplementation, networkHandles, featurePatternMatching) )
-            {
+        for( final var iterationPattern : set )
+            if (resembles(a, iterationPattern, clusteringThreshold, matchingUpdateImplementation, networkHandles, featurePatternMatching))
                 return true;
-            }
-        }
         
         return false;
     }
     
-    private static boolean resembles(Pattern a, Pattern b, float clusteringThreshold, IMatchingUpdate matchingUpdateImplementation, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
+    private static boolean resembles(final Pattern a, final Pattern b, final float clusteringThreshold, final IMatchingUpdate matchingUpdateImplementation, final NetworkHandles networkHandles, final FeaturePatternMatching featurePatternMatching)
     {
         return match(a, b, matchingUpdateImplementation, networkHandles, featurePatternMatching) > clusteringThreshold;
     }
     
-    private static float match(Pattern a, Pattern b, IMatchingUpdate matchingUpdateImplementation, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
+    private static float match(final Pattern a, final Pattern b, final IMatchingUpdate matchingUpdateImplementation, final NetworkHandles networkHandles, final FeaturePatternMatching featurePatternMatching)
     {
         return matchingUpdateImplementation.match(a, b, networkHandles, featurePatternMatching);
     }

@@ -57,51 +57,51 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
     * @param data
     * @return 
     */
-    public static double[] getBounds(Iterable<SignalData> data) {
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
+    public static double[] getBounds(final Iterable<SignalData> data) {
+        var min = Double.POSITIVE_INFINITY;
+        var max = Double.NEGATIVE_INFINITY;
     
-        for (SignalData ss : data) {   
-            double a = ss.getMin();
-            double b = ss.getMax();
+        for (final var ss : data) {
+            final var a = ss.getMin();
+            final var b = ss.getMax();
             if (a < min) min = a;
             if (b > max) max = b;
         }
         return new double[] { min, max };        
     }
     
-    protected void setMin(int signal, double n) {
+    protected void setMin(final int signal, final double n) {
         getSignal(signal).setMin(n);
     }
-    protected void setMax(int signal, double n) {
+    protected void setMax(final int signal, final double n) {
         getSignal(signal).setMax(n);
     }
     
-    public double getMin(int signal) {
-        Signal s = getSignal(signal);
+    public double getMin(final int signal) {
+        final var s = getSignal(signal);
         if (s == null) return Double.NaN;        
         return s.getMin();
     }
-    public double getMax(int signal) {
-        Signal s = getSignal(signal);
+    public double getMax(final int signal) {
+        final var s = getSignal(signal);
         if (s == null) return Double.NaN;        
         return s.getMax();
     }
     
     //TODO make a batch version of this
-    public void updateBounds(int signal) {
+    public void updateBounds(final int signal) {
         
-        Signal s = getSignal(signal);
+        final var s = getSignal(signal);
         s.resetBounds();
-        double min = Double.POSITIVE_INFINITY;
-        double max = Double.NEGATIVE_INFINITY;
+        var min = Double.POSITIVE_INFINITY;
+        var max = Double.NEGATIVE_INFINITY;
 
 
 		//signal);
-		for (Object[] objects : this) {
-			Object e = objects[signal];
+		for (final var objects : this) {
+			final var e = objects[signal];
 			if (e instanceof Number) {
-				double d = ((Number) e).doubleValue();
+				final var d = ((Number) e).doubleValue();
 				if (d < min) min = d;
 				if (d > max) max = d;
 			}
@@ -110,20 +110,20 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
         s.setMax(max);
     }
 
-    public SignalData newSignalData(String n) {
-        Signal s = getSignal(n);
+    public SignalData newSignalData(final String n) {
+        final var s = getSignal(n);
         if (s == null) return null;
         return new SignalData(this, s);
     }
 
-    public Metrics addMeters(Meter... c) {
-        for (Meter x : c)
+    public Metrics addMeters(final Meter... c) {
+        for (final var x : c)
             addMeter(x);
         return this;
     }
 
-    public <M extends Meter<?>> M getMeter(String id) {
-        int i = indexOf(id);
+    public <M extends Meter<?>> M getMeter(final String id) {
+        final var i = indexOf(id);
         if (i == -1) return null;
         return (M) meters.get(i);
     }
@@ -133,13 +133,13 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
         final int thecolumn;
         private final int[] columns;
 
-        public firstColumnIterator(int... columns) {
+        public firstColumnIterator(final int... columns) {
             this.columns = columns;
             next = new Object[1];
             thecolumn = columns[0];
         }
 
-        @Override public Object[] apply(Object[] f) {
+        @Override public Object[] apply(final Object[] f) {
             next[0] = f[thecolumn];
             return next;
         }
@@ -150,18 +150,16 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
         final Object[] next;
         private final int[] columns;
 
-        public nColumnIterator(int... columns) {
+        public nColumnIterator(final int... columns) {
             this.columns = columns;
             next = new Object[columns.length];
         }
 
         @Override
-        public Object[] apply(Object[] f) {
+        public Object[] apply(final Object[] f) {
 
-            int j = 0;
-            for (int c : columns) {
-                next[j++] = f[c];
-            }
+            var j = 0;
+            for (final var c : columns) next[j++] = f[c];
             return next;
         }
 
@@ -176,7 +174,7 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
         }
 
         @Override
-        protected RowKey getValue(Object key, int index) {
+        protected RowKey getValue(final Object key, final int index) {
             return nextRowKey;
         }
         
@@ -202,7 +200,7 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
     }
 
     /** fixed size */
-    public Metrics(int historySize) {
+    public Metrics(final int historySize) {
         super();
         this.history = historySize;
         
@@ -225,11 +223,9 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
         rows.clear();
     }
     
-    public <M extends Meter<C>, C extends Cell> M addMeter(M m) {
-        for (Signal s : m.getSignals()) {
-            if (getSignal(s.id)!=null)
-                throw new RuntimeException("Signal " + s.id + " already exists in "+ this);
-        }
+    public <M extends Meter<C>, C extends Cell> M addMeter(final M m) {
+        for (final var s : m.getSignals())
+            assert getSignal(s.id) == null : "Signal " + s.id + " already exists in " + this;
         
         meters.add(m);
         numColumns+= m.numSignals();
@@ -239,31 +235,28 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
         return m;
     }
     
-    public void removeMeter(Meter<? extends Cell> m) {
+    public void removeMeter(final Meter<? extends Cell> m) {
         throw new RuntimeException("Removal not supported yet");
     }
     
     /** generate the next row.  key can be a time number, or some other unique-like identifying value */
-    public synchronized <R extends RowKey> void update(R key) {
+    public synchronized <R extends RowKey> void update(final R key) {
         nextRowKey = key;        
         
-        boolean[] extremaToInvalidate = new boolean[ numColumns ];
+        final var extremaToInvalidate = new boolean[ numColumns ];
         
-        Object[] nextRow = new Object[ numColumns ];
+        final var nextRow = new Object[ numColumns ];
         append(nextRow, extremaToInvalidate); //append it so that any derivative columns further on can work with the most current data (in lower array indices) while the array is being formed
 
-        int c = 0;
-        for (Meter m : meters) {
-            Cell[] v = ((Meter<? extends Cell>)m).sample(key);
+        var c = 0;
+        for (final Meter m : meters) {
+            final var v = ((Meter<? extends Cell>)m).sample(key);
             if (v == null) continue;
-            int vl = v.length;
+            final var vl = v.length;
 
-            if (c + vl > nextRow.length) 
-                throw new RuntimeException("column overflow: " + m + ' ' + c + '+' + vl + '>' + nextRow.length);
+            assert c + vl <= nextRow.length : "column overflow: " + m + ' ' + c + '+' + vl + '>' + nextRow.length;
 
-            if (vl == 1) {
-                nextRow[c++] = v[0];
-            }
+            if (vl == 1) nextRow[c++] = v[0];
             else if (vl == 2) {
                 nextRow[c++] = v[0];
                 nextRow[c++] = v[1];
@@ -278,38 +271,32 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
         invalidateExtrema(true, nextRow, extremaToInvalidate);
    
         
-        for (int i = 0; i < getSignals().size(); i++) {
+        for (var i = 0; i < getSignals().size(); i++) {
             if (i == 0) extremaToInvalidate[i] = true;
-            if (extremaToInvalidate[i]) {        
-                updateBounds(i);
-            }
+            if (extremaToInvalidate[i]) updateBounds(i);
             //if (i == 0) System.out.println(get extremaToInvalidate[0] + " "  + history);
         }
         
     }
     
-    private void invalidateExtrema(boolean added, Object[] row, boolean[] extremaToInvalidate) {
-        for (int i = 0; i < row.length; i++) {
-            Object ri = row[i];
+    private void invalidateExtrema(final boolean added, final Object[] row, final boolean[] extremaToInvalidate) {
+        for (var i = 0; i < row.length; i++) {
+            final var ri = row[i];
             if (!(ri instanceof Number)) continue;
             
-            double n = ((Number)row[i]).doubleValue();
+            final var n = ((Number)row[i]).doubleValue();
             if (Double.isNaN(n)) continue;
             
-            double min = getMin(i);
-            double max = getMax(i);
+            final var min = getMin(i);
+            final var max = getMax(i);
             
-            boolean minNAN = Double.isNaN(min);
-            boolean maxNAN = Double.isNaN(max);
+            final var minNAN = Double.isNaN(min);
+            final var maxNAN = Double.isNaN(max);
             
             if (added) {
                 //for rows which have been added
-                if ((minNAN) || (n < min))  {                     
-                    setMin(i, n);
-                }
-                if ((maxNAN) || (n > max))  { 
-                    setMax(i, n);
-                }
+                if ((minNAN) || (n < min)) setMin(i, n);
+                if ((maxNAN) || (n > max)) setMax(i, n);
             }
             else {
                 //for rows which have been removed
@@ -321,14 +308,12 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
     }
     
     
-    protected void append(Object[] next, boolean[] invalidatedExtrema) {
+    protected void append(final Object[] next, final boolean[] invalidatedExtrema) {
         if (next==null) return;        
 
-        if (history > 0) {
-            while (rows.size() >= history) {
-                Object[] prev = rows.removeFirst();
-                invalidateExtrema(false, prev, invalidatedExtrema);
-            }
+        if (history > 0) while (rows.size() >= history) {
+            final var prev = rows.removeFirst();
+            invalidateExtrema(false, prev, invalidatedExtrema);
         }
         
         rows.addLast(next);     
@@ -338,7 +323,7 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
     public List<Signal> getSignals() {
         if (signalList == null) {
             signalList = new ArrayList(numColumns);
-            for (Meter<?> m : meters)
+            for (final var m : meters)
                 signalList.addAll(m.getSignals());
         }
         return signalList;        
@@ -347,30 +332,28 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
     public Map<String,Integer> getSignalIndex() {
         if (signalIndex == null) {
             signalIndex = new HashMap(numColumns);
-            int i = 0;
-            for (Signal s : getSignals()) {
-                signalIndex.put(s.id, i++);
-            }
+            var i = 0;
+            for (final var s : getSignals()) signalIndex.put(s.id, i++);
         }
         return signalIndex;
     }
     
-    public int indexOf(Signal s) {
+    public int indexOf(final Signal s) {
         return indexOf(s.id);
     }
     
-    public int indexOf(String signalID) {
-        Integer i = getSignalIndex().get(signalID);
+    public int indexOf(final String signalID) {
+        final var i = getSignalIndex().get(signalID);
         if (i == null) return -1;
         return i;
     }
     
-    public Signal getSignal(int index) {
+    public Signal getSignal(final int index) {
        return getSignals().get(index); 
     }
-    public Signal getSignal(String s) {
+    public Signal getSignal(final String s) {
        if (s == null) return null;
-       int ii = indexOf(s);
+       final var ii = indexOf(s);
        if (ii == -1) return null;
        return getSignals().get(ii); 
     }    
@@ -389,19 +372,17 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
     }
     
     
-    public Object[] getData(int signal, Object[] c) {        
+    public Object[] getData(final int signal, Object[] c) {
         if ((c == null) || (c.length != numRows() )) 
             c = new Object[ numRows() ];
-        
-        int r = 0;
-        for (Object[] row : this) {
-            c[r++] = row[signal];
-        }
+
+        var r = 0;
+        for (final var row : this) c[r++] = row[signal];
         
         return c;
     }
     
-    public Object[] getData(int signal) {        
+    public Object[] getData(final int signal) {
         return getData(signal, null);
     }
     
@@ -419,30 +400,28 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
         return null;
     }*/
     
-    public static Iterator<Object> iterateSignal(int column, boolean reverse) {
+    public static Iterator<Object> iterateSignal(final int column, final boolean reverse) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
     
     public Iterator<Object[]> iterator(final int... columns) {
-        if (columns.length == 1) {
-            //fast 1-argument
-            return Iterators.transform(iterator(), new firstColumnIterator(columns));
-        }
+        //fast 1-argument
+        if (columns.length == 1) return Iterators.transform(iterator(), new firstColumnIterator(columns));
                 
         return Iterators.transform(iterator(), new nColumnIterator(columns));
     }
 
-    public static List<Double> doubles(Iterable<Object> l) {
-        List<Double> r = new ArrayList();
-        for (Object o : l)
+    public static List<Double> doubles(final Iterable<Object> l) {
+        final List<Double> r = new ArrayList();
+        for (final var o : l)
             if (o instanceof Number) r.add(((Number)o).doubleValue());
         return r;
     }
 
 
-    public List<Object> getNewSignalValues(int column, int num) {
-        List<Object> l = new ArrayList(num);
-        Iterator<Object[]> r = reverseIterator();        
+    public List<Object> getNewSignalValues(final int column, int num) {
+        final List<Object> l = new ArrayList(num);
+        final var r = reverseIterator();
         while (r.hasNext() && num > 0) {
             l.add(r.next()[column]);
             num--;
@@ -451,89 +430,10 @@ public class Metrics<RowKey,Cell> implements Iterable<Object[]> {
     }
     
     public String[] getSignalIDs() {
-        String[] r = new String[getSignals().size()];
-        int i = 0;
-        for (Signal s : getSignals()) {
-            r[i++] = s.id;
-        }
+        final var r = new String[getSignals().size()];
+        var i = 0;
+        for (final var s : getSignals()) r[i++] = s.id;
         return r;
     }
-
-//    public void printCSVHeader(PrintStream out) {
-//        printJSONArray(out, getSignalIDs(),false );
-//    }
-//    public void printCSVLastLine(PrintStream out) {
-//        if (rows.size() > 0)
-//            printJSONArray(out, rowLast(), false);
-//    }
-//
-//    public void printCSV(PrintStream out) {
-//        printCSVHeader(out);
-//        for (Object[] row : this) {
-//            printJSONArray(out, row, false);
-//        }
-//    }
-
-    public String name() {
-        return getClass().getSimpleName();
-    }
-
-
-//    public void printARFF(PrintStream out) {
-//        printARFF(out, null);
-//    }
-//
-//    public void printARFF(PrintStream out, Predicate<Object[]> p) {
-//        //http://www.cs.waikato.ac.nz/ml/weka/arff.html
-//        out.println("@RELATION " + name());
-//
-//
-//        int n = 0;
-//        for (Meter<?> m : meters) {
-//            for (Signal s : m.getSignals()) {
-//                if (n == 0) {
-//                    //key, for now we'll use string
-//                    out.println("@ATTRIBUTE " + s.id + " STRING");
-//                }
-//                else if ((m instanceof DoubleMeter) || (m instanceof HitMeter)) {
-//                    out.println("@ATTRIBUTE " + s.id + " NUMERIC");
-//                }
-//                else {
-//                    out.println("@ATTRIBUTE " + s.id + " STRING");
-//                    //TODO use nominal by finding the unique values
-//                }
-//                n++;
-//            }
-//        }
-//
-//        out.print('%'); //ARFF comment character
-//        printCSVHeader(out);
-//
-//        out.println("@DATA");
-//        for (Object[] x : this) {
-//            if (p!=null)
-//                if (!p.apply(x)) continue;
-//            for (int i = 0; i < numColumns; i++) {
-//                if (i < x.length) {
-//                    Object y = x[i];
-//                    if (y == null)
-//                        out.print('?');
-//                    else if (y instanceof Number)
-//                        out.print(y);
-//                    else
-//                        out.print('\"' + y.toString() + '\"');
-//                }
-//                else {
-//                    //pad extra values with '?'
-//                    out.print('?');
-//                }
-//                if (i!=numColumns-1)
-//                    out.print(',');
-//                else
-//                    out.println();
-//            }
-//
-//        }
-//    }
 
 }

@@ -12,7 +12,6 @@ package ptrman.Datastructures;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import ptrman.levels.retina.helper.SpatialDrawer;
 import ptrman.math.Maths;
-import ptrman.misc.Assert;
 
 import java.util.Collection;
 import java.util.List;
@@ -31,9 +30,9 @@ public class SpatialAcceleratedMap2d {
 	private final IntIntPair gridBoundary;
 
 	// size of map must be .x % gridsize = 0 and .y % gridsize = 0
-	public SpatialAcceleratedMap2d(IMap2d<Boolean> map, final int gridsize) {
-		Assert.Assert((map.getWidth() % gridsize) == 0, "width of map is not divisable by gridsize");
-		Assert.Assert((map.getLength() % gridsize) == 0, "height of map is not divisable by gridsize");
+	public SpatialAcceleratedMap2d(final IMap2d<Boolean> map, final int gridsize) {
+		assert (map.getWidth() % gridsize) == 0 : "ASSERT: " + "width of map is not divisable by gridsize";
+		assert (map.getLength() % gridsize) == 0 : "ASSERT: " + "height of map is not divisable by gridsize";
 
 		this.map = map;
 		this.gridsize = gridsize;
@@ -57,8 +56,8 @@ public class SpatialAcceleratedMap2d {
 
 	// TODO< move outside >
 	private static Vector2d<Integer> clampVector2dInteger(final Vector2d<Integer> position, final Vector2d<Integer> min, final Vector2d<Integer> max) {
-		final int x = Maths.clampInt(position.x, min.x, max.x);
-		final int y = Maths.clampInt(position.y, min.y, max.y);
+		final var x = Maths.clampInt(position.x, min.x, max.x);
+		final var y = Maths.clampInt(position.y, min.y, max.y);
 		return new Vector2d<>(x, y);
 	}
 
@@ -70,29 +69,25 @@ public class SpatialAcceleratedMap2d {
 		return SpatialDrawer.getPositionsOfCellsOfCircleBound(gridPosition, gridRadius, gridBoundary);
 	}
 
-	public void getGridLocationsWithNegativeDirectionOfGridRadius(final IntIntPair gridPosition, final int gridRadius, Collection<IntIntPair> resultPositions) {
+	public void getGridLocationsWithNegativeDirectionOfGridRadius(final IntIntPair gridPosition, final int gridRadius, final Collection<IntIntPair> resultPositions) {
 		SpatialDrawer.getPositionsOfCellsWithNegativeDirectionOfCircleBound(gridPosition, gridRadius, gridBoundary, resultPositions);
 	}
 
 	public void recalculateGridCellStateMap() {
-		final int numberOfPixelsPerCell = gridsize * gridsize;
+		final var numberOfPixelsPerCell = gridsize * gridsize;
 
-		for (int y = 0; y < gridBoundary.getTwo(); y++) {
-			for (int x = 0; x < gridBoundary.getOne(); x++) {
-				int numberOfPixelsSetInCell = countPixelsOfGridCell(x, y);
-                if (numberOfPixelsSetInCell == 0) {
-                    gridCellStateMap.setAt(x, y, EnumGridCellState.CLEAR);
-                } else if (numberOfPixelsSetInCell == numberOfPixelsPerCell) {
+		for (var y = 0; y < gridBoundary.getTwo(); y++)
+			for (var x = 0; x < gridBoundary.getOne(); x++) {
+				final var numberOfPixelsSetInCell = countPixelsOfGridCell(x, y);
+				if (numberOfPixelsSetInCell == 0) gridCellStateMap.setAt(x, y, EnumGridCellState.CLEAR);
+				else if (numberOfPixelsSetInCell == numberOfPixelsPerCell)
 					gridCellStateMap.setAt(x, y, EnumGridCellState.FULLYSET);
-				} else {
-					gridCellStateMap.setAt(x, y, EnumGridCellState.NOTFULLYSET);
-				}
+				else gridCellStateMap.setAt(x, y, EnumGridCellState.NOTFULLYSET);
 			}
-		}
 	}
 
 	public boolean canValueBeFoundInCell(final IntIntPair cellPosition, final boolean value) {
-		final EnumGridCellState gridCellStateAtPosition = gridCellStateMap.readAt(cellPosition.getOne(), cellPosition.getTwo());
+		final var gridCellStateAtPosition = gridCellStateMap.readAt(cellPosition.getOne(), cellPosition.getTwo());
 
 		return value ? (gridCellStateAtPosition != EnumGridCellState.CLEAR) : (gridCellStateAtPosition != EnumGridCellState.FULLYSET);
 	}
@@ -106,15 +101,10 @@ public class SpatialAcceleratedMap2d {
 	}
 
 	private int countPixelsOfGridCell(final int cellX, final int cellY) {
-		int numberOfPixels = 0;
+		var numberOfPixels = 0;
 
-		for (int y = cellY * gridsize; y < (cellY + 1) * gridsize; y++) {
-			for (int x = cellX * gridsize; x < (cellX + 1) * gridsize; x++) {
-				if (map.readAt(x, y)) {
-					numberOfPixels++;
-				}
-			}
-		}
+		for (var y = cellY * gridsize; y < (cellY + 1) * gridsize; y++)
+			for (var x = cellX * gridsize; x < (cellX + 1) * gridsize; x++) if (map.readAt(x, y)) numberOfPixels++;
 
 		return numberOfPixels;
 	}

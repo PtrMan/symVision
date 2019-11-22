@@ -16,80 +16,63 @@ public enum GaussianBlur
 {
 	;
 
-	public static IMap2d<Float> blur(int radius, IMap2d<Float> input)
+	public static IMap2d<Float> blur(final int radius, final IMap2d<Float> input)
     {
 		int i;
-        int di;
 
         // create kernel
-		float[] kernel = new float[(radius - 1) * 2 + 1];
-		float variance = (float) Math.sqrt(0.15f);
+		final var kernel = new float[(radius - 1) * 2 + 1];
+		final var variance = (float) Math.sqrt(0.15f);
         kernel[radius - 1] = 1.0f;
-		float normalisation = Gaussian.calculateGaussianDistribution(0.0f, 0.0f, variance);
+		final var normalisation = Gaussian.calculateGaussianDistribution(0.0f, 0.0f, variance);
         
-        for (di = 1;di < radius;di++)
+        for (int di = 1; di < radius; di++)
         {
 
-			float gaussianResult = Gaussian.calculateGaussianDistribution((float) (di) / (float) (radius), 0.0f, variance);
-			float normalizedResult = gaussianResult / normalisation;
+			final var gaussianResult = Gaussian.calculateGaussianDistribution((float) (di) / (float) (radius), 0.0f, variance);
+			final var normalizedResult = gaussianResult / normalisation;
             kernel[radius - 1 + di] = normalizedResult;
             kernel[radius - 1 - di] = normalizedResult;
         }
 
-		IMap2d<Float> resultMap = new Map2d<>(input.getWidth(), input.getLength());
-		IMap2d<Float> tempMap = new Map2d<>(input.getWidth(), input.getLength());
+		final IMap2d<Float> resultMap = new Map2d<>(input.getWidth(), input.getLength());
+		final IMap2d<Float> tempMap = new Map2d<>(input.getWidth(), input.getLength());
         blurX(input, tempMap, kernel);
         blurY(tempMap, resultMap, kernel);
         return resultMap;
     }
 
-    public static void blurX(IMap2d<Float> input, IMap2d<Float> output, float[] kernel)
+    public static void blurX(final IMap2d<Float> input, final IMap2d<Float> output, final float[] kernel)
     {
-        int x, y;
-        int radius = 1 + (kernel.length - 1) / 2;
-        for (y = 0;y < input.getLength();y++)
-        {
-            for (x = 0;x < input.getWidth();x++)
-            {
-                int ir;
-				float temp = 0.0f;
-                for (ir = -radius;ir < radius - 1;ir++)
-                {
+        final var radius = 1 + (kernel.length - 1) / 2;
+        for (int y = 0; y < input.getLength(); y++)
+            for (int x = 0; x < input.getWidth(); x++) {
+                var temp = 0.0f;
+                for (int ir = -radius; ir < radius - 1; ir++) {
                     if (ir + x < 0 || ir + x >= input.getWidth())
-                    {
                         continue;
-                    }
-                     
+
                     temp += (input.readAt(x + ir, y) * kernel[radius + ir]);
                 }
                 output.setAt(x, y, temp);
             }
-        }
     }
 
-    public static void blurY(IMap2d<Float> input, IMap2d<Float> output, float[] kernel)
+    public static void blurY(final IMap2d<Float> input, final IMap2d<Float> output, final float[] kernel)
     {
-        int x, y;
-        int radius = 1 + (kernel.length - 1) / 2;
-        for (x = 0;x < input.getWidth();x++)
-        {
-            for (y = 0;y < input.getLength();y++)
-            {
-                int ir;
+        final var radius = 1 + (kernel.length - 1) / 2;
+        for (int x = 0; x < input.getWidth(); x++)
+            for (int y = 0; y < input.getLength(); y++) {
 
-				float temp = 0.0f;
-                for (ir = -radius;ir < radius - 1;ir++)
-                {
+                var temp = 0.0f;
+                for (int ir = -radius; ir < radius - 1; ir++) {
                     if (ir + y < 0 || ir + y >= input.getLength())
-                    {
                         continue;
-                    }
-                     
+
                     temp += (input.readAt(x, y + ir) * kernel[radius + ir]);
                 }
                 output.setAt(x, y, temp);
             }
-        }
     }
 
 }

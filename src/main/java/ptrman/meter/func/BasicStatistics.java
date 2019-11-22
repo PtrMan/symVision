@@ -23,25 +23,25 @@ public class BasicStatistics extends DependsOnColumn<Number,Double> {
     private StatisticalSummary stat;
 
     /** no window, uses SummaryStatistics */
-    public BasicStatistics(Metrics metrics, String derivedFrom) {
+    public BasicStatistics(final Metrics metrics, final String derivedFrom) {
         this(metrics, derivedFrom, 0);        
     }
     
     /** fixed window if windowSize>0 (in seconds, or whatever time unit is applied) , uses DescriptiveStatistics */
-    public BasicStatistics(Metrics metrics, String derivedFrom, int windowSize) {
+    public BasicStatistics(final Metrics metrics, final String derivedFrom, final int windowSize) {
         super(metrics, derivedFrom, 2);
         
         setWindowSize(windowSize);
     }
     
-    public void setWindowSize(int w) {
+    public void setWindowSize(final int w) {
         stat = w == 0 ? new SummaryStatistics() : new DescriptiveStatistics(w);
     }
 
     
     
     @Override
-    protected String getColumnID(Signal dependent, int i) {
+    protected String getColumnID(final Signal dependent, final int i) {
         switch (i) {
             case 0: return dependent.id + ".mean";
             case 1: return dependent.id + ".stdev";
@@ -50,16 +50,14 @@ public class BasicStatistics extends DependsOnColumn<Number,Double> {
     }
 
     @Override
-    protected Double getValue(Object key, int index) {
+    protected Double getValue(final Object key, final int index) {
         
         if (index == 0) {
-            double nextValue = newestValue().doubleValue();
-            if (Double.isFinite(nextValue)) {
-                if (stat instanceof SummaryStatistics)
-                    ((SummaryStatistics)stat).addValue( nextValue );    
-                else if (stat instanceof DescriptiveStatistics)
-                    ((DescriptiveStatistics)stat).addValue( nextValue );
-            }
+            final var nextValue = newestValue().doubleValue();
+            if (Double.isFinite(nextValue)) if (stat instanceof SummaryStatistics)
+                ((SummaryStatistics) stat).addValue(nextValue);
+            else if (stat instanceof DescriptiveStatistics)
+                ((DescriptiveStatistics) stat).addValue(nextValue);
         }
         
         switch (index) {

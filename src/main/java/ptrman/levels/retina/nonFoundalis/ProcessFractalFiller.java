@@ -20,10 +20,9 @@ import ptrman.Datastructures.FastBooleanMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.IProcess;
 import ptrman.levels.retina.ProcessA;
-import ptrman.misc.Assert;
-import ptrman.misc.BooleanHelper;
 
 import java.util.Collection;
+import java.util.stream.IntStream;
 
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
@@ -43,8 +42,8 @@ public class ProcessFractalFiller implements IProcess {
         public final SummaryStatistics statistics = new SummaryStatistics();
 
         public boolean isValueInsideVariance(final float value, final float varianceMultiplier) {
-            final float variance = (float)Math.sqrt(statistics.getPopulationVariance());
-            final float maxVariance = variance * varianceMultiplier;
+            final var variance = (float)Math.sqrt(statistics.getPopulationVariance());
+            final var maxVariance = variance * varianceMultiplier;
 
             return value > (float)statistics.getMean() - maxVariance && value < (float)statistics.getMean() + maxVariance;
         }
@@ -59,13 +58,13 @@ public class ProcessFractalFiller implements IProcess {
         public float[] varianceMultiplier;
     }
 
-    public void set(int accelerationGridSize, InterleavedF32 inputImage) {
+    public void set(final int accelerationGridSize, final InterleavedF32 inputImage) {
         this.accelerationGridSize = accelerationGridSize;
         this.inputImage = inputImage;
     }
 
     @Override
-    public void setImageSize(Vector2d<Integer> imageSize) {
+    public void setImageSize(final Vector2d<Integer> imageSize) {
         alreadySegmentatedPixelsMap = new FastBooleanMap2d(imageSize.x, imageSize.y);
     }
 
@@ -94,18 +93,18 @@ public class ProcessFractalFiller implements IProcess {
      * @param gridCellPosition
      * \param entryDirection values can be -1 or 1, tells from which side the scanning should start (used for inter-Gridcell filling)
      */
-    protected void scanGridCell(final IntIntPair gridCellPosition, final IntIntPair entryDirection, final boolean[] entryPixels, FillContext fillContext) {
+    protected void scanGridCell(final IntIntPair gridCellPosition, final IntIntPair entryDirection, final boolean[] entryPixels, final FillContext fillContext) {
         //final Vector2d<Integer> absoluteMapTopLeftPosition = Vector2d.IntegerHelper.getScaled(gridCellPosition, accelerationGridSize);
 
-        boolean[] lastFrontEntryPixels = entryPixels;
+        var lastFrontEntryPixels = entryPixels;
 
-        for( int scanFrontCounter = 0; scanFrontCounter < accelerationGridSize; scanFrontCounter++ ) {
+        for(var scanFrontCounter = 0; scanFrontCounter < accelerationGridSize; scanFrontCounter++ ) {
             // call method to calculate the scanabled pixels from the direction and scanFrontCounter offset
-            boolean[] scanablePixels = calculateScanablePixels(lastFrontEntryPixels, gridCellPosition, entryDirection, scanFrontCounter);
+            final var scanablePixels = calculateScanablePixels(lastFrontEntryPixels, gridCellPosition, entryDirection, scanFrontCounter);
 
             // fill with the help of the gaussian channel estimation
             // TODO< fill the array with useful information >
-            boolean[] filledPixelsOfCurrentFront = fillWithGaussianEstimationAndReturnFilledPixels(gridCellPosition, entryDirection, scanFrontCounter, fillContext, scanablePixels);
+            final var filledPixelsOfCurrentFront = fillWithGaussianEstimationAndReturnFilledPixels(gridCellPosition, entryDirection, scanFrontCounter, fillContext, scanablePixels);
 
             addSamplesForCurrentFront(gridCellPosition, entryDirection, scanFrontCounter, filledPixelsOfCurrentFront, fillContext.samples);
 
@@ -113,34 +112,33 @@ public class ProcessFractalFiller implements IProcess {
         }
     }
 
-    private boolean[] calculateScanablePixels(final boolean[] frontEntryPixels, final IntIntPair gridCellPosition, final IntIntPair entryDirection, int scanFrontCounter) {
-        boolean[] result = new boolean[accelerationGridSize];
+    private boolean[] calculateScanablePixels(final boolean[] frontEntryPixels, final IntIntPair gridCellPosition, final IntIntPair entryDirection, final int scanFrontCounter) {
+        final var result = new boolean[accelerationGridSize];
 
-        final boolean[] broadcastedEntryFront = booleanBroadcast(frontEntryPixels);
+        final var broadcastedEntryFront = booleanBroadcast(frontEntryPixels);
 
-        for( int i = 0; i < accelerationGridSize; i++ ) {
-            final IntIntPair samplePosition = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, i);
+        for(var i = 0; i < accelerationGridSize; i++ ) {
+            final var samplePosition = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, i);
 
-            if( !alreadySegmentatedPixelsMap.readAt(samplePosition.getOne(), samplePosition.getTwo()) && broadcastedEntryFront[i] ) {
+            if( !alreadySegmentatedPixelsMap.readAt(samplePosition.getOne(), samplePosition.getTwo()) && broadcastedEntryFront[i] )
                 result[i] = true;
-            }
         }
 
         return result;
     }
 
-    private boolean[] fillWithGaussianEstimationAndReturnFilledPixels(final IntIntPair gridCellPosition, final IntIntPair entryDirection, int scanFrontCounter, FillContext fillContext, final boolean[] scanablePixels) {
-        boolean[] filledResult = new boolean[accelerationGridSize];
+    private boolean[] fillWithGaussianEstimationAndReturnFilledPixels(final IntIntPair gridCellPosition, final IntIntPair entryDirection, final int scanFrontCounter, final FillContext fillContext, final boolean[] scanablePixels) {
+        final var filledResult = new boolean[accelerationGridSize];
 
-        for( int i = 0; i < accelerationGridSize; i++ ) {
-            final IntIntPair samplePosition = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, i);
-            final ArrayRealVector sampledPixel = readInputImageAt(samplePosition);
-            final boolean pixelShouldBeFilled = calculateIfPixelShouldBeFilled(sampledPixel, fillContext);
+        for(var i = 0; i < accelerationGridSize; i++ ) {
+            final var samplePosition = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, i);
+            final var sampledPixel = readInputImageAt(samplePosition);
+            final var pixelShouldBeFilled = calculateIfPixelShouldBeFilled(sampledPixel, fillContext);
             if( pixelShouldBeFilled ) {
                 filledResult[i] = true;
 
                 // fill
-                for( int channelI = 0; channelI < inputImage.getNumBands(); channelI++ )
+                for(var channelI = 0; channelI < inputImage.getNumBands(); channelI++ )
                     fillContext.gaussianContext[channelI].statistics.addValue(sampledPixel.getDataRef()[channelI]);
 
                 alreadySegmentatedPixelsMap.setAt(samplePosition.getOne(), samplePosition.getTwo(), true);
@@ -150,69 +148,64 @@ public class ProcessFractalFiller implements IProcess {
         return filledResult;
     }
 
-    private boolean calculateIfPixelShouldBeFilled(ArrayRealVector sampledPixel, FillContext fillContext) {
-        for( int channelI = 0; channelI < inputImage.getNumBands(); channelI++ ) {
-            final boolean isChannelValueInVariance = fillContext.gaussianContext[channelI].isValueInsideVariance((float)sampledPixel.getDataRef()[channelI], fillContext.varianceMultiplier[channelI]);
+    private boolean calculateIfPixelShouldBeFilled(final ArrayRealVector sampledPixel, final FillContext fillContext) {
+        for(var channelI = 0; channelI < inputImage.getNumBands(); channelI++ ) {
+            final var isChannelValueInVariance = fillContext.gaussianContext[channelI].isValueInsideVariance((float)sampledPixel.getDataRef()[channelI], fillContext.varianceMultiplier[channelI]);
 
-            if( !isChannelValueInVariance ) {
-                return false;
-            }
+            if( !isChannelValueInVariance ) return false;
         }
 
         return true;
     }
 
-    private void addSamplesForCurrentFront(IntIntPair gridCellPosition, IntIntPair entryDirection, int scanFrontCounter, boolean[] filledPixelsOfCurrentFront, Collection<ProcessA.Sample> samples) {
-        final int MIDDLE_INDEX = (accelerationGridSize-1)/2;
-
-        final boolean WRITE_MIDDLE_SAMPLE = true;
+    private void addSamplesForCurrentFront(final IntIntPair gridCellPosition, final IntIntPair entryDirection, final int scanFrontCounter, final boolean[] filledPixelsOfCurrentFront, final Collection<ProcessA.Sample> samples) {
+        final var MIDDLE_INDEX = (accelerationGridSize-1)/2;
 
 
-        Assert.Assert((accelerationGridSize % 2) == 1, "accelerationGridSize must be uneven!");
+        assert (accelerationGridSize % 2) == 1 : "ASSERT: " + "accelerationGridSize must be uneven!";
 
         if( arrayAreAllValues(filledPixelsOfCurrentFront, true) ) {
             // add two samples on each side
-            final IntIntPair sample1Position = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, 0);
+            final var sample1Position = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, 0);
             samples.add(new ProcessA.Sample(sample1Position));
 
-            final IntIntPair sample2Position = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, accelerationGridSize-1);
+            final var sample2Position = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, accelerationGridSize-1);
             samples.add(new ProcessA.Sample(sample2Position));
 
             // add sample in the middle if constant flag says so
+            final var WRITE_MIDDLE_SAMPLE = true;
             if( WRITE_MIDDLE_SAMPLE ) {
-                final IntIntPair middleSamplePosition = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, MIDDLE_INDEX);
+                final var middleSamplePosition = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, MIDDLE_INDEX);
 
                 samples.add(new ProcessA.Sample(middleSamplePosition));
             }
         }
         else {
-            final boolean[] frontWhereSamplesShouldBeTakes = getFrontWhereSamplesShouldBeTaken(filledPixelsOfCurrentFront);
+            final var frontWhereSamplesShouldBeTakes = getFrontWhereSamplesShouldBeTaken(filledPixelsOfCurrentFront);
             // TODO< try to optimize sample positions >
 
             addSamples(gridCellPosition, entryDirection, scanFrontCounter, frontWhereSamplesShouldBeTakes, samples);
         }
     }
 
-    private void addSamples(final IntIntPair gridCellPosition, final IntIntPair entryDirection, int scanFrontCounter, final boolean[] frontWhereSamplesShouldBeTakes, Collection<ProcessA.Sample> samples) {
-        for (boolean frontWhereSamplesShouldBeTake : frontWhereSamplesShouldBeTakes) {
-            final IntIntPair sample1Position = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, 0);
+    private void addSamples(final IntIntPair gridCellPosition, final IntIntPair entryDirection, final int scanFrontCounter, final boolean[] frontWhereSamplesShouldBeTakes, final Collection<ProcessA.Sample> samples) {
+        for (final var frontWhereSamplesShouldBeTake : frontWhereSamplesShouldBeTakes) {
+            final var sample1Position = getAbsolutePosition(gridCellPosition, entryDirection, scanFrontCounter, 0);
 
-            if (frontWhereSamplesShouldBeTake) {
-                samples.add(new ProcessA.Sample(sample1Position));
-            }
+            if (frontWhereSamplesShouldBeTake) samples.add(new ProcessA.Sample(sample1Position));
         }
     }
 
-    private static boolean[] getFrontWhereSamplesShouldBeTaken(boolean[] front) {
+    private static boolean[] getFrontWhereSamplesShouldBeTaken(final boolean[] front) {
         return BooleanHelper.booleanAnd(booleanBroadcast(front), BooleanHelper.booleanNot(front));
     }
 
-    private IntIntPair getAbsolutePosition(final IntIntPair gridCellPosition, final IntIntPair entryDirection, int scanFrontCounter, int frontIndex) {
-        final IntIntPair absoluteMapTopLeftPosition = Vector2d.IntegerHelper.getScaled(gridCellPosition, accelerationGridSize);
+    private IntIntPair getAbsolutePosition(final IntIntPair gridCellPosition, final IntIntPair entryDirection, final int scanFrontCounter, final int frontIndex) {
+        final var absoluteMapTopLeftPosition = Vector2d.IntegerHelper.getScaled(gridCellPosition, accelerationGridSize);
 
-        final IntIntPair scanFrontOffset = Vector2d.IntegerHelper.getScaled(entryDirection, scanFrontCounter);
+        final var scanFrontOffset = Vector2d.IntegerHelper.getScaled(entryDirection, scanFrontCounter);
 
-        final IntIntPair indexOffset = Vector2d.IntegerHelper.getScaled(getRotatedEntryDirection(entryDirection), frontIndex);
+        final var indexOffset = Vector2d.IntegerHelper.getScaled(getRotatedEntryDirection(entryDirection), frontIndex);
 
         return Vector2d.IntegerHelper.add(absoluteMapTopLeftPosition, Vector2d.IntegerHelper.add(scanFrontOffset, indexOffset));
     }
@@ -222,45 +215,34 @@ public class ProcessFractalFiller implements IProcess {
 
     // returns the direction for the other axis
     // is not just a 90 degrees rotation
-    private static IntIntPair getRotatedEntryDirection(IntIntPair entryDirection) {
+    private static IntIntPair getRotatedEntryDirection(final IntIntPair entryDirection) {
         return entryDirection.getTwo() == 0 ? UP : DOWN;
     }
 
 
     // TODO< move to misc >
     private static boolean arrayAreAllValues(final boolean[] array, final boolean value) {
-        for( final boolean currentValue : array ) {
-            if( currentValue != value ) {
-                return false;
-            }
-        }
+        for( final var currentValue : array ) if (currentValue != value) return false;
 
         return true;
     }
 
     // TODO< move to external boolean class >
     private static boolean[] booleanBroadcast(final boolean[] input) {
-        boolean[] result = new boolean[input.length];
+        final var result = new boolean[input.length];
 
-        for( int i = 0; i < input.length; i++ ) {
-            if( i > 0 ) {
-                result[i] |= input[i-1];
-            }
+        for(var i = 0; i < input.length; i++ ) {
+            if( i > 0 ) result[i] |= input[i - 1];
 
-            if( i < input.length-1 ) {
-                result[i] |= input[i+1];
-            }
+            if( i < input.length-1 ) result[i] |= input[i + 1];
         }
 
         return result;
     }
 
     private ArrayRealVector readInputImageAt(final IntIntPair position) {
-        int bands = inputImage.getNumBands();
-        double[] resultDoubles = new double[bands];
-
-        for(int band = 0; band < bands; band++ )
-            resultDoubles[band] = inputImage.getBand(position.getOne(), position.getTwo(), band);
+        final var bands = inputImage.getNumBands();
+        final var resultDoubles = IntStream.range(0, bands).mapToDouble(band -> inputImage.getBand(position.getOne(), position.getTwo(), band)).toArray();
 
         return new ArrayRealVector(resultDoubles);
     }

@@ -15,7 +15,7 @@ import java.util.Random;
  * Propabilistic queue for all codelets
  */
 public class Coderack {
-    public void enqueue(Codelet codelet, float priority) {
+    public void enqueue(final Codelet codelet, final float priority) {
         queue.add(codelet, priority);
     }
     
@@ -23,15 +23,14 @@ public class Coderack {
         queue.flush();
     }
     
-    public void cycle(int count) {
-        int counter;
+    public void cycle(final int count) {
 
-        for( counter = 0; counter < count; counter++ ) {
+        for(int counter = 0; counter < count; counter++ ) {
             if( queue.getSize() == 0 )
                 break;
 
-            PriorityQueue.QueueElement queueElement = queue.dequeueQueueElement();
-            Codelet currentCodelet = (Codelet)queueElement.value;
+            final var queueElement = queue.dequeueQueueElement();
+            final var currentCodelet = (Codelet)queueElement.value;
             
             // execute codelet and examine result, enqueue it to the queue if it needs to be execute again
             if( currentCodelet.run().putback )

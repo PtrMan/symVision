@@ -17,38 +17,38 @@ public class ColorRgb
     public final float g;
     public final float b;
 
-    public ColorRgb(int rgb) {
+    public ColorRgb(final int rgb) {
         this((float)((rgb >> 16) & 255) / 255.0f, (float)((rgb >> 8) & 255) / 255.0f, (float)(rgb & 255) / 255.0f);
     }
 
-    public ColorRgb(float r, float g, float b)
+    public ColorRgb(final float r, final float g, final float b)
     {
         this.r = r;
         this.g = g;
         this.b = b;
     }
 
-    public float getScaledNormalizedMagnitude(ColorRgb scale)
+    public float getScaledNormalizedMagnitude(final ColorRgb scale)
     {
         return (r*scale.r + g*scale.g + b*scale.b) / (scale.r+scale.g+scale.b);
     }
 
-    public ColorRgb add(ColorRgb other)
+    public ColorRgb add(final ColorRgb other)
     {
         return new ColorRgb(r + other.r, g + other.g, b + other.b);
     }
 
-    public ColorRgb sub(ColorRgb other)
+    public ColorRgb sub(final ColorRgb other)
     {
         return new ColorRgb(r - other.r, g - other.g, b - other.b);
     }
 
-    public ColorRgb mul(ColorRgb other)
+    public ColorRgb mul(final ColorRgb other)
     {
         return new ColorRgb(r * other.r, g * other.g, b * other.b);
     }
 
-    public double distanceSquared(ColorRgb other)
+    public double distanceSquared(final ColorRgb other)
     {
         return Maths.squaredDistance(new double[]{r, g, b});
     }

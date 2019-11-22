@@ -15,11 +15,9 @@ import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.NetworkHandles;
 import ptrman.bpsolver.nodes.FeatureNode;
 import ptrman.bpsolver.nodes.NodeTypes;
-import ptrman.misc.Assert;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.List;
 
 /**
  *
@@ -29,16 +27,13 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
 {
 
     @Override
-    public Pattern updateCore(Pattern orginal, Pattern additional, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
+    public Pattern updateCore(final Pattern orginal, final Pattern additional, final NetworkHandles networkHandles, final FeaturePatternMatching featurePatternMatching)
     {
-        final float additionalStrength = 0.1f;
 
-		int currentMatchPathElementI;
-
-        Assert.Assert(orginal.exemplars.size() == 1, "size expected to be 1");
-        Assert.Assert(orginal.exemplars.get(0).type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "");
-        Assert.Assert(additional.exemplars.size() == 1, "size expected to be 1");
-        Assert.Assert(additional.exemplars.get(0).type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "");
+        assert orginal.exemplars.size() == 1 : "ASSERT: " + "size expected to be 1";
+        assert orginal.exemplars.get(0).type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() : "ASSERT: " + "";
+        assert additional.exemplars.size() == 1 : "ASSERT: " + "size expected to be 1";
+        assert additional.exemplars.get(0).type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() : "ASSERT: " + "";
 
         // OLD TODO
         // < mark all nodes in additional as not marked >
@@ -51,15 +46,15 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
         // * match it recursivly
         // * strengthen links
 
-		List<FeaturePatternMatching.MatchingPathElement<Link>> matchingPathElements = featurePatternMatching.matchAnyRecursive(orginal.exemplars.get(0), additional.exemplars.get(0), networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
+		final var matchingPathElements = featurePatternMatching.matchAnyRecursive(orginal.exemplars.get(0), additional.exemplars.get(0), networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
 
-		Node currentMatchNodeOrginal = orginal.exemplars.get(0);
-		Node currentMatchNodeAdditional = additional.exemplars.get(0);
+        var currentMatchNodeOrginal = orginal.exemplars.get(0);
+        var currentMatchNodeAdditional = additional.exemplars.get(0);
 
-        for( currentMatchPathElementI = 0; currentMatchPathElementI < matchingPathElements.size()-1; currentMatchPathElementI++ )
+        for(int currentMatchPathElementI = 0; currentMatchPathElementI < matchingPathElements.size()-1; currentMatchPathElementI++ )
         {
 
-			FeaturePatternMatching.MatchingPathElement<Link> currentMatchPathElement = matchingPathElements.get(currentMatchPathElementI);
+			final var currentMatchPathElement = matchingPathElements.get(currentMatchPathElementI);
 
             currentMatchNodeOrginal = currentMatchPathElement.bestMatchA.target;
             currentMatchNodeAdditional = currentMatchPathElement.bestMatchB.target;
@@ -67,8 +62,9 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
 
         // strengthen links
 
-		FeaturePatternMatching.MatchingPathElement<Link> currentMatchLastPathElement = matchingPathElements.get(matchingPathElements.size() - 1);
+		final var currentMatchLastPathElement = matchingPathElements.get(matchingPathElements.size() - 1);
 
+        final var additionalStrength = 0.1f;
         currentMatchLastPathElement.bestMatchA.strength += additionalStrength;
         currentMatchLastPathElement.bestMatchB.strength += additionalStrength;
         // TODO< limit it in some way? >
@@ -76,14 +72,14 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
         // update the statistics
         // TODO< update the statistics of the other FeatureNodes along the way and at the bottom ? >
 
-		Node lastOrginalNode = currentMatchLastPathElement.bestMatchA.target;
-		Node lastAdditionalNode = currentMatchLastPathElement.bestMatchB.target;
+		final var lastOrginalNode = currentMatchLastPathElement.bestMatchA.target;
+		final var lastAdditionalNode = currentMatchLastPathElement.bestMatchB.target;
 
         // NOTE< should we just build around this case with an if? >
-        Assert.Assert(lastOrginalNode.type == NodeTypes.EnumType.FEATURENODE.ordinal(), "lastOrginalNode is not a featurenode as expected");
+        assert lastOrginalNode.type == NodeTypes.EnumType.FEATURENODE.ordinal() : "ASSERT: " + "lastOrginalNode is not a featurenode as expected";
 
-		FeatureNode lastOrginalNodeAsFeatureNode = (FeatureNode) lastOrginalNode;
-		FeatureNode lastAdditionalNodeAsFeatureNode = (FeatureNode) lastAdditionalNode;
+        final var lastOrginalNodeAsFeatureNode = (FeatureNode) lastOrginalNode;
+		final var lastAdditionalNodeAsFeatureNode = (FeatureNode) lastAdditionalNode;
 
         lastOrginalNodeAsFeatureNode.statistics.addValuesFromStatistics(lastAdditionalNodeAsFeatureNode.statistics);
 
@@ -92,42 +88,42 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
     }
 
     @Override
-    public float match(Pattern a, Pattern b, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
+    public float match(final Pattern a, final Pattern b, final NetworkHandles networkHandles, final FeaturePatternMatching featurePatternMatching)
     {
 
-		Assert.Assert(a.exemplars.size() == 1, "size expected to be 1");
-        Assert.Assert(a.exemplars.get(0).type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "");
-        Assert.Assert(b.exemplars.size() == 1, "size expected to be 1");
-        Assert.Assert(b.exemplars.get(0).type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "");
+        assert a.exemplars.size() == 1 : "ASSERT: " + "size expected to be 1";
+        assert a.exemplars.get(0).type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() : "ASSERT: " + "";
+        assert b.exemplars.size() == 1 : "ASSERT: " + "size expected to be 1";
+        assert b.exemplars.get(0).type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() : "ASSERT: " + "";
 
-		List<FeaturePatternMatching.MatchingPathElement<Link>> matchingPathElements = featurePatternMatching.matchAnyRecursive(a.exemplars.get(0), b.exemplars.get(0), networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
-		float matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
+        final var matchingPathElements = featurePatternMatching.matchAnyRecursive(a.exemplars.get(0), b.exemplars.get(0), networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
+		final var matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
 
         return matchingSimilarityValue;
     }
 
 
-    private static Node findClosestMatchForSameTypesForPlatonicInstances(Node template, Collection<Node> others, NetworkHandles networkHandles, FeaturePatternMatching featurePatternMatching)
+    private static Node findClosestMatchForSameTypesForPlatonicInstances(final Node template, final Collection<Node> others, final NetworkHandles networkHandles, final FeaturePatternMatching featurePatternMatching)
     {
 
-		Assert.Assert(others.size() >= 1, "");
+        assert others.size() >= 1 : "ASSERT: " + "";
 
-		Node bestMatchingNode = null;
-		float bestMatchingSimilarity = 0.0f;
+        Node bestMatchingNode = null;
+        var bestMatchingSimilarity = 0.0f;
 
-        for( Node iterationOther : others )
+        for( final var iterationOther : others )
         {
 
 			//Assert.Assert(!iterationOther.marked, "node must not be marked!");
-            Assert.Assert(template.type == iterationOther.type, "types must be equal");
-            
-            // for now it must be a platonic instance node
-            Assert.Assert(template.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal(), "");
-            
-            float matchingValue = featurePatternMatching.matchAnyNonRecursive(template, iterationOther, networkHandles);
+            assert template.type == iterationOther.type : "ASSERT: " + "types must be equal";
 
-			List<FeaturePatternMatching.MatchingPathElement<Link>> matchingPathElements = featurePatternMatching.matchAnyRecursive(template, iterationOther, networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
-			float matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
+            // for now it must be a platonic instance node
+            assert template.type == NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal() : "ASSERT: " + "";
+
+            final var matchingValue = featurePatternMatching.matchAnyNonRecursive(template, iterationOther, networkHandles);
+
+			final var matchingPathElements = featurePatternMatching.matchAnyRecursive(template, iterationOther, networkHandles, Collections.singletonList(Link.EnumType.CONTAINS), HardParameters.PatternMatching.MAXDEPTH);
+			final var matchingSimilarityValue = FeaturePatternMatching.calculateRatingWithDefaultStrategy(matchingPathElements);
 
             if( matchingSimilarityValue > bestMatchingSimilarity )
             {
@@ -136,7 +132,7 @@ public class MatchingUpdateImplementationForObjects implements IMatchingUpdate
             }
         }
 
-        Assert.Assert(bestMatchingNode != null, "");
+        assert bestMatchingNode != null : "ASSERT: " + "";
         return bestMatchingNode;
     }
 }

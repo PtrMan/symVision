@@ -40,10 +40,8 @@ public class ThreadCPUTimeTracker extends DoubleMeter {
     }
 
     @Override
-    protected Double getValue(Object key, int index) {
-        if (isCPUTimeMonitoringEnabled()) {
-            return getCPUTime();
-        }
+    protected Double getValue(final Object key, final int index) {
+        if (isCPUTimeMonitoringEnabled()) return getCPUTime();
         return null;
     }
 
@@ -72,10 +70,8 @@ public class ThreadCPUTimeTracker extends DoubleMeter {
 
                 //logger.info("Enabling thread contention monitoring");
 
-            } else {
-                System.err.println("Thread contention monitoring is not supported in this JVM; "
-                        + "Thread contention related trackers will be silent");
-            }
+            } else System.err.println("Thread contention monitoring is not supported in this JVM; "
+                    + "Thread contention related trackers will be silent");
         }
     }
 
@@ -92,10 +88,8 @@ public class ThreadCPUTimeTracker extends DoubleMeter {
                 cpuTimeMonitoringEnabled = true;
 
                 //logger.info("Enabling thread CPU time monitoring");
-            } else {
-                System.err.println("Thread CPU time monitoring is not supported in this JVM; "
-                        + "Thread CPU time related trackers will be silent");
-            }
+            } else System.err.println("Thread CPU time monitoring is not supported in this JVM; "
+                    + "Thread CPU time related trackers will be silent");
         }
     }
 
@@ -104,9 +98,7 @@ public class ThreadCPUTimeTracker extends DoubleMeter {
     }
 
     protected static ThreadInfo getCurrentThreadInfo() {
-        if (contentionMonitoringEnabled) {
-            return threadMXBean.getThreadInfo(Thread.currentThread().getId(), 0);
-        }
+        if (contentionMonitoringEnabled) return threadMXBean.getThreadInfo(Thread.currentThread().getId(), 0);
 
         return null;
     }

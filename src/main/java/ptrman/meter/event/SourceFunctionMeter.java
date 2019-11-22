@@ -19,7 +19,7 @@ abstract class SourceFunctionMeter<T> extends FunctionMeter<T> {
     
     private final String name;
 
-    public SourceFunctionMeter(String id) {
+    public SourceFunctionMeter(final String id) {
         super(id);
         this.name = id;
     }

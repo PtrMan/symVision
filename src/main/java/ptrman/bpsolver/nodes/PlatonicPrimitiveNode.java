@@ -19,7 +19,7 @@ import ptrman.FargGeneral.network.Node;
  */
 public class PlatonicPrimitiveNode extends Node
 {
-    public PlatonicPrimitiveNode(String platonicType, String codeletKey)
+    public PlatonicPrimitiveNode(final String platonicType, final String codeletKey)
     {
         super(NodeTypes.EnumType.PLATONICPRIMITIVENODE.ordinal());
         

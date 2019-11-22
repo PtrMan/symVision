@@ -10,15 +10,12 @@
 package ptrman.visualizationTests;
 
 import processing.core.PApplet;
-import processing.core.PImage;
 import ptrman.bpsolver.IImageDrawer;
 import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Solver2;
-import ptrman.misc.ImageConverter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Random;
 
 /**
  *
@@ -28,7 +25,7 @@ public class VisualizeAnimation extends PApplet {
     final static int RETINA_WIDTH = 128;
     final static int RETINA_HEIGHT = 128;
 
-    public Solver2 solver2 = new Solver2();
+    public final Solver2 solver2 = new Solver2();
 
 
     public static class InputDrawer implements IImageDrawer {
@@ -36,11 +33,10 @@ public class VisualizeAnimation extends PApplet {
         BufferedImage off_Image;
 
         @Override
-        public BufferedImage apply(Solver bpSolver) {
-            if (off_Image == null || off_Image.getWidth() != RETINA_WIDTH || off_Image.getHeight() != RETINA_HEIGHT) {
+        public BufferedImage apply(final Solver bpSolver) {
+            if (off_Image == null || off_Image.getWidth() != RETINA_WIDTH || off_Image.getHeight() != RETINA_HEIGHT)
                 off_Image = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
-            }
-            Graphics2D g2 = off_Image.createGraphics();
+            final var g2 = off_Image.createGraphics();
 
             g2.setColor(Color.BLACK);
 
@@ -65,7 +61,7 @@ public class VisualizeAnimation extends PApplet {
 
     static float animationTime = 0.0f;
 
-    public VisualizationDrawer drawer = new VisualizationDrawer(); // used for drawing
+    public final VisualizationDrawer drawer = new VisualizationDrawer(); // used for drawing
 
 
     public void draw(){
@@ -73,18 +69,16 @@ public class VisualizeAnimation extends PApplet {
 
         animationTime += 0.1f;
 
-        int steps = 50; // how many steps are done?
-
         solver2.imageDrawer = new VisualizeAnimation.InputDrawer();
 
         solver2.preFrame(); // do all processing and setup before the actual processing of the frame
-        for (int iStep=0;iStep<steps;iStep++) {
-            solver2.frameStep(); // step of a frame
-        }
+        // how many steps are done?
+        final var steps = 50;
+        for (var iStep = 0; iStep<steps; iStep++) solver2.frameStep(); // step of a frame
         solver2.postFrame();
 
         { // draw processed image in the background
-            PImage pimg = ImageConverter.convBufferedImageToPImage((new InputDrawer()).apply(null));
+            final var pimg = ImageConverter.convBufferedImageToPImage((new InputDrawer()).apply(null));
             tint(255.0f, 0.2f*255.0f);
             image(pimg, 0, 0); // draw image
             tint(255.0f, 255.0f); // reset tint
@@ -102,8 +96,8 @@ public class VisualizeAnimation extends PApplet {
         size(200, 200);
     }
 
-    public static void main(String[] passedArgs) {
-        String[] appletArgs = new String[] { "ptrman.visualizationTests.VisualizeAnimation" };
+    public static void imain(final String[] passedArgs) {
+        final var appletArgs = new String[] { "ptrman.visualizationTests.VisualizeAnimation" };
         PApplet.main(appletArgs);
     }
 }

@@ -20,55 +20,47 @@ public enum Map2dImageConverter
 {
 	;
 
-	public static IMap2d<ColorRgb> convertImageToMap(BufferedImage image) {
+	public static IMap2d<ColorRgb> convertImageToMap(final BufferedImage image) {
 
-		int h = image.getHeight();
-		int w = image.getWidth();
-		IMap2d<ColorRgb> result = new Map2d<>(w, h);
+		final var h = image.getHeight();
+		final var w = image.getWidth();
+		final IMap2d<ColorRgb> result = new Map2d<>(w, h);
 
-        for (int y = 0; y < h; y++)
-            for (int x = 0; x < w; x++)
+        for (var y = 0; y < h; y++)
+            for (var x = 0; x < w; x++)
 				result.setAt(x, y, new ColorRgb(image.getRGB(x, y)));
 
         return result;
     }
 
-    public static BufferedImage convertBooleanMapToImage(IMap2d<Boolean> map)
+    public static BufferedImage convertBooleanMapToImage(final IMap2d<Boolean> map)
     {
-		int x, y;
 
-		BufferedImage resultImage = new BufferedImage(map.getWidth(), map.getLength(), TYPE_INT_ARGB);
+        final var resultImage = new BufferedImage(map.getWidth(), map.getLength(), TYPE_INT_ARGB);
 
-        for( y = 0; y < resultImage.getHeight(); y++ )
-        {
-            for( x = 0; x < resultImage.getWidth(); x++ )
-            {
+        for(int y = 0; y < resultImage.getHeight(); y++ )
+            for (int x = 0; x < resultImage.getWidth(); x++) {
 
-				boolean value = map.readAt(x, y);
+                final boolean value = map.readAt(x, y);
 
-                if( value )
-                {
+                if (value)
                     resultImage.setRGB(x, y, 0xFFFFFFFF);
-                }
                 else
-                {
                     resultImage.setRGB(x, y, 0);
-                }
             }
-        }
 
         return resultImage;
     }
 
-    private static ColorRgb convertPixelToColor(int pixelValue)
+    private static ColorRgb convertPixelToColor(final int pixelValue)
     {
-        int redInt = (pixelValue >> 16) & 0xff;
-        int greenInt = (pixelValue >> 8) & 0xff;
-        int blueInt = (pixelValue) & 0xff;
+        final var redInt = (pixelValue >> 16) & 0xff;
+        final var greenInt = (pixelValue >> 8) & 0xff;
+        final var blueInt = (pixelValue) & 0xff;
 
-		float red = (float) redInt / 255.0f;
-		float green = (float) greenInt / 255.0f;
-		float blue = (float) blueInt / 255.0f;
+		final var red = (float) redInt / 255.0f;
+		final var green = (float) greenInt / 255.0f;
+		final var blue = (float) blueInt / 255.0f;
 
         return new ColorRgb(red, green, blue);
     }

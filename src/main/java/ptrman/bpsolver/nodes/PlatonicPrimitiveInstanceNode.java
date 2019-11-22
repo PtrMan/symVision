@@ -19,7 +19,7 @@ import ptrman.levels.retina.ProcessG;
  */
 public class PlatonicPrimitiveInstanceNode extends Node
 {
-    public PlatonicPrimitiveInstanceNode(PlatonicPrimitiveNode primitiveNode)
+    public PlatonicPrimitiveInstanceNode(final PlatonicPrimitiveNode primitiveNode)
     {
         super(NodeTypes.EnumType.PLATONICPRIMITIVEINSTANCENODE.ordinal());
         

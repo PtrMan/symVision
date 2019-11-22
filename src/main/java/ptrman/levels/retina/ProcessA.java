@@ -10,13 +10,10 @@
 package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.random.MersenneTwister;
-import org.apache.commons.math3.random.RandomAdaptor;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.levels.retina.helper.ProcessConnector;
-import ptrman.misc.Assert;
 
 import java.awt.*;
 import java.util.Random;
@@ -29,9 +26,9 @@ import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
  */
 public class ProcessA implements IProcess {
     @Override
-    public void setImageSize(Vector2d<Integer> imageSize) {
-        Assert.Assert((imageSize.x % 4) == 0, "imageSize.x must be divisable by 4");
-        Assert.Assert((imageSize.y % 4) == 0, "imageSize.y must be divisable by 4");
+    public void setImageSize(final Vector2d<Integer> imageSize) {
+        assert (imageSize.x % 4) == 0 : "ASSERT: " + "imageSize.x must be divisable by 4";
+        assert (imageSize.y % 4) == 0 : "ASSERT: " + "imageSize.y must be divisable by 4";
     }
 
     @Override
@@ -60,60 +57,53 @@ public class ProcessA implements IProcess {
         //new RandomAdaptor( new MersenneTwister() ); //<- expensive
         new Random();
 
-    public void processData(float throttle) {
-        int H = workingImage.getLength() / 4;
-        int W = workingImage.getWidth() / 4;
-        for(int blockY = 0; blockY < H; blockY++ ) {
-            for(int blockX = 0; blockX < W; blockX++ ) {
-                int hitCount = 0;
+    public void processData(final float throttle) {
+        final var H = workingImage.getLength() / 4;
+        final var W = workingImage.getWidth() / 4;
+        for(var blockY = 0; blockY < H; blockY++ )
+            for (var blockX = 0; blockX < W; blockX++) {
+                var hitCount = 0;
 
-                for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
-                    for (int x = blockX; x < (blockX+1)*4; x++) {
+                for (var y = blockY * 4; y < (blockY + 1) * 4; y++)
+                    for (var x = blockX; x < (blockX + 1) * 4; x++) {
                         if (throttle < 1f && rng.nextDouble() > throttle) continue;
 
-                        if( sampleMaskAtPosition(x, y, MaskDetail0) ) {
-                            if( workingImage.readAt(x, y) ) {
-                                hitCount++;
-                                workingImage.setAt(x, y, false);
+                        if (sampleMaskAtPosition(x, y, MaskDetail0)) if (workingImage.readAt(x, y)) {
+                            hitCount++;
+                            workingImage.setAt(x, y, false);
 
-                                final int objectId = idMap != null ? idMap.readAt(x, y) : -1;
-                                //Assert.Assert(objectId  != -1, "");
+                            final var objectId = idMap != null ? idMap.readAt(x, y) : -1;
+                            //Assert.Assert(objectId  != -1, "");
                                 /*if( objectId != -1 ) {
                                     int d = 0;
                                 }*/
 
-                                output(x, y, objectId);
-                            }
+                            output(x, y, objectId);
                         }
                     }
-                }
 
-                if( hitCount == 8 )
+                if (hitCount == 8)
                     continue;
 
                 // sample it a second time for nearly all of the missing pixels
-                for( int y = blockY*4; y < (blockY+1)*4; y++ ) {
-                    for (int x = blockX; x < (blockX+1)*4; x++) {
+                for (var y = blockY * 4; y < (blockY + 1) * 4; y++)
+                    for (var x = blockX; x < (blockX + 1) * 4; x++) {
                         if (throttle < 1f && rng.nextDouble() > throttle) continue;
 
-                        if( sampleMaskAtPosition(x, y, MaskDetail1) ) {
-                            if( workingImage.readAt(x, y) ) {
-                                hitCount++;
-                                workingImage.setAt(x, y, false);
+                        if (sampleMaskAtPosition(x, y, MaskDetail1)) if (workingImage.readAt(x, y)) {
+                            hitCount++;
+                            workingImage.setAt(x, y, false);
 
-                                final int objectId = idMap != null ? idMap.readAt(x, y) : -1;
-                                //Assert.Assert(objectId  != -1, "");
+                            final var objectId = idMap != null ? idMap.readAt(x, y) : -1;
+                            //Assert.Assert(objectId  != -1, "");
                                 /*if( objectId != -1 ) {
                                     int d = 0;
                                 }*/
 
-                                output(x, y, objectId);
-                            }
+                            output(x, y, objectId);
                         }
                     }
-                }
             }
-        }
     }
 
     @Override
@@ -134,7 +124,7 @@ public class ProcessA implements IProcess {
         public int refCount = 0; // used to see in process-D if sample is already used
 
         public Sample getClone() {
-            Sample clone = new Sample(position);
+            final var clone = new Sample(position);
             clone.altitude = this.altitude;
             clone.type = this.type;
             clone.objectId = this.objectId;
@@ -143,23 +133,20 @@ public class ProcessA implements IProcess {
             return clone;
         }
 
-        public void debugPlot(Graphics2D detectorImageGraphics) {
+        public void debugPlot(final Graphics2D detectorImageGraphics) {
 
-            if (isObjectIdValid()) {
-                detectorImageGraphics.setColor(Color.GREEN);
-            } else {
-                detectorImageGraphics.setColor(Color.BLUE);
-            }
+            if (isObjectIdValid()) detectorImageGraphics.setColor(Color.GREEN);
+            else detectorImageGraphics.setColor(Color.BLUE);
 
 
-            int positionX = position.getOne();
-            int positionY = position.getTwo();
+            final var positionX = position.getOne();
+            final var positionY = position.getTwo();
 
             detectorImageGraphics.fillRect(positionX, positionY, 1, 1);
 
             if (isAltitudeValid()) {
                 detectorImageGraphics.setColor(Color.RED);
-                float a = (float) (
+                final var a = (float) (
                     //altitude * 4
                     altitude/4f
                 );
@@ -174,19 +161,19 @@ public class ProcessA implements IProcess {
             EXOSCELETON
         }
 
-        public Sample(double x, double y) {
+        public Sample(final double x, final double y) {
             this(new ArrayRealVector(new double[] { x, y}, false));
         }
-        public Sample(float x, float y) {
+        public Sample(final float x, final float y) {
             this(new ArrayRealVector(new double[] { x, y}, false));
         }
-        public Sample(int x, int y) {
+        public Sample(final int x, final int y) {
             this(pair(x, y));
         }
-        public Sample(IntIntPair position) {
+        public Sample(final IntIntPair position) {
             this.position = position;
         }
-        public Sample(ArrayRealVector position) {
+        public Sample(final ArrayRealVector position) {
             this(
                 (int)Math.round(position.getEntry(0)),
                 (int)Math.round(position.getEntry(1))
@@ -205,7 +192,7 @@ public class ProcessA implements IProcess {
     }
     
     
-    public void set(IMap2d<Boolean> image, IMap2d<Integer> idMap, ProcessConnector<Sample> outputSampleConnector) {
+    public void set(final IMap2d<Boolean> image, final IMap2d<Integer> idMap, final ProcessConnector<Sample> outputSampleConnector) {
         workingImage = image.copy();
         this.idMap = idMap;
 
@@ -213,16 +200,16 @@ public class ProcessA implements IProcess {
     }
 
     private void output(final int x, final int y, final int objectId) {
-        Sample createdSample = new Sample(x, y);
+        final var createdSample = new Sample(x, y);
         createdSample.objectId = objectId;
         createdSample.conf = defaultSampleConf;
         outputSampleConnector.add(createdSample);
     }
 
-    private static boolean sampleMaskAtPosition(int px, int py, boolean[] mask4by4) {
+    private static boolean sampleMaskAtPosition(final int px, final int py, final boolean[] mask4by4) {
 
-        int modX = px % 4;
-        int modY = py % 4;
+        final var modX = px % 4;
+        final var modY = py % 4;
 
         return mask4by4[modX + modY * 4];
     }

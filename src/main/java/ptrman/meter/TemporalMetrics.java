@@ -8,6 +8,7 @@ package ptrman.meter;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -15,43 +16,37 @@ import java.util.List;
  */
 public class TemporalMetrics<O> extends Metrics<Double,O> {
 
-    public TemporalMetrics(int historySize) {
+    public TemporalMetrics(final int historySize) {
         super(historySize);
     }
 
     /** adds all meters which exist as fields of a given object (via reflection) */
-    public void addMeters(Object obj) {
-        Class c = obj.getClass();
-        Class meter = Meter.class;
-        for (Field f : c.getFields()) {
-            
-//System.out.println("field: " + f.getType() + " " + f.isAccessible() + " " + Meter.class.isAssignableFrom( f.getType() ));
-            
-            if ( meter.isAssignableFrom( f.getType() ) ) {
+    public void addMeters(final Object obj) {
+        final Class c = obj.getClass();
+        final Class meter = Meter.class;
+        //System.out.println("field: " + f.getType() + " " + f.isAccessible() + " " + Meter.class.isAssignableFrom( f.getType() ));
+        for (final var f : c.getFields())
+            if (meter.isAssignableFrom(f.getType())) {
                 Meter m = null;
                 try {
-                    m = (Meter)f.get(obj);
-                } catch (IllegalAccessException e) {
+                    m = (Meter) f.get(obj);
+                } catch (final IllegalAccessException e) {
                     //TODO ignore or handle errors?
                 }
                 addMeter(m);
             }
-        }
     }
 
     public List<SignalData> getSignalDatas() {
-        List<SignalData> l = new ArrayList();
-        
-        for (Signal sv : getSignals()) {            
-            l.add( newSignalData(sv.id) );
-        }
+        final var l = getSignals().stream().map(sv -> newSignalData(sv.id)).collect(Collectors.toList());
+
         return l;
     }
 
     /** allows updating with an integer/long time, because it will be converted
      * to double internally
      */
-    public void update(long integerTime) {
+    public void update(final long integerTime) {
         update((double)integerTime);
     }    
     

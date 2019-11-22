@@ -13,11 +13,11 @@ public enum Gaussian
 {
 	;
 
-	public static float calculateGaussianDistribution(float x, float mu, float delta)
+	public static float calculateGaussianDistribution(final float x, final float mu, final float delta)
     {
-        final float ONEDIVSQRTTWO = 0.707107f; // 1.0 / Sqrt(2.0)
+        final var ONEDIVSQRTTWO = 0.707107f; // 1.0 / Sqrt(2.0)
 
-		float distToMean = x - mu;
+		final var distToMean = x - mu;
         return ONEDIVSQRTTWO * delta * gaussianExponentTerm(distToMean,delta);
     }
 
@@ -27,13 +27,13 @@ public enum Gaussian
      * also known as the "Mexican hat" function
      * 
      */
-    public static float calculateMarrWavelet(float x, float y, float delta)
+    public static float calculateMarrWavelet(final float x, final float y, final float delta)
     {
 
-		float distToMean = x * x + y * y;
-		float factorA = -1.0f / ((float) Math.PI * delta * delta * delta * delta);
-		float factorB = 1.0f - distToMean / (2.0f * delta * delta);
-		float gaussianTerm = gaussianExponentTerm(distToMean, delta);
+		final var distToMean = x * x + y * y;
+		final var factorA = -1.0f / ((float) Math.PI * delta * delta * delta * delta);
+		final var factorB = 1.0f - distToMean / (2.0f * delta * delta);
+		final var gaussianTerm = gaussianExponentTerm(distToMean, delta);
         return factorA * factorB * gaussianTerm;
     }
 
@@ -42,7 +42,7 @@ public enum Gaussian
      * has extra function because it is used for other stuff
      * 
      */
-    public static float gaussianExponentTerm(float distToMean, float delta)
+    public static float gaussianExponentTerm(final float distToMean, final float delta)
     {
         return (float)java.lang.Math.exp(-0.5f * ((distToMean * distToMean) / (delta * delta)));
     }
