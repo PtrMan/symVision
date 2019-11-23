@@ -103,7 +103,6 @@ public class VisualizeAnimation extends PApplet {
     }
 
     public static void main(String[] passedArgs) {
-        String[] appletArgs = new String[] { "ptrman.visualizationTests.VisualizeAnimation" };
-        PApplet.main(appletArgs);
+        PApplet.main(new String[] { "ptrman.visualizationTests.VisualizeAnimation" });
     }
 }

@@ -22,15 +22,37 @@ public enum Map2dImageConverter
 
 	public static IMap2d<ColorRgb> convertImageToMap(BufferedImage image) {
 
-		int h = image.getHeight();
-		int w = image.getWidth();
-		IMap2d<ColorRgb> result = new Map2d<>(w, h);
+		return BufferedImageMap2D.rgb(image);
 
-        for (int y = 0; y < h; y++)
-            for (int x = 0; x < w; x++)
-				result.setAt(x, y, new ColorRgb(image.getRGB(x, y)));
+//		int h = image.getHeight();
+//		int w = image.getWidth();
+//		IMap2d<ColorRgb> result = new Map2d<>(w, h);
+//
+//        for (int y = 0; y < h; y++)
+//            for (int x = 0; x < w; x++)
+//				result.setAt(x, y, new ColorRgb(image.getRGB(x, y)));
+//
+//        return result;
+//        DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
+//
+//        int bufferI;
+//
+//        IMap2d<ColorRgb> convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
+//
+//        for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ )
+//        {
+//
+//            int pixelValue = javaImage.getRGB(bufferI % convertedToMap.getWidth(), bufferI / convertedToMap.getWidth());
+//
+//
+//            convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(),
+//                //new ColorRgb((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f)
+//                new ColorRgb(pixelValue)
+//            );
+//        }
+//
+//        return convertedToMap;
 
-        return result;
     }
 
     public static BufferedImage convertBooleanMapToImage(IMap2d<Boolean> map)
@@ -60,17 +82,17 @@ public enum Map2dImageConverter
         return resultImage;
     }
 
-    private static ColorRgb convertPixelToColor(int pixelValue)
-    {
-        int redInt = (pixelValue >> 16) & 0xff;
-        int greenInt = (pixelValue >> 8) & 0xff;
-        int blueInt = (pixelValue) & 0xff;
-
-		float red = (float) redInt / 255.0f;
-		float green = (float) greenInt / 255.0f;
-		float blue = (float) blueInt / 255.0f;
-
-        return new ColorRgb(red, green, blue);
-    }
+//    private static ColorRgb convertPixelToColor(int pixelValue)
+//    {
+//        int redInt = (pixelValue >> 16) & 0xff;
+//        int greenInt = (pixelValue >> 8) & 0xff;
+//        int blueInt = (pixelValue) & 0xff;
+//
+//		float red = (float) redInt / 255.0f;
+//		float green = (float) greenInt / 255.0f;
+//		float blue = (float) blueInt / 255.0f;
+//
+//        return new ColorRgb(red, green, blue);
+//    }
 
 }
