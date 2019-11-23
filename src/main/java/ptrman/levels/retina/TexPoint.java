@@ -17,8 +17,11 @@ import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 public class TexPoint {
     public double value = 0.0; // how much is the texture/filling the case?
 
+    public double gradientX = 0.0;
+    public double gradientY = 0.0;
+
     // TODO< add  >
-    public String type = ""; // type of texture, can be "f" for filling
+    public String type = ""; // type of texture, can be "f" for filling, "g" for gradient
 
     public IntIntPair pos; // position in image
 

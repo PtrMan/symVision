@@ -169,7 +169,7 @@ public class Solver2 {
 
         mapBoolean = Map2dBinary.threshold(mapGrayscale, 0.1f); // convert from edges[0]
 
-        processFi.workingImage = mapBoolean;
+        processFi.workingImage = mapGrayscale;
         processFi.preProcess();
         processFi.process(); // sample image with process-Fi
 

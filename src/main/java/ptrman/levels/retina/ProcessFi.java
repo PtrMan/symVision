@@ -22,10 +22,13 @@ import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 public class ProcessFi {
     public Random rng = new Random();
 
-    public IMap2d<Boolean> workingImage;
+    public IMap2d<Float> workingImage;
     public ProcessConnector<TexPoint> outputSampleConnector;
 
     public int numberOfSamples = 1000;
+
+    public double thresholdFilled = 0.5; // threshold for pixel to register as filled
+    public double thresholdGradient = 0.05; // threshold for pixel to register as gradient
 
     public void preProcess() {
         outputSampleConnector.workspace.clear();
@@ -35,12 +38,27 @@ public class ProcessFi {
         // TODO< better sampling strategy which is less random, based on grid, etc >
 
         for(int iSample=0;iSample<numberOfSamples;iSample++) {
-            int posX = rng.nextInt(workingImage.getWidth());
-            int posY = rng.nextInt(workingImage.getLength());
+            int posX = 1+rng.nextInt(workingImage.getWidth()-2);
+            int posY = 1+rng.nextInt(workingImage.getLength()-2);
 
-            if (workingImage.readAt(posX, posY)) {
-                TexPoint tp = new TexPoint(pair(posX, posY), "f");
-                outputSampleConnector.workspace.add(tp);
+            float v = workingImage.readAt(posX, posY);
+            if (v > thresholdFilled) {
+                { // filling particle
+                    TexPoint tp = new TexPoint(pair(posX, posY), "f"); // filled
+                    tp.value = v;
+                    outputSampleConnector.workspace.add(tp);
+                }
+
+                { // gradient particle if gradient is present
+                    float vx = workingImage.readAt(posX+1, posY);
+                    float vy = workingImage.readAt(posX, posY+1);
+                    if (Math.abs(v-vx) > thresholdGradient || Math.abs(v-vy) > thresholdGradient) { // is gradient present?
+                        TexPoint tp = new TexPoint(pair(posX, posY), "g"); // gradient
+                        tp.gradientX = v-vx;
+                        tp.gradientY = v-vy;
+                        outputSampleConnector.workspace.add(tp);
+                    }
+                }
             }
         }
     }
