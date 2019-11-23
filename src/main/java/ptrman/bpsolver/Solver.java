@@ -202,7 +202,7 @@ public class Solver {
         // processData
         processA.processData(throttle);
 
-        debugSamples = connectorSamplesFromProcessA.getWorkspace();
+        debugSamples = connectorSamplesFromProcessA.getOut();
 
         processB.processData();
         processC.processData(throttle);
@@ -232,8 +232,8 @@ public class Solver {
 
 
 
-        System.out.println("connectorDetectorsEndosceletonFromProcessD " + connectorDetectorsEndosceletonFromProcessD.getSize());
-        System.out.println("connectorDetectorsExosceletonFromProcessD " + connectorDetectorsExosceletonFromProcessD.getSize());
+        System.out.println("connectorDetectorsEndosceletonFromProcessD " + connectorDetectorsEndosceletonFromProcessD.inSize());
+        System.out.println("connectorDetectorsExosceletonFromProcessD " + connectorDetectorsExosceletonFromProcessD.inSize());
         /*
 
         // copy because processA changes the image

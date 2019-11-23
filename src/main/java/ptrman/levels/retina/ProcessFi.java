@@ -31,32 +31,36 @@ public class ProcessFi {
     public double thresholdGradient = 0.05; // threshold for pixel to register as gradient
 
     public void preProcess() {
-        outputSampleConnector.workspace.clear();
+        outputSampleConnector.out.clear();
     }
 
     public void process() {
         // TODO< better sampling strategy which is less random, based on grid, etc >
 
+        int W = workingImage.getWidth();
+        int H = workingImage.getLength();
+        assert(W>1 && H>1);
+
         for(int iSample=0;iSample<numberOfSamples;iSample++) {
-            int posX = 1+rng.nextInt(workingImage.getWidth()-2);
-            int posY = 1+rng.nextInt(workingImage.getLength()-2);
+            int posX = 1+rng.nextInt(W - 2);
+            int posY = 1+rng.nextInt(H - 2);
 
             float v = workingImage.readAt(posX, posY);
             if (v > thresholdFilled) {
                 { // filling particle
-                    TexPoint tp = new TexPoint(pair(posX, posY), "f"); // filled
+                    TexPoint tp = new TexPoint(posX, posY, "f"); // filled
                     tp.value = v;
-                    outputSampleConnector.workspace.add(tp);
+                    outputSampleConnector.out.add(tp);
                 }
 
                 { // gradient particle if gradient is present
                     float vx = workingImage.readAt(posX+1, posY);
                     float vy = workingImage.readAt(posX, posY+1);
                     if (Math.abs(v-vx) > thresholdGradient || Math.abs(v-vy) > thresholdGradient) { // is gradient present?
-                        TexPoint tp = new TexPoint(pair(posX, posY), "g"); // gradient
+                        TexPoint tp = new TexPoint(posX, posY, "g"); // gradient
                         tp.gradientX = v-vx;
                         tp.gradientY = v-vy;
-                        outputSampleConnector.workspace.add(tp);
+                        outputSampleConnector.out.add(tp);
                     }
                 }
             }

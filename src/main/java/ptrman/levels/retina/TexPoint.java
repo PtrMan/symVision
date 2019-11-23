@@ -23,10 +23,12 @@ public class TexPoint {
     // TODO< add  >
     public String type = ""; // type of texture, can be "f" for filling, "g" for gradient
 
-    public IntIntPair pos; // position in image
+    //public IntIntPair pos; // position in image
+    public int x;
+    public int y;
 
-    public TexPoint(IntIntPair pos, String type) {
-        this.pos = pos;
+    public TexPoint(int x, int y, String type) {
+        this.x = x; this.y = y;
         this.type = type;
     }
 }

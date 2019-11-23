@@ -72,7 +72,7 @@ public class ProcessC implements IProcess {
     }
 
     public void set(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> resultSampleConnector, ProcessConnector<ProcessA.Sample> resultSamplesToProcessF) {
-        if( inputSampleConnector.getWorkspace() == null ) {
+        if( inputSampleConnector.getOut() == null ) {
             throw new RuntimeException("inputSampleConnector must be a workspace Connector!");
         }
 
@@ -109,7 +109,7 @@ public class ProcessC implements IProcess {
         accelerationMap.clear();
 
         // fill
-        for( final ProcessA.Sample iterationSample : inputSampleConnector.getWorkspace()  ) {
+        for( final ProcessA.Sample iterationSample : inputSampleConnector.getOut()  ) {
             final IntIntPair p = accelerationMap.getCellPositionOfIntegerPosition(iterationSample.position);
             List<ProcessA.Sample> samplesOfCell = accelerationMap.addAt(p.getOne(), p.getTwo(), iterationSample);
         }
@@ -117,13 +117,13 @@ public class ProcessC implements IProcess {
 
         int maxSortedSamples = (int)Math.ceil( this.maxSortedSamples * throttle );
 
-        for( int outerI = 0; outerI < inputSampleConnector.getWorkspace().size(); outerI++ ) {
+        for(int outerI = 0; outerI < inputSampleConnector.getOut().size(); outerI++ ) {
 
 
 
             //SampleWithDistance[] sortedArray = createSortedArray();
 
-            ProcessA.Sample outerSample = inputSampleConnector.getWorkspace().get(outerI);
+            ProcessA.Sample outerSample = inputSampleConnector.getOut().get(outerI);
 
             int numberOfConsideredSamples = 0;
 

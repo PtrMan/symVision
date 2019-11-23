@@ -74,7 +74,7 @@ public class ProcessH implements IProcess {
 
     @Override
     public void processData() {
-        List<RetinaPrimitive> allInputDetectors = inputPrimitiveConnection.getWorkspace();
+        List<RetinaPrimitive> allInputDetectors = inputPrimitiveConnection.getOut();
 
         IntObjectHashMap<Deque<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(allInputDetectors);
 

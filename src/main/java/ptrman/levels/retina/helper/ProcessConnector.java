@@ -9,9 +9,11 @@
  */
 package ptrman.levels.retina.helper;
 
+import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.misc.Assert;
 
 import java.util.*;
+import java.util.function.Consumer;
 
 import static ptrman.levels.retina.helper.ProcessConnector.EnumMode.*;
 
@@ -29,28 +31,28 @@ public class ProcessConnector<Type> {
     }
 
     public static <T> ProcessConnector<T> createWithDefaultQueues(final EnumMode mode) {
-        return new ProcessConnector<>(new ArrayDeque<>(), new ArrayList<>(), mode);
+        return new ProcessConnector<>(new ArrayDeque<>(), new FastList<>(), mode);
     }
 
     private ProcessConnector(Queue<Type> queueImplementation, List<Type> workspaceImplementation, EnumMode mode) {
-        this.queue = queueImplementation;
-        this.workspace = workspaceImplementation;
+        this.in = queueImplementation;
+        this.out = workspaceImplementation;
         this.mode = mode;
     }
 
-    public List<Type> getWorkspace() {
+    public List<Type> getOut() {
         Assert.Assert(mode == WORKSPACE || mode == PRIMARY_QUEUE, "");
-        Assert.Assert(workspace != null, "");
-        return workspace;
+        Assert.Assert(out != null, "");
+        return out;
     }
 
     public void addAll(Collection<Type> elements) {
         if( mode == WORKSPACE || mode == PRIMARY_QUEUE ) {
-            workspace.addAll(elements);
+            out.addAll(elements);
         }
 
         if( mode == QUEUE || mode == PRIMARY_QUEUE ) {
-            queue.addAll(elements);
+            in.addAll(elements);
         }
 
     }
@@ -58,35 +60,34 @@ public class ProcessConnector<Type> {
     public void add(Type element) {
 
         if( mode == WORKSPACE || mode == PRIMARY_QUEUE ) {
-            workspace.add(element);
+            out.add(element);
         }
 
         if( mode == QUEUE || mode == PRIMARY_QUEUE ) {
-            queue.add(element);
+            in.add(element);
         }
     }
 
     public Type poll() {
         Assert.Assert( mode == QUEUE || mode == PRIMARY_QUEUE, "");
-        return queue.poll();
+        return in.poll();
     }
 
-    public int getSize() {
-        return mode == WORKSPACE ? workspace.size() : queue.size();
+    public int inSize() {
+        return in.size();
+    }
+
+    public int outSize() {
+        return out.size();
     }
 
     public void flush() {
-        if( workspace != null ) {
-            workspace.clear();
-        }
-
-        if ( queue != null ) {
-            queue.clear();
-        }
+        in.clear();
+        out.clear();
     }
 
     public final EnumMode mode;
 
-    public final Queue<Type> queue;
-    public final List<Type> workspace;
+    public final Queue<Type> in;
+    public final List<Type> out;
 }

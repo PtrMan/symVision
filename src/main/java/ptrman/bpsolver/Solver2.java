@@ -179,7 +179,7 @@ public class Solver2 {
 
         final int processZGridsize = 8;
 
-        connectorSamplesForEndosceleton.workspace.clear();
+        connectorSamplesForEndosceleton.out.clear();
         processD.annealedCandidates.clear(); // TODO< cleanup in process with method >
 
         processZFacade.setImageSize(imageSize);
@@ -293,8 +293,8 @@ public class Solver2 {
         cntrFinalProcessing = connectorDetectorsEndosceletonFromProcessH; // connect the connector for final processing to output from process-H
 
         // intersect line primitives
-        ProcessE.process(cntrFinalProcessing.workspace, mapBoolean);
+        ProcessE.process(cntrFinalProcessing.out, mapBoolean);
 
-        narsBinding.emitRetinaPrimitives(cntrFinalProcessing.workspace); // emit all collected primitives from process D
+        narsBinding.emitRetinaPrimitives(cntrFinalProcessing.out); // emit all collected primitives from process D
     }
 }
