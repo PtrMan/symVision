@@ -71,13 +71,10 @@ public class Solver2 {
     public void preFrame() {
         annealingStep = 0;
 
-        BufferedImage image = imageDrawer.apply(null);
 
-        imageSize = new Vector2d<>(image.getWidth(), image.getHeight());
+        IMap2d<ColorRgb> mapColor = Map2dImageConverter.convertImageToMap(imageDrawer.apply(null));
 
-
-        IMap2d<ColorRgb> mapColor = Map2dImageConverter.convertImageToMap(image);
-
+        imageSize = new Vector2d<>(mapColor.getWidth(), mapColor.getLength());
 
 
 
