@@ -18,7 +18,6 @@ import ptrman.misc.ImageConverter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.Random;
 
 /**
  *
@@ -29,6 +28,7 @@ public class VisualizeAnimation extends PApplet {
     final static int RETINA_HEIGHT = 128;
 
     public Solver2 solver2 = new Solver2();
+    private PImage pimg;
 
 
     public static class InputDrawer implements IImageDrawer {
@@ -84,7 +84,7 @@ public class VisualizeAnimation extends PApplet {
         solver2.postFrame();
 
         { // draw processed image in the background
-            PImage pimg = ImageConverter.convBufferedImageToPImage((new InputDrawer()).apply(null));
+            pimg = ImageConverter.convBufferedImageToPImage((new InputDrawer()).apply(null), pimg);
             tint(255.0f, 0.2f*255.0f);
             image(pimg, 0, 0); // draw image
             tint(255.0f, 255.0f); // reset tint

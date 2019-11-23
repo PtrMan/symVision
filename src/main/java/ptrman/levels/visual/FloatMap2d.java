@@ -9,6 +9,7 @@
  */
 package ptrman.levels.visual;
 
+import boofcv.struct.image.GrayF32;
 import ptrman.Datastructures.IMap2d;
 
 import java.util.Arrays;
@@ -29,10 +30,9 @@ public class FloatMap2d implements IMap2d<Float> {
     }
 
     public FloatMap2d(FloatMap2d f) {
-        throw new RuntimeException("not impl yet");
-        //this.w = f.w;
-        //this.h = f.h;
-        //this.data = f.data; //TODO copy 2d array
+        this.data = f.data.clone();
+        this.w = f.w;
+        this.h = f.h;
     }
 
     @Override

@@ -9,6 +9,7 @@
  */
 package ptrman.FargGeneral.network;
 
+import com.google.common.collect.Iterables;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 
 import java.util.*;
@@ -68,6 +69,13 @@ public abstract class Node
     }
 
     public Iterable<Link> out() {
-        return out.values().stream().flatMap(Collection::stream)::iterator;
+        switch (out.size()) {
+            case 0: return Collections.emptyList();
+            case 1: return Iterables.getFirst(out.values(), null);
+            //TODO optimized s=2 case
+            default:
+                return out.values().stream().flatMap(Collection::stream)::iterator;
+        }
+
     }
 }
