@@ -24,6 +24,7 @@ import java.awt.image.BufferedImage;
  * new solver which is incomplete but should be in a working state
  */
 public class Solver2 {
+    public ProcessFi processFi = new ProcessFi();
     public ProcessD processD;
     public ProcessD[] processDEdge;
     public ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
@@ -57,6 +58,8 @@ public class Solver2 {
         connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
 
         cntrFinalProcessing = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+
+        processFi.outputSampleConnector = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
 
         // create NARS-binding
         narsBinding = new NarsBinding(new OpenNarsNarseseConsumer());
@@ -165,6 +168,10 @@ public class Solver2 {
         }
 
         mapBoolean = Map2dBinary.threshold(mapGrayscale, 0.1f); // convert from edges[0]
+
+        processFi.workingImage = mapBoolean;
+        processFi.preProcess();
+        processFi.process(); // sample image with process-Fi
 
         ProcessZFacade processZFacade = new ProcessZFacade();
 

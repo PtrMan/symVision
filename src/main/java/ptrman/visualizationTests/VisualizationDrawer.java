@@ -24,6 +24,7 @@ public class VisualizationDrawer {
     public boolean drawVisualizationOfLineDetectors = true;
     public boolean drawVisualizationOfLineDetectorsEnableAct = true; // do we draw activation of line detectors?
     public boolean drawVisualizationOfEdgeLineDetectors = true;
+    public boolean drawVisualizationOfTex = true; // draw visualization of texture
 
     public void drawDetectors(Solver2 solver, PApplet applet) {
         if(drawVisualizationOfAltitude) {
@@ -102,6 +103,13 @@ public class VisualizationDrawer {
             }
 
             int here = 5;
+        }
+
+        if (drawVisualizationOfTex) { // visualize texture points
+            for(TexPoint iTex : solver.processFi.outputSampleConnector.workspace) {
+                applet.stroke(255.0f, 0.0f, 255.0f);
+                applet.rect(iTex.pos.getOne(), iTex.pos.getTwo(), 1, 1);
+            }
         }
     }
 
