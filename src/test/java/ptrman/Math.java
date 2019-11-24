@@ -1,4 +1,4 @@
-package math;
+package ptrman;
 
 import org.junit.Test;
 import ptrman.misc.Assert;
