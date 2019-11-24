@@ -1,5 +1,6 @@
 package viralgraph;
 
+import com.google.common.graph.GraphBuilder;
 import org.junit.Test;
 
 import java.util.function.Function;
@@ -21,11 +22,10 @@ public class GraphProcessTest {
         Function startNode = (x)->x; //HACK
 
         Function<Integer, Integer> plus2 = (Integer param1) -> param1 + 2;
-        GraphProcess graph = new GraphBuilder()
-                .edge(startNode, plus2, resultConverter, (o) -> { System.out.println(o); return true; })
-                .build();
+        GraphProcess graph = new GraphProcess();
+        graph.edge(startNode, plus2, resultConverter, (o) -> { System.out.println(o); return true; });
+        graph.set(startNode, 1);
 
-        graph.fire(startNode, 1);
     }
 
     @Test
@@ -34,11 +34,9 @@ public class GraphProcessTest {
         ConsumerNode<Integer[]> printNumbersForSomeReason = param -> IntStream.range(param[0], param[1]).forEach(System.out::println);
         ConsumerNode<Integer[]> printNumbersForSomeReason2 = param -> IntStream.range(param[0], param[1]).forEach(System.out::println);
 
-        GraphProcess graph = new GraphBuilder()
-                .edge(startNode, printNumbersForSomeReason)
-                .edge(startNode, printNumbersForSomeReason2)
-                .build();
-
-        graph.fire(startNode, new Integer[]{0, 1000});
+        GraphProcess graph = new GraphProcess();
+        graph.edge(startNode, printNumbersForSomeReason);
+        graph.edge(startNode, printNumbersForSomeReason2);
+        graph.set(startNode, new Integer[]{0, 1000});
     }
 }
