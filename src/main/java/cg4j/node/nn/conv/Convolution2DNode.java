@@ -5,7 +5,7 @@ import cg4j.Tensor;
 import cg4j.node.Node;
 import cg4j.node.io.VariableNode;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class Convolution2DNode extends Node {
 
@@ -48,6 +48,6 @@ public class Convolution2DNode extends Node {
 	}
 
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 	}
 }

@@ -5,7 +5,7 @@ import cg4j.Tensor;
 import cg4j.node.Node;
 import cg4j.node.math.AdditionNode;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A variable node creates a value that can be modified to minimize/maximize a function
@@ -41,12 +41,11 @@ public class VariableNode extends Node {
 
 	/**
 	 * Creates the gradients.
-	 *
-	 * @param deltas      The deltas of all variables.
+	 *  @param deltas      The deltas of all variables.
 	 * @param parentDelta Last node's delta.
 	 */
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 		if (gradientCreated) {
 			((VariableDeltaNode) deltas.get(this)).addChild(parentDelta);
 		} else {

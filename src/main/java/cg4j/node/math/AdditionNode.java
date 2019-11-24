@@ -6,21 +6,14 @@ import cg4j.exception.IllegalShapeException;
 import cg4j.node.Node;
 import cg4j.node.io.VariableNode;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Map;
 
 public class AdditionNode extends Node {
 	public AdditionNode(String name, Node... children) {
 		super(children[0].shape, name, children);
 		for (int i = 1; i < children.length; i++) {
 			if (!Node.ShapeEndCompatible(children[0].shape, 0, children[i].shape, 0)) {
-				throw new IllegalShapeException(
-					"Cannot add shapes ("
-						+ Arrays.toString(children[0].shape)
-						+ ", "
-						+ Arrays.toString(children[i].shape)
-						+ ")"
-				);
+				throw new IllegalShapeException("Cannot add shapes", children[0].shape, children[i].shape);
 			}
 		}
 	}
@@ -29,13 +22,7 @@ public class AdditionNode extends Node {
 		super(children[0].shape, null, children);
 		for (int i = 1; i < children.length; i++) {
 			if (!Node.ShapeEndCompatible(children[0].shape, 0, children[i].shape, 0)) {
-				throw new IllegalShapeException(
-					"Cannot add shapes ("
-						+ Arrays.toString(children[0].shape)
-						+ ", "
-						+ Arrays.toString(children[i].shape)
-						+ ")"
-				);
+				throw new IllegalShapeException("Cannot add shapes", children[0].shape, children[1].shape);
 			}
 		}
 	}
@@ -61,13 +48,11 @@ public class AdditionNode extends Node {
             Tensor in = child.eval(e);
 			if (!init) {
 				out = new Tensor(new float[in.length], in.shape);
-				for (int i = 0; i < out.length; i++) {
-					out.setVal(i, in.get(i % in.length));
-				}
+				for (int i = 0; i < out.length; i++)
+					out.set(i, in.get(i % in.length));
 			} else {
-				for (int i = 0; i < out.length; i++) {
-					out.setVal(i, out.get(i) + in.get(i % in.length));
-				}
+				for (int i = 0; i < out.length; i++)
+					out.set(i, out.get(i) + in.get(i % in.length));
 			}
 			init = true;
 		}
@@ -89,14 +74,12 @@ public class AdditionNode extends Node {
 	 * }
 	 * </pre>
 	 * The output is {@code parentDelta}, so we forward the output to all our children.
-	 *
-	 * @param deltas      The deltas of all variables.
+	 *  @param deltas      The deltas of all variables.
 	 * @param parentDelta Last node's delta.
 	 */
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
-		for (Node child : children) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
+		for (Node child : children)
 			child.createGradients(deltas, parentDelta);
-		}
 	}
 }

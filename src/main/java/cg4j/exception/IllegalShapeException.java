@@ -1,5 +1,7 @@
 package cg4j.exception;
 
+import java.util.Arrays;
+
 /**
  * This exception represents a malformed shape.
  *
@@ -8,7 +10,22 @@ package cg4j.exception;
  */
 public class IllegalShapeException extends IllegalArgumentException {
 
-	public IllegalShapeException(String str) {
+	@Deprecated public IllegalShapeException(String str) {
 		super(str);
+	}
+
+	public IllegalShapeException(int[] a, int[] b) {
+		this("", a, b);
+	}
+
+	public IllegalShapeException(String str, int[] x) {
+		this(str + "\t" + Arrays.toString(x));
+	}
+
+	public IllegalShapeException(String str, int[] a, int[] b) {
+		this(str + "\t" + Arrays.toString(a)
+			+ ", "
+			+ Arrays.toString(b)
+			+ ")");
 	}
 }

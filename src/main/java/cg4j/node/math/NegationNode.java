@@ -5,7 +5,7 @@ import cg4j.Tensor;
 import cg4j.node.Node;
 import cg4j.node.io.VariableNode;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class NegationNode extends Node {
 	public NegationNode(String name, Node child) {
@@ -31,13 +31,13 @@ public class NegationNode extends Node {
         Tensor in = children[0].eval(e);
 		Tensor out = new Tensor(new float[in.length], in.shape);
 		for (int i = 0; i < out.length; i++) {
-			out.setVal(i, -in.get(i));
+			out.set(i, -in.get(i));
 		}
 		return out;
 	}
 
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 		children[0].createGradients(deltas, new NegationNode(name + "_Gradient", parentDelta));
 	}
 }

@@ -55,7 +55,7 @@ public class GraphBuilder {
         return this;
     }
 
-    public Graph build() {
-        return new Graph(nodes);
+    public GraphProcess build() {
+        return new GraphProcess(nodes);
     }
 }

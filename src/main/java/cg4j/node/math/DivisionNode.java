@@ -7,7 +7,7 @@ import cg4j.node.Node;
 import cg4j.node.io.VariableNode;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Map;
 
 public class DivisionNode extends Node {
 	public DivisionNode(String name, Node a, Node b) {
@@ -52,7 +52,7 @@ public class DivisionNode extends Node {
         Tensor bIn = children[1].eval(e);
 		Tensor out = new Tensor(new float[aIn.length], aIn.shape);
 		for (int i = 0; i < out.length; i++) {
-			out.setVal(i, aIn.get(i) / bIn.get(i));
+			out.set(i, aIn.get(i) / bIn.get(i));
 		}
 		return out;
 	}
@@ -77,12 +77,11 @@ public class DivisionNode extends Node {
 	 * -x/y² * parentDelta = -xparentDelta/y²
 	 * }
 	 * </pre>
-	 *
-	 * @param deltas      The deltas of all variables.
+	 *  @param deltas      The deltas of all variables.
 	 * @param parentDelta Last node's delta.
 	 */
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 		children[0].createGradients(deltas, new DivisionNode(parentDelta, children[1]));
 		children[1].createGradients(deltas, new NegationNode(
 			new DivisionNode(

@@ -10,11 +10,11 @@ import java.util.function.Function;
  * Date: 12/23/2017
  * Time: 10:45 AM
  */
-public class Graph {
+public class GraphProcess {
 
     private IdentityHashMap<Function<?,?>, List<Function>> nodes;
 
-    public Graph(IdentityHashMap<Function<?,?>, List<Function>> nodes) {
+    public GraphProcess(IdentityHashMap<Function<?,?>, List<Function>> nodes) {
         this.nodes = nodes;
     }
 

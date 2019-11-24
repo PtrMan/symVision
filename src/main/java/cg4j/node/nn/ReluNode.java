@@ -5,7 +5,7 @@ import cg4j.Tensor;
 import cg4j.node.Node;
 import cg4j.node.io.VariableNode;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class ReluNode extends Node {
 	private float[] vals;
@@ -40,7 +40,7 @@ public class ReluNode extends Node {
 	}
 
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 		children[0].createGradients(deltas, new ReluDeltaNode(parentDelta));
 	}
 
@@ -60,13 +60,13 @@ public class ReluNode extends Node {
 
 			Tensor out = new Tensor(new float[in.length], in.shape);
 			for (int i = 0; i < out.length; i++) {
-				out.setVal(i, vals[i] == 0 ? 0 : in.get(i));
+				out.set(i, vals[i] == 0 ? 0 : in.get(i));
 			}
 			return out;
 		}
 
 		@Override
-		public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+		public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 
 		}
 	}

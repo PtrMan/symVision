@@ -6,6 +6,7 @@ import cg4j.node.Node;
 import cg4j.node.io.VariableNode;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class MeanNode extends Node {
 	final int[][] lastShape;
@@ -53,7 +54,7 @@ public class MeanNode extends Node {
 	}
 
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 		for (Node child : children) {
 			child.createGradients(deltas, parentDelta);
 		}

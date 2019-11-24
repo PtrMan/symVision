@@ -3,15 +3,17 @@ package cg4j.optimize;
 import cg4j.Eval;
 import cg4j.node.Node;
 import cg4j.node.io.VariableNode;
+import org.eclipse.collections.impl.map.mutable.UnifiedMap;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public abstract class Optimizer {
-	public java.util.Map<VariableNode, Node> deltas;
+	public Map<VariableNode, Node> deltas;
 
-	public abstract void minimize(Node node, HashMap<VariableNode, Node> deltas);
+	public abstract void minimize(Node node, Map<VariableNode, Node> deltas);
 
-	public abstract void maximize(Node node, HashMap<VariableNode, Node> deltas);
+	public abstract void maximize(Node node, Map<VariableNode, Node> deltas);
 
 	public abstract void run(Eval eval);
 
@@ -24,7 +26,7 @@ public abstract class Optimizer {
 	}
 
 	public Optimizer minimize(Node cost) {
-		HashMap<VariableNode, Node> deltas = new HashMap<>();
+		Map<VariableNode, Node> deltas = new UnifiedMap<>();
 		cost.createGradients(deltas, null);
 		minimize(cost, deltas);
 		return this;

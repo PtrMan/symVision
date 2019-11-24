@@ -7,7 +7,7 @@ import cg4j.node.Node;
 import cg4j.node.io.VariableNode;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Map;
 
 public class ReshapeNode extends Node {
 	public ReshapeNode(int[] shape, String name, Node child) {
@@ -49,7 +49,7 @@ public class ReshapeNode extends Node {
 	}
 
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 		children[0].createGradients(deltas, new ReshapeNode(children[0].shape, parentDelta));
 	}
 }

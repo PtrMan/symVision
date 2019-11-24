@@ -4,7 +4,7 @@ import cg4j.Eval;
 import cg4j.Tensor;
 import cg4j.node.Node;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An input node feeds data into the graph.
@@ -54,6 +54,6 @@ public class InputNode extends Node {
 	}
 
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 	}
 }

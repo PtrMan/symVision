@@ -4,7 +4,7 @@ import cg4j.Eval;
 import cg4j.Tensor;
 import cg4j.node.Node;
 
-import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This class represents a node that always has the same value.
@@ -67,12 +67,11 @@ public class ConstantNode extends Node {
 	 * }
 	 * </pre>
 	 * The output is zero, so we do nothing.
-	 *
-	 * @param deltas      The deltas of all variables.
+	 *  @param deltas      The deltas of all variables.
 	 * @param parentDelta Last node's delta.
 	 */
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 	}
 
 	@Override

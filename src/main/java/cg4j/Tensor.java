@@ -32,37 +32,20 @@ public class Tensor implements java.io.Serializable {
 	 * @throws IllegalShapeException if the length of {@code vals} doesn't equal the length given by {@code shape}
 	 * @since 1.0
 	 */
-	public Tensor(float[] vals, int[] shape) {
-		this.vals = vals; //Assign the inputs
-		this.shape = shape;
+	public Tensor(float[] vals, int... shape) {
 
 		int length = 1; //Get the length by multiplying all the values in 'shape' together
 		for (int x : shape) {
-			if (x < 0) {
-				throw new IllegalShapeException(
-					"Shape cannot have any negative values "
-						+ Arrays.toString(shape)
-				);
-			}
-			if (x == 0) {
-				throw new IllegalShapeException(
-					"Shape cannot have any zeros "
-						+ Arrays.toString(shape)
-				);
-			}
+			if (x <= 0)
+				throw new IllegalShapeException("Shape component must be positive", shape);
 			length *= x;
 		}
-		this.length = length;
+		if (vals.length != length) //If the shape's values don't match the vals' value, throw an exception
+			throw new IllegalShapeException("Shape doesn't match length=" + length, shape);
 
-		if (vals.length != length) { //If the shape's values don't match the vals' value, throw an exception
-			throw new IllegalShapeException(
-				"Shape doesn't match length of vals ("
-					+ length
-					+ " != "
-					+ vals.length
-					+ ")"
-			);
-		}
+		this.vals = vals; //Assign the inputs
+		this.shape = shape;
+		this.length = length;
 	}
 
 	private Tensor(float[] vals, int[] shape, int length) {
@@ -136,7 +119,7 @@ public class Tensor implements java.io.Serializable {
 	 * @param val The value to set.
 	 * @since 1.0
 	 */
-	public void setVal(int i, float val) {
+	public void set(int i, float val) {
 		vals[i] = val;
 	}
 
@@ -166,7 +149,7 @@ public class Tensor implements java.io.Serializable {
 	 * @param val     The value to set.
 	 * @since 1.0
 	 */
-	public void setVal(int[] indices, float val) {
+	public void set(int[] indices, float val) {
 		int i = 0;
 		for (int j = 0; j < indices.length; j++) { //Convert the indices into a single index
 			int iI = indices[j];
@@ -342,7 +325,7 @@ public class Tensor implements java.io.Serializable {
 	 *
 	 * @return float[] of values.
 	 * @see Tensor#get(int)
-	 * @see Tensor#setVal(int, float)
+	 * @see Tensor#set(int, float)
 	 */
 	public float[] getVals() {
 		return vals;

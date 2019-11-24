@@ -7,7 +7,7 @@ import cg4j.node.Node;
 import cg4j.node.io.VariableNode;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Map;
 
 public class MatrixMultiplicationNode extends Node {
 	private final boolean aTransposed;
@@ -50,13 +50,7 @@ public class MatrixMultiplicationNode extends Node {
 			);
 		}
 		if (bShape.length < 2) {
-			throw new IllegalShapeException(
-				"Cannot matrix multiply shapes ("
-					+ Arrays.toString(aShape)
-					+ ", "
-					+ Arrays.toString(bShape)
-					+ ")"
-			);
+			throw new IllegalShapeException("Cannot matrix multiply shapes", aShape, bShape);
 		}
 		if (aShape[aShape.length - 1] != bShape[bShape.length - 2]) {
 			throw new IllegalShapeException(
@@ -68,13 +62,7 @@ public class MatrixMultiplicationNode extends Node {
 			);
 		}
 		if (!Node.ShapeEndCompatible(aShape, 2, bShape, 2)) {
-			throw new IllegalShapeException(
-				"Cannot matrix multiply shapes ("
-					+ Arrays.toString(aShape)
-					+ ", "
-					+ Arrays.toString(bShape)
-					+ ")"
-			);
+			throw new IllegalShapeException("Cannot matrix multiply shapes (", aShape, bShape);
 		}
 
 		int[] out = new int[Math.max(aShape.length, bShape.length)];
@@ -278,7 +266,7 @@ public class MatrixMultiplicationNode extends Node {
 								b.get((h * (bb[bb.length - 2] * bb[bb.length - 1])
 									+ k * bb[bb.length - 1] + j) % b.length);
 						}
-						out.setVal(h * (shape[shape.length - 1] * shape[shape.length - 2])
+						out.set(h * (shape[shape.length - 1] * shape[shape.length - 2])
 							+ i * out.shape[out.shape.length - 1] + j, val);
 					}
 				}
@@ -307,7 +295,7 @@ public class MatrixMultiplicationNode extends Node {
 								* b.get((h * (bb[bb.length - 1] * bb[bb.length - 2]))
 								+ j * bb[bb.length - 1] + k);
 						}
-						out.setVal(h * (shape[shape.length - 1] * shape[shape.length - 2])
+						out.set(h * (shape[shape.length - 1] * shape[shape.length - 2])
 							+ i * out.shape[out.shape.length - 1] + j, val);
 					}
 				}
@@ -336,7 +324,7 @@ public class MatrixMultiplicationNode extends Node {
 								b.get((h * (bb[bb.length - 2] * bb[bb.length - 1])
 									+ k * bb[bb.length - 1] + j) % b.length);
 						}
-						out.setVal(h * (shape[shape.length - 1] * shape[shape.length - 2])
+						out.set(h * (shape[shape.length - 1] * shape[shape.length - 2])
 							+ i * out.shape[out.shape.length - 1] + j, val);
 					}
 				}
@@ -365,7 +353,7 @@ public class MatrixMultiplicationNode extends Node {
 								b.get((h * (bb[bb.length - 1] * bb[bb.length - 2]))
 									+ j * bb[bb.length - 1] + k);
 						}
-						out.setVal(h * (shape[shape.length - 1] * shape[shape.length - 2])
+						out.set(h * (shape[shape.length - 1] * shape[shape.length - 2])
 							+ i * out.shape[out.shape.length - 1] + j, val);
 					}
 				}
@@ -375,7 +363,7 @@ public class MatrixMultiplicationNode extends Node {
 	}
 
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 		children[0].createGradients(deltas, new MatrixMultiplicationNode(parentDelta, children[1],
 			false,
 			!bTransposed));

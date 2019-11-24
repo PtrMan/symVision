@@ -3,7 +3,6 @@ package cg4j;
 
 
 import cg4j.exception.IllegalShapeException;
-import org.graalvm.compiler.debug.Assertions;
 import org.junit.Test;
 
 import java.util.Random;
@@ -40,7 +39,7 @@ class TensorTest {
         for (int i = 0; i < 4 * 3 * 2; i++) {
             assertEquals(vals[i], tensor.get(i));
             float random = (float) Math.random();
-            tensor.setVal(i, random);
+            tensor.set(i, random);
             assertEquals(random, tensor.get(i));
         }
     }
@@ -61,7 +60,7 @@ class TensorTest {
                 for (int z = 0; z < 2; z++) {
                     assertEquals(vals[x * 3 * 2 + y * 2 + z], tensor.get(new int[]{x, y, z}));
                     float random = (float) Math.random();
-                    tensor.setVal(new int[]{x, y, z}, random);
+                    tensor.set(new int[]{x, y, z}, random);
                     assertEquals(random, tensor.get(new int[]{x, y, z}));
                 }
             }

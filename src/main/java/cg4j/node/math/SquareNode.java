@@ -6,7 +6,7 @@ import cg4j.node.Node;
 import cg4j.node.io.ConstantNode;
 import cg4j.node.io.VariableNode;
 
-import java.util.HashMap;
+import java.util.Map;
 
 public class SquareNode extends Node {
 	public SquareNode(String name, Node child) {
@@ -32,21 +32,21 @@ public class SquareNode extends Node {
 		Tensor in = children[0].eval(e);
 		Tensor out = new Tensor(new float[in.length], in.shape);
 		for (int i = 0; i < out.length; i++) {
-			out.setVal(i, in.get(i) * in.get(i));
+			out.set(i, in.get(i) * in.get(i));
 		}
 		return out;
 	}
 
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 		MultiplicationNode mult;
 		mult = parentDelta == null ? new MultiplicationNode(
 			children[0],
 			new ConstantNode(
 				new Tensor(
 					new float[]{2f}
-					, new int[]{1}
-				)
+					,
+					1)
 			)
 		) : new MultiplicationNode(
 			parentDelta,
@@ -54,8 +54,8 @@ public class SquareNode extends Node {
 			new ConstantNode(
 				new Tensor(
 					new float[]{2f}
-					, new int[]{1}
-				)
+					,
+					1)
 			)
 		);
 		children[0].createGradients(deltas, mult);

@@ -11,7 +11,7 @@ import java.util.stream.IntStream;
  * Date: 12/23/2017
  * Time: 11:15 AM
  */
-public class GraphTest {
+public class GraphProcessTest {
 
     @Test
     public void testSimpleAddition() {
@@ -21,7 +21,7 @@ public class GraphTest {
         Function startNode = (x)->x; //HACK
 
         Function<Integer, Integer> plus2 = (Integer param1) -> param1 + 2;
-        Graph graph = new GraphBuilder()
+        GraphProcess graph = new GraphBuilder()
                 .edge(startNode, plus2, resultConverter, (o) -> { System.out.println(o); return true; })
                 .build();
 
@@ -34,7 +34,7 @@ public class GraphTest {
         ConsumerNode<Integer[]> printNumbersForSomeReason = param -> IntStream.range(param[0], param[1]).forEach(System.out::println);
         ConsumerNode<Integer[]> printNumbersForSomeReason2 = param -> IntStream.range(param[0], param[1]).forEach(System.out::println);
 
-        Graph graph = new GraphBuilder()
+        GraphProcess graph = new GraphBuilder()
                 .edge(startNode, printNumbersForSomeReason)
                 .edge(startNode, printNumbersForSomeReason2)
                 .build();

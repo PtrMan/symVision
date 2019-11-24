@@ -27,8 +27,8 @@ public class LinearRegression {
 		 * Here, they represent 'y = mx + c'.
 		 * We are trying to find the optimal values for our data set.
 		 */
-		VariableNode m = new VariableNode(new Tensor(new float[1], new int[]{1}));
-		VariableNode c = new VariableNode(new Tensor(new float[1], new int[]{1}));
+		VariableNode m = new VariableNode(new Tensor(new float[1], 1));
+		VariableNode c = new VariableNode(new Tensor(new float[1], 1));
 
 		/*
 		 * Create an InputNode.
@@ -45,22 +45,18 @@ public class LinearRegression {
 		 * 'yTarget' is the optimal value for 'y'.
 		 * We find the mean squared cost through the code below.
 		 */
-		InputNode yTarget = new InputNode(new int[]{-1, 1});
-		Node cost = new MeanNode(new SquareNode(new SubtractionNode(yTarget, new AdditionNode(new MultiplicationNode(x, m), c))));
+		InputNode yTarget = new InputNode(-1, 1);
+		Node cost = new MeanNode(new SquareNode(yTarget.minus(new MultiplicationNode(x, m).plus(c))));
 
 		/*
 		 * Create a GradientDescentOptimizer and allow it to tweak 'm' and 'c'.
 		 * We also set the learning rate and what variable to minimize.
 		 */
-		GradientDescentOptimizer optimizer = new GradientDescentOptimizer().control(m, c);
+		GradientDescentOptimizer optimizer = new GradientDescentOptimizer()
+			.control(m, c);
 		optimizer.learningRate = 0.001f;
 
-		/*
-		 * Create the deltas and use them to minimize 'cost'.
-		 */
-		HashMap<VariableNode, Node> deltas = new HashMap<>();
-		cost.createGradients(deltas, null);
-		optimizer.minimize(cost, deltas);
+		optimizer.minimize(cost);
 
 		Tensor[] vals = {
 			new Tensor(new float[]{
@@ -70,7 +66,7 @@ public class LinearRegression {
 				14,
 				12,
 				10
-			}, new int[]{6, 1}),
+			}, 6, 1),
 			new Tensor(new float[]{
 				4,
 				2,
@@ -78,7 +74,7 @@ public class LinearRegression {
 				8,
 				1,
 				7
-			}, new int[]{6, 1})
+			}, 6, 1)
 		};
 
 		for (int i = 0; i < 4000; i++) {

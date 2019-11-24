@@ -13,18 +13,10 @@ public class MultiplicationNode extends Node {
 
 	public MultiplicationNode(String name, Node... children) {
 		super(children[0].shape, name, children);
-		for (int i = 1; i < children.length; i++) {
+		for (int i = 1; i < children.length; i++)
 			if (!Arrays.equals(new int[]{1}, children[i].shape))
-				if (!Node.ShapeEndCompatible(children[0].shape, 0, children[i].shape, 0)) {
-					throw new IllegalShapeException(
-						"Cannot multiply shapes ("
-							+ Arrays.toString(children[0].shape)
-							+ ", "
-							+ Arrays.toString(children[i].shape)
-							+ ")"
-					);
-				}
-		}
+				if (!Node.ShapeEndCompatible(children[0].shape, 0, children[i].shape, 0))
+					throw new IllegalShapeException("Cannot multiply shapes", children[0].shape, children[1].shape);
 	}
 
 	public MultiplicationNode(Node... children) {
@@ -32,15 +24,8 @@ public class MultiplicationNode extends Node {
 
 		for (int i = 1; i < children.length; i++) {
 			if (!Arrays.equals(new int[]{1}, children[i].shape))
-				if (!Node.ShapeEndCompatible(children[0].shape, 0, children[i].shape, 0)) {
-					throw new IllegalShapeException(
-						"Cannot multiply shapes ("
-							+ Arrays.toString(children[0].shape)
-							+ ", "
-							+ Arrays.toString(children[i].shape)
-							+ ")"
-					);
-				}
+				if (!Node.ShapeEndCompatible(children[0].shape, 0, children[i].shape, 0))
+					throw new IllegalShapeException("Cannot multiply shapes", children[0].shape, children[1].shape);
 		}
 	}
 
@@ -60,26 +45,25 @@ public class MultiplicationNode extends Node {
 			return children[0].eval(e);
 		}
 		Tensor out = null;
-		boolean init = false;
+
 		for (Node child : children) {
 			Tensor in = child.eval(e);
-			if (!init) {
-				out = new Tensor(new float[in.length], in.shape);
-			}
+			int I = in.length;
+
+			boolean init = out == null;
+			if (init) out = new Tensor(new float[I], in.shape);
+
 			for (int i = 0; i < out.length; i++) {
-				if (init) {
-					out.setVal(i, out.get(i) * in.get(i % in.length));
-				} else {
-					out.setVal(i, in.get(i % in.length));
-				}
+				int ii = i % I;
+				out.set(i, init ? in.get(ii) : out.get(i) * in.get(ii));
 			}
-			init = true;
+
 		}
 		return out;
 	}
 
 	@Override
-	public void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
 		List<Node> multToAdd = new ArrayList<>(children.length - 1);
 		for (Node child : children) {
 			for (Node childJ : children)

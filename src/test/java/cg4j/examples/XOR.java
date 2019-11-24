@@ -47,11 +47,8 @@ public class XOR {
 		 * This is the base for all fully-connected layers.
 		 */
 		Node y;
-		y = new MatrixMultiplicationNode(x, layer1Weights);
-		y = new SigmoidNode(new AdditionNode(y, layer1Biases));
-
-		y = new MatrixMultiplicationNode(y, layer2Weights);
-		y = new SigmoidNode(new AdditionNode(y, layer2Biases));
+		y = new SigmoidNode(x.times(layer1Weights).plus(layer1Biases));
+		y = new SigmoidNode(y.times(layer2Weights).plus(layer2Biases));
 
 		/*
 		 * Create a target and mean squared error.

@@ -2,12 +2,13 @@ package cg4j.node;
 
 import cg4j.Eval;
 import cg4j.Tensor;
-import cg4j.exception.NoInputSpecifiedException;
-import cg4j.node.io.InputNode;
 import cg4j.node.io.VariableNode;
+import cg4j.node.math.AdditionNode;
+import cg4j.node.math.MatrixMultiplicationNode;
+import cg4j.node.math.SubtractionNode;
 
 import java.util.Arrays;
-import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 
 //TODO: ADD JAVADOC FOR ALL NODES
@@ -50,7 +51,7 @@ public abstract class Node implements java.io.Serializable {
 
 	public abstract Tensor evaluate(Eval e);
 
-	public abstract void createGradients(HashMap<VariableNode, Node> deltas, Node parentDelta);
+	public abstract void createGradients(Map<VariableNode, Node> deltas, Node parentDelta);
 
 	@Override
 	public String toString() {
@@ -71,5 +72,16 @@ public abstract class Node implements java.io.Serializable {
 //				e.val.put(this, y);
 //		}
 		return evaluate(e);
+	}
+
+	public AdditionNode plus(Node a) {
+		return new AdditionNode(this, a);
+	}
+	public SubtractionNode minus(Node a) {
+		return new SubtractionNode(this, a);
+	}
+
+	public MatrixMultiplicationNode times(Node a) {
+		return new MatrixMultiplicationNode(this, a);
 	}
 }
