@@ -1,7 +1,6 @@
 package cg4j;
 
 import cg4j.exception.IllegalShapeException;
-import cg4j.node.Node;
 import cg4j.node.io.InputNode;
 
 import java.util.Arrays;

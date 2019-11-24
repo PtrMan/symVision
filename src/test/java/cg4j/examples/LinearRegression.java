@@ -2,18 +2,14 @@ package cg4j.examples;
 
 import cg4j.Eval;
 import cg4j.Tensor;
-import cg4j.node.Node;
+import cg4j.node.TensorNode;
 import cg4j.node.io.InputNode;
 import cg4j.node.io.VariableNode;
-import cg4j.node.math.AdditionNode;
 import cg4j.node.math.MultiplicationNode;
 import cg4j.node.math.SquareNode;
-import cg4j.node.math.SubtractionNode;
 import cg4j.node.tensor.MeanNode;
 import cg4j.optimize.GradientDescentOptimizer;
 import org.junit.Test;
-
-import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 
@@ -46,7 +42,7 @@ public class LinearRegression {
 		 * We find the mean squared cost through the code below.
 		 */
 		InputNode yTarget = new InputNode(-1, 1);
-		Node cost = new MeanNode(new SquareNode(yTarget.minus(new MultiplicationNode(x, m).plus(c))));
+		TensorNode cost = new MeanNode(new SquareNode(yTarget.minus(new MultiplicationNode(x, m).plus(c))));
 
 		/*
 		 * Create a GradientDescentOptimizer and allow it to tweak 'm' and 'c'.
@@ -88,13 +84,13 @@ public class LinearRegression {
 			/*
 			 * Allow the gradient descent algorithm to run.
 			 */
-			optimizer.run(eval);
+			optimizer.apply(eval);
 
 			/*
 			 * Display the cost every 100 iterations.
 			 */
 			if (i % 100 == 0) {
-				System.out.printf("Error: %f\n", cost.eval(eval).get(0));
+				System.out.printf("Error: %f\n", cost.apply(eval).get(0));
 			}
 		}
 
@@ -105,9 +101,9 @@ public class LinearRegression {
 			.set(x, vals[0])
 			.set(yTarget, vals[1]);
 		System.out.println();
-		float C = cost.eval(eval).get(0);
+		float C = cost.apply(eval).get(0);
 		System.out.println("Cost: " + C);
-		System.out.println("y = " + m.eval(eval).get(0) + "x + " + c.eval(eval).get(0));
+		System.out.println("y = " + m.apply(eval).get(0) + "x + " + c.apply(eval).get(0));
 		assertEquals(C, 5.08f, 0.01f);
 	}
 }

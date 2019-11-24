@@ -2,18 +2,18 @@ package cg4j.node.math;
 
 import cg4j.Eval;
 import cg4j.Tensor;
-import cg4j.node.Node;
+import cg4j.node.TensorNode;
 import cg4j.node.io.ConstantNode;
 import cg4j.node.io.VariableNode;
 
 import java.util.Map;
 
-public class SquareNode extends Node {
-	public SquareNode(String name, Node child) {
+public class SquareNode extends TensorNode {
+	public SquareNode(String name, TensorNode child) {
 		super(child.shape, name, child);
 	}
 
-	public SquareNode(Node child) {
+	public SquareNode(TensorNode child) {
 		super(child.shape, null, child);
 	}
 
@@ -25,11 +25,11 @@ public class SquareNode extends Node {
 	/**
 	 * Use {@code Eval#evaluate(Node)}
 	 *
-	 * @see Eval#evaluate(Node)
+	 * @see Eval#evaluate(TensorNode)
 	 */
 	@Override
-	public Tensor evaluate(Eval e) {
-		Tensor in = children[0].eval(e);
+	public Tensor apply(Eval e) {
+		Tensor in = children[0].apply(e);
 		Tensor out = new Tensor(new float[in.length], in.shape);
 		for (int i = 0; i < out.length; i++) {
 			out.set(i, in.get(i) * in.get(i));
@@ -38,7 +38,7 @@ public class SquareNode extends Node {
 	}
 
 	@Override
-	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, TensorNode> deltas, TensorNode parentDelta) {
 		MultiplicationNode mult;
 		mult = parentDelta == null ? new MultiplicationNode(
 			children[0],

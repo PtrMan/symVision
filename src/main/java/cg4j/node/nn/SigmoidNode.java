@@ -2,19 +2,19 @@ package cg4j.node.nn;
 
 import cg4j.Eval;
 import cg4j.Tensor;
-import cg4j.node.Node;
+import cg4j.node.TensorNode;
 import cg4j.node.io.VariableNode;
 
 import java.util.Map;
 
-public class SigmoidNode extends Node {
+public class SigmoidNode extends TensorNode {
 	private float[] vals;
 
-	public SigmoidNode(String name, Node child) {
+	public SigmoidNode(String name, TensorNode child) {
 		super(child.shape, name, child);
 	}
 
-	public SigmoidNode(Node child) {
+	public SigmoidNode(TensorNode child) {
 		super(child.shape, null, child);
 	}
 
@@ -26,11 +26,11 @@ public class SigmoidNode extends Node {
 	/**
 	 * Use {@code Eval#evaluate(Node)}
 	 *
-	 * @see Eval#evaluate(Node)
+	 * @see Eval#evaluate(TensorNode)
 	 */
 	@Override
-	public Tensor evaluate(Eval e) {
-        Tensor in = children[0].eval(e);
+	public Tensor apply(Eval e) {
+		Tensor in = children[0].apply(e);
 
 		vals = new float[in.length];
 		for (int i = 0; i < vals.length; i++) {
@@ -41,12 +41,12 @@ public class SigmoidNode extends Node {
 	}
 
 	@Override
-	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, TensorNode> deltas, TensorNode parentDelta) {
 		children[0].createGradients(deltas, new SigmoidDeltaNode(parentDelta));
 	}
 
-	private class SigmoidDeltaNode extends Node {
-		public SigmoidDeltaNode(Node child) {
+	private class SigmoidDeltaNode extends TensorNode {
+		public SigmoidDeltaNode(TensorNode child) {
 			super(child.shape, null, child);
 		}
 
@@ -56,8 +56,8 @@ public class SigmoidNode extends Node {
 		}
 
 		@Override
-		public Tensor evaluate(Eval e) {
-            Tensor in = children[0].eval(e);
+		public Tensor apply(Eval e) {
+			Tensor in = children[0].apply(e);
 
 			Tensor out = new Tensor(new float[in.length], in.shape);
 			for (int i = 0; i < out.length; i++) {
@@ -67,7 +67,7 @@ public class SigmoidNode extends Node {
 		}
 
 		@Override
-		public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
+		public void createGradients(Map<VariableNode, TensorNode> deltas, TensorNode parentDelta) {
 		}
 	}
 }

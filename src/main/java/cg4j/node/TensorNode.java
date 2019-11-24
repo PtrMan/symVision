@@ -10,10 +10,12 @@ import cg4j.node.math.SubtractionNode;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 //TODO: ADD JAVADOC FOR ALL NODES
-public abstract class Node implements java.io.Serializable {
-	public static final Node[] EmptyNodeArray = new Node[0];
+public abstract class TensorNode implements java.io.Serializable, Function<Eval,Tensor> {
+	public static final TensorNode[] EmptyNodeArray = new TensorNode[0];
 
 	private static final AtomicInteger stringGlobalCounter = new AtomicInteger();
 
@@ -21,9 +23,9 @@ public abstract class Node implements java.io.Serializable {
 	public final int[] shape;
 	public final int length;
 
-	protected Node[] children;
+	protected TensorNode[] children;
 
-	public Node(int[] shape, String name, Node... children) {
+	public TensorNode(int[] shape, String name, TensorNode... children) {
 		this.children = children;
 		this.shape = shape;
 		this.name = name == null ? getNodeClassName() + "_" + stringGlobalCounter.getAndIncrement() : name;
@@ -32,6 +34,13 @@ public abstract class Node implements java.io.Serializable {
 			length *= x;
 		}
 		this.length = length;
+	}
+
+	public void forEachRecurse(Consumer<TensorNode> each) {
+		for (TensorNode c : children) {
+			each.accept(c);
+			c.forEachRecurse(each);
+		}
 	}
 
 	public static boolean ShapeEndCompatible(int[] aShape, int aStart, int[] bShape, int bStart) {
@@ -45,43 +54,27 @@ public abstract class Node implements java.io.Serializable {
 
 	protected abstract String getNodeClassName();
 
-	public Node[] getChildren() {
+	public TensorNode[] getChildren() {
 		return children;
 	}
 
-	public abstract Tensor evaluate(Eval e);
 
-	public abstract void createGradients(Map<VariableNode, Node> deltas, Node parentDelta);
+
+	public abstract void createGradients(Map<VariableNode, TensorNode> deltas, TensorNode parentDelta);
 
 	@Override
 	public String toString() {
 		return "(" + name + ", " + Arrays.toString(children) + ")";
 	}
 
-	public Tensor eval(Eval e) {
-//		Tensor y = e.val.get(name);
-//		if (y==null) { // If we've already calculated it, just use that value
-//			if (this instanceof InputNode) { // If it's an input node, the data should already be there.
-//				throw new NoInputSpecifiedException(
-//					"No input was specified for "
-//						+ this
-//				);
-//			}
-//			y = evaluate(e);
-//			if (e.cache(this))
-//				e.val.put(this, y);
-//		}
-		return evaluate(e);
-	}
-
-	public AdditionNode plus(Node a) {
+	public AdditionNode plus(TensorNode a) {
 		return new AdditionNode(this, a);
 	}
-	public SubtractionNode minus(Node a) {
+	public SubtractionNode minus(TensorNode a) {
 		return new SubtractionNode(this, a);
 	}
 
-	public MatrixMultiplicationNode times(Node a) {
+	public MatrixMultiplicationNode times(TensorNode a) {
 		return new MatrixMultiplicationNode(this, a);
 	}
 }

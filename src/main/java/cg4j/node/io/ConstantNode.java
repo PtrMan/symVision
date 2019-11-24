@@ -2,7 +2,7 @@ package cg4j.node.io;
 
 import cg4j.Eval;
 import cg4j.Tensor;
-import cg4j.node.Node;
+import cg4j.node.TensorNode;
 
 import java.util.Map;
 
@@ -10,10 +10,10 @@ import java.util.Map;
  * This class represents a node that always has the same value.
  *
  * @author nathanwood1
- * @see Node
+ * @see TensorNode
  * @since 1.0
  */
-public class ConstantNode extends Node {
+public class ConstantNode extends TensorNode {
 	private final Tensor val;
 
 	/**
@@ -47,10 +47,10 @@ public class ConstantNode extends Node {
 	/**
 	 * Use {@code Eval#evaluate(Node)}
 	 *
-	 * @see Eval#evaluate(Node)
+	 * @see Eval#evaluate(TensorNode)
 	 */
 	@Override
-	public Tensor evaluate(Eval e) {
+	public Tensor apply(Eval e) {
 		return val;
 	}
 
@@ -71,7 +71,7 @@ public class ConstantNode extends Node {
 	 * @param parentDelta Last node's delta.
 	 */
 	@Override
-	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, TensorNode> deltas, TensorNode parentDelta) {
 	}
 
 	@Override

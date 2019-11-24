@@ -2,7 +2,7 @@ package cg4j.node.io;
 
 import cg4j.Eval;
 import cg4j.Tensor;
-import cg4j.node.Node;
+import cg4j.node.TensorNode;
 import cg4j.node.math.AdditionNode;
 
 import java.util.Map;
@@ -10,7 +10,7 @@ import java.util.Map;
 /**
  * A variable node creates a value that can be modified to minimize/maximize a function
  */
-public class VariableNode extends Node {
+public class VariableNode extends TensorNode {
 	public final Tensor val;
 	private boolean gradientCreated = false;
 
@@ -32,10 +32,10 @@ public class VariableNode extends Node {
 	/**
 	 * Use {@code Eval#evaluate(Node)}
 	 *
-	 * @see Eval#evaluate(Node)
+	 * @see Eval#evaluate(TensorNode)
 	 */
 	@Override
-	public Tensor evaluate(Eval e) {
+	public Tensor apply(Eval e) {
 		return val;
 	}
 
@@ -45,7 +45,7 @@ public class VariableNode extends Node {
 	 * @param parentDelta Last node's delta.
 	 */
 	@Override
-	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, TensorNode> deltas, TensorNode parentDelta) {
 		if (gradientCreated) {
 			((VariableDeltaNode) deltas.get(this)).addChild(parentDelta);
 		} else {
@@ -55,12 +55,12 @@ public class VariableNode extends Node {
 	}
 
 	private static class VariableDeltaNode extends AdditionNode {
-		public VariableDeltaNode(Node... children) {
+		public VariableDeltaNode(TensorNode... children) {
 			super(children);
 		}
 
-		public void addChild(Node child) {
-			Node[] childrenU = new Node[children.length + 1];
+		public void addChild(TensorNode child) {
+			TensorNode[] childrenU = new TensorNode[children.length + 1];
 			System.arraycopy(children, 0, childrenU, 0, children.length);
 			childrenU[children.length] = child;
 			this.children = childrenU;

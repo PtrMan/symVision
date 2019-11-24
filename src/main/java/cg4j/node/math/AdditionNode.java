@@ -3,25 +3,25 @@ package cg4j.node.math;
 import cg4j.Eval;
 import cg4j.Tensor;
 import cg4j.exception.IllegalShapeException;
-import cg4j.node.Node;
+import cg4j.node.TensorNode;
 import cg4j.node.io.VariableNode;
 
 import java.util.Map;
 
-public class AdditionNode extends Node {
-	public AdditionNode(String name, Node... children) {
+public class AdditionNode extends TensorNode {
+	public AdditionNode(String name, TensorNode... children) {
 		super(children[0].shape, name, children);
 		for (int i = 1; i < children.length; i++) {
-			if (!Node.ShapeEndCompatible(children[0].shape, 0, children[i].shape, 0)) {
+			if (!TensorNode.ShapeEndCompatible(children[0].shape, 0, children[i].shape, 0)) {
 				throw new IllegalShapeException("Cannot add shapes", children[0].shape, children[i].shape);
 			}
 		}
 	}
 
-	public AdditionNode(Node... children) {
+	public AdditionNode(TensorNode... children) {
 		super(children[0].shape, null, children);
 		for (int i = 1; i < children.length; i++) {
-			if (!Node.ShapeEndCompatible(children[0].shape, 0, children[i].shape, 0)) {
+			if (!TensorNode.ShapeEndCompatible(children[0].shape, 0, children[i].shape, 0)) {
 				throw new IllegalShapeException("Cannot add shapes", children[0].shape, children[1].shape);
 			}
 		}
@@ -35,17 +35,17 @@ public class AdditionNode extends Node {
 	/**
 	 * Use {@code Eval#evaluate(Node)}
 	 *
-	 * @see Eval#evaluate(Node)
+	 * @see Eval#evaluate(TensorNode)
 	 */
 	@Override
-	public Tensor evaluate(Eval e) {
+	public Tensor apply(Eval e) {
 		if (children.length == 1) {
-            return children[0].eval(e);
-        }
+			return children[0].apply(e);
+		}
 		Tensor out = null;
 		boolean init = false;
-		for (Node child : children) {
-            Tensor in = child.eval(e);
+		for (TensorNode child : children) {
+			Tensor in = child.apply(e);
 			if (!init) {
 				out = new Tensor(new float[in.length], in.shape);
 				for (int i = 0; i < out.length; i++)
@@ -78,8 +78,8 @@ public class AdditionNode extends Node {
 	 * @param parentDelta Last node's delta.
 	 */
 	@Override
-	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
-		for (Node child : children)
+	public void createGradients(Map<VariableNode, TensorNode> deltas, TensorNode parentDelta) {
+		for (TensorNode child : children)
 			child.createGradients(deltas, parentDelta);
 	}
 }

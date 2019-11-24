@@ -2,7 +2,7 @@ package cg4j.node.io;
 
 import cg4j.Eval;
 import cg4j.Tensor;
-import cg4j.node.Node;
+import cg4j.node.TensorNode;
 
 import java.util.Map;
 
@@ -10,16 +10,16 @@ import java.util.Map;
  * An input node feeds data into the graph.
  *
  * @author nathanwood1
- * @see Node
+ * @see TensorNode
  * @since 1.0
  */
-public class InputNode extends Node {
+public class InputNode extends TensorNode {
 
 	/**
 	 * Creates an {@code InputNode} from a shape.
 	 *
 	 * @param shape The shape of the output.
-	 * @see Node
+	 * @see TensorNode
 	 * @since 1.0
 	 */
 	public InputNode(int... shape) {
@@ -31,7 +31,7 @@ public class InputNode extends Node {
 	 *
 	 * @param shape The shape of the output.
 	 * @param name  {@code String} name of node. Can be null.
-	 * @see Node
+	 * @see TensorNode
 	 * @since 1.0
 	 */
 	public InputNode(String name, int... shape) {
@@ -46,14 +46,14 @@ public class InputNode extends Node {
 	/**
 	 * Use {@code Eval#evaluate(Node)}
 	 *
-	 * @see Eval#evaluate(Node)
+	 * @see Eval#evaluate(TensorNode)
 	 */
 	@Override
-	public Tensor evaluate(Eval e) {
+	public Tensor apply(Eval e) {
 		return e.val.get(name);
 	}
 
 	@Override
-	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, TensorNode> deltas, TensorNode parentDelta) {
 	}
 }

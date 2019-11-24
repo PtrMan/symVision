@@ -3,18 +3,18 @@ package cg4j.node.tensor;
 import cg4j.Eval;
 import cg4j.Tensor;
 import cg4j.exception.IllegalShapeException;
-import cg4j.node.Node;
+import cg4j.node.TensorNode;
 import cg4j.node.io.VariableNode;
 
 import java.util.Arrays;
 import java.util.Map;
 
-public class ReshapeNode extends Node {
-	public ReshapeNode(int[] shape, String name, Node child) {
+public class ReshapeNode extends TensorNode {
+	public ReshapeNode(int[] shape, String name, TensorNode child) {
 		super(shape, name, child);
 	}
 
-	public ReshapeNode(int[] shape, Node child) {
+	public ReshapeNode(int[] shape, TensorNode child) {
 		super(shape, null, child);
 	}
 
@@ -24,8 +24,8 @@ public class ReshapeNode extends Node {
 	}
 
 	@Override
-	public Tensor evaluate(Eval e) {
-		Tensor in = children[0].eval(e);
+	public Tensor apply(Eval e) {
+		Tensor in = children[0].apply(e);
 
 		int[] newShape = new int[shape.length];
 		int unknownIndex = -1;
@@ -49,7 +49,7 @@ public class ReshapeNode extends Node {
 	}
 
 	@Override
-	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, TensorNode> deltas, TensorNode parentDelta) {
 		children[0].createGradients(deltas, new ReshapeNode(children[0].shape, parentDelta));
 	}
 }

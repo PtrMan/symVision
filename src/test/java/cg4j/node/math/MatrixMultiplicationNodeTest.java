@@ -2,7 +2,7 @@ package cg4j.node.math;
 
 import cg4j.Eval;
 import cg4j.Tensor;
-import cg4j.node.Node;
+import cg4j.node.TensorNode;
 import cg4j.node.io.InputNode;
 import org.junit.Test;
 
@@ -13,7 +13,7 @@ class MatrixMultiplicationNodeTest {
     void evaluateNN() {
         InputNode a = new InputNode(-1, -1);
         InputNode b = new InputNode(-1, -1);
-        Node out = new MatrixMultiplicationNode(a, b, false, false);
+        TensorNode out = new MatrixMultiplicationNode(a, b, false, false);
         {
             Eval e = new Eval()
                     .set(a, new Tensor(new float[]{
@@ -25,7 +25,7 @@ class MatrixMultiplicationNodeTest {
                             9, 10,
                             11, 12
                     }, new int[]{3, 2}));
-            assertEquals(out.eval(e), new Tensor(new float[]{
+			assertEquals(out.apply(e), new Tensor(new float[]{
                 58, 64,
                 139, 154
             }, new int[]{2, 2}));
@@ -44,7 +44,7 @@ class MatrixMultiplicationNodeTest {
                             25, 26, 27, 28,
                             29, 30, 31, 32
                     }, new int[]{4, 4}));
-            assertEquals(out.eval(e), new Tensor(new float[]{
+			assertEquals(out.apply(e), new Tensor(new float[]{
                 250, 260, 270, 280,
                 618, 644, 670, 696,
                 986, 1028, 1070, 1112,
@@ -57,7 +57,7 @@ class MatrixMultiplicationNodeTest {
     void evaluateYN() {
         InputNode a = new InputNode(-1, -1);
         InputNode b = new InputNode(-1, -1);
-        Node out = new MatrixMultiplicationNode(a, b, true, false);
+        TensorNode out = new MatrixMultiplicationNode(a, b, true, false);
         {
             Eval e = new Eval()
                     .set(a, new Tensor(new float[]{
@@ -70,7 +70,7 @@ class MatrixMultiplicationNodeTest {
                             9, 10,
                             11, 12
                     }, new int[]{3, 2}));
-            assertEquals(out.eval(e), new Tensor(new float[]{
+			assertEquals(out.apply(e), new Tensor(new float[]{
                 58, 64,
                 139, 154
             }, new int[]{2, 2}));
@@ -89,7 +89,7 @@ class MatrixMultiplicationNodeTest {
                             25, 26, 27, 28,
                             29, 30, 31, 32
                     }, new int[]{4, 4}));
-            assertEquals(out.eval(e), new Tensor(new float[]{
+			assertEquals(out.apply(e), new Tensor(new float[]{
                 724, 752, 780, 808,
                 816, 848, 880, 912,
                 908, 944, 980, 1016,
@@ -102,7 +102,7 @@ class MatrixMultiplicationNodeTest {
     void evaluateNY() {
         InputNode a = new InputNode(-1, -1);
         InputNode b = new InputNode(-1, -1);
-        Node out = new MatrixMultiplicationNode(a, b, false, true);
+        TensorNode out = new MatrixMultiplicationNode(a, b, false, true);
         {
             Eval e = new Eval()
                     .set(a, new Tensor(new float[]{
@@ -113,7 +113,7 @@ class MatrixMultiplicationNodeTest {
                             7, 9, 11,
                             8, 10, 12
                     }, new int[]{2, 3}));
-            assertEquals(out.eval(e), new Tensor(new float[]{
+			assertEquals(out.apply(e), new Tensor(new float[]{
                 58, 64,
                 139, 154
             }, new int[]{2, 2}));
@@ -132,7 +132,7 @@ class MatrixMultiplicationNodeTest {
                             25, 26, 27, 28,
                             29, 30, 31, 32
                     }, new int[]{4, 4}));
-            assertEquals(out.eval(e), new Tensor(new float[]{
+			assertEquals(out.apply(e), new Tensor(new float[]{
                 190, 230, 270, 310,
                 486, 590, 694, 798,
                 782, 950, 1118, 1286,
@@ -145,7 +145,7 @@ class MatrixMultiplicationNodeTest {
     void evaluateYY() {
         InputNode a = new InputNode(-1, -1);
         InputNode b = new InputNode(-1, -1);
-        Node out = new MatrixMultiplicationNode(a, b, true, true);
+        TensorNode out = new MatrixMultiplicationNode(a, b, true, true);
         {
             Eval e = new Eval()
                     .set(a, new Tensor(new float[]{
@@ -157,7 +157,7 @@ class MatrixMultiplicationNodeTest {
                             7, 9, 11,
                             8, 10, 12
                     }, new int[]{2, 3}));
-            assertEquals(out.eval(e), new Tensor(new float[]{
+			assertEquals(out.apply(e), new Tensor(new float[]{
                 58, 64,
                 139, 154
             }, new int[]{2, 2}));
@@ -176,7 +176,7 @@ class MatrixMultiplicationNodeTest {
                             25, 26, 27, 28,
                             29, 30, 31, 32
                     }, new int[]{4, 4}));
-            assertEquals(out.eval(e), new Tensor(new float[]{
+			assertEquals(out.apply(e), new Tensor(new float[]{
                 538, 650, 762, 874,
                 612, 740, 868, 996,
                 686, 830, 974, 1118,

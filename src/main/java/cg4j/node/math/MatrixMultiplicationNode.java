@@ -3,36 +3,36 @@ package cg4j.node.math;
 import cg4j.Eval;
 import cg4j.Tensor;
 import cg4j.exception.IllegalShapeException;
-import cg4j.node.Node;
+import cg4j.node.TensorNode;
 import cg4j.node.io.VariableNode;
 
 import java.util.Arrays;
 import java.util.Map;
 
-public class MatrixMultiplicationNode extends Node {
+public class MatrixMultiplicationNode extends TensorNode {
 	private final boolean aTransposed;
 	private final boolean bTransposed;
 
-	public MatrixMultiplicationNode(String name, Node childA, Node childB) {
+	public MatrixMultiplicationNode(String name, TensorNode childA, TensorNode childB) {
 		super(FormatShape(childA.shape, childB.shape), name, childA, childB);
 		this.aTransposed = false;
 		this.bTransposed = false;
 	}
 
-	public MatrixMultiplicationNode(Node childA, Node childB) {
+	public MatrixMultiplicationNode(TensorNode childA, TensorNode childB) {
 		super(FormatShape(childA.shape, childB.shape), null, childA, childB);
 		this.aTransposed = false;
 		this.bTransposed = false;
 	}
 
-	public MatrixMultiplicationNode(String name, Node childA, Node childB,
+	public MatrixMultiplicationNode(String name, TensorNode childA, TensorNode childB,
 									boolean aTransposed, boolean bTransposed) {
 		super(FormatShape(childA.shape, childB.shape, aTransposed, bTransposed), name, childA, childB);
 		this.aTransposed = aTransposed;
 		this.bTransposed = bTransposed;
 	}
 
-	public MatrixMultiplicationNode(Node childA, Node childB,
+	public MatrixMultiplicationNode(TensorNode childA, TensorNode childB,
 									boolean aTransposed, boolean bTransposed) {
 		super(FormatShape(childA.shape, childB.shape, aTransposed, bTransposed), null, childA, childB);
 		this.aTransposed = aTransposed;
@@ -61,7 +61,7 @@ public class MatrixMultiplicationNode extends Node {
 					+ ")"
 			);
 		}
-		if (!Node.ShapeEndCompatible(aShape, 2, bShape, 2)) {
+		if (!TensorNode.ShapeEndCompatible(aShape, 2, bShape, 2)) {
 			throw new IllegalShapeException("Cannot matrix multiply shapes (", aShape, bShape);
 		}
 
@@ -109,7 +109,7 @@ public class MatrixMultiplicationNode extends Node {
 						+ ")"
 				);
 			}
-			if (!Node.ShapeEndCompatible(aShape, 2, bShape, 2)) {
+			if (!TensorNode.ShapeEndCompatible(aShape, 2, bShape, 2)) {
 				throw new IllegalShapeException(
 					"Cannot matrix multiply shapes ("
 						+ Arrays.toString(aShape)
@@ -155,7 +155,7 @@ public class MatrixMultiplicationNode extends Node {
 						+ ")"
 				);
 			}
-			if (!Node.ShapeEndCompatible(aShape, 2, bShape, 2)) {
+			if (!TensorNode.ShapeEndCompatible(aShape, 2, bShape, 2)) {
 				throw new IllegalShapeException(
 					"Cannot matrix multiply shapes ("
 						+ Arrays.toString(aShape)
@@ -201,7 +201,7 @@ public class MatrixMultiplicationNode extends Node {
 						+ ")"
 				);
 			}
-			if (!Node.ShapeEndCompatible(aShape, 2, bShape, 2)) {
+			if (!TensorNode.ShapeEndCompatible(aShape, 2, bShape, 2)) {
 				throw new IllegalShapeException(
 					"Cannot matrix multiply shapes ("
 						+ Arrays.toString(aShape)
@@ -231,12 +231,12 @@ public class MatrixMultiplicationNode extends Node {
 	/**
 	 * Use {@code Eval#evaluate(Node)}
 	 *
-	 * @see Eval#evaluate(Node)
+	 * @see Eval#evaluate(TensorNode)
 	 */
 	@Override
-	public Tensor evaluate(Eval e) {
-		Tensor a = children[0].eval(e);
-		Tensor b = children[1].eval(e);
+	public Tensor apply(Eval e) {
+		Tensor a = children[0].apply(e);
+		Tensor b = children[1].apply(e);
 
 		Tensor out;
 		int[] aa = a.shape;
@@ -363,7 +363,7 @@ public class MatrixMultiplicationNode extends Node {
 	}
 
 	@Override
-	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
+	public void createGradients(Map<VariableNode, TensorNode> deltas, TensorNode parentDelta) {
 		children[0].createGradients(deltas, new MatrixMultiplicationNode(parentDelta, children[1],
 			false,
 			!bTransposed));

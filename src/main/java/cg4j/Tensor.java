@@ -1,6 +1,7 @@
 package cg4j;
 
 import cg4j.exception.IllegalShapeException;
+import cg4j.node.io.VariableNode;
 
 import java.util.Arrays;
 import java.util.Random;
@@ -75,6 +76,10 @@ public class Tensor implements java.io.Serializable {
 		}
 
 		return new Tensor(vals, shape, length);
+	}
+
+	public static VariableNode variableRandom(Random random, float lb, float ub, int[] shape) {
+		return new VariableNode(fromRandom(random, lb, ub, shape));
 	}
 
 	/**

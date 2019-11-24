@@ -2,17 +2,17 @@ package cg4j.node.math;
 
 import cg4j.Eval;
 import cg4j.Tensor;
-import cg4j.node.Node;
+import cg4j.node.TensorNode;
 import cg4j.node.io.VariableNode;
 
 import java.util.Map;
 
-public class ReciprocalNode extends Node {
-	public ReciprocalNode(String name, Node child) {
+public class ReciprocalNode extends TensorNode {
+	public ReciprocalNode(String name, TensorNode child) {
 		super(child.shape, name, child);
 	}
 
-	public ReciprocalNode(Node child) {
+	public ReciprocalNode(TensorNode child) {
 		super(child.shape, null, child);
 	}
 
@@ -22,8 +22,8 @@ public class ReciprocalNode extends Node {
 	}
 
 	@Override
-	public Tensor evaluate(Eval e) {
-		Tensor in = children[0].eval(e);
+	public Tensor apply(Eval e) {
+		Tensor in = children[0].apply(e);
 		Tensor out = new Tensor(new float[in.length], in.shape);
 		for (int i = 0; i < out.length; i++) {
 			out.set(i, 1 / in.get(i));
@@ -32,8 +32,8 @@ public class ReciprocalNode extends Node {
 	}
 
 	@Override
-	public void createGradients(Map<VariableNode, Node> deltas, Node parentDelta) {
-		Node delta = new NegationNode(new ReciprocalNode(new SquareNode(parentDelta)));
+	public void createGradients(Map<VariableNode, TensorNode> deltas, TensorNode parentDelta) {
+		TensorNode delta = new NegationNode(new ReciprocalNode(new SquareNode(parentDelta)));
 		children[0].createGradients(deltas, delta);
 	}
 }
