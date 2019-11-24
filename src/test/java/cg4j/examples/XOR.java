@@ -13,6 +13,7 @@ import viralgraph.GraphProcess;
 
 import java.util.Arrays;
 import java.util.Random;
+import java.util.function.Function;
 
 import static cg4j.Tensor.variableRandom;
 import static org.junit.Assert.assertTrue;
@@ -107,15 +108,16 @@ public class XOR {
 			Eval xy = new Eval();
 			xy.set(x, xVal);
 			xy.set(yTarget, yTargetVal);
+			g.set((Function)opt, xy);
 
-			g.set(x, xy);
-			g.set(yTarget, xy);
+//			g.set(x, xy);
+//			g.set(yTarget, xy);
 
 			//Eval xy = new Eval().set(x, xVal).set(yTarget, yTargetVal);
 
 //			opt.accept(xy);
 //
-			if (i % 10 == 0)
+			//if (i % 10 == 0)
 				System.out.printf("Error: %f\n", opt.cost(xy));
 		}
 		System.out.println(g.flow);
