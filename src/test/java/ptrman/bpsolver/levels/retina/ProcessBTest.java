@@ -5,12 +5,12 @@ import org.junit.Test;
 import ptrman.Datastructures.*;
 import ptrman.levels.retina.ProcessA;
 import ptrman.levels.visual.ColorRgb;
+import ptrman.levels.visual.Map2dImageConverter;
 import ptrman.levels.visual.VisualProcessor;
 import ptrman.math.ArrayRealVectorHelper;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBuffer;
 import java.util.List;
 
 import static ptrman.levels.retina.LineDetectorWithMultiplePoints.real;
@@ -21,7 +21,7 @@ public class ProcessBTest {
     @Test
     public void test() {
         final BufferedImage testImage = drawTestImage();
-        final IMap2d<ColorRgb> colorMap = translateFromImageToMap(testImage);
+        final IMap2d<ColorRgb> colorMap = Map2dImageConverter.convertImageToMap(testImage);
 
         // setup the processing chain
 
@@ -181,32 +181,6 @@ public class ProcessBTest {
             return null;
         }
     }
-
-
-
-    // TODO< move this into the functionality of the visual processor >
-    private static IMap2d<ColorRgb> translateFromImageToMap(BufferedImage javaImage) {
-        DataBuffer imageBuffer = javaImage.getData().getDataBuffer();
-
-        int bufferI;
-
-        IMap2d<ColorRgb> convertedToMap = new Map2d<>(javaImage.getWidth(), javaImage.getHeight());
-
-        for( bufferI = 0; bufferI < imageBuffer.getSize(); bufferI++ )
-        {
-
-            int pixelValue = javaImage.getRGB(bufferI % convertedToMap.getWidth(), bufferI / convertedToMap.getWidth());
-
-
-            convertedToMap.setAt(bufferI%convertedToMap.getWidth(), bufferI/convertedToMap.getWidth(),
-                //new ColorRgb((float)r / 255.0f, (float)g / 255.0f, (float)b / 255.0f)
-                new ColorRgb(pixelValue)
-            );
-        }
-
-        return convertedToMap;
-    }
-
 
     private static BufferedImage drawTestImage() {
         final int RETINA_WIDTH = 256;

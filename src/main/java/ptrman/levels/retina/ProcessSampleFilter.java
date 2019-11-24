@@ -40,7 +40,7 @@ public class ProcessSampleFilter implements IProcess {
 
     @Override
     public void processData() {
-        while( inputSampleConnector.getSize() > 0 ) {
+        while( inputSampleConnector.inSize() > 0 ) {
             final ProcessA.Sample currentSample = inputSampleConnector.poll();
 
             if( currentSample.type == filterType ) {

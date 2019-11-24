@@ -71,13 +71,10 @@ public class Solver2 {
     public void preFrame() {
         annealingStep = 0;
 
-        BufferedImage image = imageDrawer.apply(null);
 
-        imageSize = new Vector2d<>(image.getWidth(), image.getHeight());
+        IMap2d<ColorRgb> mapColor = Map2dImageConverter.convertImageToMap(imageDrawer.apply(null));
 
-
-        IMap2d<ColorRgb> mapColor = Map2dImageConverter.convertImageToMap(image);
-
+        imageSize = new Vector2d<>(mapColor.getWidth(), mapColor.getLength());
 
 
 
@@ -179,7 +176,7 @@ public class Solver2 {
 
         final int processZGridsize = 8;
 
-        connectorSamplesForEndosceleton.workspace.clear();
+        connectorSamplesForEndosceleton.out.clear();
         processD.annealedCandidates.clear(); // TODO< cleanup in process with method >
 
         processZFacade.setImageSize(imageSize);
@@ -293,8 +290,8 @@ public class Solver2 {
         cntrFinalProcessing = connectorDetectorsEndosceletonFromProcessH; // connect the connector for final processing to output from process-H
 
         // intersect line primitives
-        ProcessE.process(cntrFinalProcessing.workspace, mapBoolean);
+        ProcessE.process(cntrFinalProcessing.out, mapBoolean);
 
-        narsBinding.emitRetinaPrimitives(cntrFinalProcessing.workspace); // emit all collected primitives from process D
+        narsBinding.emitRetinaPrimitives(cntrFinalProcessing.out); // emit all collected primitives from process D
     }
 }

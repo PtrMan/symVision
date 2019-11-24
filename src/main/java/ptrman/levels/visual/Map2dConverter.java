@@ -14,20 +14,22 @@ import ptrman.Datastructures.IMap2d;
 public enum Map2dConverter {
 	;
 
-	public static void booleanToFloat(final IMap2d<Boolean> input, IMap2d<Float> output) {
-        for( int iy = 0; iy < input.getLength(); iy++ ) {
-            for( int ix = 0; ix < input.getWidth(); ix++ ) {
-                boolean valueAtPosition = input.readAt(ix, iy);
-                output.setAt(ix, iy, convertBooleanToFloat(valueAtPosition));
+	public static void booleanToFloat(final IMap2d<Boolean> i, IMap2d<Float> o) {
+        int H = i.getLength();
+        int W = i.getWidth();
+        for(int iy = 0; iy < H; iy++ ) {
+            for(int ix = 0; ix < W; ix++ ) {
+                o.setAt(ix, iy, convertBooleanToFloat(i.readAt(ix, iy)));
             }
         }
     }
 
-    public static void floatToBoolean(final IMap2d<Float> input, IMap2d<Boolean> output, final float threshold) {
-        for( int iy = 0; iy < input.getLength(); iy++ ) {
-            for( int ix = 0; ix < input.getWidth(); ix++ ) {
-                float valueAtPosition = input.readAt(ix, iy);
-                output.setAt(ix, iy, floatAboveThreshold(valueAtPosition, threshold));
+    public static void floatToBoolean(final IMap2d<Float> i, IMap2d<Boolean> o, final float threshold) {
+        int H = i.getLength();
+        int W = i.getWidth();
+        for(int iy = 0; iy < H; iy++ ) {
+            for(int ix = 0; ix < W; ix++ ) {
+                o.setAt(ix, iy, floatAboveThreshold(i.readAt(ix, iy), threshold));
             }
         }
     }

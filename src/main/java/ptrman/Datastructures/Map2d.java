@@ -19,6 +19,10 @@ import static java.lang.System.arraycopy;
  */
 public class Map2d<Type> implements IMap2d<Type>
 {
+    private final int width;
+    private final int length;
+    private final Type[] array;
+
     public Map2d(int width, int length)
     {
         this.width = width;
@@ -79,7 +83,5 @@ public class Map2d<Type> implements IMap2d<Type>
         return cloned;
     }
     
-    private final int width;
-    private final int length;
-    private final Type[] array;
+
 }

@@ -61,7 +61,7 @@ public class ProcessB extends AbstractProcessB {
      */
     @Override
     public void processData() {
-        List<ProcessA.Sample> samples = inputSampleConnector.getWorkspace();
+        List<ProcessA.Sample> samples = inputSampleConnector.getOut();
 
         final int MAXRADIUS = (int)Math.ceil( Math.sqrt( imageSize.x*imageSize.x + imageSize.y*imageSize.y) ); // (int)Math.sqrt(squaredDistance(new double[]{(double)imageSize.x, (double)imageSize.y}));
 

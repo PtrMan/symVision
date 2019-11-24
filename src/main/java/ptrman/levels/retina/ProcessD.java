@@ -140,7 +140,7 @@ public class ProcessD implements IProcess {
     public void sampleNewByRandom() {
         final double maxLength = Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y})); // max length of line
 
-        final List<ProcessA.Sample> workingSamples = inputSampleConnector.getWorkspace();
+        final List<ProcessA.Sample> workingSamples = inputSampleConnector.getOut();
 
         // filter valid points
         List<ProcessA.Sample> filteredSamples = new ArrayList<>();
@@ -164,7 +164,7 @@ public class ProcessD implements IProcess {
     public void sampleNewByProximity() {
         final double maxLength = Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y})); // max length of line
 
-        final List<ProcessA.Sample> workingSamples = inputSampleConnector.getWorkspace();
+        final List<ProcessA.Sample> workingSamples = inputSampleConnector.getOut();
 
         if (workingSamples.size() < 2) {
             return;
@@ -383,9 +383,9 @@ public class ProcessD implements IProcess {
 
             // sample samples and project to line, check distance if it is below threshold
             for (int iSamplingAttempt=0;iSamplingAttempt<widenSamplesPerTrial;iSamplingAttempt++) {
-                int sampleIdx = rng.nextInt(inputSampleConnector.workspace.size());
+                int sampleIdx = rng.nextInt(inputSampleConnector.out.size());
 
-                ProcessA.Sample sample = inputSampleConnector.workspace.get(sampleIdx);
+                ProcessA.Sample sample = inputSampleConnector.out.get(sampleIdx);
                 if(onlyEndoskeleton && sample.type != ProcessA.Sample.EnumType.ENDOSCELETON) {
                     continue;
                 }

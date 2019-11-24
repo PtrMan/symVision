@@ -28,7 +28,7 @@ public class VisualizationDrawer {
 
     public void drawDetectors(Solver2 solver, PApplet applet) {
         if(drawVisualizationOfAltitude) {
-            for (ProcessA.Sample iSample : solver.connectorSamplesForEndosceleton.workspace) {
+            for (ProcessA.Sample iSample : solver.connectorSamplesForEndosceleton.out) {
                 float color = Math.min((float)iSample.altitude / 20.0f, 1.0f);
 
                 applet.stroke(color*255.0f);
@@ -40,7 +40,7 @@ public class VisualizationDrawer {
 
             applet.stroke(200.0f, 255.0f, 200.0f);
 
-            for (ProcessA.Sample s : solver.connectorSamplesForEndosceleton.workspace) {
+            for (ProcessA.Sample s : solver.connectorSamplesForEndosceleton.out) {
                 if (s.type == ProcessA.Sample.EnumType.ENDOSCELETON) {
                     IntIntPair p = s.position;
                     applet.rect(p.getOne(), p.getTwo(), 1, 1);
@@ -106,9 +106,9 @@ public class VisualizationDrawer {
         }
 
         if (drawVisualizationOfTex) { // visualize texture points
-            for(TexPoint iTex : solver.processFi.outputSampleConnector.workspace) {
+            for(TexPoint iTex : solver.processFi.outputSampleConnector.out) {
                 applet.stroke(255.0f, 0.0f, 255.0f);
-                applet.rect(iTex.pos.getOne(), iTex.pos.getTwo(), 1, 1);
+                applet.rect(iTex.x, iTex.y, 1, 1);
             }
         }
     }
@@ -116,19 +116,21 @@ public class VisualizationDrawer {
     public void drawPrimitives(Solver2 solver, PApplet applet) {
         // * draw primitives for edges
         for (ProcessConnector<RetinaPrimitive> iCntr : solver.connectorDetectorsFromProcessHForEdge) {
-            for(RetinaPrimitive iLinePrimitive : iCntr.workspace) {
+            for(RetinaPrimitive iLinePrimitive : iCntr.out) {
                 applet.stroke(0.0f, 255.0f, 0.0f);
 
-                double x0 = iLinePrimitive.line.a.getDataRef()[0];
-                double y0 = iLinePrimitive.line.a.getDataRef()[1];
-                double x1 = iLinePrimitive.line.b.getDataRef()[0];
-                double y1 = iLinePrimitive.line.b.getDataRef()[1];
+                double[] aa = iLinePrimitive.line.a.getDataRef();
+                double x0 = aa[0];
+                double y0 = aa[1];
+                double[] bb = iLinePrimitive.line.b.getDataRef();
+                double x1 = bb[0];
+                double y1 = bb[1];
                 applet.line((float)x0, (float)y0, (float)x1, (float)y1);
             }
         }
 
         // * draw primitives for endoskeleton
-        for(RetinaPrimitive iLinePrimitive : solver.cntrFinalProcessing.workspace) {
+        for(RetinaPrimitive iLinePrimitive : solver.cntrFinalProcessing.out) {
             applet.stroke(255.0f, 255.0f, 255.0f);
 
             double x0 = iLinePrimitive.line.a.getDataRef()[0];

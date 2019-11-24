@@ -58,7 +58,7 @@ public class ProcessF implements IProcess {
         ArrayRealVector[] borderPositions = new ArrayRealVector[COUNTOFRAYDIRECTIONS];
         List<Ray> activeRays = new FastList<>(RAYDIRECTIONS.length);
 
-        while (inputSampleConnector.getSize() > 0) {
+        while (inputSampleConnector.inSize() > 0) {
             for( ArrayRealVector borderPos : (borderPositions = processSample(inputSampleConnector.poll(), borderPositions, activeRays)))
                 outputSampleConnector.add(new ProcessA.Sample(borderPos));
         }
