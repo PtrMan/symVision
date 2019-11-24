@@ -26,7 +26,7 @@ Foundalis decided to not release his implementation due to ethical concerns. The
 
 # Implementation
 
-## Implemented features based on Phaeaco
+## Implemented features (mostly based on Phaeaco)
 
 ### Vision processes
 | Process        | Purpose           | Implementationstate  | current issues | tested? |
@@ -43,6 +43,8 @@ Foundalis decided to not release his implementation due to ethical concerns. The
 | M      | identify M features                                          | partial, ~10%? | ? | no |
 | Z      | zooms in to resolve small features                           | partial | ? | no |
 | K      | detects "K" points, points where the K intersects            | NOT IMPLEMENTED - TODO | - | - |
+| | | | | |
+| (Fi)   | detects filling and texture | sufficient? | none | visual test (partial) |
 
 Not implemented and not planned to be implemented soon, in order of importance
 

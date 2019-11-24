@@ -10,9 +10,11 @@
 package ptrman.bindingNars;
 
 public class OpenNarsNarseseConsumer implements FormatedNarseseConsumer {
+    public int quantization = 15;
+
     @Override
     public void emitLineSegment(String name, int posAX, int posAY, int posBX, int posBY, double conf) {
-        System.out.println("<(*,"+name+","+posAX+"_"+posAY+"," +posBX+"_" +posBY+") --> line>. %1.0;"+conf+"%");
+        System.out.println("<(*,"+name+","+(posAX/quantization)+"_"+(posAY/quantization)+"," +(posBX/quantization)+"_" +(posBY/quantization)+") --> line>. %1.0;"+conf+"%");
     }
 
     @Override
