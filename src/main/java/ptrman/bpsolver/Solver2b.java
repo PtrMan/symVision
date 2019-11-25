@@ -27,6 +27,7 @@ import java.util.function.Function;
  */
 public class Solver2b extends GraphProcess {
 
+    public final GraphNode output;
     public GraphNode input;
 
     public static Solver2b graph() {
@@ -57,10 +58,10 @@ public class Solver2b extends GraphProcess {
 
     private Solver2b() {
         input = the();
-        GraphNode finish = theAtomic((BufferedImage x) -> {
+        output = theAtomic((BufferedImage x) -> {
             finish(x);
         });
-        edge(input, finish);
+        edge(input, output);
 
 
         processD = new ProcessD();

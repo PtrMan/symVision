@@ -45,11 +45,31 @@ public class VisualizeLinesegmentsAnnealing {
 		w.setSize(600, 600);
 		w.doLayout();
 		w.setVisible(true);
+
+
+		solution.edge(solution.output, solution.theAtomic((x)->{
+			if (!repainting) {
+				repainting = true;
+
+				outputRender();
+
+				SwingUtilities.invokeLater(() -> {
+					repainting = false;
+					inView.setImageRepaint(input);
+					outView.setImageRepaint(output);
+				});
+			}
+		}));
+
 		javax.swing.Timer t = new Timer(1000 / 30, (a) -> {
 			input();
-			update();
+
+			solution.set(solution.input, this.input);
+
 			time++;
 		});
+
+
 		t.start();
 	}
 
@@ -117,25 +137,14 @@ public class VisualizeLinesegmentsAnnealing {
 
 	}
 
-	void update() {
-
-		solution.set(solution.input, this.input);
-
-		outputRender();
-
-		SwingUtilities.invokeLater(()->{
-			inView.setImageRepaint(input);
-			outView.setImageRepaint(output);
-		});
-
-	}
+	volatile boolean repainting = false;
 
 	private void outputRender() {
 		if (output == null)
 			output = new BufferedImage(input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_RGB);
 
 		Graphics2D g = (Graphics2D) output.getGraphics();
-		g.clearRect(0,0,output.getWidth(), output.getHeight());
+		//g.clearRect(0,0,output.getWidth(), output.getHeight());
 		g.setColor(new Color(1f, 1f, 1f)); //transparent
 		g.fillRect(0, 0, output.getWidth(), output.getHeight());
 
