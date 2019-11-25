@@ -76,9 +76,6 @@ public class NearIntersectionStrategy extends AbstractTranslatorStrategy {
             RetinaObjectWithAssociatedPointsAndWorkspaceNode retinaObjectWithAssocPointsAndWorkspace = new RetinaObjectWithAssociatedPointsAndWorkspaceNode(iterationRetinaPrimitive);
             retinaObjectWithAssocPointsAndWorkspace.workspaceNode = createdPlatonicInstanceNodeForRetinaObject;
 
-            // add all codelet's of it
-            bpSolver.codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdPlatonicInstanceNodeForRetinaObject, bpSolver.coderack, bpSolver.network, bpSolver.networkHandles);
-            
             resultMap.put(iterationRetinaPrimitive, retinaObjectWithAssocPointsAndWorkspace);
         }
 

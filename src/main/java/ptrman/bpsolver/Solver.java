@@ -11,12 +11,8 @@ package ptrman.bpsolver;
 
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
-import ptrman.FargGeneral.Coderack;
 import ptrman.FargGeneral.network.Network;
 import ptrman.FargGeneral.network.Node;
-import ptrman.bpsolver.codelets.BaryCenter;
-import ptrman.bpsolver.codelets.LineSegmentLength;
-import ptrman.bpsolver.codelets.LineSegmentSlope;
 import ptrman.bpsolver.ltm.LinkCreator;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveNode;
 import ptrman.levels.retina.*;
@@ -37,7 +33,6 @@ public class Solver {
         initializeNetwork();
         setupLtmFactoryDefault();
         initializePlatonicPrimitiveDatabase();
-        initializeCodeletLtmLookup();
 
         createConnectors();
         setupProcesses();
@@ -119,7 +114,7 @@ public class Solver {
     }
 
     public void cycle(int cycleCount) {
-        coderack.cycle(cycleCount);
+
     }
 
     public void recalculate(IMap2d<Boolean> image) {
@@ -136,8 +131,6 @@ public class Solver {
 
         final int NUMBEROFCYCLES = 500;
 
-        // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
-        coderack.flush();
 
 //        Queue<ProcessA.Sample> queueToProcessF = new ArrayDeque<>();
 
@@ -543,45 +536,6 @@ public class Solver {
     private void initializeNetwork() {
         network.linkCreator = new LinkCreator();
     }
-    
-    private void initializeCodeletLtmLookup() {
-
-        codeletLtmLookup = new CodeletLtmLookup();
-
-        CodeletLtmLookup.RegisterEntry createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
-        SolverCodelet createdCodelet = new LineSegmentLength(this);
-        createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.5f));
-        
-        codeletLtmLookup.registry.put("LineSegmentLength", createdRegistryEntry);
-        
-        createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
-        createdCodelet = new LineSegmentSlope(this);
-        createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.5f));
-        
-        codeletLtmLookup.registry.put("LineSegmentSlope", createdRegistryEntry);
-        
-        
-        createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
-        createdCodelet = new BaryCenter(this, BaryCenter.EnumRecalculate.NO);
-        createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.1f));
-        
-        codeletLtmLookup.registry.put("BaryCenter", createdRegistryEntry);
-        
-        
-        createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
-        createdCodelet = new ptrman.bpsolver.codelets.EndPoint(this);
-        createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.2f));
-        
-        codeletLtmLookup.registry.put("EndPoint", createdRegistryEntry);
-        
-        
-        createdRegistryEntry = new CodeletLtmLookup.RegisterEntry();
-        createdCodelet = new ptrman.bpsolver.codelets.Angle(this);
-        createdRegistryEntry.codeletInformations.add(new CodeletLtmLookup.RegisterEntry.CodeletInformation(createdCodelet, 0.2f));
-        
-        codeletLtmLookup.registry.put("Angle", createdRegistryEntry);
-        
-    }
 
     private void initializePlatonicPrimitiveDatabase() {
         platonicPrimitiveDatabase.calculatorsForMaxValueOfPlatonicPrimitiveNode.put(networkHandles.xCoordinatePlatonicPrimitiveNode, new PlatonicPrimitiveDatabase.ConstantValueMaxValueCalculator(getImageSizeAsFloat().x));
@@ -640,8 +594,6 @@ public class Solver {
     // the difference is that the nodes of the workspace may all be deleted
     public final Network network = new Network();
     public final NetworkHandles networkHandles = new NetworkHandles();
-    public final Coderack coderack = new Coderack();
-    public CodeletLtmLookup codeletLtmLookup;
     public final PlatonicPrimitiveDatabase platonicPrimitiveDatabase = new PlatonicPrimitiveDatabase();
 
     // all stored patterns

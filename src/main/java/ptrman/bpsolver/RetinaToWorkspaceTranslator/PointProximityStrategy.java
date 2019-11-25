@@ -12,11 +12,9 @@ package ptrman.bpsolver.RetinaToWorkspaceTranslator;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import ptrman.Datastructures.SpatialAcceleration;
 import ptrman.Datastructures.Vector2d;
-import ptrman.FargGeneral.Coderack;
 import ptrman.FargGeneral.network.Link;
 import ptrman.FargGeneral.network.Network;
 import ptrman.FargGeneral.network.Node;
-import ptrman.bpsolver.CodeletLtmLookup;
 import ptrman.bpsolver.NetworkHandles;
 import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveInstanceNode;
@@ -53,7 +51,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         }
         
         ArrayList<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints = createAndPropagateRetinaLevelObjects(retinaObjectsWithAssociatedPoints);
-        ArrayList<ObjectNodeWithGroup> objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints = createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(groupsOfRetinaObjectsWithAssociatedPoints, bpSolver.coderack, bpSolver.network, bpSolver.networkHandles, bpSolver.codeletLtmLookup, bpSolver, bpSolver.getImageSizeAsFloat());
+        ArrayList<ObjectNodeWithGroup> objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints = createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(groupsOfRetinaObjectsWithAssociatedPoints, bpSolver.network, bpSolver.networkHandles, bpSolver, bpSolver.getImageSizeAsFloat());
         ArrayList<Node> resultNodes = getNodesOfNodeAndGroupOfRetinaObject(objectNodesWithGroupsOfRetinaObjectsWithAssociatedPoints);
         return resultNodes;
     }
@@ -71,15 +69,15 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         return resultArray;
     }
     
-    private ArrayList<ObjectNodeWithGroup> createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(Iterable<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Solver bpSolver, Vector2d<Float> imageSize) {
+    private ArrayList<ObjectNodeWithGroup> createObjectNodesForGroupsOfRetinaObjectsWithAssociatedPoints(Iterable<GroupOfRetinaObjectWithAssociatedPoints> groupsOfRetinaObjectsWithAssociatedPoints, Network network, NetworkHandles networkHandles, Solver bpSolver, Vector2d<Float> imageSize) {
 
         ArrayList<ObjectNodeWithGroup> resultObjectNodesWithGroup = new ArrayList<>();
         
         for( GroupOfRetinaObjectWithAssociatedPoints iterationGroupOfRetinaObjectWithAssociatedPoints : groupsOfRetinaObjectsWithAssociatedPoints ) {
 
             PlatonicPrimitiveInstanceNode objectNode = new PlatonicPrimitiveInstanceNode(networkHandles.objectPlatonicPrimitiveNode);
-            createPlatonicInstanceNodeForRetinaObjectsAndLinkToParent(iterationGroupOfRetinaObjectWithAssociatedPoints.arrayOfRetinaObjectWithAssociatedPoints, objectNode, coderack, network, networkHandles, codeletLtmLookup);
-            createAndLinkAnglePointsAndLink(iterationGroupOfRetinaObjectWithAssociatedPoints.arrayOfRetinaObjectWithAssociatedPoints, coderack, network, networkHandles, codeletLtmLookup, bpSolver, imageSize);
+            createPlatonicInstanceNodeForRetinaObjectsAndLinkToParent(iterationGroupOfRetinaObjectWithAssociatedPoints.arrayOfRetinaObjectWithAssociatedPoints, objectNode, network, networkHandles);
+            createAndLinkAnglePointsAndLink(iterationGroupOfRetinaObjectWithAssociatedPoints.arrayOfRetinaObjectWithAssociatedPoints, network, networkHandles, bpSolver, imageSize);
 
             ObjectNodeWithGroup objectNodeWithGroup = new ObjectNodeWithGroup();
             objectNodeWithGroup.groupOfRetinaObjects = iterationGroupOfRetinaObjectWithAssociatedPoints;
@@ -92,7 +90,7 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
     }
     
     
-    private void createAndLinkAnglePointsAndLink(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup, Solver bpSolver, Vector2d<Float> imageSize) {
+    private void createAndLinkAnglePointsAndLink(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, Network network, NetworkHandles networkHandles, Solver bpSolver, Vector2d<Float> imageSize) {
 
         // TODO< hard parameters >
         final int GRIDCOUNTX = 10;
@@ -219,13 +217,13 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
         return nearestElement;
     }
     
-    private static void createPlatonicInstanceNodeForRetinaObjectsAndLinkToParent(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, PlatonicPrimitiveInstanceNode objectNode, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup) {
+    private static void createPlatonicInstanceNodeForRetinaObjectsAndLinkToParent(Iterable<RetinaObjectWithAssociatedPointsAndWorkspaceNode> arrayOfRetinaObjectWithAssociatedPoints, PlatonicPrimitiveInstanceNode objectNode, Network network, NetworkHandles networkHandles) {
         for( RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject : arrayOfRetinaObjectWithAssociatedPoints ) {
-            createPlatonicInstanceNodeForRetinaObjectAndLinkToParent(iterationRetinaObject, objectNode, coderack, network, networkHandles, codeletLtmLookup);
+            createPlatonicInstanceNodeForRetinaObjectAndLinkToParent(iterationRetinaObject, objectNode, network, networkHandles);
         }
     }
     
-    private static void createPlatonicInstanceNodeForRetinaObjectAndLinkToParent(RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject, PlatonicPrimitiveInstanceNode objectNode, Coderack coderack, Network network, NetworkHandles networkHandles, CodeletLtmLookup codeletLtmLookup) {
+    private static void createPlatonicInstanceNodeForRetinaObjectAndLinkToParent(RetinaObjectWithAssociatedPointsAndWorkspaceNode iterationRetinaObject, PlatonicPrimitiveInstanceNode objectNode, Network network, NetworkHandles networkHandles) {
 
         PlatonicPrimitiveInstanceNode createdPlatonicInstanceNodeForRetinaObject = createPlatonicInstanceNodeForRetinaObject(iterationRetinaObject.primitive, networkHandles);
         iterationRetinaObject.workspaceNode = createdPlatonicInstanceNodeForRetinaObject;
@@ -236,10 +234,6 @@ public class PointProximityStrategy extends AbstractTranslatorStrategy {
 
         Link createdBackwardLink = network.linkCreator.createLink(Link.EnumType.ISPARTOF, objectNode);
         createdPlatonicInstanceNodeForRetinaObject.out(createdBackwardLink);
-
-        // add all codelet's of it
-        codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdPlatonicInstanceNodeForRetinaObject, coderack, network, networkHandles);
-
     }
     
     private static ArrayList<GroupOfRetinaObjectWithAssociatedPoints> createAndPropagateRetinaLevelObjects(ArrayList<RetinaObjectWithAssociatedPointsAndWorkspaceNode> retinaObjectsWithAssociatedPoints) {

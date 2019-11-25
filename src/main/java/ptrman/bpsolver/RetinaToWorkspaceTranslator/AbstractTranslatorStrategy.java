@@ -203,9 +203,7 @@ public abstract class AbstractTranslatorStrategy implements ITranslatorStrategy 
             Crosspoint crosspoint = currentElement.data;
 
             PlatonicPrimitiveInstanceNode createdAnglePointNode = new PlatonicPrimitiveInstanceNode(bpSolver.networkHandles.anglePointNodePlatonicPrimitiveNode);
-            // add codelets
-            bpSolver.codeletLtmLookup.lookupAndPutCodeletsAtCoderackForPrimitiveNode(createdAnglePointNode, bpSolver.coderack, bpSolver.network, bpSolver.networkHandles);
-            
+
             // linkage
             for(  Crosspoint.RetinaObjectWithAssocWithIntersectionType iterationRetinaObjectWithAssoc : crosspoint.adjacentRetinaObjects ) {
 
