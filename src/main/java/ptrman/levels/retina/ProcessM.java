@@ -32,7 +32,6 @@ public class ProcessM {
 
     public Random rng = new Random();
 
-    public List<LineParsing> lineParsings = new ArrayList<>();
 
     public void process(List<RetinaPrimitive> lineDetectors) {
         if( lineDetectors.isEmpty() ) {
@@ -42,19 +41,15 @@ public class ProcessM {
         tryToFindLines(lineDetectors, 1);
     }
     
-    public List<LineParsing> getLineParsings()
-    {
-        return lineParsings;
-    }
-    
+
     private void tryToFindLines(List<RetinaPrimitive> lineDetectors, int numberOfIterations) {
         int iteration;
-        
-        lineParsings.clear();
-        
+
+        List<LineParsing> pp = new ArrayList<>();
+
         for( iteration = 0; iteration < numberOfIterations; iteration++ ) {
             resetMarkingsWithLocking(lineDetectors);
-            selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(lineDetectors);
+            pp.add(selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(lineDetectors));
         }
     }
     
@@ -70,7 +65,7 @@ public class ProcessM {
         }
     }
 
-    private void selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(List<RetinaPrimitive> lineDetectors) {
+    private LineParsing selectRandomLineAndTryToTraceAndStoreItAwayWithLocking(List<RetinaPrimitive> lineDetectors) {
 
         // TODO< lock >
         
@@ -80,7 +75,7 @@ public class ProcessM {
         SingleLineDetector startLineDetector = lineDetectors.get(startLineIndex).line;
 
         ArrayList<SingleLineDetector> lineParsing = findLineParsingForStartLine(startLineDetector);
-        lineParsings.add(new LineParsing(lineParsing));
+        return new LineParsing(lineParsing);
         
         // TODO< unlock >
     }

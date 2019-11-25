@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
@@ -129,15 +130,32 @@ public class GraphProcess {
 
     /** new anonymous node */
     public GraphNode the() {
-        Function f = new Function() {
-            @Override
-            public Object apply(Object x) {
-                return x;
-            }
-        };
+        Function f = x -> x;
         return the(f);
     }
 
+    public <X> GraphNode theAtomic(Consumer<X> f) {
+        return theAtomic((X x) -> {
+            f.accept(x);
+            return x;
+        });
+    }
+
+    /** wraps function in an atomically guarded section with passive fail */
+    public <X> GraphNode theAtomic(Function<X, ?> f) {
+        AtomicBoolean b = new AtomicBoolean(false);
+
+        return the((X x) -> {
+            if (b.compareAndSet(false, true)) {
+                try {
+                    return f.apply(x);
+                } finally {
+                    b.set(false);
+                }
+            }
+            return null;
+        });
+    }
     protected GraphNode nodeNew(Function f) {
         //TODO abstract into rules
         if (f instanceof InputNode) {

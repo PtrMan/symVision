@@ -148,9 +148,12 @@ public class VisualizeLinesegmentsAnnealing {
 		g.setColor(new Color(1f, 1f, 1f)); //transparent
 		g.fillRect(0, 0, output.getWidth(), output.getHeight());
 
-		java.util.Queue<RetinaPrimitive>[] hh = solution.connectorDetectorsFromProcessHForEdge;
-		if (hh!=null)
-			Stream.of(hh).flatMap(Collection::stream).forEach(r -> outputRenderer.drawPrimitive(r, g));
+		Stream.of(solution.
+			connectorDetectorsFromProcessHForEdge
+			//connectorDetectorsFromProcessDForEdge
+			//connectorDetectorsEndosceletonFromProcessD
+			//cntrFinalProcessing
+		).flatMap(Collection::stream).forEach(r -> outputRenderer.drawPrimitive(r, g));
 
 		// mouse cursor
 		//ellipse(mouseX, mouseY, 4, 4);
