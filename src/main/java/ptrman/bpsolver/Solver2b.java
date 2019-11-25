@@ -36,9 +36,9 @@ public class Solver2b extends GraphProcess {
 	public ProcessFi processFi = new ProcessFi();
 	public ProcessD processD;
 	public ProcessD[] processDEdge;
-	public Queue<ProcessA.Sample>[] connectorSamplesFromProcessAForEdge;
-	public Queue<RetinaPrimitive>[] connectorDetectorsFromProcessDForEdge;
-	public Queue<RetinaPrimitive>[] connectorDetectorsFromProcessHForEdge;
+	public final Queue<ProcessA.Sample>[] connectorSamplesFromProcessAForEdge;
+	public final Queue<RetinaPrimitive>[] connectorDetectorsFromProcessDForEdge;
+	public final Queue<RetinaPrimitive>[] connectorDetectorsFromProcessHForEdge;
 
 	//public NarsBinding narsBinding;
 	public int annealingStep = 0;
@@ -49,6 +49,15 @@ public class Solver2b extends GraphProcess {
 
 	public Solver2b() {
 		super();
+
+		connectorDetectorsFromProcessDForEdge = new Queue[numberOfEdgeDetectorDirections];
+		connectorSamplesFromProcessAForEdge = new Queue[numberOfEdgeDetectorDirections];
+		connectorDetectorsFromProcessHForEdge = new Queue[numberOfEdgeDetectorDirections];
+		for (int i = 0; i < numberOfEdgeDetectorDirections; i++) { // create connectors for edges
+			connectorDetectorsFromProcessHForEdge[i] = new ArrayDeque();
+			connectorDetectorsFromProcessDForEdge[i] = new ArrayDeque();
+			connectorSamplesFromProcessAForEdge[i] = new ArrayDeque();
+		}
 
 		input = the();
 		output = theAtomic((BufferedImage x) -> {
@@ -123,12 +132,9 @@ public class Solver2b extends GraphProcess {
 		IMap2d<Float> mapGrayscale = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(processingChain.filterChainDag.elements.size() - 1).content).result; // get from last element in the chain
 
 
-
-
 		IMap2d<Float>[] edges = new IMap2d[numberOfEdgeDetectorDirections];
-		for (int i = 0; i < numberOfEdgeDetectorDirections; i++) { // detect edges with filters
+		for (int i = 0; i < numberOfEdgeDetectorDirections; i++) // detect edges with filters
 			edges[i] = edgeDetectors[i].process(mapGrayscale);
-		}
 
 		ProcessA[] processAEdge = new ProcessA[numberOfEdgeDetectorDirections];
 		processDEdge = new ProcessD[numberOfEdgeDetectorDirections];
@@ -139,13 +145,10 @@ public class Solver2b extends GraphProcess {
 			processDEdge[i].overwriteObjectId = 0; // we want to overwrite the id of the detectors, because some parts of the program still assume object id's and we can't provide it in general case
 		}
 
-		connectorDetectorsFromProcessDForEdge = new Queue[numberOfEdgeDetectorDirections];
-		connectorSamplesFromProcessAForEdge = new Queue[numberOfEdgeDetectorDirections];
-		connectorDetectorsFromProcessHForEdge = new Queue[numberOfEdgeDetectorDirections];
 		for (int i = 0; i < numberOfEdgeDetectorDirections; i++) { // create connectors for edges
-			connectorDetectorsFromProcessHForEdge[i] = new ArrayDeque();
-			connectorDetectorsFromProcessDForEdge[i] = new ArrayDeque();
-			connectorSamplesFromProcessAForEdge[i] = new ArrayDeque();
+			connectorDetectorsFromProcessHForEdge[i].clear();
+			connectorDetectorsFromProcessDForEdge[i].clear();
+			connectorSamplesFromProcessAForEdge[i].clear();
 		}
 
 		for (int i = 0; i < numberOfEdgeDetectorDirections; i++) {
