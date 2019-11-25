@@ -35,11 +35,6 @@ public class ProcessFastCalculateEndosceleton implements IProcess {
     }
 
     @Override
-    public void preProcessData() {
-
-    }
-
-    @Override
     public void processData() {
         // corrode in one direction
         List<IMap2d<Boolean>> directonalCorrededInputs = corrodeDirectional(inputs);
@@ -98,13 +93,8 @@ public class ProcessFastCalculateEndosceleton implements IProcess {
         throw new RuntimeException(); // HACK< we need to implement this maybe but throw now exception because we want to compile it >
     }
 
-    @Override
-    public void postProcessData() {
 
-    }
-
-
-    public List<IMap2d<Boolean>> inputs;
+	public List<IMap2d<Boolean>> inputs;
 
     //protected NeuralGasNet gng;
 

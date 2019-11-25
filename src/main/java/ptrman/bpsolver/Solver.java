@@ -166,9 +166,7 @@ public class Solver {
 
         processZFacade.set(image); // image doesn't need to be copied
 
-        processZFacade.preProcessData();
         processZFacade.processData();
-        processZFacade.postProcessData();
 
         notMagnifiedOutputObjectIdsMapDebug = processZFacade.getNotMagnifiedOutputObjectIds();
 
@@ -183,23 +181,13 @@ public class Solver {
 
 
         // preProcessData
-        processA.preProcessData();
-        processB.preProcessData();
-        processC.preProcessData();
-        processF.preProcessData();
-
-        endosceletonSampleFilter.preProcessData();
 
 
-        endosceletonProcessD.preProcessData();
         //exosceletonProcessD.preProcessData();
-
-        processH.preProcessData();
-
 
 
         // processData
-        processA.processData(throttle);
+        processA.processData(new Random(), throttle);
 
 //        debugSamples = connectorSamplesFromProcessA.iterator();
 
@@ -218,17 +206,8 @@ public class Solver {
 
 
         // postProcessData
-        processA.postProcessData();
-        processB.postProcessData();
-        processC.postProcessData();
-        endosceletonSampleFilter.postProcessData();
-        processF.postProcessData();
 
-        endosceletonProcessD.postProcessData();
         //exosceletonProcessD.postProcessData();
-
-        processH.postProcessData();
-
 
 
         System.out.println("connectorDetectorsEndosceletonFromProcessD " + connectorDetectorsEndosceletonFromProcessD.size());

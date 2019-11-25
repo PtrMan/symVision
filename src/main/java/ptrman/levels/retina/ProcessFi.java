@@ -30,11 +30,12 @@ public class ProcessFi {
     public double thresholdFilled = 0.5; // threshold for pixel to register as filled
     public double thresholdGradient = 0.05; // threshold for pixel to register as gradient
 
-    public void preProcess() {
+    private void preProcess() {
         outputSampleConnector.clear();
     }
 
     public void process() {
+        preProcess();
         // TODO< better sampling strategy which is less random, based on grid, etc >
 
         int W = workingImage.getWidth();

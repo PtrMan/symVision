@@ -82,10 +82,6 @@ public class ProcessD implements IProcess {
     }
 
     @Override
-    public void preProcessData() {
-    }
-
-    @Override
     public void processData() {
         processData(1f);
     }
@@ -419,11 +415,6 @@ public class ProcessD implements IProcess {
                 iLinedetector.recalcConf();
             }
         }
-    }
-
-    @Override
-    public void postProcessData() {
-
     }
 
     private static boolean doAllSamplesHaveObjectId(final Iterable<ProcessA.Sample> samples) {

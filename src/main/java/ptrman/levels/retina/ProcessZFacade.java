@@ -88,8 +88,8 @@ public class ProcessZFacade implements IProcess {
 
     }
 
-    @Override
-    public void preProcessData() {
+
+    private void pre() {
         unprocessedPixelsMap = new Map2d<>(imageSize.x, imageSize.y);
         for( int y = 0; y < unprocessedPixelsMap.getLength(); y++ ) {
             for( int x = 0; x < unprocessedPixelsMap.getWidth(); x++ ) {
@@ -118,6 +118,8 @@ public class ProcessZFacade implements IProcess {
 
     @Override
     public void processData() {
+        pre();
+
         storePixelsIntoAccelerationDatastructuresFromMap(alreadyCopiedImage);
 
         notMagnifiedOutput = new Map2d<>(imageSize.x, imageSize.y);
@@ -127,11 +129,6 @@ public class ProcessZFacade implements IProcess {
         takeRandomPixelFromHashmapUntilNoCandidatesAndFillAndDecide(alreadyCopiedImage);
 
         magnify();
-    }
-
-    @Override
-    public void postProcessData() {
-
     }
 
     private void resetIdMaps() {

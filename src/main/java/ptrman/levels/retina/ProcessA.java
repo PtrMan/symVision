@@ -37,11 +37,6 @@ public class ProcessA implements IProcess {
 
     }
 
-    @Override
-    public void preProcessData() {
-
-    }
-
     /**
      *
      * avoids samping the same pixel by setting the sampled positions to false
@@ -51,14 +46,13 @@ public class ProcessA implements IProcess {
      */
     @Override
     public void processData() {
-        processData(1f);
+        //processData(1f);
+        throw new UnsupportedOperationException();
     }
 
-    final Random rng =
-        //new RandomAdaptor( new MersenneTwister() ); //<- expensive
-        new Random();
 
-    public void processData(float throttle) {
+
+    public void processData(Random rng, float throttle) {
         int H = workingImage.getLength() / 4;
         int W = workingImage.getWidth() / 4;
         for(int blockY = 0; blockY < H; blockY++ ) {
@@ -112,11 +106,6 @@ public class ProcessA implements IProcess {
                 }
             }
         }
-    }
-
-    @Override
-    public void postProcessData() {
-
     }
 
     public final double defaultSampleConf = 0.1; // confidence of one sample

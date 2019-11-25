@@ -35,11 +35,6 @@ public class ProcessSampleFilter implements IProcess {
     }
 
     @Override
-    public void preProcessData() {
-
-    }
-
-    @Override
     public void processData() {
         while( inputSampleConnector.size() > 0 ) {
             final ProcessA.Sample currentSample = inputSampleConnector.poll();
@@ -48,11 +43,6 @@ public class ProcessSampleFilter implements IProcess {
                 outputSampleConnector.add(currentSample);
             }
         }
-    }
-
-    @Override
-    public void postProcessData() {
-
     }
 
     private Queue<ProcessA.Sample> outputSampleConnector;

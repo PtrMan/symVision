@@ -44,10 +44,6 @@ public class ProcessZ implements IProcess {
     }
 
     @Override
-    public void preProcessData() {
-    }
-
-    @Override
     public void processData() {
 
         if ((floatNotMagnified == null || floatNotMagnified.getWidth()!=imageSize.x || floatNotMagnified.getLength()!=imageSize.y))
@@ -73,7 +69,4 @@ public class ProcessZ implements IProcess {
         magnifiedOutput = Map2dBinary.corode(tempResult);
     }
 
-    @Override
-    public void postProcessData() {
-    }
 }

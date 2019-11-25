@@ -21,7 +21,5 @@ public interface IProcess {
         setup();
     }
 
-    void preProcessData(); // used for flushing datastructures, etc
     void processData();
-    void postProcessData();
 }

@@ -19,14 +19,14 @@ import viralgraph.GraphProcess;
 import java.awt.image.BufferedImage;
 import java.util.ArrayDeque;
 import java.util.Queue;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.Consumer;
-import java.util.function.Function;
+import java.util.Random;
 
 /**
  * new solver which is incomplete but should be in a working state
  */
 public class Solver2b extends GraphProcess {
+
+	final Random random = new Random();
 
 	public final GraphNode input, output;
 	public final Queue<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD = new ArrayDeque();
@@ -163,19 +163,16 @@ public class Solver2b extends GraphProcess {
 			processDEdge[i].setImageSize(imageSize);
 			processDEdge[i].set(connectorSamplesFromProcessAForEdge[i], connectorDetectorsFromProcessDForEdge[i]);
 
-			processAEdge[i].preProcessData();
-			processAEdge[i].processData(0.12f);
-			processAEdge[i].postProcessData();
+			processAEdge[i].processData(random, 0.12f);
 
-			processDEdge[i].preProcessData();
 			processDEdge[i].processData(1.0f);
-			processDEdge[i].postProcessData();
+
 		}
 
 		mapBoolean = Map2dBinary.threshold(mapGrayscale, 0.1f); // convert from edges[0]
 
 		processFi.workingImage = mapGrayscale;
-		processFi.preProcess();
+
 		processFi.process(); // sample image with process-Fi
 
 		ProcessZFacade processZFacade = new ProcessZFacade();
@@ -192,9 +189,7 @@ public class Solver2b extends GraphProcess {
 
 		processZFacade.set(mapBoolean); // image doesn't need to be copied
 
-		processZFacade.preProcessData();
 		processZFacade.processData();
-		processZFacade.postProcessData();
 
 		IMap2d<Integer> notMagnifiedOutputObjectIdsMapDebug = processZFacade.getNotMagnifiedOutputObjectIds();
 
@@ -223,21 +218,13 @@ public class Solver2b extends GraphProcess {
 		processD.setImageSize(imageSize);
 		processD.set(conntrSamplesFromProcessC0, connectorDetectorsEndosceletonFromProcessD);
 
-		processA.preProcessData();
-		processA.processData(0.03f);
-		processA.postProcessData();
+		processA.processData(random, 0.03f);
 
-		processB.preProcessData();
 		processB.processData();
-		processB.postProcessData();
 
-		processC.preProcessData();
 		processC.processData();
-		processC.postProcessData();
 
-		processD.preProcessData();
 		processD.processData(1.0f);
-		processD.postProcessData();
 
 		frameStep();
 		postFrame();
@@ -251,9 +238,8 @@ public class Solver2b extends GraphProcess {
 
 		processD.step();
 
-		for (ProcessD d : processDEdge) {
+		for (ProcessD d : processDEdge)
 			d.step();
-		}
 
 		annealingStep++;
 	}
@@ -278,9 +264,8 @@ public class Solver2b extends GraphProcess {
 			processH.set(connectorDetectorsFromProcessDForEdge[i], connectorDetectorsFromProcessHForEdge[i]);
 			processH.setup();
 
-			processH.preProcessData();
 			processH.processData();
-			processH.postProcessData();
+
 		}
 
 		// * process-H and process-E
@@ -290,9 +275,7 @@ public class Solver2b extends GraphProcess {
 		processH.set(connectorDetectorsEndosceletonFromProcessD, connectorDetectorsEndosceletonFromProcessH);
 		processH.setup();
 
-		processH.preProcessData();
 		processH.processData();
-		processH.postProcessData();
 
 		// intersect line primitives
 		ProcessE.process(connectorDetectorsEndosceletonFromProcessH, mapBoolean);

@@ -49,11 +49,6 @@ public class ProcessF implements IProcess {
     }
 
     @Override
-    public void preProcessData() {
-
-    }
-
-    @Override
     public void processData() {
         ArrayRealVector[] borderPositions = new ArrayRealVector[COUNTOFRAYDIRECTIONS];
         List<Ray> activeRays = new FastList<>(RAYDIRECTIONS.length);
@@ -62,11 +57,6 @@ public class ProcessF implements IProcess {
             for( ArrayRealVector borderPos : (borderPositions = processSample(inputSampleConnector.poll(), borderPositions, activeRays)))
                 outputSampleConnector.add(new ProcessA.Sample(borderPos));
         }
-    }
-
-    @Override
-    public void postProcessData() {
-
     }
 
     public void set(IMap2d<Boolean> map) {

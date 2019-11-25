@@ -75,21 +75,11 @@ public class ProcessFractalFiller implements IProcess {
     }
 
     @Override
-    public void preProcessData() {
-
-    }
-
-    @Override
     public void processData() {
 
     }
 
-    @Override
-    public void postProcessData() {
-
-    }
-
-    /**
+	/**
      *
      * @param gridCellPosition
      * \param entryDirection values can be -1 or 1, tells from which side the scanning should start (used for inter-Gridcell filling)

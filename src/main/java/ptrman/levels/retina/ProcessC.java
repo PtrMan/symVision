@@ -94,11 +94,6 @@ public class ProcessC implements IProcess {
     }
 
     @Override
-    public void preProcessData() {
-
-    }
-
-    @Override
     public void processData() {
         processData(1f);
     }
@@ -202,12 +197,7 @@ public class ProcessC implements IProcess {
         }
     }
 
-    @Override
-    public void postProcessData() {
-
-    }
-
-//    /**
+    //    /**
 //     *
 //     * \param sortedArray lower values are more left
 //     */

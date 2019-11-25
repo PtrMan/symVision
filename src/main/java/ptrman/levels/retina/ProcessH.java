@@ -64,11 +64,6 @@ public class ProcessH implements IProcess {
     }
 
     @Override
-    public void preProcessData() {
-
-    }
-
-    @Override
     public void processData() {
         Collection<RetinaPrimitive> allInputDetectors = inputPrimitiveConnection;
 
@@ -80,11 +75,6 @@ public class ProcessH implements IProcess {
             // transfer the detectors into the result
             resultPrimitiveConnector.addAll(v);
         });
-
-    }
-
-    @Override
-    public void postProcessData() {
 
     }
 
