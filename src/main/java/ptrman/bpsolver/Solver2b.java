@@ -68,7 +68,14 @@ public class Solver2b extends GraphProcess {
 		//narsBinding = new NarsBinding(new OpenNarsNarseseConsumer());
 	}
 
-
+	static final int numberOfEdgeDetectorDirections = 8;
+	// convolution
+	static final Map2dApplyConvolution[] edgeDetectors = new Map2dApplyConvolution[numberOfEdgeDetectorDirections];
+	static {
+		for (int i = 0; i < numberOfEdgeDetectorDirections; i++) {
+			edgeDetectors[i] = new Map2dApplyConvolution(Convolution2dHelper.calcGaborKernel(8, (float) i / (float) numberOfEdgeDetectorDirections * 2.0f * (float) Math.PI, 10.0f / 64.0f, (float) Math.PI * 0.5f, 0.4f));
+		}
+	}
 
 	/**
 	 * must be called before the frame method family
@@ -115,13 +122,8 @@ public class Solver2b extends GraphProcess {
 
 		IMap2d<Float> mapGrayscale = ((VisualProcessor.ProcessingChain.ApplyChainElement) processingChain.filterChainDag.elements.get(processingChain.filterChainDag.elements.size() - 1).content).result; // get from last element in the chain
 
-		int numberOfEdgeDetectorDirections = 8;
 
-		// convolution
-		Map2dApplyConvolution[] edgeDetectors = new Map2dApplyConvolution[numberOfEdgeDetectorDirections];
-		for (int i = 0; i < numberOfEdgeDetectorDirections; i++) {
-			edgeDetectors[i] = new Map2dApplyConvolution(Convolution2dHelper.calcGaborKernel(8, (float) i / (float) numberOfEdgeDetectorDirections * 2.0f * (float) Math.PI, 10.0f / 64.0f, (float) Math.PI * 0.5f, 0.4f));
-		}
+
 
 		IMap2d<Float>[] edges = new IMap2d[numberOfEdgeDetectorDirections];
 		for (int i = 0; i < numberOfEdgeDetectorDirections; i++) { // detect edges with filters
@@ -151,7 +153,6 @@ public class Solver2b extends GraphProcess {
 
 			IMap2d<Boolean> mapBoolean = Map2dBinary.threshold(edges[i], 0.01f); // convert from edges[0]
 
-			Queue<ProcessA.Sample> connectorSamplesFromProcessA = new ArrayDeque();
 			processAEdge[i].set(mapBoolean.copy(), null, connectorSamplesFromProcessAForEdge[i]);
 
 			processAEdge[i].setup(imageSize);
