@@ -14,9 +14,9 @@ import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
-import ptrman.levels.retina.helper.ProcessConnector;
 
 import java.util.List;
+import java.util.Queue;
 
 import static ptrman.levels.retina.LineDetectorWithMultiplePoints.real;
 
@@ -28,8 +28,8 @@ import static ptrman.levels.retina.LineDetectorWithMultiplePoints.real;
 public class ProcessF implements IProcess {
     public IMap2d<Boolean> map;
 
-    public ProcessConnector<ProcessA.Sample> inputSampleConnector;
-    public ProcessConnector<ProcessA.Sample> outputSampleConnector;
+    public Queue<ProcessA.Sample> inputSampleConnector;
+    public Queue<ProcessA.Sample> outputSampleConnector;
 
     public static int COUNTOFRAYDIRECTIONS = 16;
     public static ArrayRealVector[] RAYDIRECTIONS;
@@ -38,7 +38,7 @@ public class ProcessF implements IProcess {
     public void setImageSize(Vector2d<Integer> imageSize) {
     }
 
-    public void preSetup(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector) {
+    public void preSetup(Queue<ProcessA.Sample> inputSampleConnector, Queue<ProcessA.Sample> outputSampleConnector) {
         this.inputSampleConnector = inputSampleConnector;
         this.outputSampleConnector = outputSampleConnector;
     }
@@ -58,7 +58,7 @@ public class ProcessF implements IProcess {
         ArrayRealVector[] borderPositions = new ArrayRealVector[COUNTOFRAYDIRECTIONS];
         List<Ray> activeRays = new FastList<>(RAYDIRECTIONS.length);
 
-        while (inputSampleConnector.inSize() > 0) {
+        while (inputSampleConnector.size() > 0) {
             for( ArrayRealVector borderPos : (borderPositions = processSample(inputSampleConnector.poll(), borderPositions, activeRays)))
                 outputSampleConnector.add(new ProcessA.Sample(borderPos));
         }

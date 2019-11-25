@@ -10,7 +10,8 @@
 package ptrman.levels.retina;
 
 import ptrman.Datastructures.Vector2d;
-import ptrman.levels.retina.helper.ProcessConnector;
+
+import java.util.Queue;
 
 /**
  * filters samples by type
@@ -20,7 +21,7 @@ public class ProcessSampleFilter implements IProcess {
         this.filterType = filterType;
     }
 
-    public void preSetupSet(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector) {
+    public void preSetupSet(Queue<ProcessA.Sample> inputSampleConnector, Queue<ProcessA.Sample> outputSampleConnector) {
         this.inputSampleConnector = inputSampleConnector;
         this.outputSampleConnector = outputSampleConnector;
     }
@@ -40,7 +41,7 @@ public class ProcessSampleFilter implements IProcess {
 
     @Override
     public void processData() {
-        while( inputSampleConnector.inSize() > 0 ) {
+        while( inputSampleConnector.size() > 0 ) {
             final ProcessA.Sample currentSample = inputSampleConnector.poll();
 
             if( currentSample.type == filterType ) {
@@ -54,8 +55,8 @@ public class ProcessSampleFilter implements IProcess {
 
     }
 
-    private ProcessConnector<ProcessA.Sample> outputSampleConnector;
-    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
+    private Queue<ProcessA.Sample> outputSampleConnector;
+    private Queue<ProcessA.Sample> inputSampleConnector;
 
     private final ProcessA.Sample.EnumType filterType;
 }

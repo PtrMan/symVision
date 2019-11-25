@@ -12,13 +12,13 @@ package ptrman.levels.retina;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.set.mutable.UnifiedSet;
 import ptrman.Datastructures.*;
-import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Queue;
 import java.util.function.Function;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -37,11 +37,11 @@ public class ProcessB extends AbstractProcessB {
     private int counterCellPositiveCandidates;
     private int counterCellCandidates;
     public IMap2d<Boolean> inputMap;
-    public ProcessConnector<ProcessA.Sample> inputSampleConnector;
-    public ProcessConnector<ProcessA.Sample> outputSampleConnector;
+    public Queue<ProcessA.Sample> inputSampleConnector;
+    public Queue<ProcessA.Sample> outputSampleConnector;
 
     @Override
-    public void set(IMap2d<Boolean> map, ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector) {
+    public void set(IMap2d<Boolean> map, Queue<ProcessA.Sample> inputSampleConnector, Queue<ProcessA.Sample> outputSampleConnector) {
         this.inputMap = map;
         this.inputSampleConnector = inputSampleConnector;
         this.outputSampleConnector = outputSampleConnector;
@@ -61,7 +61,6 @@ public class ProcessB extends AbstractProcessB {
      */
     @Override
     public void processData() {
-        List<ProcessA.Sample> samples = inputSampleConnector.getOut();
 
         final int MAXRADIUS = (int)Math.ceil( Math.sqrt( imageSize.x*imageSize.x + imageSize.y*imageSize.y) ); // (int)Math.sqrt(squaredDistance(new double[]{(double)imageSize.x, (double)imageSize.y}));
 
@@ -75,7 +74,7 @@ public class ProcessB extends AbstractProcessB {
         spatialAcceleratedMap2d = new SpatialAcceleratedMap2d(map, GRIDSIZE_FOR_SPATIALACCELERATEDMAP2D);
         spatialAcceleratedMap2d.recalculateGridCellStateMap();
         
-        for( ProcessA.Sample iterationSample : samples ) {
+        for( ProcessA.Sample iterationSample : inputSampleConnector) {
 
             Tuple2<IntIntPair, Double> nearestResult = findNearestPositionWhereMapIs(false, iterationSample.position, map, MAXRADIUS);
             if( nearestResult == null ) {

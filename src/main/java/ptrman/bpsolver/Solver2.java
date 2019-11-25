@@ -15,10 +15,10 @@ import ptrman.Datastructures.Vector2d;
 import ptrman.bindingNars.NarsBinding;
 import ptrman.bindingNars.OpenNarsNarseseConsumer;
 import ptrman.levels.retina.*;
-import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.levels.visual.*;
 
-import java.awt.image.BufferedImage;
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 /**
  * new solver which is incomplete but should be in a working state
@@ -27,16 +27,16 @@ public class Solver2 {
     public ProcessFi processFi = new ProcessFi();
     public ProcessD processD;
     public ProcessD[] processDEdge;
-    public ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
-    public ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
-    public ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessH;
+    public Queue<ProcessA.Sample> connectorSamplesForEndosceleton;
+    public Queue<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
+    public Queue<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessH;
 
-    public ProcessConnector<ProcessA.Sample>[] connectorSamplesFromProcessAForEdge;
-    public ProcessConnector<RetinaPrimitive>[] connectorDetectorsFromProcessDForEdge;
-    public ProcessConnector<RetinaPrimitive>[] connectorDetectorsFromProcessHForEdge;
+    public Queue<ProcessA.Sample>[] connectorSamplesFromProcessAForEdge;
+    public Queue<RetinaPrimitive>[] connectorDetectorsFromProcessDForEdge;
+    public Queue<RetinaPrimitive>[] connectorDetectorsFromProcessHForEdge;
 
     // connector for final processing
-    public ProcessConnector<RetinaPrimitive> cntrFinalProcessing;
+    public Queue<RetinaPrimitive> cntrFinalProcessing;
 
     public NarsBinding narsBinding;
 
@@ -55,11 +55,11 @@ public class Solver2 {
         processD.onlyEndoskeleton = true;
         processD.processDLineSamplesForProximity = 2;
 
-        connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        connectorSamplesForEndosceleton = (Queue<ProcessA.Sample>) new ArrayDeque();
 
-        cntrFinalProcessing = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        cntrFinalProcessing = (Queue<RetinaPrimitive>) new ArrayDeque();
 
-        processFi.outputSampleConnector = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        processFi.outputSampleConnector = (Queue<TexPoint>) new ArrayDeque();
 
         // create NARS-binding
         narsBinding = new NarsBinding(new OpenNarsNarseseConsumer());
@@ -133,13 +133,13 @@ public class Solver2 {
             processDEdge[i].overwriteObjectId = 0; // we want to overwrite the id of the detectors, because some parts of the program still assume object id's and we can't provide it in general case
         }
 
-        connectorDetectorsFromProcessDForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
-        connectorSamplesFromProcessAForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
-        connectorDetectorsFromProcessHForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];
+        connectorDetectorsFromProcessDForEdge = new Queue[numberOfEdgeDetectorDirections];
+        connectorSamplesFromProcessAForEdge = new Queue[numberOfEdgeDetectorDirections];
+        connectorDetectorsFromProcessHForEdge = new Queue[numberOfEdgeDetectorDirections];
         for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // create connectors for edges
-            connectorDetectorsFromProcessHForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
-            connectorDetectorsFromProcessDForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
-            connectorSamplesFromProcessAForEdge[i] = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+            connectorDetectorsFromProcessHForEdge[i] = (Queue<RetinaPrimitive>) new ArrayDeque();
+            connectorDetectorsFromProcessDForEdge[i] = (Queue<RetinaPrimitive>) new ArrayDeque();
+            connectorSamplesFromProcessAForEdge[i] = (Queue<ProcessA.Sample>) new ArrayDeque();
         }
 
         for(int i=0; i<numberOfEdgeDetectorDirections;i++) {
@@ -147,7 +147,7 @@ public class Solver2 {
 
             IMap2d<Boolean> mapBoolean = Map2dBinary.threshold(edges[i], 0.01f); // convert from edges[0]
 
-            ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+            Queue<ProcessA.Sample> connectorSamplesFromProcessA = (Queue<ProcessA.Sample>) new ArrayDeque();
             processAEdge[i].set(mapBoolean.copy(), null, connectorSamplesFromProcessAForEdge[i]);
 
             processAEdge[i].setup(imageSize);
@@ -176,7 +176,7 @@ public class Solver2 {
 
         final int processZGridsize = 8;
 
-        connectorSamplesForEndosceleton.out.clear();
+        connectorSamplesForEndosceleton.clear();
         processD.annealedCandidates.clear(); // TODO< cleanup in process with method >
 
         processZFacade.setImageSize(imageSize);
@@ -196,23 +196,23 @@ public class Solver2 {
         ProcessC processC = new ProcessC();
 
         // copy image because processA changes the image
-        ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        Queue<ProcessA.Sample> connectorSamplesFromProcessA = (Queue<ProcessA.Sample>) new ArrayDeque();
         processA.set(mapBoolean.copy(), processZFacade.getNotMagnifiedOutputObjectIds(), connectorSamplesFromProcessA);
         processA.setup(imageSize);
 
-        ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessB = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        Queue<ProcessA.Sample> conntrSamplesFromProcessB = (Queue<ProcessA.Sample>) new ArrayDeque();
         processB.set(mapBoolean.copy(), connectorSamplesFromProcessA, conntrSamplesFromProcessB);
         processB.setup(imageSize);
 
 
-        ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessC0 = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
-        ProcessConnector<ProcessA.Sample> conntrSamplesFromProcessC1 = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        Queue<ProcessA.Sample> conntrSamplesFromProcessC0 = (Queue<ProcessA.Sample>) new ArrayDeque();
+        Queue<ProcessA.Sample> conntrSamplesFromProcessC1 = (Queue<ProcessA.Sample>) new ArrayDeque();
         processC.set(conntrSamplesFromProcessB, conntrSamplesFromProcessC0, conntrSamplesFromProcessC1);
         processC.setup(imageSize);
 
-        connectorDetectorsEndosceletonFromProcessD = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        connectorDetectorsEndosceletonFromProcessD = (Queue<RetinaPrimitive>) new ArrayDeque();
 
-        connectorDetectorsEndosceletonFromProcessH = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        connectorDetectorsEndosceletonFromProcessH = (Queue<RetinaPrimitive>) new ArrayDeque();
 
 
         processD.setImageSize(imageSize);
@@ -290,8 +290,8 @@ public class Solver2 {
         cntrFinalProcessing = connectorDetectorsEndosceletonFromProcessH; // connect the connector for final processing to output from process-H
 
         // intersect line primitives
-        ProcessE.process(cntrFinalProcessing.out, mapBoolean);
+        ProcessE.process(cntrFinalProcessing, mapBoolean);
 
-        narsBinding.emitRetinaPrimitives(cntrFinalProcessing.out); // emit all collected primitives from process D
+        narsBinding.emitRetinaPrimitives(cntrFinalProcessing); // emit all collected primitives from process D
     }
 }

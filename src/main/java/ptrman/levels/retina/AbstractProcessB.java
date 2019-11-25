@@ -11,13 +11,14 @@ package ptrman.levels.retina;
 
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
-import ptrman.levels.retina.helper.ProcessConnector;
+
+import java.util.Queue;
 
 /**
  * calculates the altitude
  */
 public abstract class AbstractProcessB implements IProcess {
-    public abstract void set(IMap2d<Boolean> map, ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> outputSampleConnector);
+    public abstract void set(IMap2d<Boolean> map, Queue<ProcessA.Sample> inputSampleConnector, Queue<ProcessA.Sample> outputSampleConnector);
 
     @Override
     public void setImageSize(Vector2d<Integer> imageSize) {

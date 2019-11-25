@@ -15,14 +15,10 @@ import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
-import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.NalTvFunctions;
 import ptrman.misc.Assert;
 
-import java.util.Collection;
-import java.util.Deque;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 import static ptrman.bpsolver.Helper.createMapByObjectIdsFromListOfRetinaPrimitives;
 
@@ -35,15 +31,15 @@ public class ProcessH implements IProcess {
 
     public float maxFusionsPerCycle = 0.15f; //adjustable
 
-    public ProcessConnector<RetinaPrimitive> resultPrimitiveConnector;
-    public ProcessConnector<RetinaPrimitive> inputPrimitiveConnection;
+    public Queue<RetinaPrimitive> resultPrimitiveConnector;
+    public Queue<RetinaPrimitive> inputPrimitiveConnection;
 
     public Vector2d<Integer> imageSize;
 
     public int GRIDSIZE = 8;
     public IMap2d<Boolean> accelerationMap;
 
-    public void set(ProcessConnector<RetinaPrimitive> inputPrimitiveConnection, ProcessConnector<RetinaPrimitive> resultPrimitiveConnector) {
+    public void set(Queue<RetinaPrimitive> inputPrimitiveConnection, Queue<RetinaPrimitive> resultPrimitiveConnector) {
         this.inputPrimitiveConnection = inputPrimitiveConnection;
         this.resultPrimitiveConnector = resultPrimitiveConnector;
     }
@@ -74,7 +70,7 @@ public class ProcessH implements IProcess {
 
     @Override
     public void processData() {
-        List<RetinaPrimitive> allInputDetectors = inputPrimitiveConnection.getOut();
+        Collection<RetinaPrimitive> allInputDetectors = inputPrimitiveConnection;
 
         IntObjectHashMap<Deque<RetinaPrimitive>> objectIdToRetinaPrimitivesMap = createMapByObjectIdsFromListOfRetinaPrimitives(allInputDetectors);
 

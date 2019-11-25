@@ -10,15 +10,13 @@
 package ptrman.levels.retina;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
-import org.apache.commons.math3.random.MersenneTwister;
-import org.apache.commons.math3.random.RandomAdaptor;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
-import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.misc.Assert;
 
 import java.awt.*;
+import java.util.Queue;
 import java.util.Random;
 
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
@@ -205,7 +203,7 @@ public class ProcessA implements IProcess {
     }
     
     
-    public void set(IMap2d<Boolean> image, IMap2d<Integer> idMap, ProcessConnector<Sample> outputSampleConnector) {
+    public void set(IMap2d<Boolean> image, IMap2d<Integer> idMap, Queue<Sample> outputSampleConnector) {
         workingImage = image.copy();
         this.idMap = idMap;
 
@@ -229,7 +227,7 @@ public class ProcessA implements IProcess {
 
     private IMap2d<Boolean> workingImage;
     private IMap2d<Integer> idMap;
-    private ProcessConnector<Sample> outputSampleConnector;
+    private Queue<Sample> outputSampleConnector;
 
     private static final boolean[] MaskDetail0 =
             {

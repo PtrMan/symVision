@@ -14,13 +14,13 @@ import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import org.eclipse.collections.impl.list.mutable.FastList;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
-import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.levels.retina.helper.SpatialDrawer;
 import ptrman.levels.retina.helper.SpatialListMap2d;
 import ptrman.misc.Assert;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
@@ -40,9 +40,9 @@ public class ProcessC implements IProcess {
 
     private final Random random = new Random();
 
-    public ProcessConnector<ProcessA.Sample> inputSampleConnector;
-    public ProcessConnector<ProcessA.Sample> resultSamplesToProcessF;
-    public ProcessConnector<ProcessA.Sample> resultSampleConnector;
+    public Queue<ProcessA.Sample> inputSampleConnector;
+    public Queue<ProcessA.Sample> resultSamplesToProcessF;
+    public Queue<ProcessA.Sample> resultSampleConnector;
     final FastList<SampleWithDistance> sortedSamples = new FastList();
 
     /** sort order: lowest distance first */
@@ -71,8 +71,8 @@ public class ProcessC implements IProcess {
 
     }
 
-    public void set(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<ProcessA.Sample> resultSampleConnector, ProcessConnector<ProcessA.Sample> resultSamplesToProcessF) {
-        if( inputSampleConnector.getOut() == null ) {
+    public void set(Queue<ProcessA.Sample> inputSampleConnector, Queue<ProcessA.Sample> resultSampleConnector, Queue<ProcessA.Sample> resultSamplesToProcessF) {
+        if( inputSampleConnector.iterator() == null ) {
             throw new RuntimeException("inputSampleConnector must be a workspace Connector!");
         }
 
@@ -109,21 +109,15 @@ public class ProcessC implements IProcess {
         accelerationMap.clear();
 
         // fill
-        for( final ProcessA.Sample iterationSample : inputSampleConnector.getOut()  ) {
-            final IntIntPair p = accelerationMap.getCellPositionOfIntegerPosition(iterationSample.position);
-            List<ProcessA.Sample> samplesOfCell = accelerationMap.addAt(p.getOne(), p.getTwo(), iterationSample);
+        for (ProcessA.Sample s : inputSampleConnector) {
+            final IntIntPair p = accelerationMap.getCellPositionOfIntegerPosition(s.position);
+            List<ProcessA.Sample> samplesOfCell = accelerationMap.addAt(p.getOne(), p.getTwo(), s);
         }
 
 
         int maxSortedSamples = (int)Math.ceil( this.maxSortedSamples * throttle );
 
-        for(int outerI = 0; outerI < inputSampleConnector.getOut().size(); outerI++ ) {
-
-
-
-            //SampleWithDistance[] sortedArray = createSortedArray();
-
-            ProcessA.Sample outerSample = inputSampleConnector.getOut().get(outerI);
+        for (ProcessA.Sample s : inputSampleConnector) {
 
             int numberOfConsideredSamples = 0;
 
@@ -138,10 +132,10 @@ public class ProcessC implements IProcess {
 
                 if( currentRadius == 0 ) {
                     cellPositionsToScan = new FastList<>(1);
-                    cellPositionsToScan.add(accelerationMap.getCellPositionOfIntegerPosition(outerSample.position));
+                    cellPositionsToScan.add(accelerationMap.getCellPositionOfIntegerPosition(s.position));
                 }
                 else {
-                    cellPositionsToScan = SpatialDrawer.getPositionsOfCellsOfCircleBound(accelerationMap.getCellPositionOfIntegerPosition(outerSample.position), currentRadius, pair(accelerationMap.getWidth(), accelerationMap.getLength()));
+                    cellPositionsToScan = SpatialDrawer.getPositionsOfCellsOfCircleBound(accelerationMap.getCellPositionOfIntegerPosition(s.position), currentRadius, pair(accelerationMap.getWidth(), accelerationMap.getLength()));
                 }
 
                 for( final IntIntPair currentCellPosition : cellPositionsToScan ) {
@@ -150,11 +144,11 @@ public class ProcessC implements IProcess {
 
                         for (final ProcessA.Sample iterationSample : samplesOfCurrentCell) {
                             // we don't want to calculate it for the same sample
-                            if (iterationSample.equals(outerSample)) {
+                            if (iterationSample.equals(s)) {
                                 continue;
                             }
 
-                            final double distance = calculateDistanceBetweenSamples(outerSample, iterationSample);
+                            final double distance = calculateDistanceBetweenSamples(s, iterationSample);
 
                             numberOfConsideredSamples++;
 
@@ -189,20 +183,20 @@ public class ProcessC implements IProcess {
 
 
 
-            if( noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(sortedSamples, outerSample) ) {
-                outerSample.type = ProcessA.Sample.EnumType.ENDOSCELETON;
+            if( noMoreThanTwoNeightborsWithAltidudeStrictlyGreaterThan(sortedSamples, s) ) {
+                s.type = ProcessA.Sample.EnumType.ENDOSCELETON;
 
-                if( outerSample.altitude >= HardParameters.ProcessC.FILLEDREGIONALTITUDETHRESHOLD ) {
+                if( s.altitude >= HardParameters.ProcessC.FILLEDREGIONALTITUDETHRESHOLD ) {
                     if( random.nextFloat() < HardParameters.ProcessC.FILLEDREGIONCANDIDATEPROPABILITY ) {
-                        resultSamplesToProcessF.add(outerSample);
+                        resultSamplesToProcessF.add(s);
                     }
                 }
             }
             else {
-                outerSample.type = ProcessA.Sample.EnumType.EXOSCELETON;
+                s.type = ProcessA.Sample.EnumType.EXOSCELETON;
             }
 
-            resultSampleConnector.add(outerSample);
+            resultSampleConnector.add(s);
 
             sortedSamples.clear();
         }

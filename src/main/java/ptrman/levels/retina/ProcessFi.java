@@ -10,8 +10,8 @@
 package ptrman.levels.retina;
 
 import ptrman.Datastructures.IMap2d;
-import ptrman.levels.retina.helper.ProcessConnector;
 
+import java.util.Queue;
 import java.util.Random;
 
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
@@ -23,7 +23,7 @@ public class ProcessFi {
     public Random rng = new Random();
 
     public IMap2d<Float> workingImage;
-    public ProcessConnector<TexPoint> outputSampleConnector;
+    public Queue<TexPoint> outputSampleConnector;
 
     public int numberOfSamples = 1000;
 
@@ -31,7 +31,7 @@ public class ProcessFi {
     public double thresholdGradient = 0.05; // threshold for pixel to register as gradient
 
     public void preProcess() {
-        outputSampleConnector.out.clear();
+        outputSampleConnector.clear();
     }
 
     public void process() {
@@ -50,7 +50,7 @@ public class ProcessFi {
                 { // filling particle
                     TexPoint tp = new TexPoint(posX, posY, "f"); // filled
                     tp.value = v;
-                    outputSampleConnector.out.add(tp);
+                    outputSampleConnector.add(tp);
                 }
 
                 { // gradient particle if gradient is present
@@ -60,7 +60,7 @@ public class ProcessFi {
                         TexPoint tp = new TexPoint(posX, posY, "g"); // gradient
                         tp.gradientX = v-vx;
                         tp.gradientY = v-vy;
-                        outputSampleConnector.out.add(tp);
+                        outputSampleConnector.add(tp);
                     }
                 }
             }

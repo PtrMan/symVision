@@ -12,6 +12,7 @@ package ptrman.bindingNars;
 import ptrman.levels.retina.Intersection;
 import ptrman.levels.retina.RetinaPrimitive;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NarsBinding {
@@ -39,19 +40,23 @@ public class NarsBinding {
         return -1;
     }
 
-    public void emitRetinaPrimitives(List<RetinaPrimitive> primitives) {
+    public void emitRetinaPrimitives(Iterable<RetinaPrimitive> _primitives) {
         int primnitiveIdCntr = 0;
 
-        for (RetinaPrimitive iPrimitive : primitives) {
-            double[] axy = iPrimitive.line.a.getDataRef();
+        List<RetinaPrimitive> primitives = new ArrayList();
+
+        for (RetinaPrimitive p : _primitives) {
+            double[] axy = p.line.a.getDataRef();
             int ax = (int) Math.round(axy[0]); //(int) axy[0];
             int ay = (int) Math.round(axy[1]); //axy[1];
-            double[] bxy = iPrimitive.line.b.getDataRef();
+            double[] bxy = p.line.b.getDataRef();
             int bx = (int) Math.round(bxy[0]); //bxy[0];
             int by = (int) Math.round(bxy[1]); //bxy[1];
 
-            consumer.emitLineSegment("line"+primnitiveIdCntr, ax,ay,bx,by, iPrimitive.retConf());
+            consumer.emitLineSegment("line"+primnitiveIdCntr, ax,ay,bx,by, p.retConf());
             primnitiveIdCntr++;
+
+            primitives.add(p);
         }
 
         // emit line intersections

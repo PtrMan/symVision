@@ -17,12 +17,11 @@ import ptrman.bpsolver.IImageDrawer;
 import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Solver2;
 import ptrman.levels.retina.RetinaPrimitive;
-import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.misc.ImageConverter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
+import java.util.Queue;
 
 /**
  *
@@ -96,9 +95,8 @@ public class VisualizeAnimation extends PApplet {
         }
 
         drawer.drawPrimitives(
-            Iterables.concat(Iterables.transform(
-                Lists.newArrayList(solver2.connectorDetectorsFromProcessHForEdge), (ProcessConnector<RetinaPrimitive> x)->x.out))
-            , this);
+            Iterables.concat(Lists.newArrayList(solver2.connectorDetectorsFromProcessHForEdge)),
+            this);
 
 
         // mouse cursor

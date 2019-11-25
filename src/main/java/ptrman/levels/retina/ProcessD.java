@@ -9,6 +9,7 @@
  */
 package ptrman.levels.retina;
 
+import com.google.common.collect.Lists;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.random.MersenneTwister;
 import org.apache.commons.math3.random.RandomAdaptor;
@@ -20,7 +21,6 @@ import org.eclipse.collections.impl.list.mutable.primitive.IntArrayList;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bpsolver.HardParameters;
 import ptrman.bpsolver.Parameters;
-import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.ArrayRealVectorHelper;
 import ptrman.misc.Assert;
 
@@ -53,8 +53,8 @@ public class ProcessD implements IProcess {
 
     public double maximalDistanceOfPositions;
 
-    private ProcessConnector<ProcessA.Sample> inputSampleConnector;
-    private ProcessConnector<RetinaPrimitive> outputLineDetectorConnector;
+    private Queue<ProcessA.Sample> inputSampleConnector;
+    private Queue<RetinaPrimitive> outputLineDetectorConnector;
 
 
     public final int widenSamplesPerTrial = 10; // how many points are considered when doing a widening step?
@@ -67,7 +67,7 @@ public class ProcessD implements IProcess {
     public final Random rng = new RandomAdaptor(new MersenneTwister());
 
 
-    public void set(ProcessConnector<ProcessA.Sample> inputSampleConnector, ProcessConnector<RetinaPrimitive> outputLineDetectorConnector) {
+    public void set(Queue<ProcessA.Sample> inputSampleConnector, Queue<RetinaPrimitive> outputLineDetectorConnector) {
         this.inputSampleConnector = inputSampleConnector;
         this.outputLineDetectorConnector = outputLineDetectorConnector;
     }
@@ -140,16 +140,15 @@ public class ProcessD implements IProcess {
     public void sampleNewByRandom() {
         final double maxLength = Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y})); // max length of line
 
-        final List<ProcessA.Sample> workingSamples = inputSampleConnector.getOut();
+        final Iterable<ProcessA.Sample> workingSamples = inputSampleConnector;
 
         // filter valid points
         List<ProcessA.Sample> filteredSamples = new ArrayList<>();
         for (final ProcessA.Sample iterationSample : workingSamples) {
             boolean onlyAddEndoskeletonEnable = !(onlyEndoskeleton && iterationSample.type != ProcessA.Sample.EnumType.ENDOSCELETON);
             boolean isReferenced = iterationSample.refCount != 0;
-            if(!isReferenced && onlyAddEndoskeletonEnable ) {
+            if(!isReferenced && onlyAddEndoskeletonEnable )
                 filteredSamples.add(iterationSample);
-            }
         }
 
         List<ProcessA.Sample> selectedSamples = selectRandomSamples(filteredSamples);
@@ -164,7 +163,7 @@ public class ProcessD implements IProcess {
     public void sampleNewByProximity() {
         final double maxLength = Math.sqrt(squaredDistance(new double[]{imageSize.x, imageSize.y})); // max length of line
 
-        final List<ProcessA.Sample> workingSamples = inputSampleConnector.getOut();
+        @Deprecated final List<ProcessA.Sample> workingSamples = Lists.newArrayList(inputSampleConnector);
 
         if (workingSamples.size() < 2) {
             return;
@@ -379,29 +378,28 @@ public class ProcessD implements IProcess {
      * tries to add points to existing lines
      */
     public void tryWiden() {
+        @Deprecated List<ProcessA.Sample> inputSampleConnector = Lists.newArrayList(this.inputSampleConnector);
+
         for (LineDetectorWithMultiplePoints iLinedetector : annealedCandidates) {
 
             // sample samples and project to line, check distance if it is below threshold
             for (int iSamplingAttempt=0;iSamplingAttempt<widenSamplesPerTrial;iSamplingAttempt++) {
-                int sampleIdx = rng.nextInt(inputSampleConnector.out.size());
+                int sampleIdx = rng.nextInt(inputSampleConnector.size());
 
-                ProcessA.Sample sample = inputSampleConnector.out.get(sampleIdx);
-                if(onlyEndoskeleton && sample.type != ProcessA.Sample.EnumType.ENDOSCELETON) {
+                ProcessA.Sample sample = inputSampleConnector.get(sampleIdx);
+                if(onlyEndoskeleton && sample.type != ProcessA.Sample.EnumType.ENDOSCELETON)
                     continue;
-                }
-                if (sample.refCount > 0) {
+                if (sample.refCount > 0)
                     continue; // sample is already in use
-                }
 
                 // * project on line, check
-                if (iLinedetector.isYAxisSingularity()) {
+                if (iLinedetector.isYAxisSingularity())
                     continue; // ignore because we can't project
-                }
+
                 ArrayRealVector projectedPosition = iLinedetector.projectPointOntoLine(sample.position);
                 double dist = distance(sample.position, projectedPosition);
-                if (dist > widenSampleMaxDistance) {
+                if (dist > widenSampleMaxDistance)
                     continue;
-                }
 
                 // * add to line
                 iLinedetector.samples.add(sample);

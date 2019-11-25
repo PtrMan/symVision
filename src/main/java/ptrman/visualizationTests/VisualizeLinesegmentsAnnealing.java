@@ -12,11 +12,11 @@ package ptrman.visualizationTests;
 import boofcv.gui.image.ImagePanel;
 import ptrman.bpsolver.Solver2b;
 import ptrman.levels.retina.RetinaPrimitive;
-import ptrman.levels.retina.helper.ProcessConnector;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Collection;
 import java.util.Random;
 import java.util.stream.Stream;
 
@@ -30,7 +30,7 @@ public class VisualizeLinesegmentsAnnealing {
 	final static int RETINA_HEIGHT = 128;
 	int chosenImage = 0; // chosen image
 	int animationFrameNumber = 0;
-	public Solver2b solution = Solver2b.graph();
+	public Solver2b solution = new Solver2b();
 	public VisualizationDrawer outputRenderer = new VisualizationDrawer(); // used for drawing
 	int time = 0;
 	ImagePanel inView = new ImagePanel();
@@ -39,7 +39,7 @@ public class VisualizeLinesegmentsAnnealing {
 	private BufferedImage input;
 	public VisualizeLinesegmentsAnnealing() {
 		JFrame w = new JFrame();
-		w.setLayout(new GridLayout(2, 1));
+		w.setLayout(new GridLayout());
 		w.getContentPane().add(inView);
 		w.getContentPane().add(outView);
 		w.setSize(600, 600);
@@ -148,13 +148,9 @@ public class VisualizeLinesegmentsAnnealing {
 		g.setColor(new Color(1f, 1f, 1f)); //transparent
 		g.fillRect(0, 0, output.getWidth(), output.getHeight());
 
-		ProcessConnector<RetinaPrimitive>[] hh = solution.connectorDetectorsFromProcessHForEdge;
-		if (hh!=null) {
-			Stream.of(hh).flatMap(x -> x.out.stream()).forEach(r -> {
-				outputRenderer.drawPrimitive(r, g);
-			});
-		}
-
+		java.util.Queue<RetinaPrimitive>[] hh = solution.connectorDetectorsFromProcessHForEdge;
+		if (hh!=null)
+			Stream.of(hh).flatMap(Collection::stream).forEach(r -> outputRenderer.drawPrimitive(r, g));
 
 		// mouse cursor
 		//ellipse(mouseX, mouseY, 4, 4);

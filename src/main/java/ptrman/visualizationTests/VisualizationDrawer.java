@@ -13,7 +13,6 @@ import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import processing.core.PApplet;
 import ptrman.bpsolver.Solver2;
 import ptrman.levels.retina.*;
-import ptrman.levels.retina.helper.ProcessConnector;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -31,7 +30,7 @@ public class VisualizationDrawer {
 
 	public void drawDetectors(Solver2 solver, PApplet applet) {
 		if (drawVisualizationOfAltitude) {
-			for (ProcessA.Sample iSample : solver.connectorSamplesForEndosceleton.out) {
+			for (ProcessA.Sample iSample : solver.connectorSamplesForEndosceleton) {
 				float color = Math.min((float) iSample.altitude / 20.0f, 1.0f);
 
 				applet.stroke(color * 255.0f);
@@ -43,7 +42,7 @@ public class VisualizationDrawer {
 
 			applet.stroke(200.0f, 255.0f, 200.0f);
 
-			for (ProcessA.Sample s : solver.connectorSamplesForEndosceleton.out) {
+			for (ProcessA.Sample s : solver.connectorSamplesForEndosceleton) {
 				if (s.type == ProcessA.Sample.EnumType.ENDOSCELETON) {
 					IntIntPair p = s.position;
 					applet.rect(p.getOne(), p.getTwo(), 1, 1);
@@ -109,7 +108,7 @@ public class VisualizationDrawer {
 		}
 
 		if (drawVisualizationOfTex) { // visualize texture points
-			for (TexPoint iTex : solver.processFi.outputSampleConnector.out) {
+			for (TexPoint iTex : solver.processFi.outputSampleConnector) {
 				applet.stroke(255.0f, 0.0f, 255.0f);
 				applet.rect(iTex.x, iTex.y, 1, 1);
 			}

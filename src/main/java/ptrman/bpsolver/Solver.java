@@ -20,7 +20,6 @@ import ptrman.bpsolver.codelets.LineSegmentSlope;
 import ptrman.bpsolver.ltm.LinkCreator;
 import ptrman.bpsolver.nodes.PlatonicPrimitiveNode;
 import ptrman.levels.retina.*;
-import ptrman.levels.retina.helper.ProcessConnector;
 
 import java.util.*;
 
@@ -28,7 +27,7 @@ public class Solver {
     public float processdmaximalDistanceOfPositions = 30.0f;// was 6.0f;
 
 
-    public List<ProcessA.Sample> debugSamples;
+//    public List<ProcessA.Sample> debugSamples;
 
     public Solver() {
     }
@@ -45,28 +44,28 @@ public class Solver {
 
     private void createConnectors() {
         // mode is PRIMARY_QUEUE because the java version of processB uses the workspace, and the opengl version uses the queue
-        connectorSamplesFromProcessA = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.PRIMARY_QUEUE);
+        connectorSamplesFromProcessA = (Queue<ProcessA.Sample>) new ArrayDeque();
         allConnectors.add(connectorSamplesFromProcessA);
 
-        connectorSamplesFromProcessB = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        connectorSamplesFromProcessB = (Queue<Object>) new ArrayDeque();
         allConnectors.add(connectorSamplesFromProcessB);
 
-        connectorSamplesFromProcessC = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.PRIMARY_QUEUE);
+        connectorSamplesFromProcessC = (Queue<ProcessA.Sample>) new ArrayDeque();
         allConnectors.add(connectorSamplesFromProcessC);
-        connectorSamplesFromProcessCToProcessF = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.QUEUE);
+        connectorSamplesFromProcessCToProcessF = (Queue<ProcessA.Sample>) new ArrayDeque();
         allConnectors.add(connectorSamplesFromProcessCToProcessF);
 
-        connectorSamplesForEndosceleton = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        connectorSamplesForEndosceleton = (Queue<ProcessA.Sample>) new ArrayDeque();
         allConnectors.add(connectorSamplesForEndosceleton);
-        connectorDetectorsEndosceletonFromProcessD = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        connectorDetectorsEndosceletonFromProcessD = (Queue<RetinaPrimitive>) new ArrayDeque();
         allConnectors.add(connectorDetectorsEndosceletonFromProcessD);
-        connectorDetectorsExosceletonFromProcessD = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        connectorDetectorsExosceletonFromProcessD = (Queue<RetinaPrimitive>) new ArrayDeque();
         allConnectors.add(connectorDetectorsExosceletonFromProcessD);
 
-        connectorSamplesFromProcessF = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        connectorSamplesFromProcessF = (Queue<ProcessA.Sample>) new ArrayDeque();
         allConnectors.add(connectorSamplesFromProcessF);
 
-        connectorDetectorsEndosceletonFromProcessH = ProcessConnector.createWithDefaultQueues(ProcessConnector.EnumMode.WORKSPACE);
+        connectorDetectorsEndosceletonFromProcessH = (Queue<RetinaPrimitive>) new ArrayDeque();
         allConnectors.add(connectorSamplesFromProcessF);
     }
 
@@ -152,7 +151,7 @@ public class Solver {
         ProcessF processF = new ProcessF();
         */
 
-        allConnectors.forEach(ProcessConnector::flush);
+        allConnectors.forEach(Queue::clear);
 
 
         ProcessZFacade processZFacade = new ProcessZFacade();
@@ -202,7 +201,7 @@ public class Solver {
         // processData
         processA.processData(throttle);
 
-        debugSamples = connectorSamplesFromProcessA.getOut();
+//        debugSamples = connectorSamplesFromProcessA.iterator();
 
         processB.processData();
         processC.processData(throttle);
@@ -232,8 +231,8 @@ public class Solver {
 
 
 
-        System.out.println("connectorDetectorsEndosceletonFromProcessD " + connectorDetectorsEndosceletonFromProcessD.inSize());
-        System.out.println("connectorDetectorsExosceletonFromProcessD " + connectorDetectorsExosceletonFromProcessD.inSize());
+        System.out.println("connectorDetectorsEndosceletonFromProcessD " + connectorDetectorsEndosceletonFromProcessD.size());
+        System.out.println("connectorDetectorsExosceletonFromProcessD " + connectorDetectorsExosceletonFromProcessD.size());
         /*
 
         // copy because processA changes the image
@@ -684,15 +683,15 @@ public class Solver {
 
     private ProcessSampleFilter endosceletonSampleFilter;
 
-    private ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessA;
-    private ProcessConnector connectorSamplesFromProcessB;
-    private ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessC;
-    private ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessCToProcessF;
-    private ProcessConnector<ProcessA.Sample> connectorSamplesForEndosceleton;
-    public ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
-    private ProcessConnector<RetinaPrimitive> connectorDetectorsExosceletonFromProcessD;
-    private ProcessConnector<ProcessA.Sample> connectorSamplesFromProcessF;
-    private ProcessConnector<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessH;
+    private Queue<ProcessA.Sample> connectorSamplesFromProcessA;
+    private Queue connectorSamplesFromProcessB;
+    private Queue<ProcessA.Sample> connectorSamplesFromProcessC;
+    private Queue<ProcessA.Sample> connectorSamplesFromProcessCToProcessF;
+    private Queue<ProcessA.Sample> connectorSamplesForEndosceleton;
+    public Queue<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessD;
+    private Queue<RetinaPrimitive> connectorDetectorsExosceletonFromProcessD;
+    private Queue<ProcessA.Sample> connectorSamplesFromProcessF;
+    private Queue<RetinaPrimitive> connectorDetectorsEndosceletonFromProcessH;
 
-    private final Collection<ProcessConnector> allConnectors = new ArrayList<>();
+    private final Collection<Queue> allConnectors = new ArrayList<>();
 }
