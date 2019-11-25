@@ -97,20 +97,11 @@ public class FastBooleanMap2d implements IMap2d<Boolean> {
         //Assert.Assert(inBounds(new Vector2d<>(x, y)), "");
 
         final int indexX = x / 64;
-
-        /*
-        System.out.flush();
-        System.out.println("FastBooleanMap2d index");
-        System.out.flush();
-        System.out.println(indexX + y * widthDivBy64);
-        System.out.flush();
-        */
-
         return array[indexX + y * width/64];
     }
 
 
-    // datastructure for native 64 bit machines
+    // data-structure for native 64 bit machines
     private final long[] array;
 
     private final int width;

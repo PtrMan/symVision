@@ -14,17 +14,15 @@ import java.util.Arrays;
 import static java.lang.System.arraycopy;
 
 /**
- *
+ * Abstraction over 2d-array used as image
  * 
  */
-public class Map2d<Type> implements IMap2d<Type>
-{
+public class Map2d<Type> implements IMap2d<Type> {
     private final int width;
     private final int length;
     private final Type[] array;
 
-    public Map2d(int width, int length)
-    {
+    public Map2d(int width, int length) {
         this.width = width;
         this.length = length;
         this.array = (Type[])new Object[width*length];
@@ -35,33 +33,27 @@ public class Map2d<Type> implements IMap2d<Type>
         Arrays.fill(array, null);
     }
 
-    public Type readAt(int x, int y)
-    {
-        if( !inBounds(x, y) )
-        {
+    public Type readAt(int x, int y) {
+        if( !inBounds(x, y) ) {
             throw new RuntimeException("access error");
         }
         
         return array[x + y*width];
     }
     
-    public void setAt(int x, int y, Type value)
-    {
-        if( !inBounds(new Vector2d<>(x, y)) )
-        {
+    public void setAt(int x, int y, Type value) {
+        if( !inBounds(new Vector2d<>(x, y)) ) {
             throw new RuntimeException("access error");
         }
         
         array[x + y*width] = value;
     }
     
-    public int getWidth()
-    {
+    public int getWidth() {
         return width;
     }
     
-    public int getLength()
-    {
+    public int getLength() {
         return length;
     }
 
@@ -74,14 +66,11 @@ public class Map2d<Type> implements IMap2d<Type>
         return px >= 0 && px < width && py >= 0 && py < length;
     }
 
-    public Map2d<Type> copy()
-    {
+    public Map2d<Type> copy() {
 
         Map2d<Type> cloned = new Map2d<>(width, length);
         arraycopy(array, 0, cloned.array, 0, array.length);
         
         return cloned;
     }
-    
-
 }
