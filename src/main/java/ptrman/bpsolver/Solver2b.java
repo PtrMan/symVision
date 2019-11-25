@@ -12,19 +12,22 @@ package ptrman.bpsolver;
 import ptrman.Datastructures.Dag;
 import ptrman.Datastructures.IMap2d;
 import ptrman.Datastructures.Vector2d;
-import ptrman.bindingNars.NarsBinding;
-import ptrman.bindingNars.OpenNarsNarseseConsumer;
 import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.levels.visual.*;
 import viralgraph.GraphProcess;
 
 import java.awt.image.BufferedImage;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
 /**
  * new solver which is incomplete but should be in a working state
  */
 public class Solver2b extends GraphProcess {
+
+    public GraphNode input;
 
     public static Solver2b graph() {
         return new Solver2b(); //TODO
@@ -48,14 +51,18 @@ public class Solver2b extends GraphProcess {
 
     public int annealingStep = 0;
 
-    // image drawer which is used as the source of the images, must be set to a image drawer before the solver is used!
-    public IImageDrawer imageDrawer;
-
     public IMap2d<Boolean> mapBoolean; // boolean "main" map
 
     private Vector2d<Integer> imageSize;
 
     private Solver2b() {
+        input = the();
+        GraphNode finish = theAtomic((BufferedImage x) -> {
+            finish(x);
+        });
+        edge(input, finish);
+
+
         processD = new ProcessD();
         processD.maximalDistanceOfPositions = 5000.0;
         processD.onlyEndoskeleton = true;
@@ -71,12 +78,31 @@ public class Solver2b extends GraphProcess {
         //narsBinding = new NarsBinding(new OpenNarsNarseseConsumer());
     }
 
+    public <X> GraphNode theAtomic(Consumer<X> f) {
+        return theAtomic((X x)->{ f.accept(x); return x; });
+    }
+
+    /** wraps function in an atomically guarded section with passive fail */
+    public <X> GraphNode theAtomic(Function<X,?> f) {
+        AtomicBoolean b = new AtomicBoolean(false);
+
+        return the((X x)->{
+            if (b.compareAndSet(false, true)) {
+                try {
+                    return f.apply(x);
+                } finally {
+                    b.set(false);
+                }
+            }
+            return null;
+        });
+    }
 
 
     /**
      * must be called before the frame method family
      */
-    public void preFrame(BufferedImage input) {
+    @Deprecated private synchronized void finish(BufferedImage input) {
         annealingStep = 0;
 
 
@@ -242,12 +268,15 @@ public class Solver2b extends GraphProcess {
         processD.preProcessData();
         processD.processData(1.0f);
         processD.postProcessData();
+
+        frameStep();
+        postFrame();
     }
 
     /**
      * does one processing step for the processing of the frame
      */
-    public void frameStep() {
+    private void frameStep() {
         // do annealing step of process D
 
         processD.step();
@@ -262,7 +291,7 @@ public class Solver2b extends GraphProcess {
     /**
      * must be called to "finilize" the processing of a frame
      */
-    public void postFrame() {
+    private void postFrame() {
         // * emit narsese to narsese consumer
 
         processD.commitLineDetectors(); // split line detectors into "real" primitives

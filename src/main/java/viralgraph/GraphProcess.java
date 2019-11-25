@@ -4,7 +4,6 @@ import cg4j.Eval;
 import cg4j.node.TensorNode;
 import cg4j.node.io.InputNode;
 import com.google.common.graph.*;
-import deepboof.Tensor;
 
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -12,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 /**
@@ -32,12 +32,12 @@ public class GraphProcess {
 
 
     public void set(TensorNode n, Eval e) {
-        set(nodeOrAdd(n), n.apply(e));
+        set(the(n), n.apply(e));
     }
 
     public InputNode node(int... tensorShape) {
         InputNode i = new InputNode(tensorShape);
-        nodeOrAdd(i);
+        the(i);
         return i;
     }
 
@@ -93,35 +93,49 @@ public class GraphProcess {
 
 
     public void set(Function anon, Object x) {
-        set(nodeOrAdd(anon), x);
+        set(the(anon), x);
     }
 
     public GraphNode node(Function f) {
-        GraphNode g = ref.get(f);
-
-
-        return g;
+        return ref.get(f);
     }
 
     /** add dependencies for all discovered dependent inputs */
     private void discover(GraphNode g, TensorNode f) {
         synchronized (flow) {
             f.forEachRecurse(n -> {
-                GraphNode N = nodeOrAdd(n);
+                GraphNode N = the(n);
                 edge(N, g);
             });
         }
     }
 
-    public GraphNode nodeOrAdd(Function anon) {
+    public <X> GraphNode the(Consumer<X> anon) {
+        return the((X x)->{ anon.accept(x); return x; } );
+    }
+
+    public <X> GraphNode the(Function<X,?> anon) {
         return ref.computeIfAbsent(anon, f -> {
 
             GraphNode g = nodeNew(f);
+
+            flow.addNode(g);
 
             if (f instanceof TensorNode)
                 discover(g, ((TensorNode)f));
             return g;
         });
+    }
+
+    /** new anonymous node */
+    public GraphNode the() {
+        Function f = new Function() {
+            @Override
+            public Object apply(Object x) {
+                return x;
+            }
+        };
+        return the(f);
     }
 
     protected GraphNode nodeNew(Function f) {
@@ -167,7 +181,7 @@ public class GraphProcess {
             default: {
                 synchronized (flow) {
                     for (int i = 1; i < sequence.length; i++)
-                        flow.putEdge(nodeOrAdd(sequence[i - 1]), nodeOrAdd(sequence[i])); //TODO save target for next prev instead of lookup
+                        flow.putEdge(the(sequence[i - 1]), the(sequence[i])); //TODO save target for next prev instead of lookup
                     //TODO invalidate upstream flows that have caches involving nodes downstream of this
                 }
             }

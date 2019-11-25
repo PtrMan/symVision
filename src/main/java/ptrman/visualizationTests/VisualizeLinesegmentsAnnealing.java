@@ -11,6 +11,8 @@ package ptrman.visualizationTests;
 
 import boofcv.gui.image.ImagePanel;
 import ptrman.bpsolver.Solver2b;
+import ptrman.levels.retina.RetinaPrimitive;
+import ptrman.levels.retina.helper.ProcessConnector;
 
 import javax.swing.*;
 import java.awt.*;
@@ -22,11 +24,12 @@ import java.util.stream.Stream;
  *
  */
 public class VisualizeLinesegmentsAnnealing {
+	int episodeLen = 100; // how many frames do we visualize one step?
 
 	final static int RETINA_WIDTH = 128;
 	final static int RETINA_HEIGHT = 128;
-	static int chosenImage = 0; // chosen image
-	static int animationFrameNumber = 0;
+	int chosenImage = 0; // chosen image
+	int animationFrameNumber = 0;
 	public Solver2b solution = Solver2b.graph();
 	public VisualizationDrawer outputRenderer = new VisualizationDrawer(); // used for drawing
 	int time = 0;
@@ -34,7 +37,6 @@ public class VisualizeLinesegmentsAnnealing {
 	ImagePanel outView = new ImagePanel();
 	private BufferedImage output;
 	private BufferedImage input;
-	private int annealingStep;
 	public VisualizeLinesegmentsAnnealing() {
 		JFrame w = new JFrame();
 		w.setLayout(new GridLayout(2, 1));
@@ -44,7 +46,9 @@ public class VisualizeLinesegmentsAnnealing {
 		w.doLayout();
 		w.setVisible(true);
 		javax.swing.Timer t = new Timer(1000 / 30, (a) -> {
-			update(apply());
+			input();
+			update();
+			time++;
 		});
 		t.start();
 	}
@@ -53,9 +57,15 @@ public class VisualizeLinesegmentsAnnealing {
 		new VisualizeLinesegmentsAnnealing();
 	}
 
-	public BufferedImage apply() {
+	public void input() {
 		if (input == null || input.getWidth() != RETINA_WIDTH || input.getHeight() != RETINA_HEIGHT)
 			input = new BufferedImage(RETINA_WIDTH, RETINA_HEIGHT, BufferedImage.TYPE_INT_ARGB);
+
+		if (time % episodeLen != 0) {
+			return; //no need to change
+		}
+
+		chosenImage = new Random().nextInt(6);
 
 		Graphics2D g2 = input.createGraphics();
 
@@ -65,16 +75,19 @@ public class VisualizeLinesegmentsAnnealing {
 
 		g2.setColor(Color.WHITE);
 
-		if (chosenImage == 0) { // draw polygon
-			g2.setColor(new Color(1.0f, 0.0f, 0.0f));
 
-			Polygon poly = new Polygon();
+		switch (chosenImage) {
+			case 0:  // draw polygon
+				g2.setColor(new Color(1.0f, 0.0f, 0.0f));
 
-			poly.addPoint(10, 10);
-			poly.addPoint(70, 10);
-			poly.addPoint(40, 50);
+				Polygon poly = new Polygon();
 
-			g2.fillPolygon(poly);
+				poly.addPoint(10, 10);
+				poly.addPoint(70, 10);
+				poly.addPoint(40, 50);
+
+				g2.fillPolygon(poly);
+				break;
 		}
 		if (chosenImage == 1) { // draw "A"
 			int endpointADeltaX = (int) (Math.cos(animationFrameNumber * 0.1) * 10);
@@ -95,7 +108,6 @@ public class VisualizeLinesegmentsAnnealing {
 		} else if (chosenImage == 4) {
 			// draw big boxes
 			g2.fillRect(10, 10, 70, 20);
-
 			g2.fillRect(10, 50, 70, 20);
 		} else if (chosenImage == 5) { // chinese symbol
 			// text
@@ -103,25 +115,22 @@ public class VisualizeLinesegmentsAnnealing {
 			g2.drawString("不", 2, 100);
 		}
 
-
-		return input;
 	}
 
-	void update(BufferedImage input) {
+	void update() {
 
-		time++;
+		solution.set(solution.input, this.input);
 
-		int episodeLen = 10; // how many frames do we visualize one step?
-		if (time % episodeLen == 0) {
-			chosenImage = new Random().nextInt(6);
-		}
+		outputRender();
 
-		solution.preFrame(input); // do all processing and setup before the actual processing of the frame
+		SwingUtilities.invokeLater(()->{
+			inView.setImageRepaint(input);
+			outView.setImageRepaint(output);
+		});
 
-		solution.frameStep(); // step of a frame
+	}
 
-		solution.postFrame(); // finish off frame processing
-
+	private void outputRender() {
 		if (output == null)
 			output = new BufferedImage(input.getWidth(), input.getHeight(), BufferedImage.TYPE_INT_RGB);
 
@@ -130,16 +139,17 @@ public class VisualizeLinesegmentsAnnealing {
 		g.setColor(new Color(1f, 1f, 1f)); //transparent
 		g.fillRect(0, 0, output.getWidth(), output.getHeight());
 
-		Stream.of(solution.connectorDetectorsFromProcessHForEdge).flatMap(x -> x.out.stream()).forEach(r -> {
-			outputRenderer.drawPrimitive(r, g);
-		});
+		ProcessConnector<RetinaPrimitive>[] hh = solution.connectorDetectorsFromProcessHForEdge;
+		if (hh!=null) {
+			Stream.of(hh).flatMap(x -> x.out.stream()).forEach(r -> {
+				outputRenderer.drawPrimitive(r, g);
+			});
+		}
 
-		g.dispose();
-
-		inView.setImageRepaint(input);
-		outView.setImageRepaint(output);
 
 		// mouse cursor
 		//ellipse(mouseX, mouseY, 4, 4);
+
+		g.dispose();
 	}
 }

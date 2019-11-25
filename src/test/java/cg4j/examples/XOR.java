@@ -102,7 +102,7 @@ public class XOR {
 			.minimizeMeanSq(yTarget, y);
 		((AdamOptimizer)opt).learningRate = 0.1f;
 
-		g.nodeOrAdd(opt.cost);
+		g.the(opt.cost);
 
 		for (int i = 0; i < 100; i++) {
 			Eval xy = new Eval();
