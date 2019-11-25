@@ -138,8 +138,7 @@ public class SolverTest {
     
     private static List<Node> getNodesFromImage(Map2d<Boolean> image, Solver bpSolver) {
         // TODO MAYBE < put this into a method in BpSolver, name "clearWorkspace()" (which cleans the ltm/workspace and the coderack) >
-        bpSolver.coderack.flush();
-        
+
         ProcessA processA = new ProcessA();
         ProcessB processB = new ProcessB();
         // ProcessC processC = new ProcessC(null); TODO< overwork >

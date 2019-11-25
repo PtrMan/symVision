@@ -88,7 +88,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             else if(chosenImage == 5) { // chinese symbol
                 // text
                 g2.setFont(new Font("TimesRoman", Font.PLAIN, 90));
-                g2.drawString("不", 2, 100);
+                g2.drawString("", 2, 100);
             }
 
 

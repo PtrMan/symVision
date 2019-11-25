@@ -50,7 +50,7 @@ public class VisualizeAnimation extends PApplet {
 
             { // chinese symbol
                 g2.setFont(new Font("TimesRoman", Font.PLAIN, 90));
-                g2.drawString("不", (animationTime*5) % 100, 100);
+                g2.drawString("", (animationTime*5) % 100, 100);
             }
 
             { //
