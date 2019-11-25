@@ -9,15 +9,20 @@
  */
 package ptrman.visualizationTests;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
 import processing.core.PApplet;
 import processing.core.PImage;
 import ptrman.bpsolver.IImageDrawer;
 import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Solver2;
+import ptrman.levels.retina.RetinaPrimitive;
+import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.misc.ImageConverter;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
 
 /**
  *
@@ -90,7 +95,10 @@ public class VisualizeAnimation extends PApplet {
             tint(255.0f, 255.0f); // reset tint
         }
 
-        drawer.drawPrimitives(solver2, this);
+        drawer.drawPrimitives(
+            Iterables.concat(Iterables.transform(
+                Lists.newArrayList(solver2.connectorDetectorsFromProcessHForEdge), (ProcessConnector<RetinaPrimitive> x)->x.out))
+            , this);
 
 
         // mouse cursor
