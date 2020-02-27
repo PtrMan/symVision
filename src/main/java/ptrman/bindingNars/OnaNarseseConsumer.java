@@ -10,8 +10,11 @@ public class OnaNarseseConsumer implements FormatedNarseseConsumer {
 
     @Override
     public void emitLineSegment(String name, int posAX, int posAY, int posBX, int posBY, double conf) {
-        String ser = (posAX/quantization)+"_"+(posAY/quantization)+"__" +(posBX/quantization)+"_" +(posBY/quantization);
+        String ser = "(" + (posAX/quantization)+"_"+(posAY/quantization)+" * " +(posBX/quantization)+"_" +(posBY/quantization) + ")";
+        ser = ser.replace("-", "N"); // because ONA seems to have problem with minus
+
         String n = "<("+name+" * "+ser+") --> line >.\0";
+        System.out.println(n);
 
         byte[] buf = n.getBytes();
         DatagramSocket socket = null;
