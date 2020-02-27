@@ -13,7 +13,7 @@ public class OnaNarseseConsumer implements FormatedNarseseConsumer {
         String ser = "(" + (posAX/quantization)+"_"+(posAY/quantization)+" * " +(posBX/quantization)+"_" +(posBY/quantization) + ")";
         ser = ser.replace("-", "N"); // because ONA seems to have problem with minus
 
-        String n = "<("+name+" * "+ser+") --> line >.\0";
+        String n = "<("+name+" * "+ser+") --> line >. :|:\0";
         System.out.println(n);
 
         byte[] buf = n.getBytes();
@@ -30,7 +30,7 @@ public class OnaNarseseConsumer implements FormatedNarseseConsumer {
 
     @Override
     public void emitLineIntersection(String nameA, String nameB) {
-        String n = "<("+nameA+" * "+nameB+") --> lineIntrsctn>.\0";
+        String n = "<("+nameA+" * "+nameB+") --> lineIntrsctn>. :|:\0";
 
         byte[] buf = n.getBytes();
         DatagramSocket socket = null;
