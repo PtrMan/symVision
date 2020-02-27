@@ -72,5 +72,7 @@ public class NarsBinding {
                 }
             }
         }
+
+        consumer.flush(); // force flush because we are done with the frame
     }
 }

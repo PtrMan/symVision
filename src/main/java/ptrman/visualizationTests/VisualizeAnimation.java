@@ -11,6 +11,8 @@ package ptrman.visualizationTests;
 
 import processing.core.PApplet;
 import processing.core.PImage;
+import ptrman.bindingNars.NarsBinding;
+import ptrman.bindingNars.OnaNarseseConsumer;
 import ptrman.bpsolver.IImageDrawer;
 import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Solver2;
@@ -30,6 +32,9 @@ public class VisualizeAnimation extends PApplet {
     public Solver2 solver2 = new Solver2();
     private PImage pimg;
 
+    public VisualizeAnimation() {
+        solver2.narsBinding = new NarsBinding(new OnaNarseseConsumer());
+    }
 
     public static class InputDrawer implements IImageDrawer {
 

@@ -15,4 +15,7 @@ package ptrman.bindingNars;
 public interface FormatedNarseseConsumer {
     void emitLineSegment(String name, int posAX, int posAY, int posBX, int posBY, double conf);
     void emitLineIntersection(String nameA, String nameB);
+
+    // sends buffered data to consumer if buffering is necessary
+    void flush();
 }

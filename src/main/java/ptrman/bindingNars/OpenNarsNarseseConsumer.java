@@ -21,4 +21,9 @@ public class OpenNarsNarseseConsumer implements FormatedNarseseConsumer {
     public void emitLineIntersection(String nameA, String nameB) {
         System.out.println("<(*,"+nameA+","+nameB+") --> lineIntrsctn>.");
     }
+
+    @Override
+    public void flush() {
+        // do nothing
+    }
 }
