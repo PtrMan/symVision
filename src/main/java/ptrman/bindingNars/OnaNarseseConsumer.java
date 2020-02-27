@@ -43,18 +43,5 @@ public class OnaNarseseConsumer implements FormatedNarseseConsumer {
 
     @Override
     public void flush() {
-        // give NAR time
-        String n = "50\0";
-
-        byte[] buf = n.getBytes();
-        DatagramSocket socket = null;
-        try {
-            socket = new DatagramSocket();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(onaDestIp), 50000);
-            socket.send(packet);
-        }
-        catch (SocketException e) {}
-        catch (UnknownHostException e) {}
-        catch (IOException e) {}
     }
 }
