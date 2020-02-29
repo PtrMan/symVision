@@ -223,7 +223,7 @@ public class ProcessH implements IProcess {
             return false;
         }
 
-        // projecting the points on the other line and measue the distance
+        // projecting the points on the other line and measure the distance
 
         if( !isProjectedPointOntoLineBelowDistanceLimit(projectedBBegin, inplaceDetectorA) ) {
             return false;

@@ -61,6 +61,24 @@ public class VisualizeAnimation extends PApplet {
             g2.drawRect(0, 0, off_Image.getWidth(), off_Image.getHeight());
 
             if (scene.equals("pong")) {
+
+                ballX += ballVelX;
+                ballY += ballVelY;
+
+                if (ballX < 10) {
+                    ballVelX = Math.abs(ballVelX);
+                }
+                if (ballX > 120) {
+                    ballVelX = -Math.abs(ballVelX);
+                }
+
+                if (ballY < 0) {
+                    ballVelY = Math.abs(ballVelY);
+                }
+                if (ballY > 100) {
+                    ballVelY = -Math.abs(ballVelY);
+                }
+
                 g2.setColor(Color.WHITE);
 
                 g2.drawRect(10, 50, 10, 30);
@@ -81,22 +99,6 @@ public class VisualizeAnimation extends PApplet {
                 }
             }
 
-            ballX += ballVelX;
-            ballY += ballVelY;
-
-            if (ballX < 10) {
-                ballVelX = Math.abs(ballVelX);
-            }
-            if (ballX > 120) {
-                ballVelX = -Math.abs(ballVelX);
-            }
-
-            if (ballY < 0) {
-                ballVelY = Math.abs(ballVelY);
-            }
-            if (ballY > 100) {
-                ballVelY = -Math.abs(ballVelY);
-            }
 
             return off_Image;
         }

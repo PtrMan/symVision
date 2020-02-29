@@ -129,8 +129,9 @@ public class Solver2 {
         for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // create processors for edges
             processAEdge[i] = new ProcessA();
             processDEdge[i] = new ProcessD();
-            processDEdge[i].maximalDistanceOfPositions = 5000.0;
+            processDEdge[i].maximalDistanceOfPositions = 3.0;
             processDEdge[i].overwriteObjectId = 0; // we want to overwrite the id of the detectors, because some parts of the program still assume object id's and we can't provide it in general case
+            processDEdge[i].processDSampleByProximityProximity = 6.0;
         }
 
         connectorDetectorsFromProcessDForEdge = new ProcessConnector[numberOfEdgeDetectorDirections];

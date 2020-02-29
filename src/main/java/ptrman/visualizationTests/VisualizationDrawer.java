@@ -21,9 +21,9 @@ import ptrman.levels.retina.helper.ProcessConnector;
 public class VisualizationDrawer {
     public boolean drawVisualizationOfAltitude = true;
     public boolean drawVisualizationOfEndoSceletons = false; // do we visualize all samples of endo/exo -sceleton
-    public boolean drawVisualizationOfLineDetectors = true;
+    public boolean drawVisualizationOfLineDetectors = false;
     public boolean drawVisualizationOfLineDetectorsEnableAct = true; // do we draw activation of line detectors?
-    public boolean drawVisualizationOfEdgeLineDetectors = true;
+    public boolean drawVisualizationOfEdgeLineDetectors = false;
     public boolean drawVisualizationOfTex = true; // draw visualization of texture
 
     public void drawDetectors(Solver2 solver, PApplet applet) {
@@ -64,7 +64,7 @@ public class VisualizationDrawer {
                         applet.line((float)x0, (float)y0, (float)x1, (float)y1);
                     }
 
-                    if (false) {
+                    if (true) {
                         applet.stroke(255.0f, 0.0f, 0.0f);
                         for( ProcessA.Sample iSample : iLineDetector.samples) {
                             applet.rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
@@ -115,6 +115,7 @@ public class VisualizationDrawer {
 
     public void drawPrimitives(Solver2 solver, PApplet applet) {
         // * draw primitives for edges
+
         for (ProcessConnector<RetinaPrimitive> iCntr : solver.connectorDetectorsFromProcessHForEdge) {
             for(RetinaPrimitive iLinePrimitive : iCntr.out) {
                 applet.stroke(0.0f, 255.0f, 0.0f);
@@ -127,6 +128,35 @@ public class VisualizationDrawer {
                 double y1 = bb[1];
                 applet.line((float)x0, (float)y0, (float)x1, (float)y1);
             }
+        }
+
+
+        { // iterate over line detectors of processD for edges
+            for (ProcessD iProcessDEdge : solver.processDEdge) {
+                for(LineDetectorWithMultiplePoints iLineDetector : iProcessDEdge.annealedCandidates) {
+                    // iLineDetector.cachedSamplePositions
+
+                    float act = drawVisualizationOfLineDetectorsEnableAct ? (float)iLineDetector.calcActivation() : 1.0f;
+                    applet.stroke(act*255.0f, act*255.0f, act*255.0f);
+
+
+                    for (RetinaPrimitive iLine : solver.processD.splitDetectorIntoLines(iLineDetector)) {
+                        double x0 = iLine.line.a.getDataRef()[0];
+                        double y0 = iLine.line.a.getDataRef()[1];
+                        double x1 = iLine.line.b.getDataRef()[0];
+                        double y1 = iLine.line.b.getDataRef()[1];
+                        applet.line((float)x0, (float)y0, (float)x1, (float)y1);
+                    }
+
+                    applet.stroke(255.0f, 0.0f, 0.0f);
+                    for( ProcessA.Sample iSample : iLineDetector.samples) {
+
+                        applet.rect((float)iSample.position.getOne(), (float)iSample.position.getTwo(), 1, 1);
+                    }
+
+                }
+            }
+
         }
 
         // * draw primitives for endoskeleton
