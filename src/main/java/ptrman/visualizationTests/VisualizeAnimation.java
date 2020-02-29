@@ -32,6 +32,16 @@ public class VisualizeAnimation extends PApplet {
     public Solver2 solver2 = new Solver2();
     private PImage pimg;
 
+    // scene to choose
+    // "pong" pong
+    // "symbols1" symbol animation 1
+    public static String scene = "pong";
+
+    public static double ballX = 30.0;
+    public static double ballY = 50.0;
+    public static double ballVelX = 6.1;
+    public static double ballVelY = 1.6;
+
     public VisualizeAnimation() {
         solver2.narsBinding = new NarsBinding(new OnaNarseseConsumer());
     }
@@ -48,21 +58,45 @@ public class VisualizeAnimation extends PApplet {
             Graphics2D g2 = off_Image.createGraphics();
 
             g2.setColor(Color.BLACK);
-
             g2.drawRect(0, 0, off_Image.getWidth(), off_Image.getHeight());
 
-            g2.setColor(Color.WHITE);
+            if (scene.equals("pong")) {
+                g2.setColor(Color.WHITE);
 
-            { // chinese symbol
-                g2.setFont(new Font("TimesRoman", Font.PLAIN, 90));
-                g2.drawString("不", (animationTime*5) % 100, 100);
+                g2.drawRect(10, 50, 10, 30);
+
+                g2.fillOval((int)ballX, (int)ballY, 20, 20);
+            }
+            else if (scene.equals("symbols1")) {
+                g2.setColor(Color.WHITE);
+
+                { // chinese symbol
+                    g2.setFont(new Font("TimesRoman", Font.PLAIN, 90));
+                    g2.drawString("不", (animationTime*5) % 100, 100);
+                }
+
+                { //
+                    g2.setFont(new Font("TimesRoman", Font.PLAIN, 90));
+                    g2.drawString("X", 100 - (animationTime*8) % 100, 120);
+                }
             }
 
-            { //
-                g2.setFont(new Font("TimesRoman", Font.PLAIN, 90));
-                g2.drawString("X", 100 - (animationTime*8) % 100, 120);
+            ballX += ballVelX;
+            ballY += ballVelY;
+
+            if (ballX < 10) {
+                ballVelX = Math.abs(ballVelX);
+            }
+            if (ballX > 120) {
+                ballVelX = -Math.abs(ballVelX);
             }
 
+            if (ballY < 0) {
+                ballVelY = Math.abs(ballVelY);
+            }
+            if (ballY > 100) {
+                ballVelY = -Math.abs(ballVelY);
+            }
 
             return off_Image;
         }
