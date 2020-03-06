@@ -16,6 +16,8 @@ import ptrman.bpsolver.Solver2;
 import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
 
+import java.io.IOException;
+import java.net.*;
 import java.util.ArrayList;
 
 /**
@@ -135,6 +137,9 @@ public class VisualizationDrawer {
 
 
         { // iterate over line detectors of processD for edges
+
+            ArrayList<Bb> allBbs  = new ArrayList<>(); // BB's of all edge filters
+
             for (ProcessD iProcessDEdge : solver.processDEdge) {
                 for(LineDetectorWithMultiplePoints iLineDetector : iProcessDEdge.annealedCandidates) {
                     // iLineDetector.cachedSamplePositions
@@ -187,17 +192,64 @@ public class VisualizationDrawer {
                 }
 
                 // visualize BB's
-                applet.stroke(255.0f, 255.0f, 0.0f);
-                applet.fill(0, 1.0f);
-                for(Bb iBB : bbs) {
-                    applet.rect((int)iBB.minx, (int) iBB.miny, (int)(iBB.maxx-iBB.minx), (int)(iBB.maxy-iBB.miny));
+                if(false) {
+                    applet.stroke(255.0f, 255.0f, 0.0f);
+                    applet.fill(0, 1.0f);
+                    for(Bb iBB : bbs) {
+                        applet.rect((int)iBB.minx, (int) iBB.miny, (int)(iBB.maxx-iBB.minx), (int)(iBB.maxy-iBB.miny));
+                    }
                 }
 
-                // send to NAR
-                // TODO TODO TODO
-
+                // transfer bbs to all
+                allBbs.addAll(bbs);
             }
 
+
+
+            // merge BB's
+            for(int idx0=0; idx0 < allBbs.size();) {
+                for(int idx1=idx0+1; idx1 < allBbs.size(); idx1++) {
+                    if (Bb.checkOverlap(allBbs.get(idx0), allBbs.get(idx1))) {
+                        allBbs.set(idx0, Bb.merge(allBbs.get(idx0), allBbs.get(idx1)));
+                        allBbs.remove(idx1);
+
+                        // restart
+                        idx0 = -1;
+
+                        break;
+                    }
+                }
+                idx0++;
+            }
+
+            // visualize merged BB's
+            applet.stroke(0.0f, 255.0f, 0.0f);
+            applet.fill(0, 1.0f);
+            for(Bb iBB : allBbs) {
+                applet.rect((int)iBB.minx, (int) iBB.miny, (int)(iBB.maxx-iBB.minx), (int)(iBB.maxy-iBB.miny));
+            }
+
+            // send to NAR
+            // HACK< we should send it normally over NarsBinding >
+            for(Bb iBb : allBbs) {
+                int quantization = 15;
+                String onaDestIp = "127.0.0.1";
+
+                String ser = "(" + ((int)iBb.minx/quantization)+"_"+((int)iBb.miny/quantization)+" * " +((int)iBb.maxx/quantization)+"_" +((int)iBb.maxy/quantization) + ")";
+                ser = ser.replace("-", "N"); // because ONA seems to have problem with minus
+
+                String n = "< "+ser+" --> bb >.";
+                byte[] buf = n.getBytes();
+                DatagramSocket socket = null;
+                try {
+                    socket = new DatagramSocket();
+                    DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(onaDestIp), 50000);
+                    socket.send(packet);
+                }
+                catch (SocketException e) {}
+                catch (UnknownHostException e) {}
+                catch (IOException e) {}
+            }
         }
 
         // * draw primitives for endoskeleton

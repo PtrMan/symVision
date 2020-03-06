@@ -33,18 +33,46 @@ public class Bb {
         bb2.maxy = bb.maxy+maxDist;
         bb2.miny = bb.miny-maxDist;
         return bb2.in(x,y);
+    }
 
-        /*
-        if (x-maxDist > bb.maxx || x+maxDist < bb.minx ) {
+    public static Bb merge(Bb a, Bb b) {
+        Bb res = new Bb();
+        res.add(a.minx, a.miny);
+        res.add(a.maxx, a.maxy);
+        res.add(b.minx, b.miny);
+        res.add(b.maxx, b.maxy);
+        return res;
+    }
+
+    public static boolean checkOverlap(Bb a, Bb b) {
+        return overlapRange(a.minx, a.maxx, b.minx, b.maxx) && overlapRange(a.miny, a.maxy, b.miny, b.maxy);
+    }
+
+    // stupid helper
+    public static boolean overlapRange(double mina, double maxa, double minb, double maxb) {
+        if (mina<minb && minb<maxa) {
+            return true;
+        }
+        if (mina<maxb && maxb<maxa) {
             return true;
         }
 
-        if (y-maxDist > bb.maxy || y+maxDist < bb.miny ) {
+        if (minb<mina && mina<maxb) {
+            return true;
+        }
+        if (minb<maxa && maxa<maxb) {
+            return true;
+        }
+
+        if (mina<minb && maxb<maxa) {
+            return true;
+        }
+
+        if (minb<mina && maxa<maxb) {
             return true;
         }
 
         return false;
-        */
     }
 
     public double minx = Double.POSITIVE_INFINITY;
