@@ -91,7 +91,7 @@ public class ProcessB extends AbstractProcessB {
             }
         }
 
-        System.out.println("cell acceleration (positive cases): " + ((float) counterCellPositiveCandidates / (float) counterCellCandidates) * 100.0f + "%" );
+        if(false)  System.out.println("cell acceleration (positive cases): " + ((float) counterCellPositiveCandidates / (float) counterCellCandidates) * 100.0f + "%" );
     }
 
     @Override

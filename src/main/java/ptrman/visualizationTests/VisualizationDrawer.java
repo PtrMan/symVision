@@ -19,6 +19,7 @@ import ptrman.levels.retina.helper.ProcessConnector;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Random;
 
 /**
  * encapsulates functionality to draw visualizations for showcase and debugging
@@ -230,27 +231,34 @@ public class VisualizationDrawer {
             }
 
             // send to NAR
-            // HACK< we should send it normally over NarsBinding >
-            for(Bb iBb : allBbs) {
-                int quantization = 15;
-                String onaDestIp = "127.0.0.1";
 
-                String ser = "(" + ((int)iBb.minx/quantization)+"u"+((int)iBb.miny/quantization)+" * " +((int)iBb.maxx/quantization)+"u" +((int)iBb.maxy/quantization) + ")";
-                ser = ser.replace("-", "N"); // because ONA seems to have problem with minus
+            // HACK< it seems like NAR can get overwhelmed, so we don't send every time
+            Random rng = new Random();
+            if (rng.nextFloat() < 0.2) {
 
-                String n = "< "+ser+" --> bb >. :|:\0";
-                System.out.println(n);
-                byte[] buf = n.getBytes();
-                DatagramSocket socket = null;
-                try {
-                    socket = new DatagramSocket();
-                    DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(onaDestIp), 50000);
-                    socket.send(packet);
+                // HACK< we should send it normally over NarsBinding >
+                for(Bb iBb : allBbs) {
+                    int quantization = 15;
+                    String onaDestIp = "127.0.0.1";
+
+                    String ser = "(" + ((int)iBb.minx/quantization)+"u"+((int)iBb.miny/quantization)+" * " +((int)iBb.maxx/quantization)+"u" +((int)iBb.maxy/quantization) + ")";
+                    ser = ser.replace("-", "N"); // because ONA seems to have problem with minus
+
+                    String n = "< "+ser+" --> bb >. :|:\0";
+                    //System.out.println(n);
+                    byte[] buf = n.getBytes();
+                    DatagramSocket socket = null;
+                    try {
+                        socket = new DatagramSocket();
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(onaDestIp), 50000);
+                        socket.send(packet);
+                    }
+                    catch (SocketException e) {}
+                    catch (UnknownHostException e) {}
+                    catch (IOException e) {}
                 }
-                catch (SocketException e) {}
-                catch (UnknownHostException e) {}
-                catch (IOException e) {}
             }
+
         }
 
         // * draw primitives for endoskeleton

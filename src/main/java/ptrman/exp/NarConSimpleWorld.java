@@ -24,6 +24,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.*;
+import java.util.Random;
 
 /**
  * * connect to NAR
@@ -50,6 +51,8 @@ public class NarConSimpleWorld extends PApplet {
     public static double batY = 50.0;
 
     public static DatagramSocket socket;
+
+    public static int t = 0; // timer
 
     public NarConSimpleWorld() {
         try {
@@ -117,6 +120,8 @@ public class NarConSimpleWorld extends PApplet {
 
 
     public void draw() {
+        t++;
+
         try {
             byte[] buf = new byte[1024];
             DatagramPacket packet = new DatagramPacket(buf, buf.length);
@@ -126,10 +131,10 @@ public class NarConSimpleWorld extends PApplet {
             System.out.println("action code = "+ Integer.toString(code));
 
             if (code == 114) {
-                batVel = -20.0;
+                batVel = -7.0;
             }
             else {
-                batVel = 20.0;
+                batVel = 7.0;
             }
         }
         catch (SocketTimeoutException e) {
@@ -140,19 +145,56 @@ public class NarConSimpleWorld extends PApplet {
             e.printStackTrace();
         }
 
-        // feed with goal
-        String n = "good_nar! :|:\0";
-        System.out.println(n);
-        byte[] buf = n.getBytes();
-        DatagramSocket socket = null;
-        try {
-            socket = new DatagramSocket();
-            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName("127.0.0.1"), 50000);
-            socket.send(packet);
+        {
+            Random rng = new Random();
+            if(rng.nextFloat() < 0.02) {
+                if (rng.nextFloat() < 0.5) {
+                    String n = "^right! :|:\0";
+                    //System.out.println(n);
+                    byte[] buf = n.getBytes();
+                    DatagramSocket socket = null;
+                    try {
+                        socket = new DatagramSocket();
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName("127.0.0.1"), 50000);
+                        socket.send(packet);
+                    }
+                    catch (SocketException e) {}
+                    catch (UnknownHostException e) {}
+                    catch (IOException e) {}
+                }
+                else {
+                    String n = "^left! :|:\0";
+                    //System.out.println(n);
+                    byte[] buf = n.getBytes();
+                    DatagramSocket socket = null;
+                    try {
+                        socket = new DatagramSocket();
+                        DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName("127.0.0.1"), 50000);
+                        socket.send(packet);
+                    }
+                    catch (SocketException e) {}
+                    catch (UnknownHostException e) {}
+                    catch (IOException e) {}
+                }
+            }
         }
-        catch (SocketException e) {}
-        catch (UnknownHostException e) {}
-        catch (IOException e) {}
+
+        if (t%3 == 0) {
+            // feed with goal
+            String n = "good_nar! :|:\0";
+            //System.out.println(n);
+            byte[] buf = n.getBytes();
+            DatagramSocket socket = null;
+            try {
+                socket = new DatagramSocket();
+                DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName("127.0.0.1"), 50000);
+                socket.send(packet);
+            }
+            catch (SocketException e) {}
+            catch (UnknownHostException e) {}
+            catch (IOException e) {}
+        }
+
 
 
 
