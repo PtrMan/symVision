@@ -235,10 +235,11 @@ public class VisualizationDrawer {
                 int quantization = 15;
                 String onaDestIp = "127.0.0.1";
 
-                String ser = "(" + ((int)iBb.minx/quantization)+"_"+((int)iBb.miny/quantization)+" * " +((int)iBb.maxx/quantization)+"_" +((int)iBb.maxy/quantization) + ")";
+                String ser = "(" + ((int)iBb.minx/quantization)+"u"+((int)iBb.miny/quantization)+" * " +((int)iBb.maxx/quantization)+"u" +((int)iBb.maxy/quantization) + ")";
                 ser = ser.replace("-", "N"); // because ONA seems to have problem with minus
 
-                String n = "< "+ser+" --> bb >.";
+                String n = "< "+ser+" --> bb >.\0";
+                System.out.println(n);
                 byte[] buf = n.getBytes();
                 DatagramSocket socket = null;
                 try {

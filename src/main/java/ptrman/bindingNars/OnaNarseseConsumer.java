@@ -10,6 +10,8 @@ public class OnaNarseseConsumer implements FormatedNarseseConsumer {
 
     @Override
     public void emitLineSegment(String name, int posAX, int posAY, int posBX, int posBY, double conf) {
+        /* HACK< don't send  >
+
         String ser = "(" + (posAX/quantization)+"_"+(posAY/quantization)+" * " +(posBX/quantization)+"_" +(posBY/quantization) + ")";
         ser = ser.replace("-", "N"); // because ONA seems to have problem with minus
 
@@ -26,10 +28,12 @@ public class OnaNarseseConsumer implements FormatedNarseseConsumer {
         catch (SocketException e) {}
         catch (UnknownHostException e) {}
         catch (IOException e) {}
+        */
     }
 
     @Override
     public void emitLineIntersection(String nameA, String nameB) {
+        /* HACK< don't send  >
         String n = "<("+nameA+" * "+nameB+") --> lineIntrsctn>. :|:\0";
 
         byte[] buf = n.getBytes();
@@ -42,6 +46,7 @@ public class OnaNarseseConsumer implements FormatedNarseseConsumer {
         catch (SocketException e) {}
         catch (UnknownHostException e) {}
         catch (IOException e) {}
+        */
     }
 
     @Override
