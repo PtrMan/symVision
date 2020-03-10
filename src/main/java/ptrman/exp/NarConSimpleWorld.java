@@ -23,10 +23,7 @@ import ptrman.visualizationTests.VisualizationDrawer;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.SocketException;
-import java.net.SocketTimeoutException;
+import java.net.*;
 
 /**
  * * connect to NAR
@@ -142,6 +139,21 @@ public class NarConSimpleWorld extends PApplet {
         catch (IOException e) {
             e.printStackTrace();
         }
+
+        // feed with goal
+        String n = "good_nar! :|:\0";
+        System.out.println(n);
+        byte[] buf = n.getBytes();
+        DatagramSocket socket = null;
+        try {
+            socket = new DatagramSocket();
+            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName("127.0.0.1"), 50000);
+            socket.send(packet);
+        }
+        catch (SocketException e) {}
+        catch (UnknownHostException e) {}
+        catch (IOException e) {}
+
 
 
         background(0);
