@@ -232,9 +232,8 @@ public class VisualizationDrawer {
 
             // send to NAR
 
-            // HACK< it seems like NAR can get overwhelmed, so we don't send every time
-            Random rng = new Random();
-            if (rng.nextFloat() < 0.6) {
+            //< it seems like NAR can get overwhelmed, so we don't send every time
+            if ((solver.t % 2) == 0) {
 
                 // HACK< we should send it normally over NarsBinding >
                 for(Bb iBb : allBbs) {

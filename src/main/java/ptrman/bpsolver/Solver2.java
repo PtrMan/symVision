@@ -24,6 +24,8 @@ import java.awt.image.BufferedImage;
  * new solver which is incomplete but should be in a working state
  */
 public class Solver2 {
+    public long t = 0; // time
+
     public ProcessFi processFi = new ProcessFi();
     public ProcessD processD;
     public ProcessD[] processDEdge;
@@ -253,9 +255,11 @@ public class Solver2 {
     }
 
     /**
-     * must be called to "finilize" the processing of a frame
+     * must be called to "finalize" the processing of a frame
      */
     public void postFrame() {
+        t++; // increment time
+
         // * emit narsese to narsese consumer
 
         processD.commitLineDetectors(); // split line detectors into "real" primitives
