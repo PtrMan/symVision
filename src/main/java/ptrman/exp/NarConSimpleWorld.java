@@ -85,7 +85,7 @@ public class NarConSimpleWorld extends PApplet {
                 ballY += ballVelY;
 
                 batY += batVel;
-                batY = Math.min(batY, 80);
+                batY = Math.min(batY, 100);
                 batY = Math.max(batY, 0);
 
                 if (ballX < 10) {
@@ -100,6 +100,25 @@ public class NarConSimpleWorld extends PApplet {
                 }
                 if (ballY > 100) {
                     ballVelY = -Math.abs(ballVelY);
+                }
+
+                if (ballY < 0) {
+                    float distY = (float)Math.abs(ballY - batY);
+                    if (distY < 15) {
+                        // hit bat -> good NAR
+                        String n = "good_nar. :|:\0";
+                        System.out.println(n);
+                        byte[] buf = n.getBytes();
+                        DatagramSocket socket = null;
+                        try {
+                            socket = new DatagramSocket();
+                            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName("127.0.0.1"), 50000);
+                            socket.send(packet);
+                        }
+                        catch (SocketException e) {}
+                        catch (UnknownHostException e) {}
+                        catch (IOException e) {}
+                    }
                 }
 
                 g2.setColor(Color.WHITE);
@@ -147,7 +166,7 @@ public class NarConSimpleWorld extends PApplet {
 
         {
             Random rng = new Random();
-            if(rng.nextFloat() < 0.02) {
+            if(rng.nextFloat() < 0.08) {
                 if (rng.nextFloat() < 0.5) {
                     String n = "^right! :|:\0";
                     //System.out.println(n);
