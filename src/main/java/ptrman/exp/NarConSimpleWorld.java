@@ -198,7 +198,7 @@ public class NarConSimpleWorld extends PApplet {
             }
         }
 
-        if (t%3 == 0) {
+        if (t%1 == 0) {
             // feed with goal
             String n = "good_nar! :|:\0";
             //System.out.println(n);

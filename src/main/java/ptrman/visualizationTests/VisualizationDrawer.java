@@ -19,6 +19,7 @@ import ptrman.levels.retina.helper.ProcessConnector;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Random;
 
 /**
@@ -235,7 +236,53 @@ public class VisualizationDrawer {
             //< it seems like NAR can get overwhelmed, so we don't send every time
             if ((solver.t % 2) == 0) {
 
+                // HACK< sort BB's by x axis >
+                Collections.sort(allBbs, (a, b) -> (a.minx == b.minx) ? 0 : ((a.minx > b.minx) ? 1 : -1));
+
                 // HACK< we should send it normally over NarsBinding >
+
+                // build relations to center
+                if (allBbs.size() >= 2) {
+                    Bb centerBb = allBbs.get(0);
+                    for(int idx=1;idx<allBbs.size();idx++) {
+                        Bb otherBb = allBbs.get(idx);
+
+                        if (otherBb.minx < 20.0) {
+                            continue; // HACK for pong, ignore it because we else get BS relations
+                        }
+
+                        String relY = "c";
+                        double diffY = centerBb.miny-otherBb.miny;
+                        double diffX = centerBb.minx-otherBb.minx;
+
+                        if (diffY < -15.0) {
+                            relY = "b"; // below
+                        }
+                        if (diffY > 15.0) {
+                            relY = "a"; // above
+                        }
+
+                        int quantization = 15;
+                        String onaDestIp = "127.0.0.1";
+
+                        String n = "< {"+(relY)+"} --> rel >. :|:\0";
+                        System.out.println(n);
+                        byte[] buf = n.getBytes();
+                        DatagramSocket socket = null;
+                        try {
+                            socket = new DatagramSocket();
+                            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(onaDestIp), 50000);
+                            socket.send(packet);
+                        }
+                        catch (SocketException e) {}
+                        catch (UnknownHostException e) {}
+                        catch (IOException e) {}
+
+                        break; // we only care about first relation
+                    }
+                }
+
+                /* old code
                 for(Bb iBb : allBbs) {
                     int quantization = 15;
                     String onaDestIp = "127.0.0.1";
@@ -256,6 +303,8 @@ public class VisualizationDrawer {
                     catch (UnknownHostException e) {}
                     catch (IOException e) {}
                 }
+
+                 */
             }
 
         }
