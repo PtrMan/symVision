@@ -234,7 +234,7 @@ public class VisualizationDrawer {
             // send to NAR
 
             //< it seems like NAR can get overwhelmed, so we don't send every time
-            if ((solver.t % 2) == 0) {
+            if ((solver.t % 1) == 0) {
 
                 // HACK< sort BB's by x axis >
                 Collections.sort(allBbs, (a, b) -> (a.minx == b.minx) ? 0 : ((a.minx > b.minx) ? 1 : -1));
