@@ -120,6 +120,8 @@ public class VisualizationDrawer {
         }
     }
 
+    static String oldRel = "";
+
     public void drawPrimitives(Solver2 solver, PApplet applet) {
         // * draw primitives for edges
 
@@ -234,7 +236,7 @@ public class VisualizationDrawer {
             // send to NAR
 
             //< it seems like NAR can get overwhelmed, so we don't send every time
-            if ((solver.t % 1) == 0) {
+            if ((solver.t % 2) == 0) {
 
                 // HACK< sort BB's by x axis >
                 Collections.sort(allBbs, (a, b) -> (a.minx == b.minx) ? 0 : ((a.minx > b.minx) ? 1 : -1));
@@ -262,21 +264,25 @@ public class VisualizationDrawer {
                             relY = "a"; // above
                         }
 
-                        int quantization = 15;
-                        String onaDestIp = "127.0.0.1";
+                        if (oldRel != relY) {
+                            oldRel = relY;
 
-                        String n = "< {"+(relY)+"} --> rel >. :|:\0";
-                        System.out.println(n);
-                        byte[] buf = n.getBytes();
-                        DatagramSocket socket = null;
-                        try {
-                            socket = new DatagramSocket();
-                            DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(onaDestIp), 50000);
-                            socket.send(packet);
+                            String onaDestIp = "127.0.0.1";
+
+                            String n = "< {"+(relY)+"} --> rel >. :|:\0";
+                            System.out.println(n);
+                            byte[] buf = n.getBytes();
+                            DatagramSocket socket = null;
+                            try {
+                                socket = new DatagramSocket();
+                                DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(onaDestIp), 50000);
+                                socket.send(packet);
+                            }
+                            catch (SocketException e) {}
+                            catch (UnknownHostException e) {}
+                            catch (IOException e) {}
+
                         }
-                        catch (SocketException e) {}
-                        catch (UnknownHostException e) {}
-                        catch (IOException e) {}
 
                         break; // we only care about first relation
                     }

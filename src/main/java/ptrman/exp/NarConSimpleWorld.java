@@ -65,6 +65,12 @@ public class NarConSimpleWorld extends PApplet {
         solver2.narsBinding = new NarsBinding(new OnaNarseseConsumer());
     }
 
+
+
+    public void setup() {
+        frameRate(8);
+    }
+
     public static class InputDrawer implements IImageDrawer {
 
         BufferedImage off_Image;
@@ -102,7 +108,7 @@ public class NarConSimpleWorld extends PApplet {
                     ballVelY = -Math.abs(ballVelY);
                 }
 
-                if (ballY < 0) {
+                if (ballX < 10) {
                     float distY = (float)Math.abs(ballY - batY);
                     if (distY < 15) {
                         // hit bat -> good NAR
@@ -118,6 +124,15 @@ public class NarConSimpleWorld extends PApplet {
                         catch (SocketException e) {}
                         catch (UnknownHostException e) {}
                         catch (IOException e) {}
+                    }
+                    else { // bat didn't hit ball, respawn ball
+                        System.out.println("respawn ball");
+
+                        Random rng = new Random();
+                        ballX = 15+5 + rng.nextFloat()*80;
+                        ballY = rng.nextFloat()*80;
+
+                        ballVelY = (rng.nextFloat()*2.0 - 1.0)*2.0;
                     }
                 }
 
@@ -198,7 +213,7 @@ public class NarConSimpleWorld extends PApplet {
             }
         }
 
-        if (t%1 == 0) {
+        if (t%4 == 0) {
             // feed with goal
             String n = "good_nar! :|:\0";
             //System.out.println(n);
@@ -232,7 +247,7 @@ public class NarConSimpleWorld extends PApplet {
         solver2.postFrame();
 
         { // draw processed image in the background
-            pimg = ImageConverter.convBufferedImageToPImage((new ptrman.visualizationTests.VisualizeAnimation.InputDrawer()).apply(null), pimg);
+            pimg = ImageConverter.convBufferedImageToPImage((new ptrman.exp.NarConSimpleWorld.InputDrawer()).apply(null), pimg);
             tint(255.0f, 0.2f*255.0f);
             image(pimg, 0, 0); // draw image
             tint(255.0f, 255.0f); // reset tint
