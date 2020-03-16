@@ -230,14 +230,6 @@ public class NarConSimpleWorld extends PApplet {
         }
 
         { // simulate
-
-            ballX += ballVelX;
-            ballY += ballVelY;
-
-            batY += batVel;
-            batY = Math.min(batY, 100-15/2);
-            batY = Math.max(batY, 15/2);
-
             if (ballX < 10) {
                 ballVelX = Math.abs(ballVelX);
             }
@@ -268,6 +260,13 @@ public class NarConSimpleWorld extends PApplet {
                     ballVelY = (rng.nextFloat()*2.0 - 1.0)*2.0;
                 }
             }
+
+            ballX += ballVelX;
+            ballY += ballVelY;
+
+            batY += batVel;
+            batY = Math.min(batY, 100-15/2);
+            batY = Math.max(batY, 15/2);
         }
 
 
