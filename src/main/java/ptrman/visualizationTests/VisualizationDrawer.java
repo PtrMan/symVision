@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Random;
 
 /**
  * encapsulates functionality to draw visualizations for showcase and debugging
@@ -120,7 +119,7 @@ public class VisualizationDrawer {
         }
     }
 
-    static String oldRel = "";
+    public static String rel2 = "";
 
     public void drawPrimitives(Solver2 solver, PApplet applet) {
         // * draw primitives for edges
@@ -264,8 +263,11 @@ public class VisualizationDrawer {
                             relY = "a"; // above
                         }
 
-                        if (oldRel != relY) {
-                            oldRel = relY;
+                        rel2 = relY;
+
+                        /*
+                        if (rel2 != relY) {
+                            rel2 = relY;
 
                             String onaDestIp = "127.0.0.1";
 
@@ -283,6 +285,8 @@ public class VisualizationDrawer {
                             catch (IOException e) {}
 
                         }
+
+                         */
 
                         break; // we only care about first relation
                     }
