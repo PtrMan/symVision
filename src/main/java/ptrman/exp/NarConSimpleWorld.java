@@ -130,6 +130,12 @@ public class NarConSimpleWorld extends PApplet {
                     int here = 5;
                 }
 
+                try {
+                    Thread.sleep(1); // give other processes time
+                } catch (InterruptedException e) {
+                    //e.printStackTrace();
+                }
+
                 int here = 5;
             }
         } catch (IOException e) {
