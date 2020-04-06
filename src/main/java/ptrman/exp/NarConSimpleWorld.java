@@ -58,7 +58,11 @@ public class NarConSimpleWorld extends PApplet {
     public static BufferedReader reader;
     public static BufferedWriter writer;
 
-    public static String pathToOna = "C:\\Users\\R0B3\\dir\\github\\OpenNARS-for-Applications";
+    public static String pathToOna = "C:\\Users\\R0B3\\dir\\github\\ONAmy\\OpenNARS-for-Applications";
+
+    public static int hits = 0;
+    public static int misses = 0;
+
 
     // helper to send string to ONA
     public static void sendText(String str, boolean silent) {
@@ -66,12 +70,13 @@ public class NarConSimpleWorld extends PApplet {
             System.out.println("=>"+str);
         }
 
-        byte[] buf = (str+"\n").getBytes();
+        byte[] buf = (str+"\r\n").getBytes();
         try {
             os.write(buf);
             os.flush();
         } catch (IOException e) {
             e.printStackTrace();
+            int here = 5;
         }
     }
 
@@ -81,8 +86,42 @@ public class NarConSimpleWorld extends PApplet {
     public void narInferenceSteps(int steps) {
         sendText(""+steps, true);
 
+
+
         try {
+            /*
             while(true) {
+                int len = is.available();
+
+                if (len > 0) {
+                    int here = 5;
+                }
+
+                break;
+
+                *
+                byte[] buf = new byte[10];
+                is.read(buf);
+
+                if (buf[0] == 0) { // is empty line?
+                    break;
+                }
+
+                String bufAsString = new String(buf);
+
+                System.out.println(bufAsString);
+
+                int here = 5;
+
+                 *
+            }
+
+             */
+
+
+            while(true) {
+                //byte[] arr = new byte[1];
+                //is.read(arr);
 
                 int len = is.available();
 
@@ -161,7 +200,51 @@ public class NarConSimpleWorld extends PApplet {
             os = pro.getOutputStream();
             is = pro.getInputStream();
 
-            sendText("*motorbabbling=false", false);
+            /*
+            BufferedReader stdInput = new BufferedReader(new
+                    InputStreamReader(is));
+
+            //os.write("< a --> b >.\n".getBytes());
+
+            //sendText(""+5, false);
+
+            byte[] buf = (5+"\r\n").getBytes();
+            try {
+                os.write(buf);
+                os.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            try {
+                Thread.sleep(100); // give other processes time
+            } catch (InterruptedException e) {
+                //e.printStackTrace();
+            }
+
+            String inputLine;
+            while ((inputLine = stdInput.readLine()) != null)
+                System.out.println(inputLine);
+
+             */
+
+            /*
+            for(;;) {
+                String x = stdInput.readLine();
+
+                //if (a > 0) {
+                    int here = 5;
+                //}
+
+            }
+
+             */
+
+            int here = 5;
+
+            //int here = 5;
+
+            //sendText("*motorbabbling=false", false);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -192,9 +275,10 @@ public class NarConSimpleWorld extends PApplet {
 
             g2.setColor(Color.WHITE);
 
-            g2.drawRect(6, (int)batY-15, 10, 30);
+            g2.drawRect(6, (int)batY-20, 10, 20*2);
 
-            g2.fillOval((int)ballX, (int)ballY, 20, 20);
+            g2.fillOval((int)ballX-10, (int)ballY-10, 20, 20);
+
 
 
 
@@ -219,7 +303,7 @@ public class NarConSimpleWorld extends PApplet {
         }
 
 
-        {
+        if(false){ // manual motor babbling
             Random rng = new Random();
             if(rng.nextFloat() < 0.1) {
                 if (rng.nextFloat() < 0.5) {
@@ -239,7 +323,7 @@ public class NarConSimpleWorld extends PApplet {
             if (ballX < 10) {
                 ballVelX = Math.abs(ballVelX);
             }
-            if (ballX > 120) {
+            if (ballX > 110) {
                 ballVelX = -Math.abs(ballVelX);
             }
 
@@ -252,9 +336,10 @@ public class NarConSimpleWorld extends PApplet {
 
             if (ballX < 10) {
                 float distY = (float)Math.abs(ballY - batY);
-                if (distY < 15) {
+                if (distY <= 20+1) {
                     // hit bat -> good NAR
                     sendText("good_nar. :|:", false);
+                    hits++;
                 }
                 else { // bat didn't hit ball, respawn ball
                     System.out.println("respawn ball");
@@ -263,7 +348,12 @@ public class NarConSimpleWorld extends PApplet {
                     ballX = 15+5 + rng.nextFloat()*80;
                     ballY = rng.nextFloat()*80;
 
-                    ballVelY = (rng.nextFloat()*2.0 - 1.0)*2.0;
+                    ballVelY = 1.0 + rng.nextFloat()*3.0;
+                    if (rng.nextFloat() < 0.5) {
+                        ballVelY *= -1;
+                    }
+
+                    misses++;
                 }
             }
 
@@ -271,8 +361,8 @@ public class NarConSimpleWorld extends PApplet {
             ballY += ballVelY;
 
             batY += batVel;
-            batY = Math.min(batY, 100-15/2);
-            batY = Math.max(batY, 15/2);
+            batY = Math.min(batY, 100-20/2);
+            batY = Math.max(batY, 20/2);
         }
 
 
@@ -322,9 +412,10 @@ public class NarConSimpleWorld extends PApplet {
 
         drawer.drawPrimitives(solver2, this);
 
-
-        // mouse cursor
-        //ellipse(mouseX, mouseY, 4, 4);
+        { // draw debug
+            fill(255);
+            text("hits"+hits + " misses="+misses + " t="+t, 10, 120);
+        }
     }
 
     @Override
