@@ -50,25 +50,25 @@ public class Bb {
 
     // stupid helper
     public static boolean overlapRange(double mina, double maxa, double minb, double maxb) {
-        if (mina<minb && minb<maxa) {
+        if (mina<=minb && minb<=maxa) {
             return true;
         }
-        if (mina<maxb && maxb<maxa) {
-            return true;
-        }
-
-        if (minb<mina && mina<maxb) {
-            return true;
-        }
-        if (minb<maxa && maxa<maxb) {
+        if (mina<=maxb && maxb<=maxa) {
             return true;
         }
 
-        if (mina<minb && maxb<maxa) {
+        if (minb<=mina && mina<=maxb) {
+            return true;
+        }
+        if (minb<=maxa && maxa<=maxb) {
             return true;
         }
 
-        if (minb<mina && maxa<maxb) {
+        if (mina<=minb && maxb<=maxa) {
+            return true;
+        }
+
+        if (minb<=mina && maxa<=maxb) {
             return true;
         }
 

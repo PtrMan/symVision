@@ -17,6 +17,7 @@ import ptrman.bindingNars.OnaNarseseConsumer;
 import ptrman.bpsolver.IImageDrawer;
 import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Solver2;
+import ptrman.misc.Classifier;
 import ptrman.misc.ImageConverter;
 import ptrman.visualizationTests.VisualizationDrawer;
 
@@ -29,6 +30,8 @@ import java.util.Random;
  * * connect to NAR
  * * test in simple world (pong, etc)
  */
+
+// TODO< sub image at position >
 public class NarConSimpleWorld extends PApplet {
 
     final static int RETINA_WIDTH = 128;
@@ -62,6 +65,8 @@ public class NarConSimpleWorld extends PApplet {
 
     public static int hits = 0;
     public static int misses = 0;
+
+    public static Classifier classifier;
 
 
     // helper to send string to ONA
@@ -184,6 +189,12 @@ public class NarConSimpleWorld extends PApplet {
     }
 
     public NarConSimpleWorld() {
+        { // configure classifier
+            classifier = new Classifier();
+            classifier.minSimilarity = 0.87f;
+        }
+
+
         /*
         try {
             socket = new DatagramSocket(50001);
@@ -290,17 +301,25 @@ public class NarConSimpleWorld extends PApplet {
 
     public VisualizationDrawer drawer = new VisualizationDrawer(); // used for drawing
 
-    String oldState = "";
+    public static String lastNarsese = ""; // used to compress away changes in the wrld which are the same
 
     public void draw() {
         t++;
 
-
-        if(VisualizationDrawer.rel2 != "") { // send current state
-            String n = "< {"+(VisualizationDrawer.rel2)+"} --> rel >. :|:";
-            sendText(n, false);
-            oldState = VisualizationDrawer.rel2;
+        { // send to NARS
+            String thisNarsese = "";
+            for(String iN : VisualizationDrawer.relN) {
+                thisNarsese += iN + "\n";
+            }
+            if (!thisNarsese.equals(lastNarsese)) {
+                // iterate over narsese sentences to send
+                for(String iN : VisualizationDrawer.relN) {
+                    sendText(iN, false);
+                }
+            }
+            lastNarsese = thisNarsese;
         }
+
 
 
         if(false){ // manual motor babbling
@@ -410,11 +429,13 @@ public class NarConSimpleWorld extends PApplet {
             tint(255.0f, 255.0f); // reset tint
         }
 
-        drawer.drawPrimitives(solver2, this);
+        drawer.drawPrimitives(solver2, this, classifier);
 
         { // draw debug
             fill(255);
             text("hits"+hits + " misses="+misses + " t="+t, 10, 120);
+
+            text(lastNarsese, 10, 140); // draw narsese state
         }
     }
 

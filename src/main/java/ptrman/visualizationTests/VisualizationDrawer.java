@@ -9,17 +9,20 @@
  */
 package ptrman.visualizationTests;
 
+import org.apache.commons.math3.linear.ArrayRealVector;
 import org.eclipse.collections.api.tuple.primitive.IntIntPair;
 import processing.core.PApplet;
 import ptrman.Datastructures.Bb;
+import ptrman.Datastructures.IMap2d;
+import ptrman.Datastructures.Map2d;
 import ptrman.bpsolver.Solver2;
 import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
+import ptrman.misc.Classifier;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * encapsulates functionality to draw visualizations for showcase and debugging
@@ -119,9 +122,10 @@ public class VisualizationDrawer {
         }
     }
 
-    public static String rel2 = "";
+    // used to transfer narsese relationships
+    public static List<String> relN = new ArrayList<>();
 
-    public void drawPrimitives(Solver2 solver, PApplet applet) {
+    public void drawPrimitives(Solver2 solver, PApplet applet, Classifier classifier) {
         // * draw primitives for edges
 
         for (ProcessConnector<RetinaPrimitive> iCntr : solver.connectorDetectorsFromProcessHForEdge) {
@@ -232,10 +236,172 @@ public class VisualizationDrawer {
                 applet.rect((int)iBB.minx, (int) iBB.miny, (int)(iBB.maxx-iBB.minx), (int)(iBB.maxy-iBB.miny));
             }
 
+            List<Classification> classifications = new ArrayList<>();
+
+            if (classifier != null) { // is classification enabled?
+                ////////////////////////
+                // PREPARATION FOR CLASIFIERS
+
+                // prepare maps as targets to draw "quantized" line detectors
+                IMap2d<Boolean>[] edgeMaps = new IMap2d[solver.processDEdge.length];
+                for(int idx=0;idx<solver.processDEdge.length;idx++) {
+                    edgeMaps[idx] = new Map2d<>(solver.mapBoolean.getWidth(), solver.mapBoolean.getLength());
+                    for(int ix=0;ix<edgeMaps[idx].getWidth();ix++) {
+                        for(int iy=0;iy<edgeMaps[idx].getLength();iy++) {
+                            edgeMaps[idx].setAt(ix,iy,false);
+                        }
+                    }
+                }
+
+
+                // draw "quantized" line detectors as dots to get them back to a image representation
+                for(int idx=0;idx<solver.processDEdge.length;idx++) {
+                    IMap2d<Boolean> selmap = edgeMaps[idx];
+                    ProcessD iProcessDEdge = solver.processDEdge[idx];
+
+                    for(LineDetectorWithMultiplePoints iLineDetector : iProcessDEdge.annealedCandidates) {
+                        for( ProcessA.Sample iSample : iLineDetector.samples) {
+                            int x = iSample.position.getOne();
+                            int y = iSample.position.getTwo();
+                            selmap.setAt(x, y, true);
+                            selmap.setAt(x+1, y, true);
+                            selmap.setAt(x, y+1, true);
+                            selmap.setAt(x+1, y+1, true);
+                        }
+                    }
+                }
+
+                ////////////////////////
+                // ACTUAL CLASSIFICATION
+
+                System.out.println("FRAME");
+
+                for(Bb iBB : allBbs) {
+                    float centerX = (float)(iBB.maxx+iBB.minx)/2.0f;
+                    float centerY = (float)(iBB.maxy+iBB.miny)/2.0f;
+
+
+                    // simulate convolution by finding best classification in proximity
+
+                    ArrayRealVector stimulus = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)centerX, (int)centerY, 32, 32); // extract cropped image
+                    classifier.classify(stimulus, false);
+                    int bestCenterX = (int)centerX;
+                    int bestCenterY = (int)centerY;
+                    float bestSimilarity = classifier.bestCategorySimilarity;
+
+                    int convRange = 3; // range of convolution - in + - dimension
+                    for(int dx=-convRange;dx<convRange;dx++) {
+                        for(int dy=-convRange;dy<convRange;dy++) {
+                            int thisCenterX = (int)centerX+dx;
+                            int thisCenterY = (int)centerY+dy;
+
+                            ArrayRealVector stimulus2 = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)centerX, (int)centerY, 32, 32); // extract cropped image
+                            classifier.classify(stimulus2, false);
+                            float thisSim = classifier.bestCategorySimilarity;
+                            if (thisSim > bestSimilarity) {
+                                bestSimilarity = thisSim;
+                                bestCenterX = thisCenterX;
+                                bestCenterY = thisCenterY;
+                            }
+                        }
+                    }
+
+
+                    // * extract cropped image
+
+
+
+
+                    // DEBUG CLASSIFICATION RECT
+                    applet.stroke(255.0f, 255.0f, 255.0f);
+                    applet.fill(0, 1.0f);
+                    applet.rect( (int)bestCenterX-32/2, (int)bestCenterY-32/2, 32, 32);
+
+                    // * classify
+                    stimulus = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)bestCenterX, (int)bestCenterY, 32, 32); // extract cropped image
+                    long categoryId = classifier.classify(stimulus, true);
+                    float thisClassificationSim = classifier.bestCategorySimilarity;
+
+                    classifications.add(new Classification(bestCenterX, bestCenterY, categoryId)); // store classification for later processing
+
+
+                    // * draw classification (for debugging)
+                    applet.fill(255);
+                    applet.text("c="+categoryId, bestCenterX-32/2, bestCenterY-32/2);
+                }
+
+                System.out.println("FRAME END");
+            }
+
+
+            // TODO< group by class and send relations by element with lowest count of class! >
+
+            Map<Long, ArrayList<Classification>> classificationsByCategory = new HashMap<>();
+            for(Classification iClasfcn: classifications) {
+                if(classificationsByCategory.containsKey(iClasfcn.category)) {
+                    classificationsByCategory.get(iClasfcn.category).add(iClasfcn);
+                }
+                else {
+                    ArrayList<Classification> arr = new ArrayList<>();
+                    arr.add(iClasfcn);
+                    classificationsByCategory.put(iClasfcn.category, arr);
+                }
+            }
+
+            // find classification with lowest number of items
+            ArrayList<Classification> classificationCandidatesWithLowestMemberCount = null;
+            for(Map.Entry<Long, ArrayList<Classification>> i : classificationsByCategory.entrySet()) {
+                if (classificationCandidatesWithLowestMemberCount == null) { // is first one?
+                    classificationCandidatesWithLowestMemberCount = i.getValue();
+                }
+                else if(i.getValue().size() < classificationCandidatesWithLowestMemberCount.size()) {
+                    classificationCandidatesWithLowestMemberCount = i.getValue();
+                }
+            }
+
+
             // send to NAR
 
             //< it seems like NAR can get overwhelmed, so we don't send every time
             if ((solver.t % 2) == 0) {
+                relN.clear();
+
+                HashMap<String, Boolean> relByNarsese = new HashMap<>(); // we want to reduce the amount of spam to NARS by omitting redudant events (all happens in the same frame anyways)
+
+                // build relations between classifications with low count with classifications of high count
+                if (classificationCandidatesWithLowestMemberCount != null) {
+                    for(Classification iClassfcnWithLowestCount : classificationCandidatesWithLowestMemberCount) {
+                        for(Classification iClasfcnOther: classifications) {
+                            if (iClassfcnWithLowestCount != iClasfcnOther) { // must be different objects
+                                if (iClassfcnWithLowestCount.category != iClasfcnOther.category) { // we are only interested in different classifications!
+                                    String relY;
+                                    { // compute relationship term
+                                        relY = "c";
+                                        double diffX = iClassfcnWithLowestCount.posX-iClasfcnOther.posX;
+                                        double diffY = iClassfcnWithLowestCount.posY-iClasfcnOther.posY;
+
+                                        if (diffY < -15.0) {
+                                            relY = "b"; // below
+                                        }
+                                        if (diffY > 15.0) {
+                                            relY = "a"; // above
+                                        }
+                                    }
+
+                                    String n = "< ( {"+(relY)+"} * ( {"+iClassfcnWithLowestCount.category+"} * {"+iClasfcnOther.category+"} ) ) --> relY >. :|:";
+                                    relByNarsese.put(n, true); // store in set
+                                }
+                            }
+                        }
+                    }
+                }
+
+                for(String iN : relByNarsese.keySet()) {
+                    relN.add(iN);
+                }
+
+
+
 
                 // HACK< sort BB's by x axis >
                 Collections.sort(allBbs, (a, b) -> (a.minx == b.minx) ? 0 : ((a.minx > b.minx) ? 1 : -1));
@@ -263,58 +429,9 @@ public class VisualizationDrawer {
                             relY = "a"; // above
                         }
 
-                        rel2 = relY;
-
-                        /*
-                        if (rel2 != relY) {
-                            rel2 = relY;
-
-                            String onaDestIp = "127.0.0.1";
-
-                            String n = "< {"+(relY)+"} --> rel >. :|:\0";
-                            System.out.println(n);
-                            byte[] buf = n.getBytes();
-                            DatagramSocket socket = null;
-                            try {
-                                socket = new DatagramSocket();
-                                DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(onaDestIp), 50000);
-                                socket.send(packet);
-                            }
-                            catch (SocketException e) {}
-                            catch (UnknownHostException e) {}
-                            catch (IOException e) {}
-
-                        }
-
-                         */
-
                         break; // we only care about first relation
                     }
                 }
-
-                /* old code
-                for(Bb iBb : allBbs) {
-                    int quantization = 15;
-                    String onaDestIp = "127.0.0.1";
-
-                    String ser = "(" + ((int)iBb.minx/quantization)+"u"+((int)iBb.miny/quantization)+" * " +((int)iBb.maxx/quantization)+"u" +((int)iBb.maxy/quantization) + ")";
-                    ser = ser.replace("-", "N"); // because ONA seems to have problem with minus
-
-                    String n = "< "+ser+" --> bb >. :|:\0";
-                    //System.out.println(n);
-                    byte[] buf = n.getBytes();
-                    DatagramSocket socket = null;
-                    try {
-                        socket = new DatagramSocket();
-                        DatagramPacket packet = new DatagramPacket(buf, buf.length, InetAddress.getByName(onaDestIp), 50000);
-                        socket.send(packet);
-                    }
-                    catch (SocketException e) {}
-                    catch (UnknownHostException e) {}
-                    catch (IOException e) {}
-                }
-
-                 */
             }
 
         }
@@ -343,5 +460,38 @@ public class VisualizationDrawer {
             }
         }
 
+    }
+
+    // helper
+    // reads crops from edge maps and concatenate it all to a single vector for classification
+    static ArrayRealVector cropEdgeMapsAndConcatToVecAt(IMap2d<Boolean>[] edgeMaps, int centerX, int centerY, int width, int height) {
+        ArrayRealVector dest = new ArrayRealVector(edgeMaps.length*width*height);
+        int destIdx = 0; // index in dest
+
+        for(IMap2d<Boolean> iEdgeMap : edgeMaps) {
+            for(int ix=centerX-width/2;ix<centerX+width/2;ix++) {
+                for(int iy=centerY-height/2;iy<centerY+height/2;iy++) {
+                    if (iEdgeMap.inBounds(ix, iy)) {
+                        boolean v = iEdgeMap.readAt(ix, iy);
+                        dest.setEntry(destIdx, v ? 1 : 0);
+                    }
+                    destIdx++;
+                }
+            }
+        }
+
+        return dest;
+    }
+
+    // helper
+    static class Classification {
+        public long category;
+        public int posX;
+        public int posY;
+        public Classification(int posX, int posY, long category) {
+            this.posX = posX;
+            this.posY = posY;
+            this.category = category;
+        }
     }
 }
