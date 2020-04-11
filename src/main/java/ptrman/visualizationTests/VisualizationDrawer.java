@@ -388,7 +388,12 @@ public class VisualizationDrawer {
                                         }
                                     }
 
-                                    String n = "< ( {"+(relY)+"} * ( {"+iClassfcnWithLowestCount.category+"} * {"+iClasfcnOther.category+"} ) ) --> relY >. :|:";
+                                    // scalable way// String n = "< ( {"+(relY)+"} * < ( {"+iClassfcnWithLowestCount.category+"} * {"+iClasfcnOther.category+"} ) --> h > ) --> relY >. :|:";
+
+                                    // not scalable way, will xplode for more complicated scenes
+                                    String n = "< ( {"+(relY)+"} * {"+iClassfcnWithLowestCount.category+"_"+iClasfcnOther.category+"} ) --> relY >. :|:";
+
+
                                     relByNarsese.put(n, true); // store in set
                                 }
                             }

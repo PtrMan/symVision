@@ -137,18 +137,19 @@ public class NarConSimpleWorld extends PApplet {
                     String bufAsString = new String(buf);
                     for(String iLine : bufAsString.split("\\n")) {
 
+                        //DEBUG System.out.println(iLine);
+
                         if (iLine.contains("=/>") && iLine.contains("^")) { // is a seq with a op derived?
                             System.out.println("=/>^   "+iLine);
                             int here = 5;
                         }
 
-                        if (iLine.substring(0, 9).equals("Derived: ") || iLine.substring(0, 9).equals("Revised: ")) {
+                        if( iLine.length() >= 9 && iLine.substring(0, 9).equals("Derived: ") || iLine.length() >= 9 && iLine.substring(0, 9).equals("Revised: ")) {
                             continue; // ignore derivation messages
                         }
 
 
-
-                        if (iLine.substring(0, 4).equals("done") || iLine.substring(0, 10).equals("performing")) {
+                        if (iLine.length() >= 4 && iLine.substring(0, 4).equals("done") || iLine.length() >= 10 && iLine.substring(0, 10).equals("performing")) {
                             // don't print
                         }
                         else {
@@ -166,7 +167,7 @@ public class NarConSimpleWorld extends PApplet {
                             queuedOp = "^down";
                         }
 
-                        if (iLine.substring(0, 4).equals("done")) {
+                        if (iLine.length() >= 4 && iLine.substring(0, 4).equals("done")) {
                             return; // it is done with the steps
                         }
                     }
@@ -311,7 +312,7 @@ public class NarConSimpleWorld extends PApplet {
             for(String iN : VisualizationDrawer.relN) {
                 thisNarsese += iN + "\n";
             }
-            if (!thisNarsese.equals(lastNarsese)) {
+            if (true || !thisNarsese.equals(lastNarsese)) {
                 // iterate over narsese sentences to send
                 for(String iN : VisualizationDrawer.relN) {
                     sendText(iN, false);
@@ -388,12 +389,12 @@ public class NarConSimpleWorld extends PApplet {
 
         if (t%4 == 0) {
             // feed with goal
-            String n = "good_nar! :|:\n\0";
+            String n = "good_nar! :|:";
             sendText(n, false);
         }
 
         { // give time to reason
-            narInferenceSteps(5);
+            narInferenceSteps(2);
             // do actions
             if (queuedOp != null && queuedOp.equals("^up")) {
                 batVel = -7.0;
@@ -441,7 +442,7 @@ public class NarConSimpleWorld extends PApplet {
 
     @Override
     public void settings() {
-        size(200, 200);
+        size(400, 400);
     }
 
     public static void main(String[] passedArgs) {

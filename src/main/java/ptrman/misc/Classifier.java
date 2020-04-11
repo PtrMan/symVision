@@ -20,6 +20,8 @@ public class Classifier {
 
     public long categoryIdCounter = 1;
 
+    public boolean verbose = false;
+
     ////////////////
     // "high level" classifier
 
@@ -37,7 +39,7 @@ public class Classifier {
             }
         }
 
-        System.out.println("CLASSIFIER: class="+bestCategoryId+"   best similarity="+bestCategorySimilarity);// DEBUG
+        if(verbose) System.out.println("CLASSIFIER: class="+bestCategoryId+"   best similarity="+bestCategorySimilarity);// DEBUG
 
         if (add && bestCategorySimilarity == Float.POSITIVE_INFINITY) { // was no class found?
             // add new one
