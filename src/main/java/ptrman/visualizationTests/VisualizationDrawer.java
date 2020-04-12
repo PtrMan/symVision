@@ -375,8 +375,10 @@ public class VisualizationDrawer {
                             if (iClassfcnWithLowestCount != iClasfcnOther) { // must be different objects
                                 if (iClassfcnWithLowestCount.category != iClasfcnOther.category) { // we are only interested in different classifications!
                                     String relY;
+                                    String relX;
                                     { // compute relationship term
                                         relY = "c";
+                                        relX = "c";
                                         double diffX = iClassfcnWithLowestCount.posX-iClasfcnOther.posX;
                                         double diffY = iClassfcnWithLowestCount.posY-iClasfcnOther.posY;
 
@@ -386,14 +388,22 @@ public class VisualizationDrawer {
                                         if (diffY > 15.0) {
                                             relY = "a"; // above
                                         }
+
+                                        if (diffX < -15.0) {
+                                            relX = "b"; // below
+                                        }
+                                        if (diffX > 15.0) {
+                                            relX = "a"; // above
+                                        }
                                     }
 
                                     // scalable way// String n = "< ( {"+(relY)+"} * < ( {"+iClassfcnWithLowestCount.category+"} * {"+iClasfcnOther.category+"} ) --> h > ) --> relY >. :|:";
 
                                     // not scalable way, will xplode for more complicated scenes
                                     String n = "< ( {"+(relY)+"} * {"+iClassfcnWithLowestCount.category+"_"+iClasfcnOther.category+"} ) --> relY >. :|:";
+                                    relByNarsese.put(n, true); // store in set
 
-
+                                    n = "< ( {"+(relX)+"} * {"+iClassfcnWithLowestCount.category+"_"+iClasfcnOther.category+"} ) --> relX >. :|:";
                                     relByNarsese.put(n, true); // store in set
                                 }
                             }
