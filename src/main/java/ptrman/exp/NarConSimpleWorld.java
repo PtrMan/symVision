@@ -363,7 +363,7 @@ public class NarConSimpleWorld extends PApplet {
             for(String iN : VisualizationDrawer.relN) {
                 thisNarsese += iN + "\n";
             }
-            if (true || !thisNarsese.equals(lastNarsese)) {
+            if (!thisNarsese.equals(lastNarsese)) {
                 // iterate over narsese sentences to send
                 for(String iN : VisualizationDrawer.relN) {
                     sendText(iN, false);
