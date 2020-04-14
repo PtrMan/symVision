@@ -45,12 +45,10 @@ public class NarConSimpleWorld extends PApplet {
     // scene to choose
     // "pong" pong
     // "shootemup" for alien invasion thingy
-    public static String scene = "shootemup";
+    public static String scene = "pong";//"shootemup";
 
 
     // SHOOTEMUP
-
-    // TODO< alien >
 
     public static List<Proj> projectiles = new ArrayList<>();
 
@@ -98,6 +96,7 @@ public class NarConSimpleWorld extends PApplet {
     public static boolean useRngAgent = false; // use random action agent? used for testing
 
     public static boolean verboseAgent = true;
+    public static boolean verboseDscnExp = true;
 
     // helper to send string to ONA
     public static void sendText(String str, boolean silent) {
@@ -105,7 +104,7 @@ public class NarConSimpleWorld extends PApplet {
             return; // don't send anything to NARS if we use dummy agent
         }
 
-        if (!silent) {
+        if (false && !silent) {
             System.out.println(""+str);
         }
 
@@ -123,7 +122,7 @@ public class NarConSimpleWorld extends PApplet {
 
     // helper to let NAR perform inference steps
     public void narInferenceSteps(int steps) {
-        sendText(""+steps, true);
+        sendText(""+steps, false);
 
         if (!useRngAgent)  {
             try {
@@ -187,6 +186,10 @@ public class NarConSimpleWorld extends PApplet {
                             }
                             else {
                                 if(verboseAgent) System.out.println(iLine);
+                            }
+
+                            if (verboseDscnExp && iLine.contains("decision expectation ")) {
+                                System.out.println(iLine);
                             }
 
                             if(iLine.contains("executed with args")) {
@@ -447,6 +450,7 @@ public class NarConSimpleWorld extends PApplet {
 
                     if (dist < 10) { // did projectile hit alien?
                         // hit bat -> good NAR
+                        System.out.println("hit");
                         sendText("good_nar. :|:", false);
                         hits++;
 
@@ -456,10 +460,17 @@ public class NarConSimpleWorld extends PApplet {
                         // respawn alien to make it more complicated
                         Random rng = new Random();
                         ballX = rng.nextFloat()*110.0f;
+                        if (rng.nextFloat() < 0.5) {
+                            ballVelX = (float)Math.abs(ballVelX);
+                        }
+                        else {
+                            ballVelX = -(float)Math.abs(ballVelX);
+                        }
                     }
                 }
 
 
+                /*
                 //change direction randomly to make it more complicated
                 Random rng = new Random();
                 if (rng.nextFloat() < 0.5) {
@@ -467,7 +478,7 @@ public class NarConSimpleWorld extends PApplet {
                 }
                 else {
                     ballVelX = -(float)Math.abs(ballVelX);
-                }
+                }*/
 
                 // alien reflects on sides of screen
                 if (ballX < 10) {
@@ -486,6 +497,7 @@ public class NarConSimpleWorld extends PApplet {
                 for(int idx=0;idx<projectiles.size();idx++) {
                     if (projectiles.get(idx).y < 0) { // is projectile outside of screen
                         misses++;
+                        System.out.println("miss");
                         projectiles.remove(idx);
                         idx--;
                     }
