@@ -24,6 +24,8 @@ import ptrman.visualizationTests.VisualizationDrawer;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -42,15 +44,39 @@ public class NarConSimpleWorld extends PApplet {
 
     // scene to choose
     // "pong" pong
-    public static String scene = "pong";
+    // "shootemup" for alien invasion thingy
+    public static String scene = "shootemup";
 
+
+    // SHOOTEMUP
+
+    // TODO< alien >
+
+    public static List<Proj> projectiles = new ArrayList<>();
+
+    static class Proj {
+        public float x, y, velX, velY;
+        public Proj(float x, float y, float velX, float velY) {
+            this.x=x;
+            this.y=y;
+            this.velX=velX;
+            this.velY=velY;
+        }
+    }
+
+
+    // PONG/SHOOTEMUP
+    public static double batVel = 0.0;
+    public static double batPos = 50.0;
+
+    // is ball in "pong", is alien in SHOOTEMUP
     public static double ballX = 30.0;
     public static double ballY = 50.0;
     public static double ballVelX = 6.1;
-    public static double ballVelY = 1.6;
+    public static double ballVelY = 0;
 
-    public static double batVel = 0.0;
-    public static double batY = 50.0;
+
+
 
     public static int t = 0; // timer
 
@@ -69,10 +95,18 @@ public class NarConSimpleWorld extends PApplet {
     public static Classifier classifier;
 
 
+    public static boolean useRngAgent = false; // use random action agent? used for testing
+
+    public static boolean verboseAgent = true;
+
     // helper to send string to ONA
     public static void sendText(String str, boolean silent) {
+        if (useRngAgent) {
+            return; // don't send anything to NARS if we use dummy agent
+        }
+
         if (!silent) {
-            System.out.println("=>"+str);
+            System.out.println(""+str);
         }
 
         byte[] buf = (str+"\r\n").getBytes();
@@ -91,9 +125,8 @@ public class NarConSimpleWorld extends PApplet {
     public void narInferenceSteps(int steps) {
         sendText(""+steps, true);
 
-
-
-        try {
+        if (!useRngAgent)  {
+            try {
             /*
             while(true) {
                 int len = is.available();
@@ -124,68 +157,73 @@ public class NarConSimpleWorld extends PApplet {
              */
 
 
-            while(true) {
-                //byte[] arr = new byte[1];
-                //is.read(arr);
+                while(true) {
+                    //byte[] arr = new byte[1];
+                    //is.read(arr);
 
-                int len = is.available();
+                    int len = is.available();
 
-                if(len > 0) {
-                    byte[] buf = new byte[len];
-                    is.read(buf);
+                    if(len > 0) {
+                        byte[] buf = new byte[len];
+                        is.read(buf);
 
-                    String bufAsString = new String(buf);
-                    for(String iLine : bufAsString.split("\\n")) {
+                        String bufAsString = new String(buf);
+                        for(String iLine : bufAsString.split("\\n")) {
 
-                        //DEBUG System.out.println(iLine);
+                            //DEBUG System.out.println(iLine);
 
-                        if (iLine.contains("=/>") && iLine.contains("^")) { // is a seq with a op derived?
-                            System.out.println("=/>^   "+iLine);
-                            int here = 5;
+                            if (iLine.contains("=/>") && iLine.contains("^")) { // is a seq with a op derived?
+                                if(verboseAgent) System.out.println("=/>^   "+iLine);
+                                int here = 5;
+                            }
+
+                            if( iLine.length() >= 9 && iLine.substring(0, 9).equals("Derived: ") || iLine.length() >= 9 && iLine.substring(0, 9).equals("Revised: ")) {
+                                continue; // ignore derivation messages
+                            }
+
+
+                            if (iLine.length() >= 4 && iLine.substring(0, 4).equals("done") || iLine.length() >= 10 && iLine.substring(0, 10).equals("performing")) {
+                                // don't print
+                            }
+                            else {
+                                if(verboseAgent) System.out.println(iLine);
+                            }
+
+                            if(iLine.contains("executed with args")) {
+                                int here = 5;
+                            }
+
+                            if (iLine.equals("^up executed with args ")) {
+                                queuedOp = "^up";
+                            }
+                            else if (iLine.equals("^down executed with args ")) {
+                                queuedOp = "^down";
+                            }
+                            else if (iLine.equals("^pick executed with args ")) {
+                                queuedOp = "^pick";
+                            }
+
+                            if (iLine.length() >= 4 && iLine.substring(0, 4).equals("done")) {
+                                return; // it is done with the steps
+                            }
                         }
 
-                        if( iLine.length() >= 9 && iLine.substring(0, 9).equals("Derived: ") || iLine.length() >= 9 && iLine.substring(0, 9).equals("Revised: ")) {
-                            continue; // ignore derivation messages
-                        }
+                        int here = 5;
+                    }
 
-
-                        if (iLine.length() >= 4 && iLine.substring(0, 4).equals("done") || iLine.length() >= 10 && iLine.substring(0, 10).equals("performing")) {
-                            // don't print
-                        }
-                        else {
-                            System.out.println(iLine);
-                        }
-
-                        if(iLine.contains("executed with args")) {
-                            int here = 5;
-                        }
-
-                        if (iLine.equals("^up executed with args ")) {
-                            queuedOp = "^up";
-                        }
-                        else if (iLine.equals("^down executed with args ")) {
-                            queuedOp = "^down";
-                        }
-
-                        if (iLine.length() >= 4 && iLine.substring(0, 4).equals("done")) {
-                            return; // it is done with the steps
-                        }
+                    try {
+                        Thread.sleep(1); // give other processes time
+                    } catch (InterruptedException e) {
+                        //e.printStackTrace();
                     }
 
                     int here = 5;
                 }
-
-                try {
-                    Thread.sleep(1); // give other processes time
-                } catch (InterruptedException e) {
-                    //e.printStackTrace();
-                }
-
-                int here = 5;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
+
 
     }
 
@@ -287,9 +325,22 @@ public class NarConSimpleWorld extends PApplet {
 
             g2.setColor(Color.WHITE);
 
-            g2.drawRect(6, (int)batY-20, 10, 20*2);
+            if (scene.equals("pong")) {
+                g2.drawRect(6, (int)batPos-20, 10, 20*2);
 
-            g2.fillOval((int)ballX-10, (int)ballY-10, 20, 20);
+                g2.fillOval((int)ballX-10, (int)ballY-10, 20, 20);
+            }
+            else if (scene.equals("shootemup")) {
+                g2.drawRect((int)batPos, 80, 15, 10); // spaceship
+
+                // draw projectiles
+                for(Proj iProj : projectiles) {
+                    g2.drawRect((int)iProj.x, (int)iProj.y-7, 2, 14);
+                }
+
+                // draw alien
+                g2.fillOval((int)ballX-10, (int)ballY-10, 20, 20);
+            }
 
 
 
@@ -340,49 +391,115 @@ public class NarConSimpleWorld extends PApplet {
         }
 
         { // simulate
-            if (ballX < 10) {
-                ballVelX = Math.abs(ballVelX);
-            }
-            if (ballX > 110) {
-                ballVelX = -Math.abs(ballVelX);
-            }
-
-            if (ballY < 0) {
-                ballVelY = Math.abs(ballVelY);
-            }
-            if (ballY > 100) {
-                ballVelY = -Math.abs(ballVelY);
-            }
-
-            if (ballX < 10) {
-                float distY = (float)Math.abs(ballY - batY);
-                if (distY <= 20+1) {
-                    // hit bat -> good NAR
-                    sendText("good_nar. :|:", false);
-                    hits++;
+            if (scene.equals("pong")) {
+                if (ballX < 10) {
+                    ballVelX = Math.abs(ballVelX);
                 }
-                else { // bat didn't hit ball, respawn ball
-                    System.out.println("respawn ball");
+                if (ballX > 110) {
+                    ballVelX = -Math.abs(ballVelX);
+                }
 
-                    Random rng = new Random();
-                    ballX = 15+5 + rng.nextFloat()*80;
-                    ballY = rng.nextFloat()*80;
+                if (ballY < 0) {
+                    ballVelY = Math.abs(ballVelY);
+                }
+                if (ballY > 100) {
+                    ballVelY = -Math.abs(ballVelY);
+                }
 
-                    ballVelY = 1.0 + rng.nextFloat()*3.0;
-                    if (rng.nextFloat() < 0.5) {
-                        ballVelY *= -1;
+                if (ballX < 10) {
+                    float distY = (float)Math.abs(ballY - batPos);
+                    if (distY <= 20+1) {
+                        // hit bat -> good NAR
+                        sendText("good_nar. :|:", false);
+                        hits++;
                     }
+                    else { // bat didn't hit ball, respawn ball
+                        System.out.println("respawn ball");
 
-                    misses++;
+                        Random rng = new Random();
+                        ballX = 15+5 + rng.nextFloat()*80;
+                        ballY = rng.nextFloat()*80;
+
+                        ballVelY = 1.0 + rng.nextFloat()*3.0;
+                        if (rng.nextFloat() < 0.5) {
+                            ballVelY *= -1;
+                        }
+
+                        misses++;
+                    }
                 }
+
+                ballX += ballVelX;
+                ballY += ballVelY;
+
+                batPos += batVel;
+                batPos = Math.min(batPos, 100-20/2);
+                batPos = Math.max(batPos, 20/2);
             }
+            else if(scene.equals("shootemup")) {
+                // check collision between projectile and alien
+                for(int idx=0;idx<projectiles.size();idx++) {
+                    Proj proj = projectiles.get(idx);
 
-            ballX += ballVelX;
-            ballY += ballVelY;
+                    double diffX = proj.x - ballX;
+                    double diffY = proj.y - ballY;
+                    double dist = Math.sqrt(diffX*diffX+diffY*diffY);
 
-            batY += batVel;
-            batY = Math.min(batY, 100-20/2);
-            batY = Math.max(batY, 20/2);
+                    if (dist < 10) { // did projectile hit alien?
+                        // hit bat -> good NAR
+                        sendText("good_nar. :|:", false);
+                        hits++;
+
+                        projectiles.remove(idx);
+                        idx--;
+
+                        // respawn alien to make it more complicated
+                        Random rng = new Random();
+                        ballX = rng.nextFloat()*110.0f;
+                    }
+                }
+
+
+                //change direction randomly to make it more complicated
+                Random rng = new Random();
+                if (rng.nextFloat() < 0.5) {
+                    ballVelX = (float)Math.abs(ballVelX);
+                }
+                else {
+                    ballVelX = -(float)Math.abs(ballVelX);
+                }
+
+                // alien reflects on sides of screen
+                if (ballX < 10) {
+                    ballVelX = Math.abs(ballVelX);
+                }
+                if (ballX > 110) {
+                    ballVelX = -Math.abs(ballVelX);
+                }
+
+                // move projectiles
+                for(Proj iProj : projectiles) {
+                    iProj.x += iProj.velX;
+                    iProj.y += iProj.velY;
+                }
+
+                for(int idx=0;idx<projectiles.size();idx++) {
+                    if (projectiles.get(idx).y < 0) { // is projectile outside of screen
+                        misses++;
+                        projectiles.remove(idx);
+                        idx--;
+                    }
+                }
+
+
+                // move
+                ballX += ballVelX;
+                ballY += ballVelY;
+
+                batPos += batVel;
+                batPos = Math.min(batPos, 100-20/2);
+                batPos = Math.max(batPos, 20/2);
+            }
         }
 
 
@@ -394,13 +511,35 @@ public class NarConSimpleWorld extends PApplet {
         }
 
         { // give time to reason
-            narInferenceSteps(2);
+            if (useRngAgent) {
+                Random rng = new Random();
+                if (rng.nextFloat() < 0.1) {
+                    int c = rng.nextInt(3);
+                    if (c == 0) {
+                        queuedOp = "^up";
+                    }
+                    else if (c == 1) {
+                        queuedOp = "^down";
+                    }
+                    else if (c == 2) {
+                        queuedOp = "^pick";
+                    }
+                }
+            }
+            else {
+                narInferenceSteps(2);
+            }
+
             // do actions
             if (queuedOp != null && queuedOp.equals("^up")) {
                 batVel = -7.0;
             }
             if (queuedOp != null && queuedOp.equals("^down")) {
                 batVel = 7.0;
+            }
+            if (queuedOp != null && queuedOp.equals("^pick")) {
+                // shoot
+                projectiles.add(new Proj((float)batPos, 80, 0.0f, -8.0f));
             }
             queuedOp = null;
         }
@@ -434,9 +573,9 @@ public class NarConSimpleWorld extends PApplet {
 
         { // draw debug
             fill(255);
-            text("hits"+hits + " misses="+misses + " t="+t, 10, 120);
+            text("hits"+hits + " misses="+misses + " t="+t  + "\nuseRngAgent="+useRngAgent, 10, 120);
 
-            text(lastNarsese, 10, 140); // draw narsese state
+            text(lastNarsese, 10, 160); // draw narsese state
         }
     }
 

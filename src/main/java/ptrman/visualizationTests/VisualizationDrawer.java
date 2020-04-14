@@ -274,7 +274,9 @@ public class VisualizationDrawer {
                 ////////////////////////
                 // ACTUAL CLASSIFICATION
 
-                System.out.println("FRAME");
+                boolean verbose = false;
+
+                if(verbose) System.out.println("FRAME");
 
                 for(Bb iBB : allBbs) {
                     float centerX = (float)(iBB.maxx+iBB.minx)/2.0f;
@@ -330,7 +332,7 @@ public class VisualizationDrawer {
                     applet.text("c="+categoryId, bestCenterX-32/2, bestCenterY-32/2);
                 }
 
-                System.out.println("FRAME END");
+                if(verbose) System.out.println("FRAME END");
             }
 
 
