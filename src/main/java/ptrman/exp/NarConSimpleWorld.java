@@ -126,36 +126,6 @@ public class NarConSimpleWorld extends PApplet {
 
         if (!useRngAgent)  {
             try {
-            /*
-            while(true) {
-                int len = is.available();
-
-                if (len > 0) {
-                    int here = 5;
-                }
-
-                break;
-
-                *
-                byte[] buf = new byte[10];
-                is.read(buf);
-
-                if (buf[0] == 0) { // is empty line?
-                    break;
-                }
-
-                String bufAsString = new String(buf);
-
-                System.out.println(bufAsString);
-
-                int here = 5;
-
-                 *
-            }
-
-             */
-
-
                 while(true) {
                     //byte[] arr = new byte[1];
                     //is.read(arr);
@@ -236,15 +206,6 @@ public class NarConSimpleWorld extends PApplet {
             classifier.minSimilarity = 0.87f;
         }
 
-
-        /*
-        try {
-            socket = new DatagramSocket(50001);
-            socket.setSoTimeout(1);
-        } catch (SocketException e) {
-            e.printStackTrace();
-        }*/
-
         // TODO < decide path based on OS >
         String commandline = pathToOna+"\\NAR.exe";
 
@@ -252,46 +213,6 @@ public class NarConSimpleWorld extends PApplet {
             pro = Runtime.getRuntime().exec(new String[]{commandline, "shell"});
             os = pro.getOutputStream();
             is = pro.getInputStream();
-
-            /*
-            BufferedReader stdInput = new BufferedReader(new
-                    InputStreamReader(is));
-
-            //os.write("< a --> b >.\n".getBytes());
-
-            //sendText(""+5, false);
-
-            byte[] buf = (5+"\r\n").getBytes();
-            try {
-                os.write(buf);
-                os.flush();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                Thread.sleep(100); // give other processes time
-            } catch (InterruptedException e) {
-                //e.printStackTrace();
-            }
-
-            String inputLine;
-            while ((inputLine = stdInput.readLine()) != null)
-                System.out.println(inputLine);
-
-             */
-
-            /*
-            for(;;) {
-                String x = stdInput.readLine();
-
-                //if (a > 0) {
-                    int here = 5;
-                //}
-
-            }
-
-             */
 
             int here = 5;
 
