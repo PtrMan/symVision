@@ -45,7 +45,7 @@ public class NarConSimpleWorld extends PApplet {
     // scene to choose
     // "pong" pong
     // "shootemup" for alien invasion thingy
-    public static String scene = "pong";//"shootemup";
+    public static String scene = "shootemup";//"shootemup";
 
 
     // SHOOTEMUP
@@ -95,7 +95,7 @@ public class NarConSimpleWorld extends PApplet {
 
     public static boolean useRngAgent = false; // use random action agent? used for testing
 
-    public static boolean verboseAgent = true;
+    public static boolean verboseAgent = false;
     public static boolean verboseDscnExp = true;
 
     // helper to send string to ONA
