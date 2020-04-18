@@ -13,16 +13,13 @@ This all has to happen in
 all under the assumption of insufficient knowledge and resources (AIKR).
 
 It has to happen
-* unsupervised, because a teacher can't be a assumed inside a robot :)
-* online, there can't be pauses to "train" machine learning models
+* unsupervised, because a teacher can't be a assumed inside a vehicle(spacecraft, robot, etc) :)
+* online, training has to happen while the system is processing information
 * open ended, because a real system must be open to new perceptions, knowledge and tasks at any time
 * under AIKR because resources, inclusive (computation) time are finite and usually not sufficient for the tasks at hand
 
 The author is not aware of many deep learning (DL) or machine learning(ML) systems which fullfill these requirements even in principle.
 It was possible since the 50s to train neural networks for the recognition of specific features in a supervised way, but this is not sufficient for systems which have to operate in the real world.
-Somehow the whole field of machine vision ignored research for unsupervised methods which can be applied to vision.
-
-Foundalis decided to not release his implementation due to ethical concerns. The main author of this project decided to reimplement Foundalis ideas because the capabilities are just to useful for future systems.
 
 # Implementation
 
