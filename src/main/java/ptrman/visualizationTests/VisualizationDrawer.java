@@ -177,9 +177,8 @@ public class VisualizationDrawer {
                 ArrayList<Bb> bbs  = new ArrayList<>();
 
                 {
-                    for(LineDetectorWithMultiplePoints iLineDetector : iProcessDEdge.annealedCandidates) {
-                        applet.stroke(255.0f, 0.0f, 0.0f);
-                        for( ProcessA.Sample iSample : iLineDetector.samples) {
+                    for(int idx=0;idx<solver.connectorSamplesFromProcessAForEdge.length;idx++) {
+                        for(ProcessA.Sample iSample : solver.connectorSamplesFromProcessAForEdge[idx].out) {
                             boolean found = false; // found bb to add to?
 
                             for(Bb iBb : bbs) {
@@ -255,19 +254,16 @@ public class VisualizationDrawer {
 
 
                 // draw "quantized" line detectors as dots to get them back to a image representation
-                for(int idx=0;idx<solver.processDEdge.length;idx++) {
+                for(int idx=0;idx<solver.connectorSamplesFromProcessAForEdge.length;idx++) {
                     IMap2d<Boolean> selmap = edgeMaps[idx];
-                    ProcessD iProcessDEdge = solver.processDEdge[idx];
 
-                    for(LineDetectorWithMultiplePoints iLineDetector : iProcessDEdge.annealedCandidates) {
-                        for( ProcessA.Sample iSample : iLineDetector.samples) {
-                            int x = iSample.position.getOne();
-                            int y = iSample.position.getTwo();
-                            selmap.setAt(x, y, true);
-                            selmap.setAt(x+1, y, true);
-                            selmap.setAt(x, y+1, true);
-                            selmap.setAt(x+1, y+1, true);
-                        }
+                    for(ProcessA.Sample iSample : solver.connectorSamplesFromProcessAForEdge[idx].out) {
+                        int x = iSample.position.getOne();
+                        int y = iSample.position.getTwo();
+                        selmap.setAt(x, y, true);
+                        selmap.setAt(x+1, y, true);
+                        selmap.setAt(x, y+1, true);
+                        selmap.setAt(x+1, y+1, true);
                     }
                 }
 
