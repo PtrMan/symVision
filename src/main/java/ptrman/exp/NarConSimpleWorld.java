@@ -45,7 +45,7 @@ public class NarConSimpleWorld extends PApplet {
     // scene to choose
     // "pong" pong
     // "shootemup" for alien invasion thingy
-    public static String scene = "shootemup";//"shootemup";
+    public static String scene = "pong";//"shootemup";
 
 
     // SHOOTEMUP

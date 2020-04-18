@@ -35,7 +35,7 @@ public class VisualizeAnimation extends PApplet {
     // scene to choose
     // "pong" pong
     // "symbols1" symbol animation 1
-    public static String scene = "pong";
+    public static String scene = "symbols1";//"pong";
 
     public static double ballX = 30.0;
     public static double ballY = 50.0;
