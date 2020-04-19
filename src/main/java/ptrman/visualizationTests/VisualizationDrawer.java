@@ -399,10 +399,10 @@ public class VisualizationDrawer {
 
                                     // not scalable way, will xplode for more complicated scenes
                                     String n = "< ( {"+(relY)+"} * {"+iClassfcnWithLowestCount.category+"D"+iClasfcnOther.category+"} ) --> relY >. :|:";
-                                    relByNarsese.put(n, true); // store in set
+                                    //relByNarsese.put(n, true); // store in set
 
                                     n = "< ( {"+(relX)+"} * {"+iClassfcnWithLowestCount.category+"D"+iClasfcnOther.category+"} ) --> relX >. :|:";
-                                    relByNarsese.put(n, true); // store in set
+                                    //relByNarsese.put(n, true); // store in set
                                 }
                             }
                         }

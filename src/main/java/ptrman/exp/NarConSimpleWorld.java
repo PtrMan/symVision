@@ -282,6 +282,27 @@ public class NarConSimpleWorld extends PApplet {
     public void draw() {
         t++;
 
+        // send hidden variables (for testing)
+        if(true) {
+            VisualizationDrawer.relN.clear();
+
+            if(scene.equals("pong")) {
+                double diffY = ballY - batPos;
+
+                String relY = "c";
+                if (diffY < -15.0) {
+                    relY = "b"; // below
+                }
+                if (diffY > 15.0) {
+                    relY = "a"; // above
+                }
+
+                // not scalable way, will xplode for more complicated scenes
+                String n = "< ( {"+(relY)+"} * {"+0+"D"+1+"} ) --> relY >. :|:";
+                VisualizationDrawer.relN.add(n);
+            }
+        }
+
         { // send to NARS
             String thisNarsese = "";
             for(String iN : VisualizationDrawer.relN) {
