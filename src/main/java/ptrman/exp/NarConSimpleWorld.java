@@ -65,10 +65,10 @@ public class NarConSimpleWorld extends PApplet {
 
     // PONG/SHOOTEMUP
     public static double batVel = 0.0;
-    public static double batPos = 50.0;
+    public static double batPos = 20.0;
 
     // is ball in "pong", is alien in SHOOTEMUP
-    public static double ballX = 30.0;
+    public static double ballX = 40.0;
     public static double ballY = 50.0;
     public static double ballVelX = 6.1;
     public static double ballVelY = 0;
@@ -308,7 +308,7 @@ public class NarConSimpleWorld extends PApplet {
             for(String iN : VisualizationDrawer.relN) {
                 thisNarsese += iN + "\n";
             }
-            if (!thisNarsese.equals(lastNarsese)) {
+            if (true||!thisNarsese.equals(lastNarsese)) {
                 // iterate over narsese sentences to send
                 for(String iN : VisualizationDrawer.relN) {
                     sendText(iN, false);
@@ -355,6 +355,7 @@ public class NarConSimpleWorld extends PApplet {
                     float distY = (float)Math.abs(ballY - batPos);
                     if (distY <= 20+1) {
                         // hit bat -> good NAR
+                        System.out.println("good nar");
                         sendText("good_nar. :|:", false);
                         hits++;
                     }
@@ -481,7 +482,7 @@ public class NarConSimpleWorld extends PApplet {
                 }
             }
             else {
-                narInferenceSteps(2);
+                narInferenceSteps(1);
             }
 
             // do actions
