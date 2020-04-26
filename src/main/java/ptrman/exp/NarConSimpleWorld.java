@@ -229,7 +229,7 @@ public class NarConSimpleWorld extends PApplet {
 
 
     public void setup() {
-        frameRate(8);
+        frameRate(15);
     }
 
     public static class InputDrawer implements IImageDrawer {
@@ -482,7 +482,11 @@ public class NarConSimpleWorld extends PApplet {
                 }
             }
             else {
+                long t0 = System.nanoTime();
                 narInferenceSteps(1);
+                long dt = System.nanoTime() - t0;
+                double timeInMs = dt / 1000000.0;
+                System.out.println("reasoner time= "+timeInMs+" ms");
             }
 
             // do actions
@@ -511,11 +515,20 @@ public class NarConSimpleWorld extends PApplet {
 
         solver2.imageDrawer = new ptrman.exp.NarConSimpleWorld.InputDrawer();
 
-        solver2.preFrame(); // do all processing and setup before the actual processing of the frame
-        for (int iStep=0;iStep<steps;iStep++) {
-            solver2.frameStep(); // step of a frame
+        {
+            long t0 = System.nanoTime();
+
+            solver2.preFrame(); // do all processing and setup before the actual processing of the frame
+            for (int iStep=0;iStep<steps;iStep++) {
+                solver2.frameStep(); // step of a frame
+            }
+            solver2.postFrame();
+
+            long dt = System.nanoTime() - t0;
+            double timeInMs = dt / 1000000.0;
+            System.out.println("solver time= "+timeInMs+" ms");
         }
-        solver2.postFrame();
+
 
         { // draw processed image in the background
             pimg = ImageConverter.convBufferedImageToPImage((new ptrman.exp.NarConSimpleWorld.InputDrawer()).apply(null), pimg);

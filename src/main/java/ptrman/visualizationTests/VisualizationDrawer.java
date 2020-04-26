@@ -398,10 +398,10 @@ public class VisualizationDrawer {
                                     // scalable way// String n = "< ( {"+(relY)+"} * < ( {"+iClassfcnWithLowestCount.category+"} * {"+iClasfcnOther.category+"} ) --> h > ) --> relY >. :|:";
 
                                     // not scalable way, will xplode for more complicated scenes
-                                    String n = "< ( {"+(relY)+"} * {"+iClassfcnWithLowestCount.category+"D"+iClasfcnOther.category+"} ) --> relY >. :|:";
+                                    String n = "< {( {"+(relY)+"} * {"+iClassfcnWithLowestCount.category+"D"+iClasfcnOther.category+"} )} --> relY >. :|:";
                                     relByNarsese.put(n, true); // store in set
 
-                                    n = "< ( {"+(relX)+"} * {"+iClassfcnWithLowestCount.category+"D"+iClasfcnOther.category+"} ) --> relX >. :|:";
+                                    n = "< {( {"+(relX)+"} * {"+iClassfcnWithLowestCount.category+"D"+iClasfcnOther.category+"} )} --> relX >. :|:";
                                     //relByNarsese.put(n, true); // store in set
                                 }
                             }
