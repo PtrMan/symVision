@@ -25,9 +25,7 @@ import java.util.stream.Stream;
 
 import static org.eclipse.collections.impl.tuple.primitive.PrimitiveTuples.pair;
 
-
 /**
- *
  * computation of altitude of points
  */
 public class ProcessB extends AbstractProcessB {
@@ -56,7 +54,6 @@ public class ProcessB extends AbstractProcessB {
     }
 
     /**
-     *
      * we use the whole image, in Phaeaco he worked with the incomplete image with the guiding of processA, this is not implemented that way
      */
     @Override
@@ -118,20 +115,12 @@ public class ProcessB extends AbstractProcessB {
      * \return null if no point could be found in the radius 
      */
     private Tuple2<IntIntPair, Double> findNearestPositionWhereMapIs(boolean value, IntIntPair position, IMap2d<Boolean> image, int radius) {
-        /* debug
-        if( position.x > 80 && position.x < 90 && position.y > 60 && position.y < 70 ) {
-            int x = 0;
-        }
-        */
-
         IMap2d<Boolean> debugMap = new Map2d<>(spatialAcceleratedMap2d.getSize().x, spatialAcceleratedMap2d.getSize().y);
         for( int y = 0; y < debugMap.getLength(); y++ ) {
             for( int x = 0; x < debugMap.getWidth(); x++ ) {
                 debugMap.setAt(x, y, false);
             }
         }
-
-//        final ArrayRealVector positionReal = ptrman.math.ArrayRealVectorHelper.integerToArrayRealVector(position);
 
         final IntIntPair gridCenterPosition = spatialAcceleratedMap2d.getGridPositionOfPosition(position);
 
@@ -216,7 +205,6 @@ public class ProcessB extends AbstractProcessB {
     }
 
     private Stream<IntIntPair> getPositionsOfCandidatePixelsOfCellWhereFalse(final IntIntPair cellPosition) {
-
         final int gridsize = spatialAcceleratedMap2d.getGridsize();
 
         Assert.Assert(gridsize == 8, "only implemented for gridsize = 8");
@@ -231,37 +219,5 @@ public class ProcessB extends AbstractProcessB {
                 .filter((int x) -> !map.readAt(x, y))
                 .mapToObj((int x) -> pair(x,y))
         ).flatMap(x -> x);
-
-//        int h = (cellPosition.y + 1) * gridsize;
-//        int w = (cellPosition.x + 1) * gridsize;
-//
-//        for(int y = cellPosition.y * gridsize; y < h; y++ ) {
-//
-//            if( map.readByteAtInt(cellPosition.x * gridsize, y) != 0xff ) {
-//                for(int x = cellPosition.x * gridsize; x < w; x++ ) {
-//                    if (!map.readAt(x, y)) {
-//                        result.add(new Vector2d<>(x, y));
-//                    }
-//                }
-//            }
-//        }
     }
-
-
-    private List<Vector2d<Integer>> getPositionsOfCandidatePixelsOfCell(final Vector2d<Integer> cellPosition, final boolean value) {
-        List<Vector2d<Integer>> result = new ArrayList<>();
-
-        final int gridsize = spatialAcceleratedMap2d.getGridsize();
-
-        for( int y = cellPosition.y * gridsize; y < (cellPosition.y+1) * gridsize; y++ ) {
-            for( int x = cellPosition.x * gridsize; x < (cellPosition.x+1) * gridsize; x++ ) {
-                if( map.readAt(x, y) == value ) {
-                    result.add(new Vector2d<>(x, y));
-                }
-            }
-        }
-
-        return result;
-    }
-
 }
