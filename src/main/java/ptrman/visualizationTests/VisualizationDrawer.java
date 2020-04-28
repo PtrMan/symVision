@@ -31,9 +31,12 @@ public class VisualizationDrawer {
     public boolean drawVisualizationOfAltitude = true;
     public boolean drawVisualizationOfEndoSceletons = false; // do we visualize all samples of endo/exo -sceleton
     public boolean drawVisualizationOfLineDetectors = false;
-    public boolean drawVisualizationOfLineDetectorsEnableAct = true; // do we draw activation of line detectors?
+    public boolean drawVisualizationOfLineDetectorsEnableAct = false; // do we draw activation of line detectors?
     public boolean drawVisualizationOfEdgeLineDetectors = false;
     public boolean drawVisualizationOfTex = true; // draw visualization of texture
+
+    public boolean drawVisEdgeLine0 = false; // draw visualization of edge line detectors?
+    public boolean drawVisProcessHEdge = false; // draw visualization of edges from process H?
 
     public void drawDetectors(Solver2 solver, PApplet applet) {
         if(drawVisualizationOfAltitude) {
@@ -128,19 +131,22 @@ public class VisualizationDrawer {
     public void drawPrimitives(Solver2 solver, PApplet applet, Classifier classifier) {
         // * draw primitives for edges
 
-        for (ProcessConnector<RetinaPrimitive> iCntr : solver.connectorDetectorsFromProcessHForEdge) {
-            for(RetinaPrimitive iLinePrimitive : iCntr.out) {
-                applet.stroke(0.0f, 255.0f, 0.0f);
+        if (drawVisProcessHEdge) {
+            for (ProcessConnector<RetinaPrimitive> iCntr : solver.connectorDetectorsFromProcessHForEdge) {
+                for(RetinaPrimitive iLinePrimitive : iCntr.out) {
+                    applet.stroke(0.0f, 255.0f, 0.0f);
 
-                double[] aa = iLinePrimitive.line.a.getDataRef();
-                double x0 = aa[0];
-                double y0 = aa[1];
-                double[] bb = iLinePrimitive.line.b.getDataRef();
-                double x1 = bb[0];
-                double y1 = bb[1];
-                applet.line((float)x0, (float)y0, (float)x1, (float)y1);
+                    double[] aa = iLinePrimitive.line.a.getDataRef();
+                    double x0 = aa[0];
+                    double y0 = aa[1];
+                    double[] bb = iLinePrimitive.line.b.getDataRef();
+                    double x1 = bb[0];
+                    double y1 = bb[1];
+                    applet.line((float)x0, (float)y0, (float)x1, (float)y1);
+                }
             }
         }
+
 
 
         { // iterate over line detectors of processD for edges
@@ -154,14 +160,16 @@ public class VisualizationDrawer {
                     float act = drawVisualizationOfLineDetectorsEnableAct ? (float)iLineDetector.calcActivation() : 1.0f;
                     applet.stroke(act*255.0f, act*255.0f, act*255.0f);
 
-
-                    for (RetinaPrimitive iLine : solver.processD.splitDetectorIntoLines(iLineDetector)) {
-                        double x0 = iLine.line.a.getDataRef()[0];
-                        double y0 = iLine.line.a.getDataRef()[1];
-                        double x1 = iLine.line.b.getDataRef()[0];
-                        double y1 = iLine.line.b.getDataRef()[1];
-                        applet.line((float)x0, (float)y0, (float)x1, (float)y1);
+                    if(drawVisEdgeLine0) {
+                        for (RetinaPrimitive iLine : solver.processD.splitDetectorIntoLines(iLineDetector)) {
+                            double x0 = iLine.line.a.getDataRef()[0];
+                            double y0 = iLine.line.a.getDataRef()[1];
+                            double x1 = iLine.line.b.getDataRef()[0];
+                            double y1 = iLine.line.b.getDataRef()[1];
+                            applet.line((float)x0, (float)y0, (float)x1, (float)y1);
+                        }
                     }
+
 
                     applet.stroke(255.0f, 0.0f, 0.0f);
                     for( ProcessA.Sample iSample : iLineDetector.samples) {
@@ -450,28 +458,31 @@ public class VisualizationDrawer {
         }
 
         // * draw primitives for endoskeleton
-        for(RetinaPrimitive iLinePrimitive : solver.cntrFinalProcessing.out) {
-            applet.stroke(255.0f, 255.0f, 255.0f);
+        if(true) {
+            for(RetinaPrimitive iLinePrimitive : solver.cntrFinalProcessing.out) {
+                applet.stroke(255.0f, 255.0f, 255.0f);
 
-            double x0 = iLinePrimitive.line.a.getDataRef()[0];
-            double y0 = iLinePrimitive.line.a.getDataRef()[1];
-            double x1 = iLinePrimitive.line.b.getDataRef()[0];
-            double y1 = iLinePrimitive.line.b.getDataRef()[1];
-            applet.line((float)x0, (float)y0, (float)x1, (float)y1);
+                double x0 = iLinePrimitive.line.a.getDataRef()[0];
+                double y0 = iLinePrimitive.line.a.getDataRef()[1];
+                double x1 = iLinePrimitive.line.b.getDataRef()[0];
+                double y1 = iLinePrimitive.line.b.getDataRef()[1];
+                applet.line((float)x0, (float)y0, (float)x1, (float)y1);
 
 
-            // draw intersections as small triangles
-            applet.stroke(255.0f, 0.0f, 0.0f);
+                // draw intersections as small triangles
+                applet.stroke(255.0f, 0.0f, 0.0f);
 
-            for (Intersection iIntersection : iLinePrimitive.line.intersections) {
-                int x = (int)iIntersection.intersectionPosition.getDataRef()[0];
-                int y = (int)iIntersection.intersectionPosition.getDataRef()[1];
+                for (Intersection iIntersection : iLinePrimitive.line.intersections) {
+                    int x = (int)iIntersection.intersectionPosition.getDataRef()[0];
+                    int y = (int)iIntersection.intersectionPosition.getDataRef()[1];
 
-                applet.line(x,y-1,x-1,y+1);
-                applet.line(x,y-1,x+1,y+1);
-                applet.line(x-1,y+1,x+1,y+1);
+                    applet.line(x,y-1,x-1,y+1);
+                    applet.line(x,y-1,x+1,y+1);
+                    applet.line(x-1,y+1,x+1,y+1);
+                }
             }
         }
+
 
     }
 
