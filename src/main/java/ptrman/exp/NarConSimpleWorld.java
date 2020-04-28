@@ -298,7 +298,7 @@ public class NarConSimpleWorld extends PApplet {
                 }
 
                 // not scalable way, will xplode for more complicated scenes
-                String n = "< ( {"+(relY)+"} * {"+0+"D"+1+"} ) --> relY >. :|:";
+                String n = "< {( {"+(relY)+"} * {"+0+"D"+1+"} )} --> relY >. :|:";
                 VisualizationDrawer.relN.add(n);
             }
         }
