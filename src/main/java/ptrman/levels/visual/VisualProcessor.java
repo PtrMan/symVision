@@ -10,7 +10,6 @@
 package ptrman.levels.visual;
 
 import ptrman.Datastructures.*;
-import ptrman.meter.event.DurationStartMeter;
 import ptrman.misc.Assert;
 
 import java.util.ArrayDeque;
@@ -133,14 +132,12 @@ public class VisualProcessor
             public ChainElement(EnumMapType inputType, EnumMapType outputType, String meterName) {
                 this.inputType = inputType;
                 this.outputType = outputType;
-                durationMeters = new DurationStartMeter(meterName, true, 1.0, false);
             }
 
             public abstract void apply();
 
             public final EnumMapType inputType;
             public final EnumMapType outputType;
-            public final DurationStartMeter durationMeters;
         }
 
         public abstract static class ApplyChainElement<InputType, ResultType> extends ChainElement {
@@ -156,9 +153,7 @@ public class VisualProcessor
             }
 
             public void apply() {
-                durationMeters.start();
                 filter.apply(input, result);
-                durationMeters.stop();
             }
 
             public IMap2d<InputType> input;
