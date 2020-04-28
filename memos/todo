@@ -1,5 +1,0 @@
-20.5.15 * a "Connector workspace" between processes
-           * changes can be synced between the listening processes
-           * needs a flush method to flush the content (after each frame)
-
-20.5.15 * find bug in ProcessB/ProcessC which assigns wrong altitudes to the samples
