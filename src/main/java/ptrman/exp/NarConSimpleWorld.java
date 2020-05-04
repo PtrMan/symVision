@@ -290,16 +290,22 @@ public class NarConSimpleWorld extends PApplet {
                 double diffY = ballY - batPos;
 
                 String relY = "c";
-                if (diffY < -15.0) {
+                if (diffY < -15.0/2.0) {
                     relY = "b"; // below
                 }
-                if (diffY > 15.0) {
+                if (diffY > 15.0/2.0) {
                     relY = "a"; // above
                 }
 
                 // not scalable way, will xplode for more complicated scenes
                 String n = "< {( {"+(relY)+"} * {"+0+"D"+1+"} )} --> relY >. :|:";
+                n = relY+"Q"+0+"D"+1+ "QrelY. :|:";
+                //n = relY+". :|:";
+
                 VisualizationDrawer.relN.add(n);
+
+                //n = "d"+"Q"+0+"D"+1+ "QrelX. :|:";
+                //VisualizationDrawer.relN.add(n);
             }
         }
 
@@ -462,7 +468,7 @@ public class NarConSimpleWorld extends PApplet {
 
 
 
-        if (t%4 == 0) {
+        if (t%1 == 0) {
             // feed with goal
             String n = "goodnar! :|:";
             sendText(n, false);
