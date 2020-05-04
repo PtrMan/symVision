@@ -324,9 +324,15 @@ public class VisualizationDrawer {
                     applet.rect( (int)bestCenterX-32/2, (int)bestCenterY-32/2, 32, 32);
 
                     // * classify
+                    long t0 = System.nanoTime();
+
                     stimulus = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)bestCenterX, (int)bestCenterY, 32, 32); // extract cropped image
                     long categoryId = classifier.classify(stimulus, true);
                     float thisClassificationSim = classifier.bestCategorySimilarity;
+
+                    long dt = System.nanoTime() - t0;
+                    double timeInMs = dt / 1000000.0;
+                    System.out.println("classifier time= "+timeInMs+" ms");
 
                     classifications.add(new Classification(bestCenterX, bestCenterY, categoryId)); // store classification for later processing
 
@@ -406,7 +412,8 @@ public class VisualizationDrawer {
                                     // scalable way// String n = "< ( {"+(relY)+"} * < ( {"+iClassfcnWithLowestCount.category+"} * {"+iClasfcnOther.category+"} ) --> h > ) --> relY >. :|:";
 
                                     // not scalable way, will xplode for more complicated scenes
-                                    String n = "< {( {"+(relY)+"} * {"+iClassfcnWithLowestCount.category+"D"+iClasfcnOther.category+"} )} --> relY >. :|:";
+                                    //String n = "< {( {"+(relY)+"} * {"+iClassfcnWithLowestCount.category+"D"+iClasfcnOther.category+"} )} --> relY >. :|:";
+                                    String n = relY+"Q"+iClassfcnWithLowestCount.category+"D"+iClasfcnOther.category+ "QrelY. :|:";
                                     relByNarsese.put(n, true); // store in set
 
                                     n = "< {( {"+(relX)+"} * {"+iClassfcnWithLowestCount.category+"D"+iClasfcnOther.category+"} )} --> relX >. :|:";
