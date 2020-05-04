@@ -26,20 +26,31 @@ public class Classifier {
     // "high level" classifier
 
     public float bestCategorySimilarity = 0;
+
+    public String lastClassfnMsg = ""; // "message" of last classification
+    // "NOCLASS" : was no class found?
+    // "BELOWT" : was classification below thresold?
+    // "OK" : all fine
     public long classify(ArrayRealVector stimulus, boolean add) {
         bestCategorySimilarity = 0;
+        lastClassfnMsg = "NOCLASS";
         long bestCategoryId = -1; // -1 : invalid
 
         for(Category iCat : categories) {
             float d = calcDist(stimulus, iCat.examplars.get(0));
             float sim = calcSim(d);
             if (sim > bestCategorySimilarity) {
+                lastClassfnMsg = "BELOWT";
                 bestCategorySimilarity = sim;
                 bestCategoryId = iCat.categoryId;
             }
         }
 
         if(verbose) System.out.println("CLASSIFIER: class="+bestCategoryId+"   best similarity="+bestCategorySimilarity);// DEBUG
+
+        if(lastClassfnMsg.equals("BELOWT") && bestCategorySimilarity > minSimilarity) {
+            lastClassfnMsg = "OK";
+        }
 
         if (add && bestCategorySimilarity == Float.POSITIVE_INFINITY) { // was no class found?
             // add new one

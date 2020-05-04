@@ -298,12 +298,22 @@ public class VisualizationDrawer {
                         float bestSimilarity = classifier.bestCategorySimilarity;
 
                         // fill with center classification
-                        clasfnWSims[0] = new ClassificationWithSimilarity(bestCenterX, bestCenterY, -1, bestSimilarity);
-                        clasfnWSims[1] = new ClassificationWithSimilarity(bestCenterX, bestCenterY, -1, bestSimilarity);
+                        clasfnWSims[0] = new ClassificationWithSimilarity(bestCenterX, bestCenterY, classifier.lastClassfnMsg, bestSimilarity);
+                        clasfnWSims[1] = new ClassificationWithSimilarity(bestCenterX, bestCenterY, classifier.lastClassfnMsg, bestSimilarity);
                     }
 
+                    int boundaryMinX = (int)iBB.minx;
+                    //boundaryMinX += 8;
+                    boundaryMinX = Math.min(boundaryMinX, (int)iBB.maxx);
+
+                    int boundaryMaxX = (int)iBB.maxx;
+                    //boundaryMaxX += 8;
+                    boundaryMaxX = Math.max(boundaryMaxX, (int)iBB.minx);
+
+
+
                     for(int iiy=(int)iBB.miny;iiy<iBB.maxy;iiy+=2) {
-                        for(int iix=(int)iBB.minx;iix<iBB.maxx;iix+=2) {
+                        for(int iix=boundaryMinX;iix<boundaryMaxX;iix+=2) {
                             int thisCenterX = (int)iix;
                             int thisCenterY = (int)iiy;
 
@@ -313,7 +323,7 @@ public class VisualizationDrawer {
                             if (thisSim > clasfnWSims[1].sim) {
                                 // FIFO
                                 clasfnWSims[0] = clasfnWSims[1];
-                                clasfnWSims[1] = new ClassificationWithSimilarity(thisCenterX, thisCenterY, -1, thisSim);
+                                clasfnWSims[1] = new ClassificationWithSimilarity(thisCenterX, thisCenterY, classifier.lastClassfnMsg, thisSim);
                             }
                         }
                     }
@@ -365,6 +375,11 @@ public class VisualizationDrawer {
                         // * draw classification (for debugging)
                         applet.fill(255);
                         applet.text("c="+categoryId, iClasfnWSim.posX-32/2, iClasfnWSim.posY-32/2);
+
+                        //commented because doesn't work
+                        //if (iClasfnWSim.msg.equals("NOCLASS")) {
+                        //    break; // don't add multiple if it is novel
+                        //}
                     }
 
                 }
@@ -554,14 +569,14 @@ public class VisualizationDrawer {
     }
 
     static class ClassificationWithSimilarity {
-        public long category;
+        public String msg;
         public int posX;
         public int posY;
         public double sim; // similarity
-        public ClassificationWithSimilarity(int posX, int posY, long category, double sim) {
+        public ClassificationWithSimilarity(int posX, int posY, String msg, double sim) {
             this.posX = posX;
             this.posY = posY;
-            this.category = category;
+            this.msg = msg;
             this.sim = sim;
         }
     }
