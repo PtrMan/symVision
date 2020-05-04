@@ -518,7 +518,8 @@ public class NarConSimpleWorld extends PApplet {
 
         solver2.imageDrawer = new ptrman.exp.NarConSimpleWorld.InputDrawer();
 
-        {
+        boolean useVision = false;
+        if(useVision) {
             long t0 = System.nanoTime();
 
             solver2.preFrame(); // do all processing and setup before the actual processing of the frame
@@ -540,7 +541,10 @@ public class NarConSimpleWorld extends PApplet {
             tint(255.0f, 255.0f); // reset tint
         }
 
-        drawer.drawPrimitives(solver2, this, classifier);
+        if(useVision) { // we only draw if we have vision
+            drawer.drawPrimitives(solver2, this, classifier);
+        }
+
 
         { // draw debug
             fill(255);
