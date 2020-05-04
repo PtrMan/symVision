@@ -104,7 +104,7 @@ public class NarConSimpleWorld extends PApplet {
             return; // don't send anything to NARS if we use dummy agent
         }
 
-        if (false && !silent) {
+        if (!silent) {
             System.out.println(""+str);
         }
 
@@ -303,19 +303,22 @@ public class NarConSimpleWorld extends PApplet {
             }
         }
 
-        { // send to NARS
-            String thisNarsese = "";
-            for(String iN : VisualizationDrawer.relN) {
-                thisNarsese += iN + "\n";
-            }
-            if (true||!thisNarsese.equals(lastNarsese)) {
-                // iterate over narsese sentences to send
+        if ((t%3) == 0) { // send status not to often
+            { // send to NARS
+                String thisNarsese = "";
                 for(String iN : VisualizationDrawer.relN) {
-                    sendText(iN, false);
+                    thisNarsese += iN + "\n";
                 }
+                if (true||!thisNarsese.equals(lastNarsese)) {
+                    // iterate over narsese sentences to send
+                    for(String iN : VisualizationDrawer.relN) {
+                        sendText(iN, false);
+                    }
+                }
+                lastNarsese = thisNarsese;
             }
-            lastNarsese = thisNarsese;
         }
+
 
 
 
@@ -356,7 +359,7 @@ public class NarConSimpleWorld extends PApplet {
                     if (distY <= 20+1) {
                         // hit bat -> good NAR
                         System.out.println("good nar");
-                        sendText("good_nar. :|:", false);
+                        sendText("goodnar. :|:", false);
                         hits++;
                     }
                     else { // bat didn't hit ball, respawn ball
@@ -394,7 +397,7 @@ public class NarConSimpleWorld extends PApplet {
                     if (dist < 10) { // did projectile hit alien?
                         // hit bat -> good NAR
                         System.out.println("hit");
-                        sendText("good_nar. :|:", false);
+                        sendText("goodnar. :|:", false);
                         hits++;
 
                         projectiles.remove(idx);
@@ -461,7 +464,7 @@ public class NarConSimpleWorld extends PApplet {
 
         if (t%4 == 0) {
             // feed with goal
-            String n = "good_nar! :|:";
+            String n = "goodnar! :|:";
             sendText(n, false);
         }
 
