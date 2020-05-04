@@ -283,7 +283,7 @@ public class NarConSimpleWorld extends PApplet {
         t++;
 
         // send hidden variables (for testing)
-        if(true) {
+        if(false) {
             VisualizationDrawer.relN.clear();
 
             if(scene.equals("pong")) {
@@ -524,7 +524,7 @@ public class NarConSimpleWorld extends PApplet {
 
         solver2.imageDrawer = new ptrman.exp.NarConSimpleWorld.InputDrawer();
 
-        boolean useVision = false;
+        boolean useVision = true;
         if(useVision) {
             long t0 = System.nanoTime();
 

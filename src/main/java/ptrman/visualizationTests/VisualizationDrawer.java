@@ -286,22 +286,46 @@ public class VisualizationDrawer {
                     float centerX = (float)(iBB.maxx+iBB.minx)/2.0f;
                     float centerY = (float)(iBB.maxy+iBB.miny)/2.0f;
 
+                    long t0 = System.nanoTime();
 
-                    // simulate convolution by finding best classification in proximity
+                    ClassificationWithSimilarity[] clasfnWSims = new ClassificationWithSimilarity[2];
 
-                    ArrayRealVector stimulus = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)centerX, (int)centerY, 32, 32); // extract cropped image
-                    classifier.classify(stimulus, false);
-                    int bestCenterX = (int)centerX;
-                    int bestCenterY = (int)centerY;
-                    float bestSimilarity = classifier.bestCategorySimilarity;
+                    {
+                        ArrayRealVector stimulus = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)centerX, (int)centerY, 32, 32); // extract cropped image
+                        classifier.classify(stimulus, false);
+                        int bestCenterX = (int)centerX;
+                        int bestCenterY = (int)centerY;
+                        float bestSimilarity = classifier.bestCategorySimilarity;
 
+                        // fill with center classification
+                        clasfnWSims[0] = new ClassificationWithSimilarity(bestCenterX, bestCenterY, -1, bestSimilarity);
+                        clasfnWSims[1] = new ClassificationWithSimilarity(bestCenterX, bestCenterY, -1, bestSimilarity);
+                    }
+
+                    for(int iiy=(int)iBB.miny;iiy<iBB.maxy;iiy+=2) {
+                        for(int iix=(int)iBB.minx;iix<iBB.maxx;iix+=2) {
+                            int thisCenterX = (int)iix;
+                            int thisCenterY = (int)iiy;
+
+                            ArrayRealVector stimulus2 = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)thisCenterX, (int)thisCenterY, 32, 32); // extract cropped image
+                            classifier.classify(stimulus2, false);
+                            float thisSim = classifier.bestCategorySimilarity;
+                            if (thisSim > clasfnWSims[1].sim) {
+                                // FIFO
+                                clasfnWSims[0] = clasfnWSims[1];
+                                clasfnWSims[1] = new ClassificationWithSimilarity(thisCenterX, thisCenterY, -1, thisSim);
+                            }
+                        }
+                    }
+
+                    /* other older algorithm
                     int convRange = 3; // range of convolution - in + - dimension
                     for(int dx=-convRange;dx<convRange;dx++) {
                         for(int dy=-convRange;dy<convRange;dy++) {
                             int thisCenterX = (int)centerX+dx;
                             int thisCenterY = (int)centerY+dy;
 
-                            ArrayRealVector stimulus2 = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)centerX, (int)centerY, 32, 32); // extract cropped image
+                            ArrayRealVector stimulus2 = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)thisCenterX, (int)thisCenterY, 32, 32); // extract cropped image
                             classifier.classify(stimulus2, false);
                             float thisSim = classifier.bestCategorySimilarity;
                             if (thisSim > bestSimilarity) {
@@ -312,34 +336,37 @@ public class VisualizationDrawer {
                         }
                     }
 
+                     */
+
 
                     // * extract cropped image
 
 
 
+                    for(ClassificationWithSimilarity iClasfnWSim : clasfnWSims) {
+                        // DEBUG CLASSIFICATION RECT
+                        applet.stroke(255.0f, 255.0f, 255.0f);
+                        applet.fill(0, 1.0f);
+                        applet.rect( (int)iClasfnWSim.posX-32/2, (int)iClasfnWSim.posY-32/2, 32, 32);
 
-                    // DEBUG CLASSIFICATION RECT
-                    applet.stroke(255.0f, 255.0f, 255.0f);
-                    applet.fill(0, 1.0f);
-                    applet.rect( (int)bestCenterX-32/2, (int)bestCenterY-32/2, 32, 32);
+                        // * classify
 
-                    // * classify
-                    long t0 = System.nanoTime();
+                        ArrayRealVector stimulus = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)iClasfnWSim.posX, (int)iClasfnWSim.posY, 32, 32); // extract cropped image
+                        long categoryId = classifier.classify(stimulus, true);
+                        float thisClassificationSim = classifier.bestCategorySimilarity;
 
-                    stimulus = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)bestCenterX, (int)bestCenterY, 32, 32); // extract cropped image
-                    long categoryId = classifier.classify(stimulus, true);
-                    float thisClassificationSim = classifier.bestCategorySimilarity;
+                        long dt = System.nanoTime() - t0;
+                        double timeInMs = dt / 1000000.0;
+                        System.out.println("classifier time= "+timeInMs+" ms");
 
-                    long dt = System.nanoTime() - t0;
-                    double timeInMs = dt / 1000000.0;
-                    System.out.println("classifier time= "+timeInMs+" ms");
-
-                    classifications.add(new Classification(bestCenterX, bestCenterY, categoryId)); // store classification for later processing
+                        classifications.add(new Classification(iClasfnWSim.posX, iClasfnWSim.posY, categoryId)); // store classification for later processing
 
 
-                    // * draw classification (for debugging)
-                    applet.fill(255);
-                    applet.text("c="+categoryId, bestCenterX-32/2, bestCenterY-32/2);
+                        // * draw classification (for debugging)
+                        applet.fill(255);
+                        applet.text("c="+categoryId, iClasfnWSim.posX-32/2, iClasfnWSim.posY-32/2);
+                    }
+
                 }
 
                 if(verbose) System.out.println("FRAME END");
@@ -523,6 +550,19 @@ public class VisualizationDrawer {
             this.posX = posX;
             this.posY = posY;
             this.category = category;
+        }
+    }
+
+    static class ClassificationWithSimilarity {
+        public long category;
+        public int posX;
+        public int posY;
+        public double sim; // similarity
+        public ClassificationWithSimilarity(int posX, int posY, long category, double sim) {
+            this.posX = posX;
+            this.posY = posY;
+            this.category = category;
+            this.sim = sim;
         }
     }
 }
