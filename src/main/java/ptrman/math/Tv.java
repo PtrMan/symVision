@@ -22,6 +22,10 @@ public class Tv {
         float w1 = c2w(a.conf);
         float w2 = c2w(b.conf);
         float w = w1 + w2;
+
+        if (w == 0.0f) {
+            //return new Tv(0.0f, w2c(w));
+        }
         return new Tv((w1 * a.freq + w2 * b.freq) / w, w2c(w));
     }
 

@@ -18,6 +18,7 @@ import ptrman.Datastructures.Map2d;
 import ptrman.bpsolver.Solver2;
 import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
+import ptrman.math.Tv;
 import ptrman.misc.Classifier;
 
 import java.io.IOException;
@@ -291,7 +292,7 @@ public class VisualizationDrawer {
                     ClassificationWithSimilarity[] clasfnWSims = new ClassificationWithSimilarity[2];
 
                     {
-                        ArrayRealVector stimulus = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)centerX, (int)centerY, 32, 32); // extract cropped image
+                        Tv[] stimulus = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)centerX, (int)centerY, 32, 32); // extract cropped image
                         classifier.classify(stimulus, false);
                         int bestCenterX = (int)centerX;
                         int bestCenterY = (int)centerY;
@@ -317,7 +318,7 @@ public class VisualizationDrawer {
                             int thisCenterX = (int)iix;
                             int thisCenterY = (int)iiy;
 
-                            ArrayRealVector stimulus2 = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)thisCenterX, (int)thisCenterY, 32, 32); // extract cropped image
+                            Tv[] stimulus2 = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)thisCenterX, (int)thisCenterY, 32, 32); // extract cropped image
                             classifier.classify(stimulus2, false);
                             float thisSim = classifier.bestCategorySimilarity;
                             if (thisSim > clasfnWSims[1].sim) {
@@ -361,7 +362,7 @@ public class VisualizationDrawer {
 
                         // * classify
 
-                        ArrayRealVector stimulus = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)iClasfnWSim.posX, (int)iClasfnWSim.posY, 32, 32); // extract cropped image
+                        Tv[] stimulus = cropEdgeMapsAndConcatToVecAt(edgeMaps, (int)iClasfnWSim.posX, (int)iClasfnWSim.posY, 32, 32); // extract cropped image
                         long categoryId = classifier.classify(stimulus, true);
                         float thisClassificationSim = classifier.bestCategorySimilarity;
 
@@ -537,6 +538,7 @@ public class VisualizationDrawer {
 
     // helper
     // reads crops from edge maps and concatenate it all to a single vector for classification
+    /* commented because not used anymore
     static ArrayRealVector cropEdgeMapsAndConcatToVecAt(IMap2d<Boolean>[] edgeMaps, int centerX, int centerY, int width, int height) {
         ArrayRealVector dest = new ArrayRealVector(edgeMaps.length*width*height);
         int destIdx = 0; // index in dest
@@ -555,6 +557,34 @@ public class VisualizationDrawer {
 
         return dest;
     }
+     */
+    static Tv[] cropEdgeMapsAndConcatToVecAt(IMap2d<Boolean>[] edgeMaps, int centerX, int centerY, int width, int height) {
+        Tv[] dest = new Tv[2*edgeMaps.length*width*height];
+        for(int i=0;i<dest.length/2;i++) {
+            dest[i*2] = new Tv(0.0f, 0.0001f);
+            dest[i*2+1] = new Tv(1.0f, 0.0001f);
+        }
+
+        int destIdx = 0; // index in dest
+
+        for(IMap2d<Boolean> iEdgeMap : edgeMaps) {
+            for(int ix=centerX-width/2;ix<centerX+width/2;ix++) {
+                for(int iy=centerY-height/2;iy<centerY+height/2;iy++) {
+                    if (iEdgeMap.inBounds(ix, iy)) {
+                        boolean v = iEdgeMap.readAt(ix, iy);
+                        if(v) {
+                            dest[destIdx*2  ] = new Tv(1.0f, 0.02f);
+                            dest[destIdx*2+1] = new Tv(0.0f, 0.02f);
+                        }
+                    }
+                    destIdx++;
+                }
+            }
+        }
+
+        return dest;
+    }
+
 
     // helper
     static class Classification {

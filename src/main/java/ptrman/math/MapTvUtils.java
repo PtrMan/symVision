@@ -17,7 +17,7 @@ import java.util.List;
 public class MapTvUtils {
     // compute MapTv from Map
     // conf default is 0.02
-    public static List<Tv> convToMapTv(IMap2d<Boolean> img, float conf) {
+    public static List<Tv> convToMapTv(IMap2d<Boolean> img, float conf, boolean onlyTrue) {
         List<Tv> res = new ArrayList<>();
         for(int iy=0;iy<img.getLength();iy++) for(int ix=0;ix<img.getWidth();ix++) {
             boolean val = img.readAt(iy,ix);
@@ -26,8 +26,15 @@ public class MapTvUtils {
                 res.add(new Tv(0.0f, conf));
             }
             else {
-                res.add(new Tv(0.0f, conf));
-                res.add(new Tv(1.0f, conf));
+                if (!onlyTrue) {
+                    res.add(new Tv(0.0f, conf));
+                    res.add(new Tv(1.0f, conf));
+                }
+                else {
+                    res.add(new Tv(0.0f, 0.0f));
+                    res.add(new Tv(0.0f, 0.0f));
+                }
+
             }
         }
         return res;
@@ -41,11 +48,28 @@ public class MapTvUtils {
         return res;
     }
 
+    public static Tv[] resemblance(Tv[] a, Tv[] b) {
+        Tv[] res = new Tv[a.length];
+        for(int idx=0;idx<a.length;idx++) {
+            res[idx] = Tv.resemblance(a[idx],b[idx]);
+        }
+        return res;
+    }
+
     // compute merged tv by revision
     public static Tv calcMergedTv(List<Tv> arr) {
         Tv res = arr.get(0);
         for(int idx=1; idx<arr.size();idx++) {
             res = Tv.revision(res, arr.get(idx));
+        }
+        return res;
+    }
+
+    // compute merged tv by revision
+    public static Tv calcMergedTv(Tv[] arr) {
+        Tv res = arr[0];
+        for(int idx=1; idx<arr.length;idx++) {
+            res = Tv.revision(res, arr[idx]);
         }
         return res;
     }

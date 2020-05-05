@@ -1,6 +1,8 @@
 package ptrman.misc;
 
 import org.apache.commons.math3.linear.ArrayRealVector;
+import ptrman.math.MapTvUtils;
+import ptrman.math.Tv;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,10 +33,15 @@ public class Classifier {
     // "NOCLASS" : was no class found?
     // "BELOWT" : was classification below thresold?
     // "OK" : all fine
-    public long classify(ArrayRealVector stimulus, boolean add) {
+    public long classify(Tv[] stimulus, boolean add) {
         bestCategorySimilarity = 0;
         lastClassfnMsg = "NOCLASS";
         long bestCategoryId = -1; // -1 : invalid
+
+        {
+            // for testing
+            //float d = calcDist(stimulus, stimulus);
+        }
 
         for(Category iCat : categories) {
             float d = calcDist(stimulus, iCat.examplars.get(0));
@@ -72,15 +79,27 @@ public class Classifier {
 
     // calculate distance of exemplars
     // assumes uniform weights for simplicity
-    public float calcDist(ArrayRealVector aArr, ArrayRealVector bArr) {
+    public float calcDist(Tv[] aArr, Tv[] bArr) {
+        /* old distance computation for real values
         float d = 0.0f;
-        for(int i=0;i<aArr.getDimension();i++) {
-            float w = 1.0f / aArr.getDimension(); // weight
-            float a = (float)aArr.getDataRef()[i];
-            float b = (float)bArr.getDataRef()[i];
-            d += (w*(float)Math.pow(Math.abs(a-b), r));
+        for(int i=0;i<aArr.length;i++) {
+            float w = 1.0f / aArr.length; // weight
+
+            float diff = 0.0f;
+            // old code for real values:
+            //float a = (float)aArr.getDataRef()[i];
+            //float b = (float)bArr.getDataRef()[i];
+            //diff = a-b;
+
+            d += (w*(float)Math.pow(Math.abs(diff), r));
         }
-        return (float)Math.pow(d, 1.0f / r);
+         */
+
+        Tv[] resemblance = MapTvUtils.resemblance(aArr, bArr); // how similar are they for each TV?
+        Tv merged = MapTvUtils.calcMergedTv(resemblance); // how similar are they as one TV?
+
+        //return (float)Math.pow(d, 1.0f / r);
+        return merged.freq;
     }
 
     // calculate similarity
@@ -91,16 +110,16 @@ public class Classifier {
 
     // contemporary called the "class"
     public static class Category {
-        public ArrayList<ArrayRealVector> examplars;
+        public ArrayList<Tv[]> examplars;
         public long categoryId;
 
-        public Category(ArrayList<ArrayRealVector> examplars, long categoryId) {
+        public Category(ArrayList<Tv[]> examplars, long categoryId) {
             this.examplars = examplars;
             this.categoryId = categoryId;
         }
 
-        public static Category makeSingleExemplar(ArrayRealVector ex, long categoryId) {
-            ArrayList<ArrayRealVector> arr = new ArrayList<>();
+        public static Category makeSingleExemplar(Tv[] ex, long categoryId) {
+            ArrayList<Tv[]> arr = new ArrayList<>();
             arr.add(ex);
             return new Category(arr, categoryId);
         }

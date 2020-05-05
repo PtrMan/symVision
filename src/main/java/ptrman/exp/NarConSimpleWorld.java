@@ -203,7 +203,7 @@ public class NarConSimpleWorld extends PApplet {
     public NarConSimpleWorld() {
         { // configure classifier
             classifier = new Classifier();
-            classifier.minSimilarity = 0.87f;
+            classifier.minSimilarity = 0.8f;
         }
 
         // TODO < decide path based on OS >
