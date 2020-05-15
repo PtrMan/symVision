@@ -130,7 +130,7 @@ public class VisualizationDrawer {
     // used to transfer narsese relationships
     public static List<String> relN = new ArrayList<>();
 
-    public void drawPrimitives(Solver2 solver, PApplet applet, TvClassifier classifier, Classifier realClassifier) {
+    public void drawPrimitives(Solver2 solver, PApplet applet, TvClassifier classifier, Classifier realClassifier, Classifier microfoveaClassifier) {
         // * draw primitives for edges
 
         if (drawVisProcessHEdge) {
@@ -279,11 +279,11 @@ public class VisualizationDrawer {
 
                         // classify stimulus
                         System.out.println("TODO - classify fovea sample with microFaveaClassifier");
-
+                        long microfoveaCategory = microfoveaClassifier.classify(stimulus, true);
 
                         // * draw microfovea classification (for debugging)
                         applet.fill(0,255,0);
-                        applet.text("c=", (int)foveaPosX, (int)foveaPosY);
+                        applet.text(""+microfoveaCategory, (int)foveaPosX, (int)foveaPosY);
                     }
                 }
             }

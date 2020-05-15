@@ -173,7 +173,7 @@ public class VisualizeLinesegmentsAnnealing extends PApplet {
             drawer.drawDetectors(solver2, this);
         }
         else if(stateName.equals("showPrimitives")) { // are we shwoing the primitives?
-            drawer.drawPrimitives(solver2, this, null, null);
+            drawer.drawPrimitives(solver2, this, null, null, null);
         }
 
         // mouse cursor
