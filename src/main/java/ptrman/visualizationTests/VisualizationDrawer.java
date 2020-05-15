@@ -245,7 +245,7 @@ public class VisualizationDrawer {
                 applet.rect((int)iBB.minx, (int) iBB.miny, (int)(iBB.maxx-iBB.minx), (int)(iBB.maxy-iBB.miny));
             }
 
-
+            List<Classification> microfoveaClassifications = new ArrayList<>();
 
             // PROCESSING<
             //    we sample the image with a fovea and put the classifications into a array.
@@ -278,8 +278,8 @@ public class VisualizationDrawer {
                         }
 
                         // classify stimulus
-                        System.out.println("TODO - classify fovea sample with microFaveaClassifier");
                         long microfoveaCategory = microfoveaClassifier.classify(stimulus, true);
+                        microfoveaClassifications.add(new Classification( (int)foveaPosX, (int)foveaPosY,microfoveaCategory));
 
                         // * draw microfovea classification (for debugging)
                         applet.fill(0,255,0);
@@ -391,6 +391,56 @@ public class VisualizationDrawer {
                     // * draw classification (for debugging)
                     applet.fill(255);
                     applet.text("c="+categoryId, bestCenterX-32/2, bestCenterY-32/2);
+
+
+                    // we need to learn the appearance of the object from the proposal
+                    // * select microfovea classiications which are inside proposal
+                    // * classify with multilayer classifier - one layer for each category of the sample from the microfovea
+                    {
+                        Bb proposal = iBB;
+
+                        List<Classification> microfoveaClassificationsInsideFovea = new ArrayList<>();
+
+                        for(Classification iClsfn:microfoveaClassifications) {
+                            boolean isInsideProposal = proposal.minx <= iClsfn.posX && iClsfn.posX <= proposal.maxx;
+                            isInsideProposal = isInsideProposal && proposal.miny <= iClsfn.posY && iClsfn.posY <= proposal.maxy;
+                            if(isInsideProposal) {
+                                microfoveaClassificationsInsideFovea.add(iClsfn);
+                            }
+                        }
+
+                        // translate image of microfovea by painting to a map
+                        int multilayerMapSize = 32; // sie of the maps of the multilayers for microfovea classification
+                        Map<Long, IMap2d<Boolean>> mapByMicrofoveaCategory = new HashMap<>();
+                        {
+                            for(Classification iMicrofovClsfn:microfoveaClassificationsInsideFovea) { // iterate over all microfovea classifications inside proposal
+                                boolean containsCategory = mapByMicrofoveaCategory.containsKey(iMicrofovClsfn.category);
+                                if (!containsCategory) {
+                                    mapByMicrofoveaCategory.put(iMicrofovClsfn.category, new Map2d<>(multilayerMapSize,multilayerMapSize));
+                                }
+
+                                int relPosX = (int)(iMicrofovClsfn.posX - (proposal.maxx+proposal.minx)*0.5f); // calc relative position to center of proposal
+                                int relPosY = (int)(iMicrofovClsfn.posY - (proposal.maxy+proposal.miny)*0.5f); // calc relative position to center of proposal
+                                IMap2d<Boolean> selCategoryMap = mapByMicrofoveaCategory.get(iMicrofovClsfn.category); // fetch selected map
+
+                                // * paint
+                                int posInMapX = relPosX + multilayerMapSize/2;
+                                int posInMapY = relPosY + multilayerMapSize/2;
+                                if(selCategoryMap.inBounds(posInMapX,posInMapY) && selCategoryMap.inBounds(posInMapX+1,posInMapY+1) ) {
+                                    selCategoryMap.setAt(posInMapX,posInMapY,true);
+                                    selCategoryMap.setAt(posInMapX+1,posInMapY,true);
+                                    selCategoryMap.setAt(posInMapX,posInMapY+1,true);
+                                    selCategoryMap.setAt(posInMapX+1,posInMapY+1,true);
+                                }
+                            }
+                        }
+
+                        // * do actual classification with multilayer classifier
+
+                        System.out.println("TODO - classify with multilayer classifier");
+
+
+                    }
                 }
 
                 if(verbose) System.out.println("FRAME END");
