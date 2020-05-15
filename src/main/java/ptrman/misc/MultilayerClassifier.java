@@ -1,7 +1,5 @@
 package ptrman.misc;
 
-import ptrman.Datastructures.IMap2d;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,7 +21,7 @@ public class MultilayerClassifier {
     public float minSimilarity = 0.0f; // minimal similarity to create new category
 
     // categories/classes
-    public List<Category> categories = new ArrayList<>();
+    public Map<Long, Category> categories = new HashMap<>();
 
     public long categoryIdCounter = 1;
 
@@ -48,8 +46,8 @@ public class MultilayerClassifier {
             //float d = calcDist(stimulus, stimulus);
         }
 
-        for(Category iCat : categories) {
-            float d = calcDist(stimulus, iCat.examplars.get(0));
+        for(Category iCat : categories.values()) {
+            float d = calcDist(stimulus, iCat.exemplar);
             float sim = calcSim(d);
             if (sim > bestCategorySimilarity) {
                 lastClassfnMsg = "BELOWT";
@@ -67,12 +65,12 @@ public class MultilayerClassifier {
         if (add && bestCategorySimilarity == Float.POSITIVE_INFINITY) { // was no class found?
             // add new one
             bestCategoryId = categoryIdCounter++;
-            categories.add(Category.makeSingleExemplar(stimulus, bestCategoryId));
+            categories.put(bestCategoryId, Category.makeSingleExemplar(stimulus, bestCategoryId));
         }
         else if (add && bestCategorySimilarity < minSimilarity) { // was no close enough category found?
             // add new one
             bestCategoryId = categoryIdCounter++;
-            categories.add(Category.makeSingleExemplar(stimulus, bestCategoryId));
+            categories.put(bestCategoryId, Category.makeSingleExemplar(stimulus, bestCategoryId));
         }
 
         return bestCategoryId;
@@ -130,6 +128,49 @@ public class MultilayerClassifier {
         return merged.freq;
     }
 
+    public static Map<Long, List<Tv>> revise(Map<Long, List<Tv>> a, Map<Long, List<Tv>> b) {
+        Map<Long, Integer> commonCounter = new HashMap<>();
+        for(long ia : a.keySet()) {
+            if(!commonCounter.containsKey(ia)) {
+                commonCounter.put(ia, 0);
+            }
+            commonCounter.put(ia, commonCounter.get(ia)+1); // count up
+        }
+        for(long ib : b.keySet()) {
+            if(!commonCounter.containsKey(ib)) {
+                commonCounter.put(ib, 0);
+            }
+            commonCounter.put(ib, commonCounter.get(ib)+1); // count up
+        }
+
+        Map<Long, List<Tv>> merged = new HashMap<>();
+
+        // merge by uncommon keys
+        for(Map.Entry<Long, Integer> iKeyVal : commonCounter.entrySet()) {
+            long key = iKeyVal.getKey();
+            int cnt = iKeyVal.getValue();
+            if(cnt == 1) { // is not common?
+               if (a.containsKey(key)) { // is it in a?
+                    merged.put(key, a.get(key));
+               }
+               else { // must be in b
+                   merged.put(key, b.get(key));
+               }
+            }
+        }
+
+        // revise by common keys
+        for(Map.Entry<Long, Integer> iKeyVal : commonCounter.entrySet()) {
+            long key = iKeyVal.getKey();
+            int cnt = iKeyVal.getValue();
+            if(cnt == 2) { // is not common?
+                merged.put(key, MapTvUtils.revision(a.get(key), b.get(key)));
+            }
+        }
+
+        return merged;
+    }
+
     // calculate similarity
     // /param d distance
     public float calcSim(float d) {
@@ -138,18 +179,16 @@ public class MultilayerClassifier {
 
     // contemporary called the "class"
     public static class Category {
-        public ArrayList<Map<Long, List<Tv>>> examplars;
+        public Map<Long, List<Tv>> exemplar;
         public long categoryId;
 
-        public Category(ArrayList<Map<Long, List<Tv>>> examplars, long categoryId) {
-            this.examplars = examplars;
+        public Category(Map<Long, List<Tv>> examplar, long categoryId) {
+            this.exemplar = examplar;
             this.categoryId = categoryId;
         }
 
         public static Category makeSingleExemplar(Map<Long, List<Tv>> ex, long categoryId) {
-            ArrayList<Map<Long, List<Tv>>> arr = new ArrayList<>();
-            arr.add(ex);
-            return new Category(arr, categoryId);
+            return new Category(ex, categoryId);
         }
     }
 }

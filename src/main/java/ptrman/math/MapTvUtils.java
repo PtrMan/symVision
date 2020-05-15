@@ -57,6 +57,14 @@ public class MapTvUtils {
         return res;
     }
 
+    public static List<Tv> revision(List<Tv> a, List<Tv> b) {
+        List<Tv> res = new ArrayList<>();
+        for(int idx=0;idx<a.size();idx++) {
+            res.add(Tv.revision(a.get(idx),b.get(idx)));
+        }
+        return res;
+    }
+
     // compute merged tv by revision
     public static Tv calcMergedTv(List<Tv> arr) {
         Tv res = arr.get(0);

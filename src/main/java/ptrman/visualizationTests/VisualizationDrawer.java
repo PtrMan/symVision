@@ -444,11 +444,21 @@ public class VisualizationDrawer {
                             }
                         }
 
-                        // * do actual classification with multilayer classifier
-                        long byMicrofoveaCategory = byMicrofoveaClassifier.classify(convToTvMap(mapByMicrofoveaCategory), true);
+                        // update classification
+                        if( byMicrofoveaClassifier.categories.containsKey(categoryId) ) {
+                            MultilayerClassifier.Category premise = byMicrofoveaClassifier.categories.get(categoryId);
+                            premise.exemplar = MultilayerClassifier.revise(premise.exemplar, convToTvMap(mapByMicrofoveaCategory)); // revision
+                        }
+                        else {
+                            // add it
+                            byMicrofoveaClassifier.categories.put(categoryId, MultilayerClassifier.Category.makeSingleExemplar(convToTvMap(mapByMicrofoveaCategory), categoryId));
+                        }
 
-                        applet.fill(255,0,0);
-                        applet.text("\r\nmfc="+byMicrofoveaCategory, bestCenterX-32/2, bestCenterY-32/2);
+                        // * do actual classification with multilayer classifier
+                        //long byMicrofoveaCategory = byMicrofoveaClassifier.classify(convToTvMap(mapByMicrofoveaCategory), true);
+
+                        //applet.fill(255,0,0);
+                        //applet.text("\r\nmfc="+byMicrofoveaCategory, bestCenterX-32/2, bestCenterY-32/2);
 
 
                     }
