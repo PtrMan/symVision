@@ -19,6 +19,7 @@ import ptrman.bpsolver.Solver;
 import ptrman.bpsolver.Solver2;
 import ptrman.misc.Classifier;
 import ptrman.misc.ImageConverter;
+import ptrman.misc.TvClassifier;
 import ptrman.visualizationTests.VisualizationDrawer;
 
 import java.awt.*;
@@ -90,7 +91,7 @@ public class NarConSimpleWorld extends PApplet {
     public static int hits = 0;
     public static int misses = 0;
 
-    public static Classifier classifier;
+    public static TvClassifier classifier;
 
 
     public static boolean useRngAgent = false; // use random action agent? used for testing
@@ -202,7 +203,7 @@ public class NarConSimpleWorld extends PApplet {
 
     public NarConSimpleWorld() {
         { // configure classifier
-            classifier = new Classifier();
+            classifier = new TvClassifier();
             classifier.minSimilarity = 0.8f;
         }
 

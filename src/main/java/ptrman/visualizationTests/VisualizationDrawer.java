@@ -20,6 +20,7 @@ import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.Tv;
 import ptrman.misc.Classifier;
+import ptrman.misc.TvClassifier;
 
 import java.io.IOException;
 import java.net.*;
@@ -129,7 +130,7 @@ public class VisualizationDrawer {
     // used to transfer narsese relationships
     public static List<String> relN = new ArrayList<>();
 
-    public void drawPrimitives(Solver2 solver, PApplet applet, Classifier classifier) {
+    public void drawPrimitives(Solver2 solver, PApplet applet, TvClassifier classifier) {
         // * draw primitives for edges
 
         if (drawVisProcessHEdge) {
