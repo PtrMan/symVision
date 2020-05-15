@@ -92,6 +92,7 @@ public class NarConSimpleWorld extends PApplet {
     public static int misses = 0;
 
     public static TvClassifier classifier;
+    public static Classifier realClassifier; // classifier which is using real numbers
 
 
     public static boolean useRngAgent = false; // use random action agent? used for testing
@@ -205,6 +206,9 @@ public class NarConSimpleWorld extends PApplet {
         { // configure classifier
             classifier = new TvClassifier();
             classifier.minSimilarity = 0.8f;
+
+            realClassifier = new Classifier();
+            realClassifier.minSimilarity = 0.87f;
         }
 
         // TODO < decide path based on OS >
@@ -559,7 +563,7 @@ public class NarConSimpleWorld extends PApplet {
         }
 
         if(useVision) { // we only draw if we have vision
-            drawer.drawPrimitives(solver2, this, classifier);
+            drawer.drawPrimitives(solver2, this, classifier, realClassifier);
         }
 
 

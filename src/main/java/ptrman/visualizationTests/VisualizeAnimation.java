@@ -131,7 +131,7 @@ public class VisualizeAnimation extends PApplet {
             tint(255.0f, 255.0f); // reset tint
         }
 
-        drawer.drawPrimitives(solver2, this, null);
+        drawer.drawPrimitives(solver2, this, null, null);
 
 
         // mouse cursor
