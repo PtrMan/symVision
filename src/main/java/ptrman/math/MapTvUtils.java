@@ -20,7 +20,8 @@ public class MapTvUtils {
     public static List<Tv> convToMapTv(IMap2d<Boolean> img, float conf, boolean onlyTrue) {
         List<Tv> res = new ArrayList<>();
         for(int iy=0;iy<img.getLength();iy++) for(int ix=0;ix<img.getWidth();ix++) {
-            boolean val = img.readAt(iy,ix);
+            Boolean val2 = img.readAt(iy,ix);
+            boolean val = val2 != null ? val2 : false;
             if (val) {
                 res.add(new Tv(1.0f, conf));
                 res.add(new Tv(0.0f, conf));
@@ -40,10 +41,10 @@ public class MapTvUtils {
         return res;
     }
 
-    public static List<Tv> resemblance(List<Tv> a, List<Tv> b) {
-        List<Tv> res = new ArrayList<>();
+    public static Tv[] resemblance(List<Tv> a, List<Tv> b) {
+        Tv[] res = new Tv[a.size()];
         for(int idx=0;idx<a.size();idx++) {
-            res.add(Tv.resemblance(a.get(idx),b.get(idx)));
+            res[idx] = Tv.resemblance(a.get(idx),b.get(idx));
         }
         return res;
     }

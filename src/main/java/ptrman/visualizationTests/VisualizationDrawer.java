@@ -20,11 +20,14 @@ import ptrman.levels.retina.*;
 import ptrman.levels.retina.helper.ProcessConnector;
 import ptrman.math.Tv;
 import ptrman.misc.Classifier;
+import ptrman.misc.MultilayerClassifier;
 import ptrman.misc.TvClassifier;
 
 import java.io.IOException;
 import java.net.*;
 import java.util.*;
+
+import static ptrman.math.MapTvUtils.convToMapTv;
 
 /**
  * encapsulates functionality to draw visualizations for showcase and debugging
@@ -130,7 +133,13 @@ public class VisualizationDrawer {
     // used to transfer narsese relationships
     public static List<String> relN = new ArrayList<>();
 
+
+    // TODO< move to vision class >
+    MultilayerClassifier byMicrofoveaClassifier = new MultilayerClassifier();
+
     public void drawPrimitives(Solver2 solver, PApplet applet, TvClassifier classifier, Classifier realClassifier, Classifier microfoveaClassifier) {
+        byMicrofoveaClassifier.minSimilarity = 0.6f; //0.9f; // TODO< tune >
+
         // * draw primitives for edges
 
         if (drawVisProcessHEdge) {
@@ -254,7 +263,7 @@ public class VisualizationDrawer {
             {
                 Random rng = new Random();
 
-                int microFoveaSamples = 10;
+                int microFoveaSamples = 40;
                 for(int iFoveaSample=0;iFoveaSample<microFoveaSamples;iFoveaSample++) {
                     // pick random proposal to sample from
                     if(allBbs.size() > 0) {
@@ -436,8 +445,10 @@ public class VisualizationDrawer {
                         }
 
                         // * do actual classification with multilayer classifier
+                        long byMicrofoveaCategory = byMicrofoveaClassifier.classify(convToTvMap(mapByMicrofoveaCategory), true);
 
-                        System.out.println("TODO - classify with multilayer classifier");
+                        applet.fill(255,0,0);
+                        applet.text("\r\nmfc="+byMicrofoveaCategory, bestCenterX-32/2, bestCenterY-32/2);
 
 
                     }
@@ -592,6 +603,16 @@ public class VisualizationDrawer {
         }
 
 
+    }
+
+    private Map<Long, List<Tv>> convToTvMap(Map<Long, IMap2d<Boolean>> arg) {
+        Map<Long, List<Tv>> res = new HashMap<>();
+        for(Map.Entry<Long, IMap2d<Boolean>> iKeyVal:arg.entrySet()) {
+            long key = iKeyVal.getKey();
+            IMap2d<Boolean> map = iKeyVal.getValue();
+            res.put(key,convToMapTv(map, 0.02f, false));
+        }
+        return res;
     }
 
     // helper

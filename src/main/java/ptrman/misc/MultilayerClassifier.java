@@ -1,5 +1,10 @@
 package ptrman.misc;
 
+import ptrman.Datastructures.IMap2d;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import ptrman.math.MapTvUtils;
 import ptrman.math.Tv;
 
@@ -7,8 +12,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 // see https://www.foundalis.com/res/Unification_of_Clustering_Concept_Formation_Categorization_and_Analogy_Making.pdf
+// TODO< implement revision with a flag, only with found best category above threshold! >
 // TODO< implement categories with multiple exemplars >
-public class TvClassifier {
+public class MultilayerClassifier {
     public float r = 2.0f; // used to compute distance
 
     public float q = 1.5f; // used for computing similarity
@@ -32,7 +38,7 @@ public class TvClassifier {
     // "NOCLASS" : was no class found?
     // "BELOWT" : was classification below thresold?
     // "OK" : all fine
-    public long classify(Tv[] stimulus, boolean add) {
+    public long classify(Map<Long, List<Tv>> stimulus, boolean add) {
         bestCategorySimilarity = 0;
         lastClassfnMsg = "NOCLASS";
         long bestCategoryId = -1; // -1 : invalid
@@ -72,32 +78,55 @@ public class TvClassifier {
         return bestCategoryId;
     }
 
+    // computes distance between exemplars, in this case maps of TV's
+    public static float calcDist(Map<Long, List<Tv>> a, Map<Long, List<Tv>> b) {
 
-    ////////////////
-    // "low level"
+        // we can only compute overlaps when there are same classes
 
-    // calculate distance of exemplars
-    // assumes uniform weights for simplicity
-    public static float calcDist(Tv[] aArr, Tv[] bArr) {
-        /* old distance computation for real values
-        float d = 0.0f;
-        for(int i=0;i<aArr.length;i++) {
-            float w = 1.0f / aArr.length; // weight
-
-            float diff = 0.0f;
-            // old code for real values:
-            //float a = (float)aArr.getDataRef()[i];
-            //float b = (float)bArr.getDataRef()[i];
-            //diff = a-b;
-
-            d += (w*(float)Math.pow(Math.abs(diff), r));
+        Map<Long, Integer> commonCounter = new HashMap<>();
+        for(long ia : a.keySet()) {
+            if(!commonCounter.containsKey(ia)) {
+                commonCounter.put(ia, 0);
+            }
+            commonCounter.put(ia, commonCounter.get(ia)+1); // count up
         }
-         */
+        for(long ib : b.keySet()) {
+            if(!commonCounter.containsKey(ib)) {
+                commonCounter.put(ib, 0);
+            }
+            commonCounter.put(ib, commonCounter.get(ib)+1); // count up
+        }
 
-        Tv[] resemblance = MapTvUtils.resemblance(aArr, bArr); // how similar are they for each TV?
+        List<Tv> alist = new ArrayList<>();
+        List<Tv> blist = new ArrayList<>();
+
+        // compose by common keys
+        for(Map.Entry<Long, Integer> iKeyVal : commonCounter.entrySet()) {
+            long key = iKeyVal.getKey();
+            int cnt = iKeyVal.getValue();
+            if(cnt == 2) { // is common?
+                List<Tv> amap = a.get(key);
+                List<Tv> bmap = b.get(key);
+                alist.addAll(amap);
+                blist.addAll(bmap);
+            }
+        }
+        // compose by uncommon keys
+        for(Map.Entry<Long, Integer> iKeyVal : commonCounter.entrySet()) {
+            long key = iKeyVal.getKey();
+            int cnt = iKeyVal.getValue();
+            if(cnt == 1) { // is not common?
+                alist.add(new Tv(0.0f, 0.02f));
+                alist.add(new Tv(0.0f, 0.02f));
+                blist.add(new Tv(0.0f, 0.02f));
+                blist.add(new Tv(0.0f, 0.02f));
+            }
+        }
+
+        // fold
+        Tv[] resemblance = MapTvUtils.resemblance(alist, blist); // how similar are they for each TV?
         Tv merged = MapTvUtils.calcMergedTv(resemblance); // how similar are they as one TV?
 
-        //return (float)Math.pow(d, 1.0f / r);
         return merged.freq;
     }
 
@@ -109,16 +138,16 @@ public class TvClassifier {
 
     // contemporary called the "class"
     public static class Category {
-        public ArrayList<Tv[]> examplars;
+        public ArrayList<Map<Long, List<Tv>>> examplars;
         public long categoryId;
 
-        public Category(ArrayList<Tv[]> examplars, long categoryId) {
+        public Category(ArrayList<Map<Long, List<Tv>>> examplars, long categoryId) {
             this.examplars = examplars;
             this.categoryId = categoryId;
         }
 
-        public static Category makeSingleExemplar(Tv[] ex, long categoryId) {
-            ArrayList<Tv[]> arr = new ArrayList<>();
+        public static Category makeSingleExemplar(Map<Long, List<Tv>> ex, long categoryId) {
+            ArrayList<Map<Long, List<Tv>>> arr = new ArrayList<>();
             arr.add(ex);
             return new Category(arr, categoryId);
         }
