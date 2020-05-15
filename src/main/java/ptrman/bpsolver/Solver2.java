@@ -11,6 +11,7 @@ package ptrman.bpsolver;
 
 import ptrman.Datastructures.Dag;
 import ptrman.Datastructures.IMap2d;
+import ptrman.Datastructures.Map2d;
 import ptrman.Datastructures.Vector2d;
 import ptrman.bindingNars.NarsBinding;
 import ptrman.bindingNars.OpenNarsNarseseConsumer;
@@ -50,6 +51,9 @@ public class Solver2 {
     public IMap2d<Boolean> mapBoolean; // boolean "main" map
 
     private Vector2d<Integer> imageSize;
+
+    public IMap2d<Float>[] bluredEdges; // blured edges, source is raw edge signal without discretiation and threshold etc
+    public IMap2d<Float>[] edges; // real valued edges, source is raw edge signal without discretiation and threshold etc
 
     public Solver2() {
         processD = new ProcessD();
@@ -121,10 +125,29 @@ public class Solver2 {
             edgeDetectors[i] = new Map2dApplyConvolution(Convolution2dHelper.calcGaborKernel(8, (float)i/(float)numberOfEdgeDetectorDirections * 2.0f * (float)Math.PI, 10.0f/64.0f, (float)Math.PI*0.5f, 0.4f));
         }
 
-        IMap2d<Float>[] edges = new IMap2d[numberOfEdgeDetectorDirections];
+        edges = new IMap2d[numberOfEdgeDetectorDirections];
         for(int i=0; i<numberOfEdgeDetectorDirections;i++) { // detect edges with filters
             edges[i] = edgeDetectors[i].process(mapGrayscale);
         }
+
+        // blur edges
+        bluredEdges = new IMap2d[numberOfEdgeDetectorDirections];
+        for(int mapidx=0; mapidx<numberOfEdgeDetectorDirections;mapidx++) {
+            IMap2d<Float> iSrc = edges[mapidx];
+            bluredEdges[mapidx] = new Map2d<>(iSrc.getWidth(),iSrc.getLength());
+            for(int iy=0;iy<iSrc.getLength()/4;iy++) {
+                for(int ix=0;ix<iSrc.getWidth()/4;ix++) {
+                    float sum=0.0f;
+                    for(int idy=0;idy<4;idy++) {
+                        for(int idx=0;idx<4;idx++) {
+                            sum += (iSrc.readAt(ix*4+idx,iy*4+idy));
+                        }
+                    }
+                    bluredEdges[mapidx].setAt(ix,iy,sum/(4*4));
+                }
+            }
+        }
+
 
         ProcessA[] processAEdge = new ProcessA[numberOfEdgeDetectorDirections];
         processDEdge = new ProcessD[numberOfEdgeDetectorDirections];

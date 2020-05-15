@@ -245,6 +245,52 @@ public class VisualizationDrawer {
                 applet.rect((int)iBB.minx, (int) iBB.miny, (int)(iBB.maxx-iBB.minx), (int)(iBB.maxy-iBB.miny));
             }
 
+
+
+            // PROCESSING<
+            //    we sample the image with a fovea and put the classifications into a array.
+            //
+            // >
+            {
+                Random rng = new Random();
+
+                int microFoveaSamples = 10;
+                for(int iFoveaSample=0;iFoveaSample<microFoveaSamples;iFoveaSample++) {
+                    // pick random proposal to sample from
+                    if(allBbs.size() > 0) {
+                        int bbIdx = rng.nextInt(allBbs.size());
+                        Bb bb = allBbs.get(bbIdx);
+
+                        double foveaPosX = bb.minx + rng.nextFloat()*(bb.maxx-bb.minx);
+                        double foveaPosY = bb.miny + rng.nextFloat()*(bb.maxy-bb.miny);
+
+                        ArrayRealVector stimulus = new ArrayRealVector();
+                        { // build stimulus array
+                            for(int iEdgeIdx=0;iEdgeIdx<solver.bluredEdges.length;iEdgeIdx++) {
+                                // sharp central stimulus, small focal area
+                                ArrayRealVector stimulusSharp = realFloatCropEdgeMapsAndConcatToVecAt(solver.edges, (int)foveaPosX, (int)foveaPosY, 16, 16); // extract cropped image
+                                stimulus = new ArrayRealVector(stimulus, stimulusSharp); // append
+                                // blured central stimulus, larger focal area
+                                // NOTE< pixels are 4x4 large, so area is large >
+                                ArrayRealVector stimulusBlurred = realFloatCropEdgeMapsAndConcatToVecAt(solver.bluredEdges, (int)foveaPosX/4, (int)foveaPosY/4, 6, 6); // extract cropped image
+                                stimulus = new ArrayRealVector(stimulus, stimulusBlurred); // append
+                            }
+                        }
+
+                        // classify stimulus
+                        System.out.println("TODO - classify fovea sample with microFaveaClassifier");
+
+
+                        // * draw microfovea classification (for debugging)
+                        applet.fill(0,255,0);
+                        applet.text("c=", (int)foveaPosX, (int)foveaPosY);
+                    }
+                }
+            }
+
+
+
+
             List<Classification> classifications = new ArrayList<>();
 
             if (classifier != null) { // is classification enabled?
@@ -292,7 +338,7 @@ public class VisualizationDrawer {
 
                     // simulate convolution by finding best classification in proximity
 
-                    ArrayRealVector stimulus = realCropEdgeMapsAndConcatToVecAt(edgeMaps, (int)centerX, (int)centerY, 32, 32); // extract cropped image
+                    ArrayRealVector stimulus = realBoolCropEdgeMapsAndConcatToVecAt(edgeMaps, (int)centerX, (int)centerY, 32, 32); // extract cropped image
                     realClassifier.classify(stimulus, false);
                     int bestCenterX = (int)centerX;
                     int bestCenterY = (int)centerY;
@@ -304,7 +350,7 @@ public class VisualizationDrawer {
                             int thisCenterX = (int)centerX+dx;
                             int thisCenterY = (int)centerY+dy;
 
-                            ArrayRealVector stimulus2 = realCropEdgeMapsAndConcatToVecAt(edgeMaps, (int)centerX, (int)centerY, 32, 32); // extract cropped image
+                            ArrayRealVector stimulus2 = realBoolCropEdgeMapsAndConcatToVecAt(edgeMaps, (int)centerX, (int)centerY, 32, 32); // extract cropped image
                             realClassifier.classify(stimulus2, false);
                             float thisSim = realClassifier.bestCategorySimilarity;
                             if (thisSim > bestSimilarity) {
@@ -331,7 +377,7 @@ public class VisualizationDrawer {
                     // * classify
                     long t0 = System.nanoTime();
 
-                    stimulus = realCropEdgeMapsAndConcatToVecAt(edgeMaps, (int)bestCenterX, (int)bestCenterY, 32, 32); // extract cropped image
+                    stimulus = realBoolCropEdgeMapsAndConcatToVecAt(edgeMaps, (int)bestCenterX, (int)bestCenterY, 32, 32); // extract cropped image
                     long categoryId = realClassifier.classify(stimulus, true);
                     float thisClassificationSim = realClassifier.bestCategorySimilarity;
 
@@ -500,7 +546,7 @@ public class VisualizationDrawer {
 
     // helper
     // reads crops from edge maps and concatenate it all to a single vector for classification
-    static ArrayRealVector realCropEdgeMapsAndConcatToVecAt(IMap2d<Boolean>[] edgeMaps, int centerX, int centerY, int width, int height) {
+    static ArrayRealVector realBoolCropEdgeMapsAndConcatToVecAt(IMap2d<Boolean>[] edgeMaps, int centerX, int centerY, int width, int height) {
         ArrayRealVector dest = new ArrayRealVector(edgeMaps.length*width*height);
         int destIdx = 0; // index in dest
 
@@ -510,6 +556,26 @@ public class VisualizationDrawer {
                     if (iEdgeMap.inBounds(ix, iy)) {
                         boolean v = iEdgeMap.readAt(ix, iy);
                         dest.setEntry(destIdx, v ? 1 : 0);
+                    }
+                    destIdx++;
+                }
+            }
+        }
+
+        return dest;
+    }
+    static ArrayRealVector realFloatCropEdgeMapsAndConcatToVecAt(IMap2d<Float>[] edgeMaps, int centerX, int centerY, int width, int height) {
+        ArrayRealVector dest = new ArrayRealVector(edgeMaps.length*width*height);
+        int destIdx = 0; // index in dest
+
+        for(IMap2d<Float> iEdgeMap : edgeMaps) {
+            for(int ix=centerX-width/2;ix<centerX+width/2;ix++) {
+                for(int iy=centerY-height/2;iy<centerY+height/2;iy++) {
+                    if (iEdgeMap.inBounds(ix, iy)) {
+                        Float v = iEdgeMap.readAt(ix, iy);
+                        if(v!=null) { // necessary because it speeds up the code because we don't need to initialize all values
+                            dest.setEntry(destIdx, v);
+                        }
                     }
                     destIdx++;
                 }
