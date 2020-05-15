@@ -138,7 +138,7 @@ public class VisualizationDrawer {
     MultilayerClassifier byMicrofoveaClassifier = new MultilayerClassifier();
 
     public void drawPrimitives(Solver2 solver, PApplet applet, TvClassifier classifier, Classifier realClassifier, Classifier microfoveaClassifier) {
-        byMicrofoveaClassifier.minSimilarity = 0.6f; //0.9f; // TODO< tune >
+        byMicrofoveaClassifier.minSimilarity = 0.1f; //0.9f; // TODO< tune >
 
         // * draw primitives for edges
 
