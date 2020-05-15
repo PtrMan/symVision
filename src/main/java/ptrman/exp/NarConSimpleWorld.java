@@ -311,6 +311,8 @@ public class NarConSimpleWorld extends PApplet {
 
         if ((t%3) == 0) { // send status not to often
             { // send to NARS
+                boolean isAnythingVisible = false;
+
                 String thisNarsese = "";
                 for(String iN : VisualizationDrawer.relN) {
                     thisNarsese += iN + "\n";
@@ -319,9 +321,17 @@ public class NarConSimpleWorld extends PApplet {
                     // iterate over narsese sentences to send
                     for(String iN : VisualizationDrawer.relN) {
                         sendText(iN, false);
+                        isAnythingVisible = true;
                     }
                 }
                 lastNarsese = thisNarsese;
+
+                if (!isAnythingVisible) {
+                    // HACK< send a pseudo observation to NARS so it can at least learn pong etc >
+                    // we need this because NARS doesn't receive any input when there are no relations present.
+                    // this is the case when bat and ball are overlaping.
+                    sendText("<nothing0 --> nothing>. :|:", false);
+                }
             }
         }
 
